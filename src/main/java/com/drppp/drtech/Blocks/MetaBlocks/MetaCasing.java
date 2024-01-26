@@ -1,0 +1,53 @@
+package com.drppp.drtech.Blocks.MetaBlocks;
+
+
+import com.drppp.drtech.DrTechMain;
+import gregtech.api.block.VariantBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+
+import javax.annotation.Nonnull;
+
+public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
+
+    public MetaCasing() {
+        super(Material.IRON);
+        setTranslationKey("Meta_Machine_Casing");
+        setHardness(2.0f);
+        setResistance(5.0f);
+        setSoundType(SoundType.METAL);
+        setHarvestLevel("wrench", 2);
+        setDefaultState(getState(MetalCasingType.GRAVITATION_FIELD_CASING));
+        setRegistryName("meta_machine_casing");
+        setCreativeTab(DrTechMain.Mytab);
+    }
+
+    @Override
+    public boolean canCreatureSpawn(@Nonnull IBlockState state, @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull EntityLiving.SpawnPlacementType type) {
+        return false;
+    }
+
+    public enum MetalCasingType implements IStringSerializable {
+
+        GRAVITATION_FIELD_CASING("gravitation_field_casing");
+
+        private final String name;
+
+        MetalCasingType(String name) {
+            this.name = name;
+        }
+
+        @Nonnull
+        @Override
+        public String getName() {
+            return this.name;
+        }
+
+    }
+
+}

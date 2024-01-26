@@ -1,0 +1,15 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "gravitation_field_casing": {
+        "textures": {
+          "all": "drtech:blocks/gravitation_field_casing"
+        }
+      }
+    }
+  }
+}

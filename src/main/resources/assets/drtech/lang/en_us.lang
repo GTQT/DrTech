@@ -1,0 +1,26 @@
+tile.drtech.gravitational_anomaly.name=Gravitational Anomaly
+itemGroup.mytab=MyTab
+
+metaitem.energy_element_1.name=Energy Element One
+metaitem.energy_element_2.name=Energy Element Two
+metaitem.energy_element_3.name=Energy Element Three
+metaitem.energy_element_4.name=Energy Element Four
+metaitem.energy_element_5.name=Energy Element Five
+#Glasses
+tile.glasses_casing.ti_boron_silicate_glass_block.name=Ti Boron Silicate GLASS
+tile.glasses_casing.w_boron_silicate_glass_block.name=W Boron Silicate GLASS
+tile.glasses_casing.cr_boron_silicate_glass_block.name=CR Boron Silicate GLASS
+tile.glasses_casing.thy_boron_silicate_glass_block.name=ThYBoron Silicate GLASS
+tile.glasses_casing.ir_boron_silicate_glass_block.name=IR Boron Silicate GLASS
+tile.glasses_casing.os_boron_silicate_glass_block.name=OS Boron Silicate GLASS
+tile.glasses_casing.ne_boron_silicate_glass_block.name=NE Boron Silicate GLASS
+tile.glasses_casing.sne_boron_silicate_glass_block.name=SpaceNE Boron Silicate GLASS
+#MetaCasing
+tile.Meta_Machine_Casing.gravitation_field_casing.name=Gravitation Field Casing
+#Machine
+drtech.machine.annihilation_generator.name=Annihilation Generator
+
+
+drtech.machine.annihilation_generator.tooltip.1=1111。
+drtech.machine.annihilation_generator.tooltip.2=2222。
+drtech.machine.annihilation_generator.tooltip.3=3333。
