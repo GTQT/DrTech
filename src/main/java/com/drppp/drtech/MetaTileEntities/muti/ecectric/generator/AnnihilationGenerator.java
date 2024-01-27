@@ -12,6 +12,7 @@ import com.drppp.drtech.MetaTileEntities.Logic.AnnihilationGeneratorLogic;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
+import gregtech.api.capability.IControllable;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.IWorkable;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -58,7 +59,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AnnihilationGenerator extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable {
+public class AnnihilationGenerator extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
     private final AnnihilationGeneratorLogic logic;
     protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());
     protected ItemHandlerList itemImportInventory;
@@ -306,7 +307,9 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
     public int getLeve() {
         return leve;
     }
-
+    protected boolean shouldShowVoidingModeButton() {
+        return false;
+    }
     @Override
     public void receiveCustomData(int dataId, PacketBuffer buf) {
         super.receiveCustomData(dataId, buf);

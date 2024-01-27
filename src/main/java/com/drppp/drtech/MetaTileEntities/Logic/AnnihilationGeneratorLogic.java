@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 
 public class AnnihilationGeneratorLogic {
     private final AnnihilationGenerator host;
-
+    long baseEnergy=0;
     public AnnihilationGenerator getHost() {
         return host;
     }
@@ -102,7 +102,7 @@ public class AnnihilationGeneratorLogic {
                 return;
             }
             this.weight = entity.weight;
-
+        this.eAmpereFlow = 300;
             if(progressTime>=this.maxProgress)
             {
                 CalculatingTireAndAmp();
@@ -125,9 +125,10 @@ public class AnnihilationGeneratorLogic {
     }
     private void CaculatemEut()
     {
-       long baseEnergy =  this.eVoltage*this.eAmpereFlow;
-       float power = host.getLeve()*0.25f;
-       this.mEUt = (long) (baseEnergy * power);
+       baseEnergy =  (long)this.eVoltage* (long)this.eAmpereFlow;
+      // float power = host.getLeve()*0.25f;
+       this.mEUt = baseEnergy * host.getLeve() / 4;
+        baseEnergy = 0;
     }
     private void CalculatingTireAndAmp()
     {
