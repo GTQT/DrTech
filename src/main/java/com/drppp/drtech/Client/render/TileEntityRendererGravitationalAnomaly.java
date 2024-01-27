@@ -5,8 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.util.glu.Sphere;
-
 public class TileEntityRendererGravitationalAnomaly extends TileEntitySpecialRenderer<TileEntityGravitationalAnomaly> {
    // public static final ResourceLocation core = new ResourceLocation("drtech:textures/blocks/gravitational_anomaly.png");
 
@@ -14,7 +15,7 @@ public class TileEntityRendererGravitationalAnomaly extends TileEntitySpecialRen
 
     public TileEntityRendererGravitationalAnomaly() {
     }
-
+    @SideOnly(Side.CLIENT)
     public void render(TileEntityGravitationalAnomaly tileEntity, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (tileEntity.shouldRender()) {
             EntityPlayer player = Minecraft.getMinecraft().player;

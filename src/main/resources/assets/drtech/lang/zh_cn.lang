@@ -1,5 +1,6 @@
 tile.drtech.gravitational_anomaly.name=质量异常点
-itemGroup.mytab=我的栏目
+tile.my_laser_pipe_normal.name=透明激光管
+itemGroup.mytab=DR科技
 
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素

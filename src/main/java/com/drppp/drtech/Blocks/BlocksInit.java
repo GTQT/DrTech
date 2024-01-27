@@ -2,12 +2,11 @@ package com.drppp.drtech.Blocks;
 
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
+import com.drppp.drtech.Blocks.Pipe.BlockMyLaserPipe;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
-import gregtech.common.pipelike.laser.BlockLaserPipe;
 import gregtech.common.pipelike.laser.LaserPipeType;
-import gregtech.common.pipelike.optical.OpticalPipeType;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -21,7 +20,7 @@ public class BlocksInit {
     public static final BlockGravitationalAnomaly BLOCK_GRAVITATIONAL_ANOMALY = new BlockGravitationalAnomaly();
     public static final MetaGlasses TRANSPARENT_CASING = new MetaGlasses("glasses_casing");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
-    public static final BlockLaserPipe[] MY_LASER_PIPES = new BlockLaserPipe[OpticalPipeType.values().length];
+    public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
     public  static void init(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
@@ -31,15 +30,11 @@ public class BlocksInit {
 
 
         //管道 未生效
-        LaserPipeType[] var11 = LaserPipeType.values();
-        for(int i = 0; i < var11.length; ++i) {
-            LaserPipeType type = var11[i];
-            MY_LASER_PIPES[type.ordinal()] = new BlockLaserPipe(type);
-            MY_LASER_PIPES[type.ordinal()].setRegistryName(String.format("my_laser_pipe_%s", type.getName()));
-            MY_LASER_PIPES[type.ordinal()].setTranslationKey(String.format("my_laser_pipe_%s", type.getName()));
-            MY_LASER_PIPES[type.ordinal()].setCreativeTab(DrTechMain.Mytab);
-            event.getRegistry().register(MY_LASER_PIPES[type.ordinal()]);
-        }
+        MY_LASER_PIPE.setRegistryName("my_laser_pipe_normal");
+        MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
+        MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
+        event.getRegistry().register(MY_LASER_PIPE);
+
 
     }
 

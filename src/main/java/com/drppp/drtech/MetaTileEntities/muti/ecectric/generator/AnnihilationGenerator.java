@@ -1,5 +1,6 @@
 package com.drppp.drtech.MetaTileEntities.muti.ecectric.generator;
 
+import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
@@ -11,7 +12,8 @@ import com.drppp.drtech.MetaTileEntities.Logic.AnnihilationGeneratorLogic;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
-import gregtech.api.capability.*;
+import gregtech.api.capability.IEnergyContainer;
+import gregtech.api.capability.IWorkable;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.ItemHandlerList;
 import gregtech.api.metatileentity.IDataInfoProvider;
@@ -23,6 +25,7 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
@@ -30,11 +33,13 @@ import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -321,6 +326,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
     public void addToolUsages(ItemStack stack, @Nullable World world, List<String> tooltip, boolean advanced) {
         super.addToolUsages(stack, world, tooltip, advanced);
     }
+
 
 }
 

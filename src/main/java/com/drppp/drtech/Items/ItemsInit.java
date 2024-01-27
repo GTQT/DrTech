@@ -1,9 +1,12 @@
 package com.drppp.drtech.Items;
 
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Tags;
 import gregtech.api.block.VariantItemBlock;
+import gregtech.client.model.SimpleStateMapper;
 import gregtech.common.pipelike.laser.BlockLaserPipe;
+import gregtech.common.pipelike.laser.ItemBlockLaserPipe;
 import gregtech.common.pipelike.laser.LaserPipeType;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -19,7 +22,6 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static com.drppp.drtech.Blocks.BlocksInit.MY_LASER_PIPES;
 import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
@@ -29,24 +31,25 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
-
-
-
         //未生效
-        LaserPipeType[] var11 = LaserPipeType.values();
-        for(int i = 0; i < var11.length; ++i) {
-            LaserPipeType type = var11[i];
-            event.getRegistry().register(Item.getItemFromBlock(MY_LASER_PIPES[type.ordinal()]));
-        }
+        event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
     }
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
         registerItemModel(BlocksInit.TRANSPARENT_CASING);
         registerItemModel(BlocksInit.COMMON_CASING);
-        BlockLaserPipe[] var7 = MY_LASER_PIPES;
-        for(int i = 0; i < var7.length; ++i) {
-            registerItemModel(var7[i]);
-        }
+        //registerItemModel(BlocksInit.MY_LASER_PIPE);
+
+
+
+            BlockLaserPipe pipe = BlocksInit.MY_LASER_PIPE;
+            ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(pipe), (stack) -> {
+                return LaserPipeRenderer.INSTANCE.getModelLocation();
+            });
+        var normalStateMapper = new SimpleStateMapper(LaserPipeRenderer.INSTANCE.getModelLocation());
+            ModelLoader.setCustomStateMapper(pipe, normalStateMapper);
+
+
     }
     @SideOnly(Side.CLIENT)
     private static void registerItemModel(@Nonnull Block block) {

@@ -112,7 +112,7 @@ public class AnnihilationGeneratorLogic {
                 this.weight = entity.weight = Math.max(0, entity.weight);
             }
             CaculatemEut();
-            host.getEnergyContainer().addEnergy(this.mEUt);
+            host.getEnergyContainer().changeEnergy(this.mEUt);
         if(this.weight<=0)
         {
             this.eAmpereFlow=0;

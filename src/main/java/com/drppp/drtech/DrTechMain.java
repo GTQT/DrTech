@@ -1,17 +1,18 @@
 package com.drppp.drtech;
 
+import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -37,12 +38,23 @@ public class DrTechMain {
     public void preInit(FMLPreInitializationEvent event) {
         // register to the event bus so that we can listen to events
         MinecraftForge.EVENT_BUS.register(this);
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         Mytab = new MyCreativeTabs("mytab");
         MyMetaItems.MetaItemsInit();
-
+       // TexturesInit();
     }
-
+    @EventHandler
+    @SideOnly(Side.CLIENT)
+    // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
+    public void ClientpreInit(FMLPreInitializationEvent event) {
+        TexturesInit();
+    }
+    @SideOnly(Side.CLIENT)
+    public void TexturesInit()
+    {
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
+        TextureUtils.addIconRegister(Textures::register);
+        LaserPipeRenderer.INSTANCE.preInit();
+    }
     @SubscribeEvent
     // Register recipes here (Remove if not needed)
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
@@ -53,16 +65,14 @@ public class DrTechMain {
     // Register items here (Remove if not needed)
     public void registerItems(RegistryEvent.Register<Item> event) {
         ItemsInit.init(event);
-        onModelRegistration();
-    }
 
+    }
     @SubscribeEvent
     // Register blocks here (Remove if not needed)
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         BlocksInit.init(event);
 
     }
-
     @EventHandler
     // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
     public void init(FMLInitializationEvent event) {
@@ -79,11 +89,6 @@ public class DrTechMain {
     public void serverStarting(FMLServerStartingEvent event) {
     }
 
-    @SideOnly(Side.CLIENT)
-    public static void onModelRegistration() {
-        ModelResourceLocation model = new ModelResourceLocation(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY.getRegistryName(), "inventory");
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY), 0, model);
-        ItemsInit.registerItemModels();
-    }
+
 
 }
