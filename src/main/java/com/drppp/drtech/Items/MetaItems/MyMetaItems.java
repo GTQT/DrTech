@@ -8,6 +8,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem ENERGY_ELEMENT_3;
     public static MetaItem<?>.MetaValueItem ENERGY_ELEMENT_4;
     public static MetaItem<?>.MetaValueItem ENERGY_ELEMENT_5;
+    public static MetaItem<?>.MetaValueItem GRAVITY_SHIELD;
     public static void MetaItemsInit()
     {
        MetaItems1 metaItem = new MetaItems1();

@@ -1,9 +1,18 @@
 package com.drppp.drtech.Items.MetaItems;
 
 import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 
 public  class MetaItems1 extends StandardMetaItem {
@@ -30,5 +39,42 @@ public  class MetaItems1 extends StandardMetaItem {
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.weight.tooltip.5", new Object[0]));
                 }));
+        MyMetaItems.GRAVITY_SHIELD = this.addItem(5,"gravity_shield").setMaxStackSize(1).setCreativeTabs(DrTechMain.Mytab)
+                .addComponents(new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.gravity_shield.tooltip.1", new Object[0]));
+                }));;
+    }
+
+    @Override
+    public @NotNull ActionResult<ItemStack> onItemRightClick(@NotNull World world, EntityPlayer player, @NotNull EnumHand hand) {
+        ItemStack item = player.getHeldItemMainhand();
+        if(player.isSneaking() && item.getItem()== MyMetaItems.GRAVITY_SHIELD.getMetaItem() && item.getMetadata()==MyMetaItems.GRAVITY_SHIELD.getMetaValue())
+        {
+            if(!player.capabilities.allowFlying)
+            {
+                enableFlyingAbility(player);
+            }
+            else
+            {
+                disableFlyingAbility(player);
+            }
+        }
+        return super.onItemRightClick(world, player, hand);
+    }
+
+    private void enableFlyingAbility(EntityPlayer player)
+    {
+        player.capabilities.allowFlying = true;
+        player.capabilities.isFlying = false;
+        player.sendPlayerAbilities();
+        player.sendStatusMessage(new TextComponentString("重力已屏蔽!"), true);
+    }
+
+    private void disableFlyingAbility(EntityPlayer player)
+    {
+        player.capabilities.allowFlying = false;
+        player.capabilities.isFlying = false;
+        player.sendPlayerAbilities();
+        player.sendStatusMessage(new TextComponentString("取消重力屏蔽!"), true);
     }
 }

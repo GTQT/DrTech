@@ -26,4 +26,5 @@ dependencies {
     implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848")
     implementation rfg.deobf("curse.maven:gregtech-ce-unofficial-557242:4965457")
     implementation rfg.deobf("curse.maven:ctm-267602:2915363")
+    compileOnlyApi rfg.deobf("curse.maven:baubles-227083:2518667")
 }

@@ -7,7 +7,6 @@ import gregtech.api.block.VariantItemBlock;
 import gregtech.client.model.SimpleStateMapper;
 import gregtech.common.pipelike.laser.BlockLaserPipe;
 import gregtech.common.pipelike.laser.ItemBlockLaserPipe;
-import gregtech.common.pipelike.laser.LaserPipeType;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -26,6 +25,7 @@ import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
     public static  final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new  ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID,"gravitational_anomaly");
+
     public static void init(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
