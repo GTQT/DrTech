@@ -102,7 +102,6 @@ public class AnnihilationGeneratorLogic {
                 return;
             }
             this.weight = entity.weight;
-        this.eAmpereFlow = 300;
             if(progressTime>=this.maxProgress)
             {
                 CalculatingTireAndAmp();
@@ -178,6 +177,7 @@ public class AnnihilationGeneratorLogic {
             this.tire = 1;
             this.eVoltage =7800;
         }
+
     }
 
     public int geteVoltage() {
