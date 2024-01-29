@@ -43,6 +43,7 @@ public  class MetaItems1 extends StandardMetaItem {
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.gravity_shield.tooltip.1", new Object[0]));
                 }));;
+                MyMetaItems.SKULL_DUST = this.addItem(6,"skull_dust").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
     }
 
     @Override
@@ -67,7 +68,7 @@ public  class MetaItems1 extends StandardMetaItem {
         player.capabilities.allowFlying = true;
         player.capabilities.isFlying = false;
         player.sendPlayerAbilities();
-        player.sendStatusMessage(new TextComponentString("重力已屏蔽!"), true);
+        player.sendStatusMessage(new TextComponentString(I18n.format("metaitem.gravity_shield.info.1", new Object[0])), true);
     }
 
     private void disableFlyingAbility(EntityPlayer player)
@@ -75,6 +76,6 @@ public  class MetaItems1 extends StandardMetaItem {
         player.capabilities.allowFlying = false;
         player.capabilities.isFlying = false;
         player.sendPlayerAbilities();
-        player.sendStatusMessage(new TextComponentString("取消重力屏蔽!"), true);
+        player.sendStatusMessage(new TextComponentString(I18n.format("metaitem.gravity_shield.info.2", new Object[0])), true);
     }
 }

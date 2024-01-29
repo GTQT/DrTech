@@ -31,17 +31,12 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
-        //未生效
         event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
     }
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
         registerItemModel(BlocksInit.TRANSPARENT_CASING);
         registerItemModel(BlocksInit.COMMON_CASING);
-        //registerItemModel(BlocksInit.MY_LASER_PIPE);
-
-
-
             BlockLaserPipe pipe = BlocksInit.MY_LASER_PIPE;
             ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(pipe), (stack) -> {
                 return LaserPipeRenderer.INSTANCE.getModelLocation();

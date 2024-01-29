@@ -8,6 +8,7 @@ metaitem.energy_element_3.name=3号能量元素
 metaitem.energy_element_4.name=4号能量元素
 metaitem.energy_element_5.name=5号能量元素
 metaitem.gravity_shield.name=重力屏蔽仪
+metaitem.skull_dust.name=凋零骷髅粉
 #Glasses
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃
@@ -21,6 +22,7 @@ tile.glasses_casing.sne_boron_silicate_glass_block.name=宇宙中子强化硅酸
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
+drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
 
 
 
@@ -36,6 +38,8 @@ metaitem.weight.tooltip.2=物质量:100
 metaitem.weight.tooltip.3=物质量:150
 metaitem.weight.tooltip.4=物质量:200
 metaitem.weight.tooltip.5=物质量:300
+metaitem.gravity_shield.info.1=重力已屏蔽！
+metaitem.gravity_shield.info.2=取消重力屏蔽！
 metaitem.gravity_shield.tooltip.1=shift+右键开启或关闭
 
 mymod.machine.annihilation_generator.tooltip.1=1111。

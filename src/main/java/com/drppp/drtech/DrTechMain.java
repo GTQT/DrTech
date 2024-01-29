@@ -7,6 +7,7 @@ import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.Load.DrTechReceipeManager;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import net.minecraft.block.Block;
@@ -58,7 +59,7 @@ public class DrTechMain {
     @SubscribeEvent
     // Register recipes here (Remove if not needed)
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-
+        DrTechReceipeManager.init();
     }
 
     @SubscribeEvent
