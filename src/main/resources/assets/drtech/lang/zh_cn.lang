@@ -1,7 +1,7 @@
 tile.drtech.gravitational_anomaly.name=质量异常点
 tile.my_laser_pipe_normal.name=透明激光管
 itemGroup.mytab=DR科技
-
+recipemap.eimplosion_compressor.name=电力聚爆压缩机
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
 metaitem.energy_element_3.name=3号能量元素
@@ -23,6 +23,7 @@ tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
+drtech.machine.electric_implosion_compressor.name=电力聚爆压缩机
 
 
 
