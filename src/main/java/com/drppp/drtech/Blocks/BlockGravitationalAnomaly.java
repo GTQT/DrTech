@@ -27,7 +27,6 @@ public class BlockGravitationalAnomaly extends Block {
     protected AxisAlignedBB boundingBox;
     public BlockGravitationalAnomaly() {
         super(Material.IRON);
-        this.setBlockUnbreakable();
         this.setResistance(5000000.0F);
         this.disableStats();
         this.setRegistryName(Tags.MODID,"gravitational_anomaly");
@@ -95,4 +94,5 @@ public class BlockGravitationalAnomaly extends Block {
         }
         return false;
     }
+
 }

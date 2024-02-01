@@ -24,6 +24,7 @@ import  com.drppp.drtech.Blocks.BlocksInit;
 
 import static com.drppp.drtech.Load.DrtechReceipes.EIMPLOSION_RECIPES;
 import static gregtech.api.recipes.RecipeMaps.*;
+import static gregtech.api.unification.material.Materials.Carbon;
 import static gregtech.api.unification.material.Materials.NetherStar;
 import static gregtech.api.unification.material.info.MaterialFlags.EXPLOSIVE;
 import static gregtech.api.unification.material.info.MaterialFlags.FLAMMABLE;
@@ -52,6 +53,11 @@ public class MachineReceipe {
                 .output(BlocksInit.MY_LASER_PIPE)
                 .duration(100)
                 .EUt(7680)
+                .buildAndRegister();
+        EIMPLOSION_RECIPES.recipeBuilder()
+                .input(OrePrefix.dust,Carbon,63)
+                .output(Items.DIAMOND)
+                .explosivesAmount(OreDictUnifier.get(OrePrefix.dust, Carbon))
                 .buildAndRegister();
         OrePrefix.dust.addProcessingHandler(PropertyKey.DUST, MachineReceipe::processDust);
     }

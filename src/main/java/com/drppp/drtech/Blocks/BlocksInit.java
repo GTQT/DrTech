@@ -1,5 +1,6 @@
 package com.drppp.drtech.Blocks;
 
+import com.drppp.drtech.Blocks.Crops.CropsInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Blocks.Pipe.BlockMyLaserPipe;
@@ -34,8 +35,7 @@ public class BlocksInit {
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
         MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
         event.getRegistry().register(MY_LASER_PIPE);
-
-
+        CropsInit.init(event);
     }
 
     public static Vector3f randomSpherePoint(double x0, double y0, double z0, Vec3d radius, Random rand) {

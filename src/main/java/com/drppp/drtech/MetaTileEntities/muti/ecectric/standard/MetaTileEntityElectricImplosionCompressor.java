@@ -57,6 +57,8 @@ public class MetaTileEntityElectricImplosionCompressor extends GCYMRecipeMapMult
     }
 
     private static IBlockState getCasingState() {
+
+
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TUNGSTENSTEEL_ROBUST);
     }
 

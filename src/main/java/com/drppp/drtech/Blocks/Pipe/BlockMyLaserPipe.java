@@ -9,6 +9,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
+
 public class BlockMyLaserPipe extends BlockLaserPipe {
     public BlockMyLaserPipe(@NotNull LaserPipeType pipeType) {
         super(pipeType);
@@ -18,4 +19,5 @@ public class BlockMyLaserPipe extends BlockLaserPipe {
     public @NotNull EnumBlockRenderType getRenderType(@NotNull IBlockState state) {
         return LaserPipeRenderer.INSTANCE.getBlockRenderType();
     }
+
 }
