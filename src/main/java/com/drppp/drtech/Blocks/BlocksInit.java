@@ -30,12 +30,12 @@ public class BlocksInit {
         event.getRegistry().register(COMMON_CASING);
 
 
-        //管道 未生效
+
         MY_LASER_PIPE.setRegistryName("my_laser_pipe_normal");
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
         MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
         event.getRegistry().register(MY_LASER_PIPE);
-        CropsInit.init(event);
+
     }
 
     public static Vector3f randomSpherePoint(double x0, double y0, double z0, Vec3d radius, Random rand) {

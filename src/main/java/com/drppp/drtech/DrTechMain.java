@@ -2,6 +2,7 @@ package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Blocks.Crops.CropsInit;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
@@ -72,7 +73,7 @@ public class DrTechMain {
     // Register blocks here (Remove if not needed)
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         BlocksInit.init(event);
-
+        CropsInit.init(event);
     }
     @EventHandler
     // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)

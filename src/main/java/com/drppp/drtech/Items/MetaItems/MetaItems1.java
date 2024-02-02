@@ -44,7 +44,7 @@ public  class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.gravity_shield.tooltip.1", new Object[0]));
                 }));;
                 MyMetaItems.SKULL_DUST = this.addItem(6,"skull_dust").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
-                MyMetaItems.REDSTONE_SEED = this.addItem(7,"redstone_seed").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+                //MyMetaItems.REDSTONE_SEED = this.addItem(7,"redstone_seed").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
     }
 
     @Override

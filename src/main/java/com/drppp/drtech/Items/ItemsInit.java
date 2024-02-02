@@ -2,6 +2,10 @@ package com.drppp.drtech.Items;
 
 import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
+import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.Items.ItemCropSeed.ItemFluStoneCropSeed;
+import com.drppp.drtech.Items.ItemCropSeed.ItemLapisCropSeed;
+import com.drppp.drtech.Items.ItemCropSeed.ItemRedStoneCropSeed;
 import com.drppp.drtech.Tags;
 import gregtech.api.block.VariantItemBlock;
 import gregtech.client.model.SimpleStateMapper;
@@ -25,10 +29,16 @@ import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
     public static  final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new  ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID,"gravitational_anomaly");
+    public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
+    public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
+    public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
 
     public static void init(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
+        event.getRegistry().register(ITEM_RED_STONE_SEED);
+        event.getRegistry().register(ITEM_LAPIS_SEED);
+        event.getRegistry().register(ITEM_FLU_SEED);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
         event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
@@ -43,6 +53,9 @@ public class ItemsInit {
             });
         var normalStateMapper = new SimpleStateMapper(LaserPipeRenderer.INSTANCE.getModelLocation());
             ModelLoader.setCustomStateMapper(pipe, normalStateMapper);
+        ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
 
 
     }

@@ -10,7 +10,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem ENERGY_ELEMENT_5;
     public static MetaItem<?>.MetaValueItem GRAVITY_SHIELD;
     public static MetaItem<?>.MetaValueItem SKULL_DUST;
-    public static MetaItem<?>.MetaValueItem REDSTONE_SEED;
+    //public static MetaItem<?>.MetaValueItem REDSTONE_SEED;
     public static void MetaItemsInit()
     {
        MetaItems1 metaItem = new MetaItems1();
