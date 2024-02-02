@@ -5,6 +5,7 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Tags;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockFarmland;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;

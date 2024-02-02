@@ -3,6 +3,7 @@ package com.drppp.drtech.Items.ItemCropSeed;
 import com.drppp.drtech.Blocks.Crops.CropsInit;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
+import net.minecraft.block.BlockFarmland;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -21,8 +22,7 @@ public class ItemFluStoneCropSeed extends Item {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
-
-        if (worldIn.isAirBlock(pos.up()) && CropsInit.FLU_CROP.getDefaultState().getBlock().canPlaceBlockAt(worldIn, pos.up()))
+        if (worldIn.isAirBlock(pos.up()) && CropsInit.FLU_CROP.getDefaultState().getBlock().canPlaceBlockAt(worldIn, pos.up()) && worldIn.getBlockState(pos).getBlock() instanceof BlockFarmland && worldIn.getBlockState(pos).getValue(BlockFarmland.MOISTURE) > 0)
             {
                 worldIn.setBlockState(pos.up(), CropsInit.FLU_CROP.getDefaultState());
                 stack.shrink(1);
