@@ -1,8 +1,9 @@
-tile.drtech.gravitational_anomaly.name=质量异常点
-tile.my_laser_pipe_normal.name=透明激光管
 itemGroup.mytab=DR科技
+#recipemap
 recipemap.eimplosion_compressor.name=电力聚爆压缩机
 recipemap.uu_producter.name=UU物质生产
+recipemap.uu_copy.name=复制机
+#Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
 metaitem.energy_element_3.name=3号能量元素
@@ -11,10 +12,11 @@ metaitem.energy_element_5.name=5号能量元素
 metaitem.gravity_shield.name=重力屏蔽仪
 metaitem.skull_dust.name=凋零骷髅粉
 metaitem.scrap.name=废料
+metaitem.cd_rom.name=记忆光盘
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
-#Glasses
+#Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃
 tile.glasses_casing.cr_boron_silicate_glass_block.name=铬强化硅酸盐硼玻璃
@@ -23,6 +25,8 @@ tile.glasses_casing.ir_boron_silicate_glass_block.name=铱强化硅酸盐硼玻�
 tile.glasses_casing.os_boron_silicate_glass_block.name=锇强化硅酸盐硼玻璃
 tile.glasses_casing.ne_boron_silicate_glass_block.name=中子强化硅酸盐硼玻璃
 tile.glasses_casing.sne_boron_silicate_glass_block.name=宇宙中子强化硅酸盐硼玻璃
+tile.drtech.gravitational_anomaly.name=质量异常点
+tile.my_laser_pipe_normal.name=透明激光管
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 #Machine
@@ -31,10 +35,10 @@ drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
 drtech.machine.electric_implosion_compressor.name=电力聚爆压缩机
 
 
-
-drtech.machine.annihilation_generator.tooltip.1=根据物质量分阶段发电(400为一段)
-drtech.machine.annihilation_generator.tooltip.2=随时间递增发电A数目 每个阶段有最大发电A数 跨阶段后电流会恢复成1
-drtech.machine.annihilation_generator.tooltip.3=根据线圈等级会有额外效率加成
+#Tips
+drtech.machine.annihilation_generator.tooltip.1=§c根据物质量分阶段发电(400为一段)
+drtech.machine.annihilation_generator.tooltip.2=§c随时间递增发电A数目 每个阶段有最大发电A数 跨阶段后电流会恢复成1
+drtech.machine.annihilation_generator.tooltip.3=§c根据线圈等级会有额外效率加成
 gregtech.multiblock.weight=剩余质量:%s
 gregtech.multiblock.mEUt=输出功率:%s%s
 drtech.multiblock.tire=线圈等级:%s
@@ -47,10 +51,9 @@ metaitem.weight.tooltip.5=物质量:300
 metaitem.gravity_shield.info.1=重力已屏蔽！
 metaitem.gravity_shield.info.2=取消重力屏蔽！
 metaitem.gravity_shield.tooltip.1=shift+右键开启或关闭
+behavior.data_item.cd_rom.title=§n光盘存储数据：
+behavior.data_item.cd_rom.data=- §a%s
 
-mymod.machine.annihilation_generator.tooltip.1=1111。
-mymod.machine.annihilation_generator.tooltip.2=2222。
-mymod.machine.annihilation_generator.tooltip.3=3333。
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
@@ -88,3 +91,17 @@ drtech.machine.uu_producter.uev.name=史诗UU物质生产机 II
 drtech.machine.uu_producter.uiv.name=史诗UU物质生产机 III
 drtech.machine.uu_producter.uxv.name=史诗UU物质生产机 IV
 drtech.machine.uu_producter.opv.name=传奇UU物质生产机
+#复制机
+drtech.machine.duplicator.lv.name=基础UU复制机
+drtech.machine.duplicator.mv.name=进阶UU复制机
+drtech.machine.duplicator.hv.name=进阶UU复制机 II
+drtech.machine.duplicator.ev.name=进阶UU复制机 III
+drtech.machine.duplicator.iv.name=精英UU复制机
+drtech.machine.duplicator.luv.name=精英UU复制机 II
+drtech.machine.duplicator.zpm.name=精英UU复制机 III
+drtech.machine.duplicator.uv.name=终极UU复制机
+drtech.machine.duplicator.uhv.name=史诗UU复制机
+drtech.machine.duplicator.uev.name=史诗UU复制机 II
+drtech.machine.duplicator.uiv.name=史诗UU复制机 III
+drtech.machine.duplicator.uxv.name=史诗UU复制机 IV
+drtech.machine.duplicator.opv.name=传奇UU复制机

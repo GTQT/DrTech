@@ -11,6 +11,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem GRAVITY_SHIELD;
     public static MetaItem<?>.MetaValueItem SKULL_DUST;
     public static MetaItem<?>.MetaValueItem SCRAP;
+    public static MetaItem<?>.MetaValueItem CD_ROM;
     public static void MetaItemsInit()
     {
        MetaItems1 metaItem = new MetaItems1();

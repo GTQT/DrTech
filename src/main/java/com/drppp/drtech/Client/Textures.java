@@ -28,6 +28,8 @@ public class Textures {
     @SideOnly(Side.CLIENT)
     public static OrientedOverlayRenderer UUPRODUCTER_OVERLAY;
     @SideOnly(Side.CLIENT)
+    public static OrientedOverlayRenderer DUPLICATOR;
+    @SideOnly(Side.CLIENT)
     public static void register(TextureMap textureMap) {
 
         LASER_PIPE_SIDE = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side"));
@@ -35,5 +37,6 @@ public class Textures {
         LASER_PIPE_OVERLAY = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side_overlay"));
         LASER_PIPE_OVERLAY_EMISSIVE = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side_overlay_emissive"));
         UUPRODUCTER_OVERLAY  = new OrientedOverlayRenderer("machines/uu_producter");
+        DUPLICATOR  = new OrientedOverlayRenderer("machines/duplicator");
     }
 }
