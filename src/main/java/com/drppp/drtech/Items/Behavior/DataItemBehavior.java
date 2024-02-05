@@ -35,9 +35,9 @@ public class DataItemBehavior implements IItemBehaviour, IDataItem {
     @Override
     public void addInformation(@NotNull ItemStack itemStack, List<String> lines) {
         NBTTagCompound compound = itemStack.getTagCompound();
-        String name  =compound.getString("Name");
-        if (name == null || name.isEmpty() || "".equals(name)) return;
+        String name  ="空";
+        if (compound != null) name = compound.getString("Name");
         lines.add(I18n.format("behavior.data_item.cd_rom.title"));
-        lines.add(I18n.format("behavior.data_item.cd_rom.data", compound.getString("Name")));
+        lines.add(I18n.format("behavior.data_item.cd_rom.data", name));
     }
 }
