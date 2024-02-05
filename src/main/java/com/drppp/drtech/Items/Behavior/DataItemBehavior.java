@@ -9,6 +9,7 @@ import gregtech.api.util.AssemblyLineManager;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -33,9 +34,10 @@ public class DataItemBehavior implements IItemBehaviour, IDataItem {
 
     @Override
     public void addInformation(@NotNull ItemStack itemStack, List<String> lines) {
-        String researchId = AssemblyLineManager.readResearchId(itemStack);
-        if (researchId == null) return;
-        lines.add(I18n.format("behavior.data_item.assemblyline.title"));
-        lines.add(I18n.format("behavior.data_item.assemblyline.data", researchId));
+        NBTTagCompound compound = itemStack.getTagCompound();
+        String name  =compound.getString("Name");
+        if (name == null || name.isEmpty() || "".equals(name)) return;
+        lines.add(I18n.format("behavior.data_item.cd_rom.title"));
+        lines.add(I18n.format("behavior.data_item.cd_rom.data", compound.getString("Name")));
     }
 }

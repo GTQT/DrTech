@@ -2,6 +2,7 @@ package com.drppp.drtech.Load;
 
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.recipes.RecipeBuilder;
 import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.recipes.ingredients.nbtmatch.NBTCondition;
@@ -27,8 +28,10 @@ import net.minecraft.item.ItemStack;
 import  com.drppp.drtech.Blocks.BlocksInit;
 import net.minecraft.nbt.NBTTagCompound;
 
-import static com.drppp.drtech.Load.DrtechReceipes.EIMPLOSION_RECIPES;
-import static com.drppp.drtech.Load.DrtechReceipes.UU_RECIPES;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.drppp.drtech.Load.DrtechReceipes.*;
 import static gregtech.api.recipes.RecipeMaps.*;
 import static gregtech.api.unification.material.Materials.Carbon;
 import static gregtech.api.unification.material.Materials.NetherStar;
@@ -82,18 +85,39 @@ public class MachineReceipe {
                 .EUt(256)
                 .duration(1600)
                 .buildAndRegister();
-        ItemStack is = MetaItems.TOOL_DATA_STICK.getStackForm();
-        NBTTagCompound compound = GTUtility.getOrCreateNbtCompound(MetaItems.ELECTRIC_MOTOR_LV.getStackForm());
-        writeResearchToNBT(compound, "1xmetaitem.electric.motor.lv@127");
-        is.setTagCompound(compound);
-        RecipeBuilder<?> builder= SCANNER_RECIPES.recipeBuilder()
-                 .inputNBT(is.getItem(), 1,is.getMetadata(),NBTMatcher.ANY, NBTCondition.ANY)
-                 .input(MetaItems.ELECTRIC_MOTOR_LV)
-                 .outputs(is)
-                 .duration(100)
-                 .EUt(2);
-        builder.applyProperty(ScanProperty.getInstance(), true);
-        builder.buildAndRegister();
+        //扫描和复制配方
+        DrtechUtils.initList();
+        for (int i = 0; i < DrtechUtils.listMater.size(); i++) {
+            ItemStack is = MyMetaItems.CD_ROM.getStackForm();
+            NBTTagCompound compound = new NBTTagCompound();
+            compound.setString("Name",DrtechUtils.getName(DrtechUtils.listMater.get(i)));
+            is.setTagCompound(compound);
+            int mass  =(int)DrtechUtils.listMater.get(i).getMass();
+            var buid =  SCANNER_RECIPES.recipeBuilder()
+                    .input(MyMetaItems.CD_ROM)
+                    .outputs(is)
+                    .duration(DrtechUtils.baseTime*2*mass)
+                    .EUt(30);
+           var copybuild =  COPY_RECIPES.recipeBuilder()
+                    .notConsumable(is)
+                    .fluidInputs(Materials.UUMatter.getFluid(mass))
+                    .duration(DrtechUtils.baseTime*mass)
+                    .EUt(30);
+            if(DrtechUtils.listMater.get(i).hasProperty(PropertyKey.DUST))
+            {
+                buid.input(dust,DrtechUtils.listMater.get(i),1);
+                copybuild.output(dust,DrtechUtils.listMater.get(i),1);
+            }
+            else if(DrtechUtils.listMater.get(i).hasFluid())
+            {
+                buid.fluidInputs(DrtechUtils.listMater.get(i).getFluid(144));
+                copybuild.fluidOutputs(DrtechUtils.listMater.get(i).getFluid(144));
+            }
+            else
+                continue;
+            buid.buildAndRegister();
+            copybuild.buildAndRegister();
+        }
 
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
