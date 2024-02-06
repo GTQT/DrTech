@@ -5,6 +5,7 @@ import com.drppp.drtech.Load.DrtechReceipes;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.generator.AnnihilationGenerator;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityAdvancedProsscessArray;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityElectricImplosionCompressor;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityInfiniteFluidDrill;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.GTValues;
@@ -13,6 +14,7 @@ import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.util.GTUtility;
 
+import gregtech.common.metatileentities.multi.electric.MetaTileEntityFluidDrill;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +31,7 @@ public class MetaTileEntities {
     public static MetaTileEntityLaserHatch[] LASER_OUTPUT_HATCH_16384 = new MetaTileEntityLaserHatch[10];
     public static final SimpleMachineMetaTileEntity[] UU_PRODUCTER = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
     public static final SimpleMachineMetaTileEntity[] DUPLICATOR = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
+    public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -46,7 +49,8 @@ public class MetaTileEntities {
         registerSimpleMetaTileEntity(UU_PRODUCTER, 17012 +endPos, "uu_producter", DrtechReceipes.UU_RECIPES, Textures.UUPRODUCTER_OVERLAY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         //17024
         registerSimpleMetaTileEntity(DUPLICATOR, 17024, "duplicator", DrtechReceipes.COPY_RECIPES, Textures.DUPLICATOR, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
-
+        //17032
+        INFINITE_FLUID_DRILLING_RIG =registerMetaTileEntity(17032, new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
     }
 
 

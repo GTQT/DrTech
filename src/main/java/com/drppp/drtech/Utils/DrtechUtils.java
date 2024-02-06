@@ -146,6 +146,7 @@ public class DrtechUtils {
         listMater.add(Materials.Trinium);
         listMater.add(Materials.Neutronium);
         listMater.add(Materials.Naquadah);
+        listMater.add(Materials.Tritanium);
     }
     public static String getName(MetaItem.MetaValueItem is) {
         return is.getStackForm().getDisplayName();

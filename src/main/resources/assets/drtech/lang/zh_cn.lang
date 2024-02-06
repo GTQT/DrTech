@@ -29,10 +29,12 @@ tile.drtech.gravitational_anomaly.name=质量异常点
 tile.my_laser_pipe_normal.name=透明激光管
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
+tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
 drtech.machine.electric_implosion_compressor.name=电力聚爆压缩机
+drtech.machine.fluid_drilling_rig.iv.name=无尽油气钻机
 
 
 #Tips
@@ -92,16 +94,16 @@ drtech.machine.uu_producter.uiv.name=史诗UU物质生产机 III
 drtech.machine.uu_producter.uxv.name=史诗UU物质生产机 IV
 drtech.machine.uu_producter.opv.name=传奇UU物质生产机
 #复制机
-drtech.machine.duplicator.lv.name=基础UU复制机
-drtech.machine.duplicator.mv.name=进阶UU复制机
-drtech.machine.duplicator.hv.name=进阶UU复制机 II
-drtech.machine.duplicator.ev.name=进阶UU复制机 III
-drtech.machine.duplicator.iv.name=精英UU复制机
-drtech.machine.duplicator.luv.name=精英UU复制机 II
-drtech.machine.duplicator.zpm.name=精英UU复制机 III
-drtech.machine.duplicator.uv.name=终极UU复制机
-drtech.machine.duplicator.uhv.name=史诗UU复制机
-drtech.machine.duplicator.uev.name=史诗UU复制机 II
-drtech.machine.duplicator.uiv.name=史诗UU复制机 III
-drtech.machine.duplicator.uxv.name=史诗UU复制机 IV
-drtech.machine.duplicator.opv.name=传奇UU复制机
+drtech.machine.duplicator.lv.name=基础复制机
+drtech.machine.duplicator.mv.name=进阶复制机
+drtech.machine.duplicator.hv.name=进阶复制机 II
+drtech.machine.duplicator.ev.name=进阶复制机 III
+drtech.machine.duplicator.iv.name=精英复制机
+drtech.machine.duplicator.luv.name=精英复制机 II
+drtech.machine.duplicator.zpm.name=精英复制机 III
+drtech.machine.duplicator.uv.name=终极复制机
+drtech.machine.duplicator.uhv.name=史诗复制机
+drtech.machine.duplicator.uev.name=史诗复制机 II
+drtech.machine.duplicator.uiv.name=史诗复制机 III
+drtech.machine.duplicator.uxv.name=史诗复制机 IV
+drtech.machine.duplicator.opv.name=传奇复制机

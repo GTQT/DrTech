@@ -34,7 +34,8 @@ public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
 
     public enum MetalCasingType implements IStringSerializable {
 
-        GRAVITATION_FIELD_CASING("gravitation_field_casing");
+        GRAVITATION_FIELD_CASING("gravitation_field_casing"),
+        NEUTRON_MACHINE_CASING("neutron_mechanical_casing");
 
         private final String name;
 

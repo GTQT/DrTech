@@ -9,6 +9,11 @@
         "textures": {
           "all": "drtech:blocks/gravitation_field_casing"
         }
+      },
+      "neutron_mechanical_casing": {
+        "textures": {
+          "all": "drtech:blocks/neutron_mechanical_casing"
+        }
       }
     }
   }
