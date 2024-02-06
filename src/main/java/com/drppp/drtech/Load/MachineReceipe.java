@@ -117,8 +117,14 @@ public class MachineReceipe {
                 continue;
             buid.buildAndRegister();
             copybuild.buildAndRegister();
+            SCANNER_RECIPES.recipeBuilder()
+                    .input(MyMetaItems.CD_ROM)
+                    .notConsumable(is)
+                    .outputs(is)
+                    .duration(100)
+                    .EUt(30)
+                    .buildAndRegister();
         }
-
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {

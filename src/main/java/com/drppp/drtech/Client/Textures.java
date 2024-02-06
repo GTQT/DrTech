@@ -6,6 +6,7 @@ import gregtech.api.unification.material.info.MaterialIconType;
 import gregtech.api.util.GTLog;
 import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
+import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
@@ -28,7 +29,10 @@ public class Textures {
     @SideOnly(Side.CLIENT)
     public static OrientedOverlayRenderer UUPRODUCTER_OVERLAY;
     @SideOnly(Side.CLIENT)
+
     public static OrientedOverlayRenderer DUPLICATOR;
+    @SideOnly(Side.CLIENT)
+    public static final SimpleOverlayRenderer NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
     @SideOnly(Side.CLIENT)
     public static void register(TextureMap textureMap) {
 
@@ -38,5 +42,6 @@ public class Textures {
         LASER_PIPE_OVERLAY_EMISSIVE = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side_overlay_emissive"));
         UUPRODUCTER_OVERLAY  = new OrientedOverlayRenderer("machines/uu_producter");
         DUPLICATOR  = new OrientedOverlayRenderer("machines/duplicator");
+
     }
 }
