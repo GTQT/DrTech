@@ -34,6 +34,10 @@ public class Textures {
     @SideOnly(Side.CLIENT)
     public static final SimpleOverlayRenderer NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
     @SideOnly(Side.CLIENT)
+    public static final SimpleOverlayRenderer MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
+    @SideOnly(Side.CLIENT)
+    public static final OrientedOverlayRenderer LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
+    @SideOnly(Side.CLIENT)
     public static void register(TextureMap textureMap) {
 
         LASER_PIPE_SIDE = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side"));

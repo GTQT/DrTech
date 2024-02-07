@@ -3,6 +3,7 @@ package com.drppp.drtech.Blocks;
 import com.drppp.drtech.Blocks.Crops.CropsInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
+import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses1;
 import com.drppp.drtech.Blocks.Pipe.BlockMyLaserPipe;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
@@ -20,6 +21,7 @@ import java.util.Random;
 public class BlocksInit {
     public static final BlockGravitationalAnomaly BLOCK_GRAVITATIONAL_ANOMALY = new BlockGravitationalAnomaly();
     public static final MetaGlasses TRANSPARENT_CASING = new MetaGlasses("glasses_casing");
+    public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
     public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
     public  static void init(RegistryEvent.Register<Block> event)
@@ -27,6 +29,7 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
         GameRegistry.registerTileEntity(TileEntityGravitationalAnomaly.class, new ResourceLocation(Tags.MODID, "gravitational_anomaly"));
         event.getRegistry().register(TRANSPARENT_CASING);
+        event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
 
 

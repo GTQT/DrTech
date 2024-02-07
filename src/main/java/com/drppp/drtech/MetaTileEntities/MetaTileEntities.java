@@ -6,6 +6,7 @@ import com.drppp.drtech.MetaTileEntities.muti.ecectric.generator.AnnihilationGen
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityAdvancedProsscessArray;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityElectricImplosionCompressor;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityInfiniteFluidDrill;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityLargeUUProducter;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.GTValues;
@@ -32,6 +33,7 @@ public class MetaTileEntities {
     public static final SimpleMachineMetaTileEntity[] UU_PRODUCTER = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
     public static final SimpleMachineMetaTileEntity[] DUPLICATOR = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
     public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
+    public static MetaTileEntityLargeUUProducter LARGE_UU_PRODUCTER;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -51,6 +53,7 @@ public class MetaTileEntities {
         registerSimpleMetaTileEntity(DUPLICATOR, 17024, "duplicator", DrtechReceipes.COPY_RECIPES, Textures.DUPLICATOR, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         //17032
         INFINITE_FLUID_DRILLING_RIG =registerMetaTileEntity(17032, new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
+        LARGE_UU_PRODUCTER = registerMetaTileEntity(17033,new MetaTileEntityLargeUUProducter(getmyId("large_uu_producter")));
     }
 
 
