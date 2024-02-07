@@ -59,7 +59,9 @@ metaitem.gravity_shield.info.2=取消重力屏蔽！
 metaitem.gravity_shield.tooltip.1=shift+右键开启或关闭
 behavior.data_item.cd_rom.title=§n光盘存储数据：
 behavior.data_item.cd_rom.data=- §a%s
-
+drtech.machine.uuproducter.tip.1=§6同等电压下比小机器快四倍
+drtech.machine.uuproducter.tip.2=§6耗电量为原本一半
+drtech.machine.uuproducter.tip.3=§6并行=8*电压等级
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
