@@ -6,6 +6,7 @@ import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses1;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Load.DrtechReceipes;
+import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -44,7 +45,7 @@ public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockControlle
 
     public MetaTileEntityLargeUUProducter(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, DrtechReceipes.UU_RECIPES);
-        this.recipeMapWorkable = new MultiblockRecipeLogic(this, true);
+        this.recipeMapWorkable = new UUProducterRecipeLogic(this, true);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockControlle
                 .where('S', selfPredicate())
                 .where('C', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.MASS_GENERATION_COIL_CASING)))
                 .where('G', states(BlocksInit.TRANSPARENT_CASING1.getState(MetaGlasses1.CasingType.UU_GALSS)))
-                .where('X', states(getCasingState()).or(abilities))
+                .where('X', states(getCasingState()).setMinGlobalLimited(25).or(abilities))
                 .where('#', air())
                 .build();
     }
@@ -83,6 +84,9 @@ public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockControlle
     @Override
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, boolean advanced) {
         super.addInformation(stack, player, tooltip, advanced);
+        tooltip.add(I18n.format("drtech.machine.uuproducter.tip.1"));
+        tooltip.add(I18n.format("drtech.machine.uuproducter.tip.2"));
+        tooltip.add(I18n.format("drtech.machine.uuproducter.tip.3"));
         tooltip.add(TooltipHelper.RAINBOW_SLOW + I18n.format("gregtech.machine.perfect_oc"));
     }
 
@@ -91,5 +95,42 @@ public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockControlle
     @Override
     protected ICubeRenderer getFrontOverlay() {
         return Textures.LARGE_UU_PRODUCTER;
+    }
+    protected class UUProducterRecipeLogic extends MultiblockRecipeLogic{
+
+
+        public UUProducterRecipeLogic(RecipeMapMultiblockController tileEntity) {
+            super(tileEntity);
+        }
+
+        public UUProducterRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
+            super(tileEntity, hasPerfectOC);
+        }
+        @Override
+        public void setMaxProgress(int maxProgress) {
+            this.maxProgressTime = maxProgress / 4;
+        }
+        @Override
+        protected boolean drawEnergy(int recipeEUt, boolean simulate) {
+            long resultEnergy = this.getEnergyStored() - (long)recipeEUt/2;
+            if (resultEnergy >= 0L && resultEnergy <= this.getEnergyCapacity()) {
+                if (!simulate) {
+                    this.getEnergyContainer().changeEnergy((long)(-recipeEUt));
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+        @Override
+        public int getParallelLimit() {
+            int tire = 1;
+            for (int i = 0; i < GTValues.V.length; i++) {
+                if(GTValues.V[i]==this.getMaxVoltage())
+                    tire = i;
+            }
+            return tire*8;
+        }
     }
 }
