@@ -18,24 +18,15 @@ import java.util.Iterator;
 import static gregtech.client.renderer.texture.Textures.iconRegisters;
 
 public class Textures {
-    @SideOnly(Side.CLIENT)
     public static TextureAtlasSprite LASER_PIPE_IN;
-    @SideOnly(Side.CLIENT)
     public static TextureAtlasSprite LASER_PIPE_SIDE;
-    @SideOnly(Side.CLIENT)
     public static TextureAtlasSprite LASER_PIPE_OVERLAY;
-    @SideOnly(Side.CLIENT)
     public static TextureAtlasSprite LASER_PIPE_OVERLAY_EMISSIVE;
-    @SideOnly(Side.CLIENT)
     public static OrientedOverlayRenderer UUPRODUCTER_OVERLAY;
-    @SideOnly(Side.CLIENT)
 
     public static OrientedOverlayRenderer DUPLICATOR;
-    @SideOnly(Side.CLIENT)
     public static final SimpleOverlayRenderer NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
-    @SideOnly(Side.CLIENT)
     public static final SimpleOverlayRenderer MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
-    @SideOnly(Side.CLIENT)
     public static final OrientedOverlayRenderer LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
     @SideOnly(Side.CLIENT)
     public static void register(TextureMap textureMap) {
