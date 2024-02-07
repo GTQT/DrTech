@@ -2,10 +2,14 @@ package com.drppp.drtech.MetaTileEntities.muti.ecectric.standard;
 
 import gregicality.multiblocks.api.metatileentity.GCYMRecipeMapMultiblockController;
 import gregicality.multiblocks.api.render.GCYMTextures;
+import gregtech.api.GTValues;
+import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
+import gregtech.api.metatileentity.multiblock.MultiMapMultiblockController;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
+import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.recipes.RecipeMaps;
@@ -26,9 +30,10 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.drppp.drtech.Load.DrtechReceipes.EIMPLOSION_RECIPES;
 
-public class MetaTileEntityElectricImplosionCompressor extends GCYMRecipeMapMultiblockController {
+public class MetaTileEntityElectricImplosionCompressor extends RecipeMapMultiblockController {
     public MetaTileEntityElectricImplosionCompressor(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, EIMPLOSION_RECIPES);
+        this.recipeMapWorkable = new ImplosionCompressor(this, false);
     }
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity metaTileEntityHolder) {
@@ -79,14 +84,29 @@ public class MetaTileEntityElectricImplosionCompressor extends GCYMRecipeMapMult
     @SideOnly(Side.CLIENT)
     @Override
     protected @NotNull OrientedOverlayRenderer getFrontOverlay() {
-        return GCYMTextures.ELECTRIC_IMPLOSION_OVERLAY;
+        return com.drppp.drtech.Client.Textures.ELECTRIC_IMPLOSION_OVERLAY;
     }
 
     @Override
     public boolean hasMufflerMechanics() {
         return true;
     }
+    protected class ImplosionCompressor extends MultiblockRecipeLogic {
 
+        public ImplosionCompressor(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
+            super(tileEntity, hasPerfectOC);
+        }
+
+        @Override
+        public int getParallelLimit() {
+            int tire = 1;
+            for (int i = 0; i < GTValues.V.length; i++) {
+                if(GTValues.V[i]==this.getMaxVoltage())
+                    tire = i;
+            }
+            return tire*8;
+        }
+    }
 
 }
 
