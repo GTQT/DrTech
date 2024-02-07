@@ -37,7 +37,11 @@ public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
         GRAVITATION_FIELD_CASING("gravitation_field_casing"),
         NEUTRON_MACHINE_CASING("neutron_mechanical_casing"),
         MASS_GENERATION_CASING("mass_generation_casing"),
-        MASS_GENERATION_COIL_CASING("mass_generation_coil_casing");
+        MASS_GENERATION_COIL_CASING("mass_generation_coil_casing"),
+        BUNCHER_CASING("buncher_casing"),
+        RESONATOR_CASING("resonator_casing"),
+        HIGH_VOLTAGE_CAPACITOR_BLOCK_CASING("high_voltage_capacitor_block_casing"),
+        ELEMENT_CONSTRAINS_MACHINE_CASING("element_constrains_machine_casing");
 
         private final String name;
 

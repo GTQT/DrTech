@@ -2,7 +2,6 @@ package com.drppp.drtech.MetaTileEntities.muti.ecectric.standard;
 
 import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses1;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Load.DrtechReceipes;
@@ -14,58 +13,52 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
-import gregtech.api.pattern.MultiblockShapeInfo;
 import gregtech.api.pattern.TraceabilityPredicate;
-import gregtech.api.recipes.RecipeMaps;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.utils.TooltipHelper;
-import gregtech.common.ConfigHolder;
-import gregtech.common.blocks.BlockBoilerCasing;
-import gregtech.common.blocks.BlockMetalCasing;
-import gregtech.common.blocks.BlockWireCoil;
-import gregtech.common.blocks.MetaBlocks;
-import gregtech.common.metatileentities.MetaTileEntities;
-import gregtech.core.sound.GTSoundEvents;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockController {
+public class MetaTileEntityLargeElementDuplicator extends RecipeMapMultiblockController {
 
-    public MetaTileEntityLargeUUProducter(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId, DrtechReceipes.UU_RECIPES);
-        this.recipeMapWorkable = new UUProducterRecipeLogic(this, true);
+    public MetaTileEntityLargeElementDuplicator(ResourceLocation metaTileEntityId) {
+        super(metaTileEntityId, DrtechReceipes.COPY_RECIPES);
+        this.recipeMapWorkable = new DuplicatorRecipeLogic(this, true);
     }
 
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity tileEntity) {
-        return new MetaTileEntityLargeUUProducter(metaTileEntityId);
+        return new MetaTileEntityLargeElementDuplicator(metaTileEntityId);
     }
 
     @Override
     protected BlockPattern createStructurePattern() {
         TraceabilityPredicate abilities = autoAbilities();
         return FactoryBlockPattern.start()
-                .aisle("XXXXX", "XGGGX", "XGGGX", "XXXXX")
-                .aisle("XCCCX", "G###G", "G###G", "XXXXX")
-                .aisle("XCCCX", "G###G", "G###G", "XXXXX")
-                .aisle("XCCCX", "G###G", "G###G", "XXXXX")
-                .aisle("XXSXX", "XGGGX", "XGGGX", "XXXXX")
+                .aisle("###XXX###", "##XXXXX##", "#XXXXXXX#", "XXXXXXXXX","XXXXXXXXX","XXXXXXXXX","#XXXXXXX#", "##XXXXX##", "###XXX###")
+                .aisle("###XWX###", "##WQZQW##", "#WQZTZQW#", "XQZTYTZQX","WQZYYYZQW","XQZTYTZQX","#WQZTZQW#", "##WQZQW##", "###XWX###")
+                .aisle("###XGX###", "##G###G##", "#G#####G#", "X###Y###X","G##YYY##G","X###Y###X","#G#####G#", "##G###G##", "###XGX###")
+                .aisle("###XGX###", "##G###G##", "#G#####G#", "X###Y###X","G##YYY##G","X###Y###X","#G#####G#", "##G###G##", "###XGX###")
+                .aisle("###XWX###", "##WQZQW##", "#WQZTZQW#", "XQZTYTZQX","WQZYYYZQW","XQZTYTZQX","#WQZTZQW#", "##WQZQW##", "###XWX###")
+                .aisle("###XXX###", "##XXXXX##", "#XXXXXXX#", "XXXXXXXXX","XXXXSXXXX","XXXXXXXXX","#XXXXXXX#", "##XXXXX##", "###XXX###")
                 .where('S', selfPredicate())
                 .where('C', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.MASS_GENERATION_COIL_CASING)))
-                .where('G', states(BlocksInit.TRANSPARENT_CASING1.getState(MetaGlasses1.CasingType.UU_GALSS)))
-                .where('X', states(getCasingState()).setMinGlobalLimited(25).or(abilities))
+                .where('G', states(BlocksInit.TRANSPARENT_CASING1.getState(MetaGlasses1.CasingType.COPY_GALSS)))
+                .where('X', states(getCasingState()).setMinGlobalLimited(138).or(abilities))
+                .where('W', states(getCasingState1()))
+                .where('Q', states(getCasingState2()))
+                .where('Z', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.RESONATOR_CASING)))
+                .where('T', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.BUNCHER_CASING)))
+                .where('Y', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HIGH_VOLTAGE_CAPACITOR_BLOCK_CASING)))
                 .where('#', air())
                 .build();
     }
@@ -73,20 +66,24 @@ public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockControlle
     @SideOnly(Side.CLIENT)
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart sourcePart) {
-        return Textures.MASS_GENERATION_CASING;
+        return Textures.ELEMENT_CONSTRAINS_MACHINE_CASING;
     }
 
     protected IBlockState getCasingState() {
+        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.ELEMENT_CONSTRAINS_MACHINE_CASING);
+    }
+    protected IBlockState getCasingState1() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.MASS_GENERATION_CASING);
     }
-
-
+    protected IBlockState getCasingState2() {
+        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.MASS_GENERATION_COIL_CASING);
+    }
     @Override
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, boolean advanced) {
         super.addInformation(stack, player, tooltip, advanced);
-        tooltip.add(I18n.format("drtech.machine.uuproducter.tip.1"));
-        tooltip.add(I18n.format("drtech.machine.uuproducter.tip.2"));
-        tooltip.add(I18n.format("drtech.machine.uuproducter.tip.3"));
+        tooltip.add(I18n.format("drtech.machine.duplicator.tip.1"));
+        tooltip.add(I18n.format("drtech.machine.duplicator.tip.2"));
+        tooltip.add(I18n.format("drtech.machine.duplicator.tip.3"));
         tooltip.add(TooltipHelper.RAINBOW_SLOW + I18n.format("gregtech.machine.perfect_oc"));
     }
 
@@ -96,19 +93,20 @@ public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockControlle
     protected ICubeRenderer getFrontOverlay() {
         return Textures.LARGE_UU_PRODUCTER;
     }
-    protected class UUProducterRecipeLogic extends MultiblockRecipeLogic{
+    protected class DuplicatorRecipeLogic extends MultiblockRecipeLogic{
 
-
-        public UUProducterRecipeLogic(RecipeMapMultiblockController tileEntity) {
-            super(tileEntity);
-        }
-
-        public UUProducterRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
+        public DuplicatorRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
             super(tileEntity, hasPerfectOC);
         }
+
+        @Override
+        public void setMaxProgress(int maxProgress) {
+            this.maxProgressTime = maxProgress / 2;
+        }
+
         @Override
         protected boolean drawEnergy(int recipeEUt, boolean simulate) {
-            long resultEnergy = this.getEnergyStored() - (long)recipeEUt/2;
+            long resultEnergy = this.getEnergyStored() - (long)recipeEUt;
             if (resultEnergy >= 0L && resultEnergy <= this.getEnergyCapacity()) {
                 if (!simulate) {
                     this.getEnergyContainer().changeEnergy((long)(-recipeEUt));

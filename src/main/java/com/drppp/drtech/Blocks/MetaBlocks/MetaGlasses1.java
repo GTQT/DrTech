@@ -68,7 +68,8 @@ public class MetaGlasses1 extends VariantActiveBlock<MetaGlasses1.CasingType> {
                 super.shouldSideBeRendered(state, world, pos, side);
     }
     public enum CasingType implements IStringSerializable {
-        UU_GALSS("uu_glass_block", 1);
+        UU_GALSS("uu_glass_block", 1),
+        COPY_GALSS("copy_glass_block", 1);
 
 
         private final String name;

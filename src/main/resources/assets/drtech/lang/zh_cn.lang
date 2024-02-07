@@ -13,6 +13,7 @@ metaitem.gravity_shield.name=重力屏蔽仪
 metaitem.skull_dust.name=凋零骷髅粉
 metaitem.scrap.name=废料
 metaitem.cd_rom.name=记忆光盘
+metaitem.uu_mater.name=固态UU物质
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
@@ -26,6 +27,7 @@ tile.glasses_casing.os_boron_silicate_glass_block.name=锇强化硅酸盐硼玻�
 tile.glasses_casing.ne_boron_silicate_glass_block.name=中子强化硅酸盐硼玻璃
 tile.glasses_casing.sne_boron_silicate_glass_block.name=宇宙中子强化硅酸盐硼玻璃
 tile.glasses_casing1.uu_glass_block.name=抑制玻璃方块
+tile.glasses_casing1.copy_glass_block.name=粒子抑制玻璃方块
 tile.drtech.gravitational_anomaly.name=质量异常点
 tile.my_laser_pipe_normal.name=透明激光管
 #MetaCasing
@@ -33,12 +35,18 @@ tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
 tile.Meta_Machine_Casing.mass_generation_casing.name=质量发生机械方块
 tile.Meta_Machine_Casing.mass_generation_coil_casing.name=质量发生线圈方块
+tile.Meta_Machine_Casing.mass_generation_coil_casing.name=质量发生线圈方块
+tile.Meta_Machine_Casing.buncher_casing.name=调制腔
+tile.Meta_Machine_Casing.resonator_casing.name=谐振腔
+tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=高压流电容方块
+tile.Meta_Machine_Casing.element_constrains_machine_casing.name=元素约束机械方块
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
 drtech.machine.electric_implosion_compressor.name=电力聚爆压缩机
 drtech.machine.fluid_drilling_rig.iv.name=无尽油气钻机
 drtech.machine.large_uu_producter.name=大型质量发生仪
+drtech.machine.large_element_duplicator.name=大型元素复制机
 
 
 #Tips
@@ -59,9 +67,12 @@ metaitem.gravity_shield.info.2=取消重力屏蔽！
 metaitem.gravity_shield.tooltip.1=shift+右键开启或关闭
 behavior.data_item.cd_rom.title=§n光盘存储数据：
 behavior.data_item.cd_rom.data=- §a%s
-drtech.machine.uuproducter.tip.1=§6同等电压下比小机器快四倍
+drtech.machine.uuproducter.tip.1=§6享受大机器的快乐
 drtech.machine.uuproducter.tip.2=§6耗电量为原本一半
 drtech.machine.uuproducter.tip.3=§6并行=8*电压等级
+drtech.machine.duplicator.tip.1=§6享受大机器的快乐
+drtech.machine.duplicator.tip.2=§6速度提升2倍
+drtech.machine.duplicator.tip.3=§6并行=8*电压等级
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
