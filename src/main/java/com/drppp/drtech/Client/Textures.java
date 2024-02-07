@@ -27,6 +27,7 @@ public class Textures {
     public static OrientedOverlayRenderer DUPLICATOR;
     public static final SimpleOverlayRenderer NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
     public static final SimpleOverlayRenderer MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
+    public static final SimpleOverlayRenderer ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
     public static final OrientedOverlayRenderer LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
     @SideOnly(Side.CLIENT)
     public static void register(TextureMap textureMap) {
