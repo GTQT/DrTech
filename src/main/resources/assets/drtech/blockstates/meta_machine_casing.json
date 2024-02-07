@@ -14,6 +14,14 @@
         "textures": {
           "all": "drtech:blocks/neutron_mechanical_casing"
         }
+      },"mass_generation_casing": {
+        "textures": {
+          "all": "drtech:blocks/mass_generation_casing"
+        }
+      },"mass_generation_coil_casing": {
+        "textures": {
+          "all": "drtech:blocks/mass_generation_coil_casing"
+        }
       }
     }
   }

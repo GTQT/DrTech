@@ -40,12 +40,14 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_LAPIS_SEED);
         event.getRegistry().register(ITEM_FLU_SEED);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
         event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
     }
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
         registerItemModel(BlocksInit.TRANSPARENT_CASING);
+        registerItemModel(BlocksInit.TRANSPARENT_CASING1);
         registerItemModel(BlocksInit.COMMON_CASING);
             BlockLaserPipe pipe = BlocksInit.MY_LASER_PIPE;
             ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(pipe), (stack) -> {

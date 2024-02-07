@@ -1,0 +1,20 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "active=false,variant=uu_glass_block": {
+      "model": "minecraft:cube_all",
+      "ambientocclusion": false,
+      "textures": {
+        "all": "drtech:blocks/glasses/uu_glass_block"
+      }
+    },
+    "active=true,variant=uu_glass_block": {
+      "model": "minecraft:cube_all",
+      "ambientocclusion": false,
+      "textures": {
+        "all": "drtech:blocks/glasses/uu_glass_block"
+      }
+    }
+    }
+  }
+
