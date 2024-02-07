@@ -25,16 +25,20 @@ tile.glasses_casing.ir_boron_silicate_glass_block.name=铱强化硅酸盐硼玻�
 tile.glasses_casing.os_boron_silicate_glass_block.name=锇强化硅酸盐硼玻璃
 tile.glasses_casing.ne_boron_silicate_glass_block.name=中子强化硅酸盐硼玻璃
 tile.glasses_casing.sne_boron_silicate_glass_block.name=宇宙中子强化硅酸盐硼玻璃
+tile.glasses_casing1.uu_glass_block.name=抑制玻璃方块
 tile.drtech.gravitational_anomaly.name=质量异常点
 tile.my_laser_pipe_normal.name=透明激光管
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
+tile.Meta_Machine_Casing.mass_generation_casing.name=质量发生机械方块
+tile.Meta_Machine_Casing.mass_generation_coil_casing.name=质量发生线圈方块
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
 drtech.machine.electric_implosion_compressor.name=电力聚爆压缩机
 drtech.machine.fluid_drilling_rig.iv.name=无尽油气钻机
+drtech.machine.large_uu_producter.name=大型质量发生仪
 
 
 #Tips
