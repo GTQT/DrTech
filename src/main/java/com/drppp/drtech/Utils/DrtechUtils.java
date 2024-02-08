@@ -6,12 +6,19 @@ import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.common.items.MetaItems;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockSapling;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.drppp.drtech.Load.DrtechReceipes.LOG_CREATE;
 
 public class DrtechUtils {
     public static  List<Material> listMater = new ArrayList<>();
@@ -155,4 +162,24 @@ public class DrtechUtils {
     {
         return mater.getLocalizedName();
     }
+
+    public static void addLogCreate(int EUt, int tick, int outNum, int meta)
+    {
+        LOG_CREATE.recipeBuilder()
+                .notConsumable(new ItemStack(Blocks.SAPLING,1,meta))
+                .outputs(new ItemStack(Blocks.LOG,outNum,meta))
+                .EUt(EUt)
+                .duration(tick)
+                .buildAndRegister();
+    }
+    public static void addLog2Create(int EUt, int tick, int outNum, int meta)
+    {
+        LOG_CREATE.recipeBuilder()
+                .notConsumable(new ItemStack(Blocks.SAPLING,1,meta+4))
+                .outputs(new ItemStack(Blocks.LOG2,outNum,meta))
+                .EUt(EUt)
+                .duration(tick)
+                .buildAndRegister();
+    }
+
 }

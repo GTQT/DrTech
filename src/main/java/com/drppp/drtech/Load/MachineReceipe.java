@@ -125,6 +125,16 @@ public class MachineReceipe {
                     .EUt(30)
                     .buildAndRegister();
         }
+        for (int i = 0; i < 4; i++) {
+            DrtechUtils.addLogCreate(30,100,1,i);
+        }
+        for (int i = 0; i < 2; i++) {
+            DrtechUtils.addLog2Create(30,100,1,i);
+        }
+
+
+
+
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {

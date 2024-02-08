@@ -27,6 +27,7 @@ public class Textures {
     public static OrientedOverlayRenderer DUPLICATOR;
     public static final SimpleOverlayRenderer NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
     public static final SimpleOverlayRenderer MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
+    public static final SimpleOverlayRenderer ASEPTIC_MACHINE_CASING = new SimpleOverlayRenderer("casings/aseptic_machine_casing");
     public static final SimpleOverlayRenderer ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
     public static final OrientedOverlayRenderer LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
     public static OrientedOverlayRenderer ELECTRIC_IMPLOSION_OVERLAY = new OrientedOverlayRenderer("multiblock/electric_implosion");

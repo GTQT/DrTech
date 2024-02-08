@@ -42,6 +42,12 @@
         "textures": {
           "all": "drtech:blocks/element_constrains_machine_casing"
         }
+      },
+
+      "aseptic_machine_casing": {
+        "textures": {
+          "all": "drtech:blocks/aseptic_machine_casing"
+        }
       }
     }
   }
