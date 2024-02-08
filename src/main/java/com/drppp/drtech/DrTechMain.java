@@ -9,6 +9,7 @@ import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.Load.DrTechReceipeManager;
+import com.drppp.drtech.Materials.DrtechMaterials;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import net.minecraft.block.Block;
@@ -42,7 +43,6 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(this);
         Mytab = new MyCreativeTabs("mytab");
         MyMetaItems.MetaItemsInit();
-       // TexturesInit();
     }
     @EventHandler
     @SideOnly(Side.CLIENT)

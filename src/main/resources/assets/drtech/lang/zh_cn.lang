@@ -4,6 +4,7 @@ recipemap.eimplosion_compressor.name=电力聚爆压缩机
 recipemap.uu_producter.name=UU物质生产
 recipemap.uu_copy.name=复制机
 recipemap.log_create.name=原木拟生
+recipemap.molecular_recombination.name=分子重组
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
@@ -29,6 +30,7 @@ tile.glasses_casing.ne_boron_silicate_glass_block.name=中子强化硅酸盐硼�
 tile.glasses_casing.sne_boron_silicate_glass_block.name=宇宙中子强化硅酸盐硼玻璃
 tile.glasses_casing1.uu_glass_block.name=抑制玻璃方块
 tile.glasses_casing1.copy_glass_block.name=粒子抑制玻璃方块
+tile.glasses_casing1.recombination_glass_block.name=分子抑制玻璃方块
 tile.drtech.gravitational_anomaly.name=质量异常点
 tile.my_laser_pipe_normal.name=透明激光管
 #MetaCasing
@@ -46,11 +48,13 @@ tile.Meta_Machine_Casing.aseptic_machine_casing.name=无菌农场机械方块
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
 drtech.machine.electric_implosion_compressor.name=电力聚爆压缩机
-drtech.machine.fluid_drilling_rig.iv.name=无尽油气钻机
+drtech.machine.fluid_drilling_rig.iv.name=无尽流体钻机
 drtech.machine.large_uu_producter.name=大型质量发生仪
 drtech.machine.large_element_duplicator.name=大型元素复制机
 drtech.machine.log_factory.name=原木拟生厂
-
+drtech.machine.molecular_recombination.name=大型分子重组仪
+#Materials
+gregtech.material.bedrock=基岩
 
 #Tips
 drtech.machine.annihilation_generator.tooltip.1=§c根据物质量分阶段发电(400为一段)
@@ -79,6 +83,8 @@ drtech.machine.duplicator.tip.3=§6并行=8*电压等级
 drtech.machine.logcreate.tip.1=§1产量公式：(2×电压等级2-2×电压等级+5)×5×输出系数
 drtech.machine.logcreate.tip.2=§3锯 = 1x  圆锯 = 2x  链锯 = 4x
 drtech.machine.logcreate.tip.3=§3工作速度固定为5秒
+drtech.machine.recombination.tip.1=§3并行=2*电压等级
+drtech.machine.recombination.tip.2=§3分子之间的转换！
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
