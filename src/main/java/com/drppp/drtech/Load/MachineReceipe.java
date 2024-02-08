@@ -33,8 +33,7 @@ import java.util.List;
 
 import static com.drppp.drtech.Load.DrtechReceipes.*;
 import static gregtech.api.recipes.RecipeMaps.*;
-import static gregtech.api.unification.material.Materials.Carbon;
-import static gregtech.api.unification.material.Materials.NetherStar;
+import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.material.info.MaterialFlags.EXPLOSIVE;
 import static gregtech.api.unification.material.info.MaterialFlags.FLAMMABLE;
 import static gregtech.api.unification.ore.OrePrefix.dust;
@@ -131,10 +130,36 @@ public class MachineReceipe {
         for (int i = 0; i < 2; i++) {
             DrtechUtils.addLog2Create(30,100,1,i);
         }
-
-
-
-
+        MOLECULAR_RECOMBINATION.recipeBuilder()
+                .input(OrePrefix.dust,Carbon,1)
+                .output(dust,Graphene,1)
+                .EUt(7680)
+                .duration(652)
+                .buildAndRegister();
+        MOLECULAR_RECOMBINATION.recipeBuilder()
+                .input(OrePrefix.dust,Tin,1)
+                .output(dust,Silver,1)
+                .EUt(7680)
+                .duration(326)
+                .buildAndRegister();
+        MOLECULAR_RECOMBINATION.recipeBuilder()
+                .input(OrePrefix.dust,Copper,1)
+                .output(dust,Nickel,1)
+                .EUt(7680)
+                .duration(326)
+                .buildAndRegister();
+        MOLECULAR_RECOMBINATION.recipeBuilder()
+                .input(Items.REDSTONE)
+                .output(dust,Ruby,1)
+                .EUt(7680)
+                .duration(326)
+                .buildAndRegister();
+        MOLECULAR_RECOMBINATION.recipeBuilder()
+                .input(Items.COAL)
+                .output(Items.DIAMOND)
+                .EUt(7680)
+                .duration(652)
+                .buildAndRegister();
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {

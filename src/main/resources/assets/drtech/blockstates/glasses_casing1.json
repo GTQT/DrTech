@@ -28,6 +28,20 @@
       "textures": {
         "all": "drtech:blocks/glasses/copy_glass_block"
       }
+    },
+    "active=false,variant=recombination_glass_block": {
+      "model": "minecraft:cube_all",
+      "ambientocclusion": false,
+      "textures": {
+        "all": "drtech:blocks/glasses/recombination_glass_block"
+      }
+    },
+    "active=true,variant=recombination_glass_block": {
+      "model": "minecraft:cube_all",
+      "ambientocclusion": false,
+      "textures": {
+        "all": "drtech:blocks/glasses/recombination_glass_block"
+      }
     }
     }
   }
