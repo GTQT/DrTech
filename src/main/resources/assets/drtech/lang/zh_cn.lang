@@ -3,6 +3,7 @@ itemGroup.mytab=DR科技
 recipemap.eimplosion_compressor.name=电力聚爆压缩机
 recipemap.uu_producter.name=UU物质生产
 recipemap.uu_copy.name=复制机
+recipemap.log_create.name=原木拟生
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
@@ -40,6 +41,7 @@ tile.Meta_Machine_Casing.buncher_casing.name=调制腔
 tile.Meta_Machine_Casing.resonator_casing.name=谐振腔
 tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=高压流电容方块
 tile.Meta_Machine_Casing.element_constrains_machine_casing.name=元素约束机械方块
+tile.Meta_Machine_Casing.aseptic_machine_casing.name=无菌农场机械方块
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
@@ -47,6 +49,7 @@ drtech.machine.electric_implosion_compressor.name=电力聚爆压缩机
 drtech.machine.fluid_drilling_rig.iv.name=无尽油气钻机
 drtech.machine.large_uu_producter.name=大型质量发生仪
 drtech.machine.large_element_duplicator.name=大型元素复制机
+drtech.machine.log_factory.name=原木拟生厂
 
 
 #Tips
@@ -73,6 +76,9 @@ drtech.machine.uuproducter.tip.3=§6并行=8*电压等级
 drtech.machine.duplicator.tip.1=§6享受大机器的快乐
 drtech.machine.duplicator.tip.2=§6速度提升2倍
 drtech.machine.duplicator.tip.3=§6并行=8*电压等级
+drtech.machine.logcreate.tip.1=§1产量公式：(2×电压等级2-2×电压等级+5)×5×输出系数
+drtech.machine.logcreate.tip.2=§3锯 = 1x  圆锯 = 2x  链锯 = 4x
+drtech.machine.logcreate.tip.3=§3工作速度固定为5秒
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓

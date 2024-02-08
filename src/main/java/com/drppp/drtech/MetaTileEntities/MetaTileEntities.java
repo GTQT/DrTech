@@ -32,6 +32,7 @@ public class MetaTileEntities {
     public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
     public static MetaTileEntityLargeUUProducter LARGE_UU_PRODUCTER;
     public static MetaTileEntityLargeElementDuplicator LARGE_ELEMENT_DUPLICATOR;
+    public static MetaTileEntityLogFactory LOG_FACTORY;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -53,6 +54,7 @@ public class MetaTileEntities {
         INFINITE_FLUID_DRILLING_RIG =registerMetaTileEntity(17032, new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
         LARGE_UU_PRODUCTER = registerMetaTileEntity(17033,new MetaTileEntityLargeUUProducter(getmyId("large_uu_producter")));
         LARGE_ELEMENT_DUPLICATOR = registerMetaTileEntity(17034,new MetaTileEntityLargeElementDuplicator(getmyId("large_element_duplicator")));
+        LOG_FACTORY = registerMetaTileEntity(17035,new MetaTileEntityLogFactory(getmyId("log_factory")));
     }
 
 
