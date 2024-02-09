@@ -4,6 +4,7 @@ import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Load.DrtechReceipes;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.generator.AnnihilationGenerator;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.*;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.GTValues;
@@ -34,6 +35,7 @@ public class MetaTileEntities {
     public static MetaTileEntityLargeElementDuplicator LARGE_ELEMENT_DUPLICATOR;
     public static MetaTileEntityLogFactory LOG_FACTORY;
     public static MetaTileEntityLargeMolecularRecombination LARGE_MOLECULAR_RECOMBINATION;
+    public static MetaTileEntityYotTank YOUT_TANK;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -57,6 +59,7 @@ public class MetaTileEntities {
         LARGE_ELEMENT_DUPLICATOR = registerMetaTileEntity(17034,new MetaTileEntityLargeElementDuplicator(getmyId("large_element_duplicator")));
         LOG_FACTORY = registerMetaTileEntity(17035,new MetaTileEntityLogFactory(getmyId("log_factory")));
         LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(17036,new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
+        YOUT_TANK = registerMetaTileEntity(17037,new MetaTileEntityYotTank(getmyId("yot_tank")));
     }
 
 

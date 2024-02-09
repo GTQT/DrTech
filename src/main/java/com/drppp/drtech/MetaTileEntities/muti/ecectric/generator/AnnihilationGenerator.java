@@ -12,6 +12,7 @@ import com.drppp.drtech.MetaTileEntities.Logic.AnnihilationGeneratorLogic;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
+import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IControllable;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.IWorkable;
@@ -49,6 +50,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -189,7 +191,13 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new AnnihilationGenerator(this.metaTileEntityId);
     }
-
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing side) {
+        if (capability == GregtechTileCapabilities.CAPABILITY_CONTROLLABLE) {
+            return GregtechTileCapabilities.CAPABILITY_CONTROLLABLE.cast(this);
+        }
+        return super.getCapability(capability, side);
+    }
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {
         super.addDisplayText(textList);

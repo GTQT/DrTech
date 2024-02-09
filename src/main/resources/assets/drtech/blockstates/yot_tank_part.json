@@ -1,0 +1,48 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "yot_part_tier_t1": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t1"
+        }
+      },
+      "yot_part_tier_t2": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t2"
+        }
+      },"yot_part_tier_t3": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t3"
+        }
+      },"yot_part_tier_t4": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t4"
+        }
+      },
+      "yot_part_tier_t5": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t5"
+        }
+      },
+      "yot_part_tier_t6": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t6"
+        }
+      },
+      "yot_part_tier_t7": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t7"
+        }
+      },
+      "yot_part_tier_t8": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t8"
+        }
+      }
+    }
+  }
+}

@@ -48,6 +48,17 @@
         "textures": {
           "all": "drtech:blocks/aseptic_machine_casing"
         }
+      },
+
+      "yot_tank_casing": {
+        "textures": {
+          "north": "drtech:blocks/yot_tank_casing_side",
+          "south": "drtech:blocks/yot_tank_casing_side",
+          "west": "drtech:blocks/yot_tank_casing_side",
+          "east": "drtech:blocks/yot_tank_casing_side",
+          "up": "drtech:blocks/yot_tank_casing_top",
+          "down": "drtech:blocks/yot_tank_casing_top"
+        }
       }
     }
   }

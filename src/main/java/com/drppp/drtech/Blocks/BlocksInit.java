@@ -1,6 +1,7 @@
 package com.drppp.drtech.Blocks;
 
 import com.drppp.drtech.Blocks.Crops.CropsInit;
+import com.drppp.drtech.Blocks.MetaBlocks.BlockYotTankPart;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses1;
@@ -8,6 +9,7 @@ import com.drppp.drtech.Blocks.Pipe.BlockMyLaserPipe;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
+import com.drppp.drtech.Utils.Datas;
 import gregtech.common.pipelike.laser.LaserPipeType;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -23,6 +25,7 @@ public class BlocksInit {
     public static final MetaGlasses TRANSPARENT_CASING = new MetaGlasses("glasses_casing");
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
+    public static final BlockYotTankPart YOT_TANK = new BlockYotTankPart();
     public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
     public  static void init(RegistryEvent.Register<Block> event)
     {
@@ -31,6 +34,7 @@ public class BlocksInit {
         event.getRegistry().register(TRANSPARENT_CASING);
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
+        event.getRegistry().register(YOT_TANK);
 
 
 
@@ -38,7 +42,7 @@ public class BlocksInit {
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
         MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
         event.getRegistry().register(MY_LASER_PIPE);
-
+        Datas.init();
     }
 
     public static Vector3f randomSpherePoint(double x0, double y0, double z0, Vec3d radius, Random rand) {

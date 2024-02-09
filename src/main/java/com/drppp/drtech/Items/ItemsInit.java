@@ -42,6 +42,7 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK,  VariantItemBlock::new));
         event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
     }
     @SideOnly(Side.CLIENT)
@@ -49,6 +50,7 @@ public class ItemsInit {
         registerItemModel(BlocksInit.TRANSPARENT_CASING);
         registerItemModel(BlocksInit.TRANSPARENT_CASING1);
         registerItemModel(BlocksInit.COMMON_CASING);
+        registerItemModel(BlocksInit.YOT_TANK);
             BlockLaserPipe pipe = BlocksInit.MY_LASER_PIPE;
             ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(pipe), (stack) -> {
                 return LaserPipeRenderer.INSTANCE.getModelLocation();

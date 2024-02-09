@@ -42,7 +42,8 @@ public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
         RESONATOR_CASING("resonator_casing"),
         HIGH_VOLTAGE_CAPACITOR_BLOCK_CASING("high_voltage_capacitor_block_casing"),
         ELEMENT_CONSTRAINS_MACHINE_CASING("element_constrains_machine_casing"),
-        ASEPTIC_MACHINE_CASING("aseptic_machine_casing");
+        ASEPTIC_MACHINE_CASING("aseptic_machine_casing"),
+        YOT_TANK_CASING("yot_tank_casing");
 
         private final String name;
 

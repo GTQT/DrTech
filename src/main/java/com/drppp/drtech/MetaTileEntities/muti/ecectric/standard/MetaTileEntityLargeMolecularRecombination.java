@@ -1,11 +1,15 @@
 package com.drppp.drtech.MetaTileEntities.muti.ecectric.standard;
 
+import codechicken.lib.render.CCRenderState;
+import codechicken.lib.vec.Matrix4;
+import codechicken.lib.vec.Vector3;
 import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses1;
 import com.drppp.drtech.Client.Textures;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
+import gregtech.api.metatileentity.IFastRenderMetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
@@ -14,6 +18,9 @@ import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.unification.material.Materials;
+import gregtech.api.util.GTUtility;
+import gregtech.client.particle.GTLaserBeamParticle;
+import gregtech.client.particle.GTParticleManager;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
 import gregtech.client.utils.TooltipHelper;
@@ -25,6 +32,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -35,7 +44,12 @@ import java.util.List;
 
 import static com.drppp.drtech.Load.DrtechReceipes.MOLECULAR_RECOMBINATION;
 
+
 public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblockController {
+    @SideOnly(Side.CLIENT)
+    private GTLaserBeamParticle[][] beamParticles;
+    private static final ResourceLocation LASER_LOCATION = GTUtility.gregtechId("textures/fx/laser/laser.png");
+    private static final ResourceLocation LASER_HEAD_LOCATION = GTUtility.gregtechId("textures/fx/laser/laser_start.png");
     public MetaTileEntityLargeMolecularRecombination(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, MOLECULAR_RECOMBINATION);
         this.recipeMapWorkable = new LargeMoecularRecombinationLogic(this, true);
@@ -102,6 +116,7 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
         tooltip.add(I18n.format("drtech.machine.recombination.tip.2"));
         tooltip.add(TooltipHelper.RAINBOW_SLOW + I18n.format("gregtech.machine.perfect_oc"));
     }
+
     protected class LargeMoecularRecombinationLogic extends MultiblockRecipeLogic {
 
         public LargeMoecularRecombinationLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
