@@ -7,6 +7,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses1;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Load.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;

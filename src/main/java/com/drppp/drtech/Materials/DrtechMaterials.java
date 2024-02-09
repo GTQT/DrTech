@@ -18,7 +18,7 @@ import static gregtech.api.util.GTUtility.gregtechId;
 public class DrtechMaterials {
 public static Material BedRock;
     public static void init()
-    {
+    {/*
         BedRock = new Material.Builder(30000, gregtechId("bedrock"))
                 .ingot(6)
                 .color(0x020806)
@@ -34,6 +34,6 @@ public static Material BedRock;
                 .fluidPipeProperties(110_000, 8000, true, true, true, true)
                 .blastTemp(12800, BlastProperty.GasTier.HIGHEST, VA[UEV])
 
-                .build();
+                .build();*/
     }
 }

@@ -44,6 +44,16 @@ tile.Meta_Machine_Casing.resonator_casing.name=谐振腔
 tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=高压流电容方块
 tile.Meta_Machine_Casing.element_constrains_machine_casing.name=元素约束机械方块
 tile.Meta_Machine_Casing.aseptic_machine_casing.name=无菌农场机械方块
+tile.Meta_Machine_Casing.yot_tank_casing.name=yot机械方块
+#YOUT_TANK
+tile.yot_tank_part.yot_part_tier_t1.name=流体单元方块(T1)
+tile.yot_tank_part.yot_part_tier_t2.name=流体单元方块(T2)
+tile.yot_tank_part.yot_part_tier_t3.name=流体单元方块(T3)
+tile.yot_tank_part.yot_part_tier_t4.name=流体单元方块(T4)
+tile.yot_tank_part.yot_part_tier_t5.name=流体单元方块(T5)
+tile.yot_tank_part.yot_part_tier_t6.name=流体单元方块(T6)
+tile.yot_tank_part.yot_part_tier_t7.name=流体单元方块(T7)
+tile.yot_tank_part.yot_part_tier_t8.name=流体单元方块(T8)
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
@@ -53,6 +63,7 @@ drtech.machine.large_uu_producter.name=大型质量发生仪
 drtech.machine.large_element_duplicator.name=大型元素复制机
 drtech.machine.log_factory.name=原木拟生厂
 drtech.machine.molecular_recombination.name=大型分子重组仪
+drtech.machine.yot_tank.name=YOT储罐
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -85,6 +96,8 @@ drtech.machine.logcreate.tip.2=§3锯 = 1x  圆锯 = 2x  链锯 = 4x
 drtech.machine.logcreate.tip.3=§3工作速度固定为5秒
 drtech.machine.recombination.tip.1=§3并行=2*电压等级
 drtech.machine.recombination.tip.2=§3分子之间的转换！
+drtech.universal.tooltip.energy_storage_capacity=§c流体缓存：§r%,d L
+drtech.multiblock.yot_tank.fluid_type=流体类型:%s
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
