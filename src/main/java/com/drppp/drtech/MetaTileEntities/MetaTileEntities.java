@@ -52,14 +52,14 @@ public class MetaTileEntities {
         }
         registerSimpleMetaTileEntity(UU_PRODUCTER, 17012 +endPos, "uu_producter", DrtechReceipes.UU_RECIPES, Textures.UUPRODUCTER_OVERLAY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         //17024
-        registerSimpleMetaTileEntity(DUPLICATOR, 17024, "duplicator", DrtechReceipes.COPY_RECIPES, Textures.DUPLICATOR, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerSimpleMetaTileEntity(DUPLICATOR, 17035, "duplicator", DrtechReceipes.COPY_RECIPES, Textures.DUPLICATOR, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         //17032
-        INFINITE_FLUID_DRILLING_RIG =registerMetaTileEntity(17032, new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
-        LARGE_UU_PRODUCTER = registerMetaTileEntity(17033,new MetaTileEntityLargeUUProducter(getmyId("large_uu_producter")));
-        LARGE_ELEMENT_DUPLICATOR = registerMetaTileEntity(17034,new MetaTileEntityLargeElementDuplicator(getmyId("large_element_duplicator")));
-        LOG_FACTORY = registerMetaTileEntity(17035,new MetaTileEntityLogFactory(getmyId("log_factory")));
-        LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(17036,new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
-        YOUT_TANK = registerMetaTileEntity(17037,new MetaTileEntityYotTank(getmyId("yot_tank")));
+        INFINITE_FLUID_DRILLING_RIG =registerMetaTileEntity(17056, new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
+        LARGE_UU_PRODUCTER = registerMetaTileEntity(17057,new MetaTileEntityLargeUUProducter(getmyId("large_uu_producter")));
+        LARGE_ELEMENT_DUPLICATOR = registerMetaTileEntity(17058,new MetaTileEntityLargeElementDuplicator(getmyId("large_element_duplicator")));
+        LOG_FACTORY = registerMetaTileEntity(17059,new MetaTileEntityLogFactory(getmyId("log_factory")));
+        LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(17060,new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
+        YOUT_TANK = registerMetaTileEntity(17061,new MetaTileEntityYotTank(getmyId("yot_tank")));
     }
 
 
