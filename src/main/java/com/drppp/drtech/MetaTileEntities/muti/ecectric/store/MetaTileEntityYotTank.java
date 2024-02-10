@@ -130,12 +130,15 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         super.writeToNBT(data);
         data.setBoolean("isActive", isActive);
         data.setBoolean("isWorkingEnabled", isWorkingEnabled);
-        NBTTagCompound fluidNBT = new NBTTagCompound();
-        fluid.writeToNBT(fluidNBT);
-        data.setTag(NBT_FLUID,fluidNBT);
-        if (fluidBank != null) {
-            data.setTag(NBT_FLUID_BANK, fluidBank.writeToNBT(new NBTTagCompound()));
-        }
+       if(fluid!=null)
+       {
+           NBTTagCompound fluidNBT = new NBTTagCompound();
+           fluid.writeToNBT(fluidNBT);
+           data.setTag(NBT_FLUID,fluidNBT);
+           if (fluidBank != null) {
+               data.setTag(NBT_FLUID_BANK, fluidBank.writeToNBT(new NBTTagCompound()));
+           }
+       }
         return data;
     }
 
@@ -144,11 +147,14 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         super.readFromNBT(data);
         isActive = data.getBoolean("isActive");
         isWorkingEnabled = data.getBoolean("isWorkingEnabled");
-        NBTTagCompound fluidNBT= (NBTTagCompound) data.getTag(NBT_FLUID);
-        fluid = FluidStack.loadFluidStackFromNBT(fluidNBT);
-        if (data.hasKey(NBT_FLUID_BANK)) {
-            fluidBank = new YotTankFluidBank(data.getCompoundTag(NBT_FLUID_BANK));
+        if(data.hasKey(NBT_FLUID))
+        {
+            NBTTagCompound fluidNBT= (NBTTagCompound) data.getTag(NBT_FLUID);
+            fluid = FluidStack.loadFluidStackFromNBT(fluidNBT);
+            if (data.hasKey(NBT_FLUID_BANK)) {
+                fluidBank = new YotTankFluidBank(data.getCompoundTag(NBT_FLUID_BANK));
 
+            }
         }
     }
     @Override
@@ -177,7 +183,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                         }
                     }
                 }
-                if(outputFluidInventory.getTanks()>0)
+                if(outputFluidInventory.getTanks()>0 && this.fluid!=null)
                 {
                     List<FluidStack> Outputs = new ArrayList<>();
                     for (int i = 0; i < outputFluidInventory.getTanks(); i++) {
@@ -185,8 +191,9 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                         Outputs.add(new FluidStack(this.fluid.getFluid(), (int) energyDebanked));
                     }
                     GTTransferUtils.addFluidsToFluidHandler(outputFluidInventory ,false, Outputs);
-
                 }
+                if(!fluidBank.hasFluid())
+                    fluid = null;
             }
         }
     }
@@ -246,8 +253,8 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
-        tooltip.add(I18n.format("gregtech.machine.power_substation.tooltip1"));
-        tooltip.add(I18n.format("gregtech.machine.power_substation.tooltip2"));
+        tooltip.add(I18n.format("gregtech.machine.yot_tank.tooltip1"));
+        tooltip.add(I18n.format("gregtech.machine.yot_tank.tooltip2"));
     }
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {

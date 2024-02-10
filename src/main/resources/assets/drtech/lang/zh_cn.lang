@@ -67,7 +67,17 @@ drtech.machine.yot_tank.name=YOT储罐
 #Materials
 gregtech.material.bedrock=基岩
 
-#Tips
+#Tips §0黑色 §1深蓝 §2深绿
+#
+#§3天蓝 §4 红色§5深紫
+#
+#§6金黄 §7浅灰 §8深灰
+#
+#§9淡紫 §a浅绿 §b淡蓝
+#
+#§c淡红 §d淡紫 §e淡黄
+#
+#§f白色
 drtech.machine.annihilation_generator.tooltip.1=§c根据物质量分阶段发电(400为一段)
 drtech.machine.annihilation_generator.tooltip.2=§c随时间递增发电A数目 每个阶段有最大发电A数 跨阶段后电流会恢复成1
 drtech.machine.annihilation_generator.tooltip.3=§c根据线圈等级会有额外效率加成
@@ -98,6 +108,8 @@ drtech.machine.recombination.tip.1=§3并行=2*电压等级
 drtech.machine.recombination.tip.2=§3分子之间的转换！
 drtech.universal.tooltip.energy_storage_capacity=§c流体缓存：§r%,d L
 drtech.multiblock.yot_tank.fluid_type=流体类型:%s
+gregtech.machine.yot_tank.tooltip1=§9超超超超级量子缸！
+gregtech.machine.yot_tank.tooltip2=§9存储任意搭配,运行不耗电!
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
