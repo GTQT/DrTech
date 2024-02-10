@@ -46,10 +46,7 @@ import static com.drppp.drtech.Load.DrtechReceipes.MOLECULAR_RECOMBINATION;
 
 
 public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblockController {
-    @SideOnly(Side.CLIENT)
-    private GTLaserBeamParticle[][] beamParticles;
-    private static final ResourceLocation LASER_LOCATION = GTUtility.gregtechId("textures/fx/laser/laser.png");
-    private static final ResourceLocation LASER_HEAD_LOCATION = GTUtility.gregtechId("textures/fx/laser/laser_start.png");
+
     public MetaTileEntityLargeMolecularRecombination(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, MOLECULAR_RECOMBINATION);
         this.recipeMapWorkable = new LargeMoecularRecombinationLogic(this, true);
@@ -101,7 +98,7 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
 
     @SideOnly(Side.CLIENT)
     @Override
-    protected @NotNull OrientedOverlayRenderer getFrontOverlay() {
+    protected @NotNull ICubeRenderer getFrontOverlay() {
         return Textures.LARGE_UU_PRODUCTER;
     }
 

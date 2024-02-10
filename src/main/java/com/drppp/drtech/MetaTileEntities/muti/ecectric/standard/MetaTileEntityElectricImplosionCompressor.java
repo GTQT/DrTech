@@ -80,13 +80,13 @@ public class MetaTileEntityElectricImplosionCompressor extends RecipeMapMultiblo
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.ROBUST_TUNGSTENSTEEL_CASING;
     }
-
+/*
     @SideOnly(Side.CLIENT)
     @Override
-    protected @NotNull OrientedOverlayRenderer getFrontOverlay() {
+    protected  ICubeRenderer getFrontOverlay() {
         return com.drppp.drtech.Client.Textures.ELECTRIC_IMPLOSION_OVERLAY;
     }
-
+*/
     @Override
     public boolean hasMufflerMechanics() {
         return true;

@@ -55,6 +55,7 @@ public class DrTechMain {
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         TextureUtils.addIconRegister(Textures::register);
+        Textures.init();
         LaserPipeRenderer.INSTANCE.preInit();
     }
     @SubscribeEvent
