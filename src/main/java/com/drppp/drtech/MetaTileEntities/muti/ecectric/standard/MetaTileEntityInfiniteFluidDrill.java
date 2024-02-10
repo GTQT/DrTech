@@ -240,7 +240,7 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
     protected ICubeRenderer getFrontOverlay() {
         return Textures.FLUID_RIG_OVERLAY;
     }
-
+    @SideOnly(Side.CLIENT)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);

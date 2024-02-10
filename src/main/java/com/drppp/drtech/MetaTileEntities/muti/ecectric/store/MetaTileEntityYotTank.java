@@ -298,7 +298,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                // TextFormatting.GOLD,
                // "drtech.multiblock.yot_tank.fluid_type", fluidBank.fluid.getUnlocalizedName()));
     }
-
+    @SideOnly(Side.CLIENT)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);

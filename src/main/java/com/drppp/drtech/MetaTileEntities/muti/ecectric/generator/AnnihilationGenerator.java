@@ -257,6 +257,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
             this.leve = 1;
         }
     }
+    @SideOnly(Side.CLIENT)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
