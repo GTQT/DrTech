@@ -2,6 +2,7 @@ package com.drppp.drtech.Load;
 
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.recipes.RecipeBuilder;
 import gregtech.api.recipes.RecipeMaps;
@@ -27,6 +28,7 @@ import net.minecraft.item.ItemStack;
 
 import  com.drppp.drtech.Blocks.BlocksInit;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.Loader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,6 +162,10 @@ public class MachineReceipe {
                 .EUt(7680)
                 .duration(652)
                 .buildAndRegister();
+        if (Loader.isModLoaded(GtqtCoreLinkage.GTQTCORE_ID))
+        {
+            GtqtCoreLinkage.MachineRecipeInit();
+        }
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {
