@@ -36,6 +36,7 @@ public class MetaTileEntities {
     public static MetaTileEntityLogFactory LOG_FACTORY;
     public static MetaTileEntityLargeMolecularRecombination LARGE_MOLECULAR_RECOMBINATION;
     public static MetaTileEntityYotTank YOUT_TANK;
+    public static MetaTileEntityMobsKiller MOB_KILLER;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -60,6 +61,7 @@ public class MetaTileEntities {
         LOG_FACTORY = registerMetaTileEntity(17059,new MetaTileEntityLogFactory(getmyId("log_factory")));
         LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(17060,new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
         YOUT_TANK = registerMetaTileEntity(17061,new MetaTileEntityYotTank(getmyId("yot_tank")));
+        MOB_KILLER = registerMetaTileEntity(17062,new MetaTileEntityMobsKiller(getmyId("mob_killer")));
     }
 
 
