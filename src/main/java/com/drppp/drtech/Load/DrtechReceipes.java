@@ -18,6 +18,7 @@ public final class DrtechReceipes {
     public static final RecipeMap<SimpleRecipeBuilder> COPY_RECIPES ;
     public static final RecipeMap<SimpleRecipeBuilder> LOG_CREATE ;
     public static final RecipeMap<SimpleRecipeBuilder> MOLECULAR_RECOMBINATION ;
+    public static final RecipeMap<SimpleRecipeBuilder> MOB_KILLER ;
 
     private DrtechReceipes() {
     }
@@ -36,6 +37,7 @@ public final class DrtechReceipes {
         COPY_RECIPES = new RecipeMap<>("uu_copy",1,1,1,1,(new SimpleRecipeBuilder()),false);
         LOG_CREATE = new RecipeMap<>("log_create",1,1,1,1,(new SimpleRecipeBuilder()),false);
         MOLECULAR_RECOMBINATION = new RecipeMap<>("molecular_recombination",1,1,1,1,(new SimpleRecipeBuilder()),false);
+        MOB_KILLER = new RecipeMap<>("mob_killer",2,6,0,1,(new SimpleRecipeBuilder()),false);
 
     }
 }

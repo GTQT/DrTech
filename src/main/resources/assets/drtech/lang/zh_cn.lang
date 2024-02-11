@@ -5,6 +5,7 @@ recipemap.uu_producter.name=UU物质生产
 recipemap.uu_copy.name=复制机
 recipemap.log_create.name=原木拟生
 recipemap.molecular_recombination.name=分子重组
+recipemap.mob_killer.name=怪物屠宰
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
@@ -64,6 +65,7 @@ drtech.machine.large_element_duplicator.name=大型元素复制机
 drtech.machine.log_factory.name=原木拟生厂
 drtech.machine.molecular_recombination.name=大型分子重组仪
 drtech.machine.yot_tank.name=YOT储罐
+drtech.machine.mob_killer.name=怪物模拟仓
 #Materials
 gregtech.material.bedrock=基岩
 
