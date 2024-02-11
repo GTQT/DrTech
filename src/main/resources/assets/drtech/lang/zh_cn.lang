@@ -112,6 +112,8 @@ drtech.universal.tooltip.energy_storage_capacity=§c流体缓存：§r%,d L
 drtech.multiblock.yot_tank.fluid_type=流体类型:%s
 gregtech.machine.yot_tank.tooltip1=§9超超超超级量子缸！
 gregtech.machine.yot_tank.tooltip2=§9存储任意搭配,运行不耗电!
+drtech.machine.mobskiller.tip.1=§3根据电路板和生物群系产出掉落物!
+drtech.machine.mobskiller.tip.2=§3按照电路1-14分别是:僵尸、骷髅、爬行者、女巫、烈焰人、猪人、凋零骷髅、恶魂、末影人、史莱姆、牛、鸡、羊、猪
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓

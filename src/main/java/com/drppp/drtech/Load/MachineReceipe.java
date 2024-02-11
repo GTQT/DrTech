@@ -132,6 +132,12 @@ public class MachineReceipe {
         for (int i = 0; i < 2; i++) {
             DrtechUtils.addLog2Create(30,100,1,i);
         }
+        LOG_CREATE.recipeBuilder()
+                .notConsumable(new ItemStack(MetaBlocks.RUBBER_SAPLING,1))
+                .output(MetaBlocks.RUBBER_LOG)
+                .EUt(30)
+                .duration(100)
+                .buildAndRegister();
         MOLECULAR_RECOMBINATION.recipeBuilder()
                 .input(OrePrefix.dust,Carbon,1)
                 .output(dust,Graphene,1)
