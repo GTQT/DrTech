@@ -43,11 +43,23 @@ public  class MetaItems1 extends StandardMetaItem {
         MyMetaItems.GRAVITY_SHIELD = this.addItem(5,"gravity_shield").setMaxStackSize(1).setCreativeTabs(DrTechMain.Mytab)
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.gravity_shield.tooltip.1", new Object[0]));
-                }));;
+                }));
                 MyMetaItems.SKULL_DUST = this.addItem(6,"skull_dust").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
                 MyMetaItems.SCRAP = this.addItem(7,"scrap").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
                 MyMetaItems.CD_ROM = this.addItem(8,"cd_rom").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(16).addComponents(new DataItemBehavior(true));
                 MyMetaItems.UU_MATER = this.addItem(9,"uu_mater").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+                MyMetaItems.PIPIE_1 = this.addItem(10,"pipe_1").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64)
+                        .addComponents(new TooltipBehavior((lines) -> {
+                            lines.add(I18n.format("metaitem.pipe_1.tooltip.1", new Object[0]));
+                        }));
+                MyMetaItems.PIPIE_5 = this.addItem(11,"pipe_5").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64)
+                        .addComponents(new TooltipBehavior((lines) -> {
+                            lines.add(I18n.format("metaitem.pipe_5.tooltip.1", new Object[0]));
+                        }));
+                MyMetaItems.PIPIE_10 = this.addItem(12,"pipe_10").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64)
+                        .addComponents(new TooltipBehavior((lines) -> {
+                            lines.add(I18n.format("metaitem.pipe_10.tooltip.1", new Object[0]));
+                        }));
     }
 
     @Override

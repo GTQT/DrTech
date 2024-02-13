@@ -13,6 +13,9 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem SCRAP;
     public static MetaItem<?>.MetaValueItem CD_ROM;
     public static MetaItem<?>.MetaValueItem UU_MATER;
+    public static MetaItem<?>.MetaValueItem PIPIE_1;
+    public static MetaItem<?>.MetaValueItem PIPIE_5;
+    public static MetaItem<?>.MetaValueItem PIPIE_10;
     public static void MetaItemsInit()
     {
        MetaItems1 metaItem = new MetaItems1();
