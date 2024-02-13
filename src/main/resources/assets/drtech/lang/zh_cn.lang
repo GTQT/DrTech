@@ -6,6 +6,7 @@ recipemap.uu_copy.name=复制机
 recipemap.log_create.name=原木拟生
 recipemap.molecular_recombination.name=分子重组
 recipemap.mob_killer.name=怪物屠宰
+recipemap.deep_ground_pump.name=热能抽取
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
@@ -17,6 +18,9 @@ metaitem.skull_dust.name=凋零骷髅粉
 metaitem.scrap.name=废料
 metaitem.cd_rom.name=记忆光盘
 metaitem.uu_mater.name=固态UU物质
+metaitem.pipe_1.name=地热管道1
+metaitem.pipe_5.name=地热管道5
+metaitem.pipe_10.name=地热管道10
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
@@ -45,7 +49,7 @@ tile.Meta_Machine_Casing.resonator_casing.name=谐振腔
 tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=高压流电容方块
 tile.Meta_Machine_Casing.element_constrains_machine_casing.name=元素约束机械方块
 tile.Meta_Machine_Casing.aseptic_machine_casing.name=无菌农场机械方块
-tile.Meta_Machine_Casing.yot_tank_casing.name=yot机械方块
+tile.Meta_Machine_Casing.yot_tank_casing.name=YOT机械方块
 #YOUT_TANK
 tile.yot_tank_part.yot_part_tier_t1.name=流体单元方块(T1)
 tile.yot_tank_part.yot_part_tier_t2.name=流体单元方块(T2)
@@ -66,6 +70,7 @@ drtech.machine.log_factory.name=原木拟生厂
 drtech.machine.molecular_recombination.name=大型分子重组仪
 drtech.machine.yot_tank.name=YOT储罐
 drtech.machine.mob_killer.name=怪物模拟仓
+drtech.machine.deep_ground_pump.name=深热地泵
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -114,6 +119,10 @@ gregtech.machine.yot_tank.tooltip1=§9超超超超级量子缸！
 gregtech.machine.yot_tank.tooltip2=§9存储任意搭配,运行不耗电!
 drtech.machine.mobskiller.tip.1=§3根据电路板和生物群系产出掉落物!
 drtech.machine.mobskiller.tip.2=§3按照电路1-14分别是:僵尸、骷髅、爬行者、女巫、烈焰人、猪人、凋零骷髅、恶魂、末影人、史莱姆、牛、鸡、羊、猪
+metaitem.pipe_1.tooltip.1=管道长度:1
+metaitem.pipe_5.tooltip.1=管道长度:5
+metaitem.pipe_10.tooltip.1=管道长度:10
+drtech.deep_ground_pump.deep=当前深度:%s
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓

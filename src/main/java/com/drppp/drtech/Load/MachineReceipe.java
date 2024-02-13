@@ -28,6 +28,9 @@ import net.minecraft.item.ItemStack;
 
 import  com.drppp.drtech.Blocks.BlocksInit;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.Loader;
 
 import java.util.ArrayList;
@@ -172,6 +175,12 @@ public class MachineReceipe {
         {
             GtqtCoreLinkage.MachineRecipeInit();
         }
+        DRRP_GROUND_PUMP.recipeBuilder()
+                .fluidInputs(new FluidStack(FluidRegistry.WATER, 1000))
+                .fluidOutputs(new FluidStack(Steam.getFluid(), 1000))
+                .EUt(512)
+                .duration(20)
+                .buildAndRegister();
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {
