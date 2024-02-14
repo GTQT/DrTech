@@ -276,6 +276,12 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.TFFT_TANK_CASING;
     }
+    @SideOnly(Side.CLIENT)
+    @NotNull
+    @Override
+    protected ICubeRenderer getFrontOverlay() {
+        return Textures.TFFT_OVERLAY;
+    }
     protected static final Supplier<TraceabilityPredicate> BATTERY_PREDICATE = () -> new TraceabilityPredicate(
             blockWorldState -> {
                 IBlockState state = blockWorldState.getBlockState();
