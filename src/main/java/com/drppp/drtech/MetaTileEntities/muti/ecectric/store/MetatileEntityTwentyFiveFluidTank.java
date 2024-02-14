@@ -214,10 +214,14 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 }
                 if(outputFluidInventory.getTanks()>0 && this.fluid[circuit]!=null)
                 {
+
                     List<FluidStack> Outputs = new ArrayList<>();
                     for (int i = 0; i < outputFluidInventory.getTanks(); i++) {
-                        long energyDebanked = fluidBank.drain(outputFluidInventory.getTankAt(i).getCapacity()-outputFluidInventory.getTankAt(i).getFluidAmount(),this.circuit);
-                        Outputs.add(new FluidStack(this.fluid[circuit].getFluid(), (int) energyDebanked));
+                        if((this.fluid[circuit]!=null && this.fluid[circuit].isFluidEqual(outputFluidInventory.getTankAt(i).getFluid())) || outputFluidInventory.getTankAt(i).getFluid()==null)
+                        {
+                            long energyDebanked = fluidBank.drain(outputFluidInventory.getTankAt(i).getCapacity()-outputFluidInventory.getTankAt(i).getFluidAmount(),this.circuit);
+                            Outputs.add(new FluidStack(this.fluid[circuit].getFluid(), (int) energyDebanked));
+                        }
                     }
                     GTTransferUtils.addFluidsToFluidHandler(outputFluidInventory ,false, Outputs);
                 }
