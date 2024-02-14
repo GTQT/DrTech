@@ -2,11 +2,9 @@ package com.drppp.drtech.Blocks.MetaBlocks;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import gregtech.api.GTValues;
 import gregtech.api.block.VariantBlock;
 import gregtech.api.items.toolitem.ToolClasses;
 import gregtech.api.metatileentity.multiblock.IBatteryData;
-import gregtech.common.blocks.BlockBatteryPart;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -23,17 +21,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTankPartType> {
+public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartType> {
 
-    public BlockYotTankPart() {
+    public BlockFTTFPart() {
         super(Material.IRON);
-        setTranslationKey("yot_tank_part");
-        setRegistryName(Tags.MODID,"yot_tank_part");
+        setTranslationKey("tfft_part");
+        setRegistryName(Tags.MODID,"tfft_part");
         setHardness(5.0f);
         setResistance(10.0f);
         setSoundType(SoundType.METAL);
         setHarvestLevel(ToolClasses.WRENCH, 3); // Diamond level, can be mined by a steel wrench or better
-        setDefaultState(getState(BlockYotTankPartType.YOT_PART_TIER_T1));
+        setDefaultState(getState(BlockYotTankPartType.TFFT_PART_TIER_T1));
         setCreativeTab(DrTechMain.Mytab);
     }
 
@@ -56,14 +54,16 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
 
     public enum BlockYotTankPartType implements IStringSerializable, IBatteryData {
 
-        YOT_PART_TIER_T1(1,1000000L),
-        YOT_PART_TIER_T2(2, 100000000L),
-        YOT_PART_TIER_T3(3, 10000000000L),
-        YOT_PART_TIER_T4(4,1000000000000L),
-        YOT_PART_TIER_T5(5, 100000000000000L),
-        YOT_PART_TIER_T6(6, 10000000000000000L),
-        YOT_PART_TIER_T7(7,1000000000000000000L),
-        YOT_PART_TIER_T8(8, Long.MAX_VALUE)
+        TFFT_PART_TIER_T1(1,1000000L),
+        TFFT_PART_TIER_T2(2, 4000000L),
+        TFFT_PART_TIER_T3(3, 16000000L),
+        TFFT_PART_TIER_T4(4,64000000L),
+        TFFT_PART_TIER_T5(5, 256000000L),
+        TFFT_PART_TIER_T6(6, 2048000000L),
+        TFFT_PART_TIER_T7(7,131072000000L),
+        TFFT_PART_TIER_T8(8, 8388608000000L),
+        TFFT_PART_TIER_T9(9, 536870912000000L),
+        TFFT_PART_TIER_T10(10, 1099511627776000000L)
         ;
 
         private final int tier;
