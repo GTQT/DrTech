@@ -1,10 +1,7 @@
 package com.drppp.drtech.Blocks;
 
 import com.drppp.drtech.Blocks.Crops.CropsInit;
-import com.drppp.drtech.Blocks.MetaBlocks.BlockYotTankPart;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses1;
+import com.drppp.drtech.Blocks.MetaBlocks.*;
 import com.drppp.drtech.Blocks.Pipe.BlockMyLaserPipe;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
@@ -26,6 +23,7 @@ public class BlocksInit {
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
     public static final BlockYotTankPart YOT_TANK = new BlockYotTankPart();
+    public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
     public  static void init(RegistryEvent.Register<Block> event)
     {
@@ -35,6 +33,7 @@ public class BlocksInit {
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
         event.getRegistry().register(YOT_TANK);
+        event.getRegistry().register(TFFT_TANK);
 
 
 

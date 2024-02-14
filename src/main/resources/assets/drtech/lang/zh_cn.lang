@@ -50,6 +50,7 @@ tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=高压流电�
 tile.Meta_Machine_Casing.element_constrains_machine_casing.name=元素约束机械方块
 tile.Meta_Machine_Casing.aseptic_machine_casing.name=无菌农场机械方块
 tile.Meta_Machine_Casing.yot_tank_casing.name=YOT机械方块
+tile.Meta_Machine_Casing.tfft_casing.name=TFFT机械方块
 #YOUT_TANK
 tile.yot_tank_part.yot_part_tier_t1.name=流体单元方块(T1)
 tile.yot_tank_part.yot_part_tier_t2.name=流体单元方块(T2)
@@ -59,6 +60,17 @@ tile.yot_tank_part.yot_part_tier_t5.name=流体单元方块(T5)
 tile.yot_tank_part.yot_part_tier_t6.name=流体单元方块(T6)
 tile.yot_tank_part.yot_part_tier_t7.name=流体单元方块(T7)
 tile.yot_tank_part.yot_part_tier_t8.name=流体单元方块(T8)
+#TFFT_TANK
+tile.tfft_part.tfft_part_tier_t1.name=流体单元方块(T1)
+tile.tfft_part.tfft_part_tier_t2.name=流体单元方块(T2)
+tile.tfft_part.tfft_part_tier_t3.name=流体单元方块(T3)
+tile.tfft_part.tfft_part_tier_t4.name=流体单元方块(T4)
+tile.tfft_part.tfft_part_tier_t5.name=流体单元方块(T5)
+tile.tfft_part.tfft_part_tier_t6.name=流体单元方块(T6)
+tile.tfft_part.tfft_part_tier_t7.name=流体单元方块(T7)
+tile.tfft_part.tfft_part_tier_t8.name=流体单元方块(T8)
+tile.tfft_part.tfft_part_tier_t9.name=流体单元方块(T9)
+tile.tfft_part.tfft_part_tier_t10.name=流体单元方块(T10)
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
@@ -71,6 +83,7 @@ drtech.machine.molecular_recombination.name=大型分子重组仪
 drtech.machine.yot_tank.name=YOT储罐
 drtech.machine.mob_killer.name=怪物模拟仓
 drtech.machine.deep_ground_pump.name=深热地泵
+drtech.machine.tfft_tank.name=T.F.F.T储罐
 #Materials
 gregtech.material.bedrock=基岩
 

@@ -49,6 +49,11 @@
           "all": "drtech:blocks/aseptic_machine_casing"
         }
       },
+      "tfft_casing": {
+        "textures": {
+          "all": "drtech:blocks/tfft_casing"
+        }
+      },
 
       "yot_tank_casing": {
         "textures": {
