@@ -42,6 +42,16 @@
         "textures": {
           "all": "drtech:blocks/yottank/yot_part_tier_t8"
         }
+      },
+      "yot_part_tier_t9": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t9"
+        }
+      },
+      "yot_part_tier_t10": {
+        "textures": {
+          "all": "drtech:blocks/yottank/yot_part_tier_t10"
+        }
       }
     }
   }

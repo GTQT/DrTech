@@ -60,6 +60,8 @@ tile.yot_tank_part.yot_part_tier_t5.name=流体单元方块(T5)
 tile.yot_tank_part.yot_part_tier_t6.name=流体单元方块(T6)
 tile.yot_tank_part.yot_part_tier_t7.name=流体单元方块(T7)
 tile.yot_tank_part.yot_part_tier_t8.name=流体单元方块(T8)
+tile.yot_tank_part.yot_part_tier_t9.name=流体单元方块(T9)
+tile.yot_tank_part.yot_part_tier_t10.name=流体单元方块(T10)
 #TFFT_TANK
 tile.tfft_part.tfft_part_tier_t1.name=流体单元方块(T1)
 tile.tfft_part.tfft_part_tier_t2.name=流体单元方块(T2)
@@ -126,7 +128,7 @@ drtech.machine.logcreate.tip.2=§3锯 = 1x  圆锯 = 2x  链锯 = 4x
 drtech.machine.logcreate.tip.3=§3工作速度固定为5秒
 drtech.machine.recombination.tip.1=§3并行=2*电压等级
 drtech.machine.recombination.tip.2=§3分子之间的转换！
-drtech.universal.tooltip.energy_storage_capacity=§c流体缓存：§r%,d L
+drtech.universal.tooltip.energy_storage_capacity=§c流体缓存：§r%s L
 drtech.multiblock.yot_tank.fluid_type=流体类型:%s
 gregtech.machine.yot_tank.tooltip1=§9超超超超级量子缸！
 gregtech.machine.yot_tank.tooltip2=§9存储任意搭配,运行不耗电!
