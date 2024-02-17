@@ -6,7 +6,6 @@ public class DrTechReceipeManager {
     public static void init()
     {
         MachineReceipe.load();
-        CraftingReceipe.load();
         MobsDropsRecipe.load();
     }
 }

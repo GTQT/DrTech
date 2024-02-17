@@ -8,6 +8,7 @@ import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.Load.CraftingReceipe;
 import com.drppp.drtech.Load.DrTechReceipeManager;
 import com.drppp.drtech.Materials.DrtechMaterials;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
@@ -80,6 +81,7 @@ public class DrTechMain {
     // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
     public void init(FMLInitializationEvent event) {
         MetaTileEntities.Init();
+        CraftingReceipe.load();
     }
 
     @EventHandler

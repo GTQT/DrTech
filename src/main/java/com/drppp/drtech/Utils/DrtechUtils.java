@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,5 +183,16 @@ public class DrtechUtils {
                 .duration(tick)
                 .buildAndRegister();
     }
+    public static BigInteger getBigIntegerMin(BigInteger a,BigInteger b)
+    {
+        int comparisonResult = a.compareTo(b);
 
+        BigInteger minValue;
+        if (comparisonResult < 0) {
+            minValue = a;
+        } else {
+            minValue = b;
+        }
+        return  minValue;
+    }
 }

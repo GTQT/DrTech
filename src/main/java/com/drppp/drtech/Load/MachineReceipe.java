@@ -1,5 +1,6 @@
 package com.drppp.drtech.Load;
 
+import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.Linkage.GtqtCoreLinkage;
@@ -77,13 +78,12 @@ public class MachineReceipe {
         OrePrefix.dust.addProcessingHandler(PropertyKey.DUST, MachineReceipe::processDust);
         //160秒
         UU_RECIPES.recipeBuilder()
-                .fluidInputs(Materials.Air.getFluid(10))
+                .circuitMeta(1)
                 .fluidOutputs(Materials.UUMatter.getFluid(1))
                 .EUt(256)
                 .duration(3200)
                 .buildAndRegister();
         UU_RECIPES.recipeBuilder()
-                .fluidInputs(Materials.Air.getFluid(1))
                 .input(MyMetaItems.SCRAP)
                 .fluidOutputs(Materials.UUMatter.getFluid(1))
                 .EUt(256)
@@ -180,6 +180,98 @@ public class MachineReceipe {
                 .fluidOutputs(new FluidStack(Steam.getFluid(), 1000))
                 .EUt(512)
                 .duration(20)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.plate, Polyethylene)
+                .input(dust, Silver)
+                .output(MyMetaItems.CD_ROM)
+                .EUt(30)
+                .duration(200)
+                .buildAndRegister();
+        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
+                .input(OrePrefix.block, BorosilicateGlass)
+                .fluidInputs(Titanium.getFluid(576))
+                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING,1,0))
+                .EUt(480)
+                .duration(200)
+                .buildAndRegister();
+        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
+                .input(OrePrefix.block, BorosilicateGlass)
+                .fluidInputs(Tungsten.getFluid(576))
+                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING,1,1))
+                .EUt(1920)
+                .duration(200)
+                .buildAndRegister();
+        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
+                .input(OrePrefix.block, BorosilicateGlass)
+                .fluidInputs(Chrome.getFluid(576))
+                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING,1,3))
+                .EUt(7680)
+                .duration(200)
+                .buildAndRegister();
+        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
+            .input(OrePrefix.block, BorosilicateGlass)
+            .fluidInputs(Iridium.getFluid(576))
+                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING,1,4))
+            .EUt(30720)
+            .duration(200)
+            .buildAndRegister();
+        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
+                .input(OrePrefix.block, BorosilicateGlass)
+                .fluidInputs(Osmium.getFluid(576))
+                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING,1,5))
+                .EUt(122880)
+                .duration(200)
+                .buildAndRegister();
+        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
+                .input(OrePrefix.block, BorosilicateGlass)
+                .fluidInputs(Neutronium.getFluid(576))
+                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING,1,6))
+                .EUt(491520)
+                .duration(200)
+                .buildAndRegister();
+        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
+                .fluidInputs(UUMatter.getFluid(1000))
+                .output(MyMetaItems.UU_MATER)
+                .EUt(16)
+                .duration(10)
+                .buildAndRegister();
+        EXTRACTOR_RECIPES.recipeBuilder()
+                .fluidOutputs(UUMatter.getFluid(1000))
+                .input(MyMetaItems.UU_MATER)
+                .EUt(16)
+                .duration(10)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.frameGt, Wood)
+                .input(OrePrefix.pipeTinyFluid,Steel,2)
+                .input(MetaItems.VOLTAGE_COIL_MV)
+                .input(MetaItems.PLANT_BALL,4)
+                .input(OrePrefix.plank, Wood,3)
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING,1,8))
+                .circuitMeta(3)
+                .duration(100)
+                .EUt(64)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.frameGt,Steel)
+                .input(OrePrefix.plate, EnderPearl,4)
+                .input(OrePrefix.plate, Steel,4)
+                .circuitMeta(6)
+                .fluidInputs(Polytetrafluoroethylene.getFluid(144))
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING,1,10))
+                .EUt(480)
+                .duration(100)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.frameGt,StainlessSteel)
+                .input(OrePrefix.plate, EnderPearl,4)
+                .input(OrePrefix.plate, StainlessSteel,4)
+                .circuitMeta(3)
+                .fluidInputs(Polytetrafluoroethylene.getFluid(144))
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING,1,9))
+                .EUt(480)
+                .duration(100)
                 .buildAndRegister();
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
