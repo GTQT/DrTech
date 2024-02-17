@@ -184,6 +184,7 @@ public class MachineReceipe {
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.plate, Polyethylene)
                 .input(dust, Silver)
+                .fluidInputs(Glue.getFluid(144))
                 .output(MyMetaItems.CD_ROM)
                 .EUt(30)
                 .duration(200)

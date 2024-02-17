@@ -7,7 +7,9 @@ import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.unification.stack.UnificationEntry;
+import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 public class CraftingReceipe {
@@ -36,6 +38,18 @@ public class CraftingReceipe {
                 'M', MetaItems.FIELD_GENERATOR_LV,
                 'A', new UnificationEntry(OrePrefix.plate,Materials.Polytetrafluoroethylene),
                 'B',  new UnificationEntry(OrePrefix.rotor,Materials.StainlessSteel)
+        );
+        ModHandler.addShapedRecipe("mob_killer", MetaTileEntities.MOB_KILLER.getStackForm(),
+                "WAW", "AFA", "SSS",
+                'W',  MetaItems.ROBOT_ARM_HV,
+                'A', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.HV),
+                'F', new ItemStack(MetaBlocks.MACHINE,1,988),
+                'S', Items.DIAMOND_SWORD
+        );
+        ModHandler.addShapedRecipe("advanced_process_array", MetaTileEntities.ADVANCED_PROCESS_ARRAY.getStackForm(),
+                "WWW", "WSW", "WWW",
+                'W',  MetaBlocks.TRANSPARENT_CASING,
+                'S', new ItemStack(MetaBlocks.MACHINE,1,1031)
         );
     }
 }
