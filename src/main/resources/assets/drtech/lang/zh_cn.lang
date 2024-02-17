@@ -138,6 +138,15 @@ metaitem.pipe_1.tooltip.1=管道长度:1
 metaitem.pipe_5.tooltip.1=管道长度:5
 metaitem.pipe_10.tooltip.1=管道长度:10
 drtech.deep_ground_pump.deep=当前深度:%s
+gtqt.multiblock.yot_tank.fluid_type=%s 流体类型:%s 存储：%s
+gtqt.multiblock.tfft.computation=填充：%s
+gtqt.multiblock.power_substation.stored=容量：%s
+gtqtcore.multiblock.tfft.threshold_decrement=流体向后一
+gtqtcore.multiblock.tfft.threshold_increment=流体向前一
+gtqtcore.multiblock.tfft.threshold_decrement1=流体向后十
+gtqtcore.multiblock.tfft.threshold_increment1=流体向前十
+drtech.multiblock.power_substation.eut=耗电量:§3%d EU/T
+drtech.universal.tooltip.energy_eut=§c单元耗电：§r%d EU/T
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓

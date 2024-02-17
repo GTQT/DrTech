@@ -1,10 +1,10 @@
 package com.drppp.drtech.Blocks.MetaBlocks;
 
 import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.ITfftData;
 import com.drppp.drtech.Tags;
 import gregtech.api.block.VariantBlock;
 import gregtech.api.items.toolitem.ToolClasses;
-import gregtech.api.metatileentity.multiblock.IBatteryData;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -49,36 +49,44 @@ public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartTy
         BlockYotTankPartType batteryType = getState(stack);
         if (batteryType.getCapacity() != 0) {
             tooltip.add(I18n.format("drtech.universal.tooltip.energy_storage_capacity", batteryType.getCapacity()));
+            tooltip.add(I18n.format("drtech.universal.tooltip.energy_eut", batteryType.getEut()));
         }
     }
 
-    public enum BlockYotTankPartType implements IStringSerializable, IBatteryData {
+    public enum BlockYotTankPartType implements IStringSerializable, ITfftData {
 
-        TFFT_PART_TIER_T1(1,1000000L),
-        TFFT_PART_TIER_T2(2, 4000000L),
-        TFFT_PART_TIER_T3(3, 16000000L),
-        TFFT_PART_TIER_T4(4,64000000L),
-        TFFT_PART_TIER_T5(5, 256000000L),
-        TFFT_PART_TIER_T6(6, 2048000000L),
-        TFFT_PART_TIER_T7(7,131072000000L),
-        TFFT_PART_TIER_T8(8, 8388608000000L),
-        TFFT_PART_TIER_T9(9, 536870912000000L),
-        TFFT_PART_TIER_T10(10, 1099511627776000000L)
+        TFFT_PART_TIER_T1(1,1000000L,1),
+        TFFT_PART_TIER_T2(2, 4000000L,2),
+        TFFT_PART_TIER_T3(3, 16000000L,5),
+        TFFT_PART_TIER_T4(4,64000000L,14),
+        TFFT_PART_TIER_T5(5, 256000000L,42),
+        TFFT_PART_TIER_T6(6, 2048000000L,132),
+        TFFT_PART_TIER_T7(7,131072000000L,429),
+        TFFT_PART_TIER_T8(8, 8388608000000L,1430),
+        TFFT_PART_TIER_T9(9, 536870912000000L,4862),
+        TFFT_PART_TIER_T10(10, 1099511627776000000L,0)
         ;
 
         private final int tier;
         private final long capacity;
+        private final int eut;
 
         BlockYotTankPartType() {
             this.tier = -1;
             this.capacity = 0;
+            this.eut=0;
         }
 
-        BlockYotTankPartType(int tier, long capacity) {
+        BlockYotTankPartType(int tier, long capacity,int eut) {
             this.tier = tier;
             this.capacity = capacity;
+            this.eut  =eut;
         }
-
+        @Override
+        public int getEut()
+        {
+            return this.eut;
+        }
         @Override
         public int getTier() {
             return tier;
@@ -89,7 +97,6 @@ public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartTy
             return capacity;
         }
 
-        // must be separately named because of reobf issue
         @NotNull
         @Override
         public String getBatteryName() {

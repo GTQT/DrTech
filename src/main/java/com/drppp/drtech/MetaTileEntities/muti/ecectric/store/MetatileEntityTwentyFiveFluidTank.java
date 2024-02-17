@@ -8,12 +8,15 @@ import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Utils.Datas;
-import gregtech.api.capability.GregtechDataCodes;
-import gregtech.api.capability.GregtechTileCapabilities;
-import gregtech.api.capability.IControllable;
-import gregtech.api.capability.IMultipleTankHandler;
+import gregtech.api.capability.*;
+import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.FluidTankList;
 import gregtech.api.capability.impl.ItemHandlerList;
+import gregtech.api.gui.GuiTextures;
+import gregtech.api.gui.Widget;
+import gregtech.api.gui.resources.TextureArea;
+import gregtech.api.gui.widgets.ClickButtonWidget;
+import gregtech.api.gui.widgets.WidgetGroup;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
@@ -21,7 +24,6 @@ import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.pattern.TraceabilityPredicate;
-import gregtech.api.unification.material.Materials;
 import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.TextComponentUtil;
@@ -31,11 +33,11 @@ import gregtech.common.items.MetaItems;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -46,6 +48,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Supplier;
@@ -63,8 +66,10 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     public IMultipleTankHandler inputFluidInventory;
     public IMultipleTankHandler outputFluidInventory;
     protected ItemHandlerList itemImportInventory;
+    protected IEnergyContainer energyContainer;
     private TFFTTankFluidBank fluidBank;
     private int circuit=0;
+    private int time=0;
     public int getCircuitNo()
     {
         return  this.circuit;
@@ -173,7 +178,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     @Override
     protected void updateFormedValid() {
         if (!this.getWorld().isRemote ) {
-            getCircuit();
+            //getCircuit();
             if (getOffsetTimer() % 20 == 0) {
                 // active here is just used for rendering
                 for (int i = 0; i < 25; i++) {
@@ -187,7 +192,12 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 }
 
             }
-            if (isWorkingEnabled()) {
+            if(this.energyContainer.getInputVoltage() * this.energyContainer.getInputAmperage() >this.fluidBank.eut && this.energyContainer.getEnergyStored()>this.fluidBank.eut)
+            {
+                this.energyContainer.changeEnergy(-this.fluidBank.eut);
+                this.setWorkingEnabled(true);
+            }
+            if (isWorkingEnabled() && time++>20 && isActive) {
                 if(inputFluidInventory.getTanks()>0){
                     for (int i = 0; i < inputFluidInventory.getTanks(); i++) {
                         if(inputFluidInventory.getTankAt(i).getFluidAmount()>0)
@@ -227,26 +237,10 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 }
                 if(!fluidBank.hasFluid(this.circuit))
                     fluid[circuit] = null;
+                time=0;
             }
         }
     }
-    private void getCircuit()
-    {
-        int circuit = 0;
-        for (int i = 0; i < this.itemImportInventory.getSlots(); i++) {
-            ItemStack is = this.itemImportInventory.getStackInSlot(i);
-            if(is.getItem() == MetaItems.INTEGRATED_CIRCUIT.getMetaItem() && is.getMetadata()== MetaItems.INTEGRATED_CIRCUIT.getMetaValue())
-            {
-                NBTTagCompound compound = is.getTagCompound();
-                if(compound.hasKey("Configuration"))
-                    circuit = compound.getInteger("Configuration");
-                else
-                    circuit=0;
-            }
-        }
-        this.circuit = Math.min(circuit,24);
-    }
-
     @NotNull
     @Override
     protected BlockPattern createStructurePattern() {
@@ -259,7 +253,8 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                         .or(autoAbilities())
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1)
-                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setExactLimit(1)))
+                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setExactLimit(1))
+                                .or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setPreviewCount(1)))
                 )
                 .where('G', states(getGlassState()))
                 .where('B', BATTERY_PREDICATE.get())
@@ -286,7 +281,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             blockWorldState -> {
                 IBlockState state = blockWorldState.getBlockState();
                 if (Datas.TFFT_CASINGS.containsKey(state)) {
-                    IBatteryData tfft_parts = Datas.TFFT_CASINGS.get(state);
+                    ITfftData tfft_parts = Datas.TFFT_CASINGS.get(state);
                     if (tfft_parts.getTier() != -1 && tfft_parts.getCapacity() > 0) {
                         String key = TFFT_PART_HEADER + tfft_parts.getBatteryName();
                         MetatileEntityTwentyFiveFluidTank.TfftPartMatchWrapper wrapper = blockWorldState.getMatchContext().get(key);
@@ -311,43 +306,95 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected void addDisplayText(List<ITextComponent> textList) {
         MultiblockDisplayText.builder(textList, isStructureFormed())
                 .setWorkingStatus(true, isActive() && isWorkingEnabled()) // transform into two-state system for display
-                .setWorkingStatusKeys(
-                        "gregtech.multiblock.idling",
-                        "gregtech.multiblock.idling",
-                        "gregtech.machine.active_transformer.routing")
                 .addCustom(tl -> {
                     if (isStructureFormed() && fluidBank != null) {
-                        BigInteger energyStored = fluidBank.getStored(this.circuit);
+
                         BigInteger energyCapacity = fluidBank.getCapacity(this.circuit);
-
-                        // Stored EU line
-                        ITextComponent storedFormatted = TextComponentUtil.stringWithColor(
-                                TextFormatting.GOLD,
-                                TextFormattingUtil.formatNumbers(energyStored) + " L");
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GRAY,
-                                "gregtech.multiblock.power_substation.stored",
-                                storedFormatted));
-
-                        // EU Capacity line
                         ITextComponent capacityFormatted = TextComponentUtil.stringWithColor(
                                 TextFormatting.GOLD,
                                 TextFormattingUtil.formatNumbers(energyCapacity) + " L");
                         tl.add(TextComponentUtil.translationWithColor(
                                 TextFormatting.GRAY,
-                                "gregtech.multiblock.power_substation.capacity",
-                                capacityFormatted));
-
+                                "gtqt.multiblock.power_substation.stored",capacityFormatted));
                         tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GOLD,
-                                "drtech.multiblock.yot_tank.fluid_type",
-                                this.fluid[circuit]==null?"空":this.fluid[circuit].getLocalizedName()));
+                                TextFormatting.GRAY,
+                                "drtech.multiblock.power_substation.eut",this.fluidBank.eut));
+                        tl.add(TextComponentUtil.translationWithColor(TextFormatting.GOLD, "======================"));
+                        for(int i=-2;i<=2;i++)
+                        {
+
+                            if(i==0) {
+
+                                tl.add(TextComponentUtil.translationWithColor(TextFormatting.GOLD, "gtqt.multiblock.yot_tank.fluid_type", circuit, this.fluid[circuit] == null ? "空" : this.fluid[circuit].getLocalizedName(), getstoredFormatted(circuit+i)));
+                            }
+                            else if(circuit+i>=0&&circuit+i<25)
+                            {
+                                tl.add(TextComponentUtil.translationWithColor(TextFormatting.GRAY, "gtqt.multiblock.yot_tank.fluid_type", circuit + i, this.fluid[circuit + i] == null ? "空" : this.fluid[circuit + i].getLocalizedName(), getstoredFormatted(circuit+i)));
+                            }
+                        }
+                        tl.add(TextComponentUtil.translationWithColor(TextFormatting.GOLD, "======================"));
                     }
-                })
-                .addWorkingStatusLine();
-        //textList.add(TextComponentUtil.translationWithColor(
-        // TextFormatting.GOLD,
-        // "drtech.multiblock.yot_tank.fluid_type", fluidBank.fluid.getUnlocalizedName()));
+                });
+    }
+    ITextComponent getstoredFormatted(int x) {
+        BigInteger energyStored = null;
+        if (x >= 0) {
+            energyStored = fluidBank.getStored(x);
+        }
+        ITextComponent storedFormatted = TextComponentUtil.stringWithColor(TextFormatting.GOLD, TextFormattingUtil.formatNumbers(energyStored) + " L");
+        return storedFormatted;
+
+    }
+    @Override
+    public TextureArea getProgressBarTexture(int index) {
+        return index == 0 ? GuiTextures.PROGRESS_BAR_HPCA_COMPUTATION : GuiTextures.PROGRESS_BAR_FUSION_HEAT;
+    }
+    @Override
+    public void addBarHoverText(List<ITextComponent> hoverList, int index) {
+        BigInteger energyStored = fluidBank.getStored(this.circuit);
+        BigInteger energyCapacity = fluidBank.getCapacity(this.circuit);
+        if (index == 0) {
+            ITextComponent cwutInfo = TextComponentUtil.stringWithColor(
+                    TextFormatting.AQUA,
+                    energyStored+ " / " + energyCapacity + "L");
+            hoverList.add(TextComponentUtil.translationWithColor(
+                    TextFormatting.GRAY,
+                    "gtqt.multiblock.tfft.computation",
+                    cwutInfo));
+        }
+    }
+    @Override
+    @Nonnull
+    protected Widget getFlexButton(int x, int y, int width, int height) {
+        WidgetGroup group = new WidgetGroup(x, y, width, height);
+        group.addWidget(new ClickButtonWidget(0, 0, 9, 9, "", this::decrementThreshold)
+                .setButtonTexture(GuiTextures.BUTTON_THROTTLE_MINUS)
+                .setTooltipText("gtqtcore.multiblock.tfft.threshold_decrement"));
+        group.addWidget(new ClickButtonWidget(9, 0, 9, 9, "", this::incrementThreshold)
+                .setButtonTexture(GuiTextures.BUTTON_THROTTLE_PLUS)
+                .setTooltipText("gtqtcore.multiblock.tfft.threshold_increment"));
+        group.addWidget(new ClickButtonWidget(0, 9, 9, 9, "", this::decrementThreshold1)
+                .setButtonTexture(GuiTextures.BUTTON_THROTTLE_MINUS)
+                .setTooltipText("gtqtcore.multiblock.tfft.threshold_decrement1"));
+        group.addWidget(new ClickButtonWidget(9, 9, 9, 9, "", this::incrementThreshold1)
+                .setButtonTexture(GuiTextures.BUTTON_THROTTLE_PLUS)
+                .setTooltipText("gtqtcore.multiblock.tfft.threshold_increment1"));
+        return group;
+    }
+
+    private void incrementThreshold(Widget.ClickData clickData) {
+        this.circuit = MathHelper.clamp(circuit + 1, 0, 24);
+    }
+
+    private void decrementThreshold(Widget.ClickData clickData) {
+        this.circuit = MathHelper.clamp(circuit - 1, 0, 24);
+    }
+    private void incrementThreshold1(Widget.ClickData clickData) {
+        this.circuit = MathHelper.clamp(circuit + 10, 0, 24);
+    }
+
+    private void decrementThreshold1(Widget.ClickData clickData) {
+        this.circuit = MathHelper.clamp(circuit - 10, 0, 24);
     }
     @SideOnly(Side.CLIENT)
     @Override
@@ -369,7 +416,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected void formStructure(PatternMatchContext context) {
         super.formStructure(context);
         initializeAbilities();
-        List<IBatteryData> parts = new ArrayList<>();
+        List<ITfftData> parts = new ArrayList<>();
         for (Map.Entry<String, Object> battery : context.entrySet()) {
             if (battery.getKey().startsWith(TFFT_PART_HEADER) &&
                     battery.getValue() instanceof TfftPartMatchWrapper wrapper) {
@@ -392,11 +439,13 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         this.inputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
         this.outputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
         this.itemImportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
+        this.energyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
     }
     private void resetTileAbilities() {
         this.inputFluidInventory = new FluidTankList(true);
         this.outputFluidInventory = new FluidTankList(true);
         this.itemImportInventory =  new ItemHandlerList(Collections.emptyList());
+        this.energyContainer = new EnergyContainerList(Collections.emptyList());
     }
 
     @Override
@@ -405,10 +454,10 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     }
     private static class TfftPartMatchWrapper {
 
-        private final IBatteryData partType;
+        private final ITfftData partType;
         private int amount;
 
-        public TfftPartMatchWrapper(IBatteryData partType) {
+        public TfftPartMatchWrapper(ITfftData partType) {
             this.partType = partType;
         }
 
@@ -422,17 +471,20 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         private static final String NBT_SIZE = "Size";
         private static final String NBT_STORED = "Stored";
         private static final String NBT_MAX = "Max";
+        private static final String NBT_EUT = "Eut";
         private final long[][] storage=new long[25][];
         private final long[][] maximums=new long[25][];
         private final BigInteger[] capacity = new BigInteger[25];
         private int index[] = new int[25];
+        public  int eut = 0;
 
-        public TFFTTankFluidBank(List<IBatteryData> batteries) {
+        public TFFTTankFluidBank(List<ITfftData> batteries) {
             for (int i = 0; i < 25; i++) {
                 storage[i] = new long[batteries.size()];
                 maximums[i] = new long[batteries.size()];
                 for (int j = 0; j < batteries.size(); j++) {
                     maximums[i][j] = batteries.get(j).getCapacity()/25;
+                    eut+= batteries.get(j).getEut();
                 }
                 capacity[i] = summarize(maximums[i]);
             }
@@ -453,6 +505,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
 
                 capacity[j] = summarize(maximums[j]);
             }
+            this.eut = storageTag.getInteger(NBT_EUT);
         }
 
         private NBTTagCompound writeToNBT(NBTTagCompound compound) {
@@ -467,15 +520,11 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                     compound.setTag(j+String.valueOf(i), subtag);
                 }
             }
-
+            compound.setInteger(NBT_EUT,this.eut);
             return compound;
         }
-        /**
-         * Rebuild the power storage with a new list of batteries.
-         * Will use existing stored power and try to map it onto new batteries.
-         * If there was more power before the rebuild operation, it will be lost.
-         */
-        public TFFTTankFluidBank rebuild(@NotNull List<IBatteryData> batteries) {
+
+        public TFFTTankFluidBank rebuild(@NotNull List<ITfftData> batteries) {
             if (batteries.isEmpty()) {
                 throw new IllegalArgumentException("Cannot rebuild Power Substation power bank with no batteries!");
             }
@@ -492,61 +541,36 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         /** @return Amount filled into storage */
         public long fill(long amount,int circuit) {
             if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
-
-            // ensure index
             if (index[circuit] != storage[circuit].length - 1 && storage[circuit][index[circuit]] == maximums[circuit][index[circuit]]) {
                 index[circuit]++;
             }
-
             long maxFill = Math.min(maximums[index[circuit]][circuit] - storage[circuit][index[circuit]], amount);
-
-            // storage is completely full
             if (maxFill == 0 && index[circuit] == storage[circuit].length - 1) {
                 return 0;
             }
-
-            // fill this "battery" as much as possible
             storage[circuit][index[circuit]] += maxFill;
             amount -= maxFill;
-
-            // try to fill other "batteries" if necessary
             if (amount > 0 && index[circuit] != storage[circuit].length - 1) {
                 return maxFill + fill(amount,circuit);
             }
-
-            // other fill not necessary, either because the storage is now completely full,
-            // or we were able to consume all the energy in this "battery"
             return maxFill;
         }
 
-        /** @return Amount drained from storage */
         public long drain(long amount,int circuit) {
             if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
-
-            // ensure index
             if (index[circuit] != 0 && storage[circuit][index[circuit]] == 0) {
                 index[circuit]--;
             }
-
             long maxDrain = Math.min(storage[circuit][index[circuit]], amount);
-
-            // storage is completely empty
             if (maxDrain == 0 && index[circuit] == 0) {
                 return 0;
             }
-
-            // drain this "battery" as much as possible
             storage[circuit][index[circuit]] -= maxDrain;
             amount -= maxDrain;
-
-            // try to drain other "batteries" if necessary
             if (amount > 0 && index[circuit] != 0) {
                 index[circuit]--;
                 return maxDrain + drain(amount,circuit);
             }
-
-            // other drain not necessary, either because the storage is now completely empty,
-            // or we were able to drain all the energy from this "battery"
             return maxDrain;
         }
 
@@ -570,7 +594,6 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             long currentSum = 0;
             for (long value : values) {
                 if (currentSum != 0 && value > Long.MAX_VALUE - currentSum) {
-                    // will overflow if added
                     retVal = retVal.add(BigInteger.valueOf(currentSum));
                     currentSum = 0;
                 }

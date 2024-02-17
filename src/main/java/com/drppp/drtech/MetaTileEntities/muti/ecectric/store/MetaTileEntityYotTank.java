@@ -8,6 +8,7 @@ import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Utils.Datas;
+import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.GregTechAPI;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -26,11 +27,6 @@ import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.renderer.ICubeRenderer;
-import gregtech.client.utils.TooltipHelper;
-import gregtech.common.blocks.BlockGlassCasing;
-import gregtech.common.blocks.BlockMetalCasing;
-import gregtech.common.blocks.MetaBlocks;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityPowerSubstation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -67,6 +63,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     public IMultipleTankHandler inputFluidInventory;
     public IMultipleTankHandler outputFluidInventory;
     private YotTankFluidBank fluidBank;
+    int time=0;
     public MetaTileEntityYotTank(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -171,8 +168,8 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 // active here is just used for rendering
                 setActive(fluidBank.hasFluid());
             }
-
-            if (isWorkingEnabled()) {
+            time++;
+            if (isWorkingEnabled() && time>20) {
                 if(inputFluidInventory.getTanks()>0){
                     for (int i = 0; i < inputFluidInventory.getTanks(); i++) {
                         if(this.fluid==null || this.fluid.isFluidEqual(inputFluidInventory.getTankAt(i).getFluid()))
@@ -185,8 +182,11 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 }
                 if(outputFluidInventory.getTanks()>0 && this.fluid!=null)
                 {
+
                     List<FluidStack> Outputs = new ArrayList<>();
                     for (int i = 0; i < outputFluidInventory.getTanks(); i++) {
+                        if(outputFluidInventory.getTankAt(i).getFluid()!=null && !outputFluidInventory.getTankAt(i).getFluid().isFluidEqual(this.fluid))
+                            continue;
                         long energyDebanked = fluidBank.drain(outputFluidInventory.getTankAt(i).getCapacity()-outputFluidInventory.getTankAt(i).getFluidAmount());
                         Outputs.add(new FluidStack(this.fluid.getFluid(), (int) energyDebanked));
                     }
@@ -194,6 +194,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 }
                 if(!fluidBank.hasFluid())
                     fluid = null;
+                time=0;
             }
         }
     }
@@ -235,9 +236,9 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             blockWorldState -> {
                 IBlockState state = blockWorldState.getBlockState();
                 if (Datas.YOT_CASINGS.containsKey(state)) {
-                    IBatteryData yot_parts = Datas.YOT_CASINGS.get(state);
-                    if (yot_parts.getTier() != -1 && yot_parts.getCapacity() > 0) {
-                        String key = YOT_PART_HEADER + yot_parts.getBatteryName();
+                    IStoreData yot_parts = Datas.YOT_CASINGS.get(state);
+                    if (yot_parts.getTier() != -1 && yot_parts.getCapacity().compareTo(BigInteger.ZERO)==1) {
+                        String key = YOT_PART_HEADER + yot_parts.getStoreName();
                         MetaTileEntityYotTank.YotPartMatchWrapper wrapper = blockWorldState.getMatchContext().get(key);
                         if (wrapper == null) wrapper = new MetaTileEntityYotTank.YotPartMatchWrapper(yot_parts);
                         blockWorldState.getMatchContext().set(key, wrapper.increment());
@@ -298,6 +299,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                // TextFormatting.GOLD,
                // "drtech.multiblock.yot_tank.fluid_type", fluidBank.fluid.getUnlocalizedName()));
     }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
@@ -318,7 +320,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     protected void formStructure(PatternMatchContext context) {
         super.formStructure(context);
         initializeAbilities();
-        List<IBatteryData> parts = new ArrayList<>();
+        List<IStoreData> parts = new ArrayList<>();
         for (Map.Entry<String, Object> battery : context.entrySet()) {
             if (battery.getKey().startsWith(YOT_PART_HEADER) &&
                     battery.getValue() instanceof MetaTileEntityYotTank.YotPartMatchWrapper wrapper) {
@@ -352,10 +354,10 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     }
     private static class YotPartMatchWrapper {
 
-        private final IBatteryData partType;
+        private final IStoreData partType;
         private int amount;
 
-        public YotPartMatchWrapper(IBatteryData partType) {
+        public YotPartMatchWrapper(IStoreData partType) {
             this.partType = partType;
         }
 
@@ -369,14 +371,17 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         private static final String NBT_SIZE = "Size";
         private static final String NBT_STORED = "Stored";
         private static final String NBT_MAX = "Max";
-        private final long[] storage;
-        private final long[] maximums;
+        private final BigInteger[] storage;
+        private final BigInteger[] maximums;
         private final BigInteger capacity;
         private int index;
 
-        public YotTankFluidBank(List<IBatteryData> batteries) {
-            storage = new long[batteries.size()];
-            maximums = new long[batteries.size()];
+        public YotTankFluidBank(List<IStoreData> batteries) {
+            storage = new BigInteger[batteries.size()];
+            for (int i = 0; i < batteries.size(); i++) {
+                storage[i] = BigInteger.ZERO;
+            }
+            maximums = new BigInteger[batteries.size()];
             for (int i = 0; i < batteries.size(); i++) {
                 maximums[i] = batteries.get(i).getCapacity();
             }
@@ -385,14 +390,17 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
 
         public YotTankFluidBank(NBTTagCompound storageTag) {
             int size = storageTag.getInteger(NBT_SIZE);
-            storage = new long[size];
-            maximums = new long[size];
+            storage = new BigInteger[size];
+            for (int i = 0; i < size; i++) {
+                storage[i] = BigInteger.ZERO;
+            }
+            maximums = new BigInteger[size];
             for (int i = 0; i < size; i++) {
                 NBTTagCompound subtag = storageTag.getCompoundTag(String.valueOf(i));
                 if (subtag.hasKey(NBT_STORED)) {
-                    storage[i] = subtag.getLong(NBT_STORED);
+                    storage[i] = new BigInteger(subtag.getString(NBT_STORED));
                 }
-                maximums[i] = subtag.getLong(NBT_MAX);
+                maximums[i] = new BigInteger(subtag.getString(NBT_MAX));
             }
 
             capacity = summarize(maximums);
@@ -402,10 +410,10 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             compound.setInteger(NBT_SIZE, storage.length);
             for (int i = 0; i < storage.length; i++) {
                 NBTTagCompound subtag = new NBTTagCompound();
-                if (storage[i] > 0) {
-                    subtag.setLong(NBT_STORED, storage[i]);
+                if (storage[i].compareTo(BigInteger.ZERO)==1) {
+                    subtag.setString(NBT_STORED, storage[i].toString());
                 }
-                subtag.setLong(NBT_MAX, maximums[i]);
+                subtag.setString(NBT_MAX, maximums[i].toString());
                 compound.setTag(String.valueOf(i), subtag);
             }
             return compound;
@@ -415,12 +423,12 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
          * Will use existing stored power and try to map it onto new batteries.
          * If there was more power before the rebuild operation, it will be lost.
          */
-        public YotTankFluidBank rebuild(@NotNull List<IBatteryData> batteries) {
+        public YotTankFluidBank rebuild(@NotNull List<IStoreData> batteries) {
             if (batteries.isEmpty()) {
                 throw new IllegalArgumentException("Cannot rebuild Power Substation power bank with no batteries!");
             }
             YotTankFluidBank newStorage = new YotTankFluidBank(batteries);
-            for (long stored : storage) {
+            for (BigInteger stored : storage) {
                 newStorage.fill(stored);
             }
             return newStorage;
@@ -429,62 +437,65 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         /** @return Amount filled into storage */
         public long fill(long amount) {
             if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
-
-            // ensure index
-            if (index != storage.length - 1 && storage[index] == maximums[index]) {
+            if (index != storage.length - 1 && storage[index].compareTo(maximums[index])==0) {
                 index++;
             }
-
-            long maxFill = Math.min(maximums[index] - storage[index], amount);
-
-            // storage is completely full
-            if (maxFill == 0 && index == storage.length - 1) {
+            BigInteger maxFill = DrtechUtils.getBigIntegerMin(maximums[index].subtract(storage[index]), new BigInteger(String.valueOf(amount)));
+            if (maxFill.compareTo(BigInteger.ZERO)==0 && index == storage.length - 1) {
                 return 0;
             }
-
-            // fill this "battery" as much as possible
-            storage[index] += maxFill;
-            amount -= maxFill;
-
-            // try to fill other "batteries" if necessary
+            storage[index] = storage[index].add(maxFill);
+            amount -= maxFill.longValue();
             if (amount > 0 && index != storage.length - 1) {
-                return maxFill + fill(amount);
+                return maxFill.longValue() + fill(amount);
             }
-
-            // other fill not necessary, either because the storage is now completely full,
-            // or we were able to consume all the energy in this "battery"
+            return maxFill.longValue();
+        }
+        public BigInteger fill(BigInteger amount) {
+            if (amount.compareTo(BigInteger.ZERO) ==-1) throw new IllegalArgumentException("Amount cannot be negative!");
+            if (index != storage.length - 1 && storage[index].compareTo(maximums[index])==0) {
+                index++;
+            }
+            BigInteger maxFill = DrtechUtils.getBigIntegerMin(maximums[index].subtract(storage[index]), new BigInteger(String.valueOf(amount)));
+            if (maxFill.compareTo(BigInteger.ZERO)==0 && index == storage.length - 1) {
+                return BigInteger.ZERO;
+            }
+            storage[index] = storage[index].add(maxFill);
+            amount = amount.subtract(maxFill);
+            if (amount.compareTo(BigInteger.ZERO)==1 && index != storage.length - 1) {
+                return maxFill.add(fill(amount));
+            }
             return maxFill;
         }
-
         /** @return Amount drained from storage */
         public long drain(long amount) {
             if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
 
             // ensure index
-            if (index != 0 && storage[index] == 0) {
+            if (index != 0 && storage[index].compareTo(BigInteger.ZERO) == 0) {
                 index--;
             }
 
-            long maxDrain = Math.min(storage[index], amount);
+            BigInteger maxDrain = DrtechUtils.getBigIntegerMin(storage[index], new BigInteger(String.valueOf(amount)));
 
             // storage is completely empty
-            if (maxDrain == 0 && index == 0) {
+            if (maxDrain.compareTo(BigInteger.ZERO) == 0 && index == 0) {
                 return 0;
             }
 
             // drain this "battery" as much as possible
-            storage[index] -= maxDrain;
-            amount -= maxDrain;
+            storage[index] = storage[index].subtract(maxDrain);
+            amount -= maxDrain.longValue();
 
             // try to drain other "batteries" if necessary
             if (amount > 0 && index != 0) {
                 index--;
-                return maxDrain + drain(amount);
+                return maxDrain.longValue() + drain(amount);
             }
 
             // other drain not necessary, either because the storage is now completely empty,
             // or we were able to drain all the energy from this "battery"
-            return maxDrain;
+            return maxDrain.longValue();
         }
 
         public BigInteger getCapacity() {
@@ -496,25 +507,17 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         }
 
         public boolean hasFluid() {
-            for (long l : storage) {
-                if (l > 0) return true;
+            for (BigInteger l : storage) {
+                if (l.compareTo(BigInteger.ZERO)==1) return true;
             }
             return false;
         }
 
-        private static BigInteger summarize(long[] values) {
+        private static BigInteger summarize(BigInteger[] values) {
             BigInteger retVal = BigInteger.ZERO;
-            long currentSum = 0;
-            for (long value : values) {
-                if (currentSum != 0 && value > Long.MAX_VALUE - currentSum) {
-                    // will overflow if added
-                    retVal = retVal.add(BigInteger.valueOf(currentSum));
-                    currentSum = 0;
-                }
-                currentSum += value;
-            }
-            if (currentSum != 0) {
-                retVal = retVal.add(BigInteger.valueOf(currentSum));
+            for (BigInteger value : values) {
+                if(value!=null)
+                    retVal = retVal.add(value);
             }
             return retVal;
         }

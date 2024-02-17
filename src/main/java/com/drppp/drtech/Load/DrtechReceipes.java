@@ -34,8 +34,8 @@ public final class DrtechReceipes {
                      .setSlotOverlay(false, false, false, GuiTextures.IMPLOSION_OVERLAY_2)
                      .setSlotOverlay(true, false, true, GuiTextures.DUST_OVERLAY)
                      .setSound(SoundEvents.ENTITY_GENERIC_EXPLODE);
-        UU_RECIPES = new RecipeMap<>("uu_producter",1,0,1,1,(new SimpleRecipeBuilder()),false);
-        COPY_RECIPES = new RecipeMap<>("uu_copy",1,1,1,1,(new SimpleRecipeBuilder()),false);
+        UU_RECIPES = new RecipeMap<>("uu_producter",2,0,1,1,(new SimpleRecipeBuilder()),false);
+        COPY_RECIPES = new RecipeMap<>("uu_copy",2,1,1,1,(new SimpleRecipeBuilder()),false);
         LOG_CREATE = new RecipeMap<>("log_create",1,1,1,1,(new SimpleRecipeBuilder()),false);
         MOLECULAR_RECOMBINATION = new RecipeMap<>("molecular_recombination",1,1,1,1,(new SimpleRecipeBuilder()),false);
         MOB_KILLER = new RecipeMap<>("mob_killer",2,6,0,1,(new SimpleRecipeBuilder()),false);
