@@ -48,7 +48,7 @@ public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartTy
 
         BlockYotTankPartType batteryType = getState(stack);
         if (batteryType.getCapacity() != 0) {
-            tooltip.add(I18n.format("drtech.universal.tooltip.energy_storage_capacity", batteryType.getCapacity()));
+            tooltip.add(I18n.format("drtech.universal.tooltip.energy_storage_capacity", Long.toString(batteryType.getCapacity()).replaceAll("(\\d)(?=(\\d{3})+$)", "$1,")));
             tooltip.add(I18n.format("drtech.universal.tooltip.energy_eut", batteryType.getEut()));
         }
     }

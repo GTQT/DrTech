@@ -13,6 +13,10 @@ import gregtech.api.GregTechAPI;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.FluidTankList;
+import gregtech.api.gui.GuiTextures;
+import gregtech.api.gui.Widget;
+import gregtech.api.gui.widgets.ClickButtonWidget;
+import gregtech.api.gui.widgets.WidgetGroup;
 import gregtech.api.items.metaitem.stats.ItemFluidContainer;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -46,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
+import javax.annotation.Nonnull;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Supplier;
@@ -63,6 +68,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     public IMultipleTankHandler inputFluidInventory;
     public IMultipleTankHandler outputFluidInventory;
     private YotTankFluidBank fluidBank;
+    private int outputflag = 0;
     int time=0;
     public MetaTileEntityYotTank(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
@@ -127,6 +133,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         super.writeToNBT(data);
         data.setBoolean("isActive", isActive);
         data.setBoolean("isWorkingEnabled", isWorkingEnabled);
+        data.setInteger("OutFlag",this.outputflag);
        if(fluid!=null)
        {
            NBTTagCompound fluidNBT = new NBTTagCompound();
@@ -144,6 +151,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         super.readFromNBT(data);
         isActive = data.getBoolean("isActive");
         isWorkingEnabled = data.getBoolean("isWorkingEnabled");
+        this.outputflag = data.getInteger("OutFlag");
         if(data.hasKey(NBT_FLUID))
         {
             NBTTagCompound fluidNBT= (NBTTagCompound) data.getTag(NBT_FLUID);
@@ -180,7 +188,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                         }
                     }
                 }
-                if(outputFluidInventory.getTanks()>0 && this.fluid!=null)
+                if(outputFluidInventory.getTanks()>0 && this.fluid!=null && this.outputflag==1)
                 {
 
                     List<FluidStack> Outputs = new ArrayList<>();
@@ -198,7 +206,31 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             }
         }
     }
-
+    @Override
+    @Nonnull
+    protected Widget getFlexButton(int x, int y, int width, int height) {
+        WidgetGroup group = new WidgetGroup(x, y, width, height);
+        group.addWidget(new ClickButtonWidget(0, 0, 18, 9, "", this::clearFluid)
+                .setButtonTexture(GuiTextures.BUTTON_CLEAR_GRID)
+                .setTooltipText("gtqtcore.multiblock.tfft.clearfluid"));
+        group.addWidget(new ClickButtonWidget(0, 9, 18, 9, "", this::setoutputFlag)
+                .setButtonTexture(GuiTextures.LOCK)
+                .setTooltipText("gtqtcore.multiblock.tfft.isoutput"));
+        return group;
+    }
+    private void setoutputFlag(Widget.ClickData clickData)
+    {
+        if( this.outputflag==0)
+            this.outputflag=1;
+        else if (this.outputflag==1) {
+            this.outputflag=0;
+        }
+    }
+    private void clearFluid(Widget.ClickData clickData)
+    {
+        this.fluid = null;
+        this.fluidBank.clearStore();
+    }
     @NotNull
     @Override
     protected BlockPattern createStructurePattern() {
@@ -291,7 +323,11 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                         tl.add(TextComponentUtil.translationWithColor(
                                 TextFormatting.GOLD,
                                 "drtech.multiblock.yot_tank.fluid_type",
-                                this.fluid==null?"空":this.fluid.getLocalizedName()));
+                                this.fluid==null?"空":this.fluid.getLocalizedName())
+                        );
+                        tl.add(TextComponentUtil.translationWithColor(
+                                TextFormatting.GRAY,
+                                "drtech.multiblock.power_substation.output",this.outputflag==0?"禁用":"启用"));
                     }
                 })
                 .addWorkingStatusLine();
@@ -521,6 +557,11 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             }
             return retVal;
         }
-
+        public  void clearStore()
+        {
+            for (int i = 0; i < storage.length; i++) {
+                storage[i] = BigInteger.ZERO;
+            }
+        }
     }
 }

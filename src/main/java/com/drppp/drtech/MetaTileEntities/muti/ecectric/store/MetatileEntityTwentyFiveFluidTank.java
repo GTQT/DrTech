@@ -70,6 +70,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     private TFFTTankFluidBank fluidBank;
     private int circuit=0;
     private int time=0;
+    private int outputflag = 0;
     public int getCircuitNo()
     {
         return  this.circuit;
@@ -137,6 +138,8 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         super.writeToNBT(data);
         data.setBoolean("isActive", isActive);
         data.setBoolean("isWorkingEnabled", isWorkingEnabled);
+        data.setInteger("OutFlag",this.outputflag);
+        data.setInteger("Circuit",this.circuit);
         for (int i = 0; i < 25; i++) {
             if(fluid[i]!=null)
             {
@@ -156,6 +159,8 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         super.readFromNBT(data);
         isActive = data.getBoolean("isActive");
         isWorkingEnabled = data.getBoolean("isWorkingEnabled");
+        this.outputflag = data.getInteger("OutFlag");
+        this.circuit = data.getInteger("Circuit");
         for (int i = 0; i < 25; i++) {
             if(data.hasKey(NBT_FLUID+i))
             {
@@ -197,7 +202,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 this.energyContainer.changeEnergy(-this.fluidBank.eut);
                 this.setWorkingEnabled(true);
             }
-            if (isWorkingEnabled() && time++>20 && isActive) {
+            if (isWorkingEnabled() && time++>20 ) {
                 if(inputFluidInventory.getTanks()>0){
                     for (int i = 0; i < inputFluidInventory.getTanks(); i++) {
                         if(inputFluidInventory.getTankAt(i).getFluidAmount()>0)
@@ -222,7 +227,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                         }
                     }
                 }
-                if(outputFluidInventory.getTanks()>0 && this.fluid[circuit]!=null)
+                if(outputFluidInventory.getTanks()>0 && this.fluid[circuit]!=null &&this.outputflag==1)
                 {
 
                     List<FluidStack> Outputs = new ArrayList<>();
@@ -319,6 +324,9 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                         tl.add(TextComponentUtil.translationWithColor(
                                 TextFormatting.GRAY,
                                 "drtech.multiblock.power_substation.eut",this.fluidBank.eut));
+                        tl.add(TextComponentUtil.translationWithColor(
+                                TextFormatting.GRAY,
+                                "drtech.multiblock.power_substation.output",this.outputflag==0?"禁用":"启用"));
                         tl.add(TextComponentUtil.translationWithColor(TextFormatting.GOLD, "======================"));
                         for(int i=-2;i<=2;i++)
                         {
@@ -373,12 +381,12 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         group.addWidget(new ClickButtonWidget(9, 0, 9, 9, "", this::incrementThreshold)
                 .setButtonTexture(GuiTextures.BUTTON_THROTTLE_PLUS)
                 .setTooltipText("gtqtcore.multiblock.tfft.threshold_increment"));
-        group.addWidget(new ClickButtonWidget(0, 9, 9, 9, "", this::decrementThreshold1)
-                .setButtonTexture(GuiTextures.BUTTON_THROTTLE_MINUS)
-                .setTooltipText("gtqtcore.multiblock.tfft.threshold_decrement1"));
-        group.addWidget(new ClickButtonWidget(9, 9, 9, 9, "", this::incrementThreshold1)
-                .setButtonTexture(GuiTextures.BUTTON_THROTTLE_PLUS)
-                .setTooltipText("gtqtcore.multiblock.tfft.threshold_increment1"));
+        group.addWidget(new ClickButtonWidget(0, 9, 9, 9, "", this::clearFluid)
+                .setButtonTexture(GuiTextures.BUTTON_CLEAR_GRID)
+                .setTooltipText("gtqtcore.multiblock.tfft.clearfluid"));
+        group.addWidget(new ClickButtonWidget(9, 9, 9, 9, "", this::setoutputFlag)
+                .setButtonTexture(GuiTextures.LOCK)
+                .setTooltipText("gtqtcore.multiblock.tfft.isoutput"));
         return group;
     }
 
@@ -389,12 +397,18 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     private void decrementThreshold(Widget.ClickData clickData) {
         this.circuit = MathHelper.clamp(circuit - 1, 0, 24);
     }
-    private void incrementThreshold1(Widget.ClickData clickData) {
-        this.circuit = MathHelper.clamp(circuit + 10, 0, 24);
+    private void setoutputFlag(Widget.ClickData clickData)
+    {
+        if( this.outputflag==0)
+            this.outputflag=1;
+        else if (this.outputflag==1) {
+            this.outputflag=0;
+        }
     }
-
-    private void decrementThreshold1(Widget.ClickData clickData) {
-        this.circuit = MathHelper.clamp(circuit - 10, 0, 24);
+    private void clearFluid(Widget.ClickData clickData)
+    {
+        this.fluid[circuit] = null;
+        this.fluidBank.clearStore(circuit);
     }
     @SideOnly(Side.CLIENT)
     @Override
@@ -604,6 +618,11 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             }
             return retVal;
         }
-
+        public  void clearStore(int circuit)
+        {
+            for (int i = 0; i < storage.length; i++) {
+                storage[circuit][i]=0;
+            }
+        }
     }
 }

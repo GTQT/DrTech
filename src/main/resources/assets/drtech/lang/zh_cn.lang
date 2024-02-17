@@ -143,8 +143,9 @@ gtqt.multiblock.tfft.computation=填充：%s
 gtqt.multiblock.power_substation.stored=容量：%s
 gtqtcore.multiblock.tfft.threshold_decrement=流体向后一
 gtqtcore.multiblock.tfft.threshold_increment=流体向前一
-gtqtcore.multiblock.tfft.threshold_decrement1=流体向后十
-gtqtcore.multiblock.tfft.threshold_increment1=流体向前十
+gtqtcore.multiblock.tfft.clearfluid=清空当前流体
+gtqtcore.multiblock.tfft.isoutput=输出状态切换
+drtech.multiblock.power_substation.output=流体输出状态:%s
 drtech.multiblock.power_substation.eut=耗电量:§3%d EU/T
 drtech.universal.tooltip.energy_eut=§c单元耗电：§r%d EU/T
 #Hatch

@@ -1,6 +1,7 @@
 package com.drppp.drtech.Blocks.MetaBlocks;
 
 import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.IStoreData;
 import com.drppp.drtech.Tags;
 import gregtech.api.GTValues;
 import gregtech.api.block.VariantBlock;
@@ -21,6 +22,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTankPartType> {
@@ -49,34 +51,36 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
         super.addInformation(stack, world, tooltip, advanced);
 
         BlockYotTankPartType batteryType = getState(stack);
-        if (batteryType.getCapacity() != 0) {
-            tooltip.add(I18n.format("drtech.universal.tooltip.energy_storage_capacity", batteryType.getCapacity()));
+        if (batteryType.getCapacity().compareTo(BigInteger.ZERO)==1) {
+            tooltip.add(I18n.format("drtech.universal.tooltip.energy_storage_capacity", batteryType.getCapacity().toString().replaceAll("(\\d)(?=(\\d{3})+$)", "$1,")));
         }
     }
 
-    public enum BlockYotTankPartType implements IStringSerializable, IBatteryData {
+    public enum BlockYotTankPartType implements IStringSerializable, IStoreData {
 
-        YOT_PART_TIER_T1(1,1000000L),
-        YOT_PART_TIER_T2(2, 100000000L),
-        YOT_PART_TIER_T3(3, 10000000000L),
-        YOT_PART_TIER_T4(4,1000000000000L),
-        YOT_PART_TIER_T5(5, 100000000000000L),
-        YOT_PART_TIER_T6(6, 10000000000000000L),
-        YOT_PART_TIER_T7(7,1000000000000000000L),
-        YOT_PART_TIER_T8(8, Long.MAX_VALUE)
+        YOT_PART_TIER_T1(1,"1000000"),
+        YOT_PART_TIER_T2(2, "100000000"),
+        YOT_PART_TIER_T3(3, "10000000000"),
+        YOT_PART_TIER_T4(4,"1000000000000"),
+        YOT_PART_TIER_T5(5, "100000000000000"),
+        YOT_PART_TIER_T6(6, "10000000000000000"),
+        YOT_PART_TIER_T7(7,"1000000000000000000"),
+        YOT_PART_TIER_T8(8, "100000000000000000000"),
+        YOT_PART_TIER_T9(9, "10000000000000000000000"),
+        YOT_PART_TIER_T10(10, "1000000000000000000000000")
         ;
 
         private final int tier;
-        private final long capacity;
+        private final BigInteger capacity;
 
         BlockYotTankPartType() {
             this.tier = -1;
-            this.capacity = 0;
+            this.capacity = new BigInteger("0");
         }
 
-        BlockYotTankPartType(int tier, long capacity) {
+        BlockYotTankPartType(int tier, String capacity) {
             this.tier = tier;
-            this.capacity = capacity;
+            this.capacity = new BigInteger(capacity);
         }
 
         @Override
@@ -85,21 +89,21 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
         }
 
         @Override
-        public long getCapacity() {
+        public BigInteger getCapacity() {
             return capacity;
         }
 
         // must be separately named because of reobf issue
         @NotNull
         @Override
-        public String getBatteryName() {
+        public String getStoreName() {
             return name().toLowerCase();
         }
 
         @NotNull
         @Override
         public String getName() {
-            return getBatteryName();
+            return getStoreName();
         }
     }
 }
