@@ -4,6 +4,7 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntityDeepGroundPump;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.gui.ModularUI;
@@ -16,6 +17,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart {
+    private MetaTileEntityYotTank yotTank;
     public MetaTileEntityYotHatch(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, GTValues.UV, false);
     }
@@ -29,6 +31,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart {
     public void setWorkingEnabled(boolean workingEnabled) {
         World world = this.getWorld();
         if (world != null && !world.isRemote) {
+
             writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(workingEnabled));
         }
     }
@@ -48,5 +51,9 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart {
         if (this.shouldRenderOverlay()) {
             Textures.ME_INPUT_BUS.renderSided(getFrontFacing(), renderState, translation, pipeline);
         }
+    }
+
+    public void setYotTank(MetaTileEntityYotTank yotTank) {
+        this.yotTank = yotTank;
     }
 }
