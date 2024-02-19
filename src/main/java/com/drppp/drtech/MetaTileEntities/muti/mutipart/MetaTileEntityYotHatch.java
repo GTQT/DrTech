@@ -1,16 +1,25 @@
 package com.drppp.drtech.MetaTileEntities.muti.mutipart;
 
+import appeng.api.AEApi;
 import appeng.api.config.AccessRestriction;
 import appeng.api.config.Actionable;
+import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
+import appeng.api.networking.events.MENetworkCellArrayUpdate;
+import appeng.api.networking.events.MENetworkStorageEvent;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
+import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.*;
+import appeng.api.storage.channels.IFluidStorageChannel;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IItemList;
 import appeng.api.util.AEPartLocation;
 import appeng.api.util.DimensionalCoord;
+import appeng.client.gui.widgets.GuiProgressBar;
 import appeng.fluids.util.AEFluidStack;
+import appeng.me.helpers.AENetworkProxy;
 import appeng.me.helpers.IGridProxyable;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
@@ -39,6 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart implements IMultiblockAbilityPart<IAEFluidContainer> , IGridProxyable, IActionHost, ICellContainer,
@@ -46,6 +56,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     private MetaTileEntityYotTank yotTank;
     private final IAEFluidContainer iaeFluidContainer;
     private WrappedFluidStack fluidStack;
+    private int priority=10;
     public MetaTileEntityYotHatch(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, GTValues.UV, false);
         iaeFluidContainer = null;
@@ -103,19 +114,47 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     @Override
     public void update() {
-        super.update();
-        //fluidStack =  WrappedFluidStack.fromFluidStack(this.yotTank.getFluid());
-    }
 
+       if(this.yotTank==null)
+           return;
+
+        if (!this.getWorld().isRemote) {
+            if (isChanged()) {
+                IGridNode node = getGridNode(null);
+                if (node != null) {
+                    IGrid grid = node.getGrid();
+                    if (grid != null) {
+                        grid.postEvent(new MENetworkCellArrayUpdate());
+                        IStorageGrid storageGrid = grid.getCache(IStorageGrid.class);
+                        if (storageGrid == null) {
+                            node.getGrid().postEvent(new MENetworkStorageEvent(null, getChannel()));
+                        } else {
+                            node.getGrid().postEvent(
+                                    new MENetworkStorageEvent(storageGrid.getInventory(getChannel()), getChannel()));
+                        }
+                        node.getGrid().postEvent(new MENetworkCellArrayUpdate());
+                    }
+                }
+            } else {
+            }
+        }
+        super.update();
+    }
+    private boolean isChanged() {
+        if (this.yotTank == null) return false;
+        if(this.yotTank.getFluid()==null) return false;
+        return true;
+    }
     @Override
     public DimensionalCoord getLocation() {
-        return null;
+        return new DimensionalCoord(this.getWorld(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
     }
 
     @Nullable
     @Override
     public IGridNode getGridNode(@NotNull AEPartLocation aePartLocation) {
-        return null;
+        AENetworkProxy gp = getProxy();
+        return gp != null ? gp.getNode() : null;
     }
 
     @Override
@@ -131,32 +170,37 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     @NotNull
     @Override
     public IGridNode getActionableNode() {
-        return null;
+        AENetworkProxy gp = getProxy();
+        return gp != null ? gp.getNode() : null;
     }
 
     @Override
     public List<IMEInventoryHandler> getCellArray(IStorageChannel<?> iStorageChannel) {
-        return null;
+        List<IMEInventoryHandler> list = new ArrayList<>();
+        if (iStorageChannel == getChannel()) {
+            list.add(this);
+        }
+        return list;
     }
 
     @Override
     public AccessRestriction getAccess() {
-        return null;
+        return AccessRestriction.READ_WRITE;
     }
 
     @Override
     public boolean isPrioritized(IAEFluidStack iaeFluidStack) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canAccept(IAEFluidStack iaeFluidStack) {
-        return false;
+        return true;
     }
 
     @Override
     public int getPriority() {
-        return 0;
+        return this.priority;
     }
 
     @Override
@@ -166,17 +210,106 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     @Override
     public boolean validForPass(int i) {
-        return false;
+        return true;
     }
 
     @Override
     public IAEFluidStack injectItems(IAEFluidStack iaeFluidStack, Actionable actionable, IActionSource iActionSource) {
-        return null;
+        long amt = fill(null, iaeFluidStack, false);
+        if (amt == iaeFluidStack.getStackSize()) {
+            if (actionable.equals(Actionable.MODULATE)) fill(null, iaeFluidStack, true);
+            return null;
+        }
+        return iaeFluidStack;
     }
 
+    public int fill(GuiProgressBar.Direction from, FluidStack resource, boolean doFill) {
+        if (yotTank == null  || !yotTank.isActive()) return 0;
+        if (yotTank.getFluid() != null && !yotTank.getFluid().getLocalizedName().equals("")
+                && !yotTank.getFluid().equals(resource.getFluid().getName()))
+            return 0;
+        if (yotTank.getFluid() == null || yotTank.getFluid().getLocalizedName().equals("")
+                || yotTank.getFluid().equals(resource.getFluid().getName())) {
+            yotTank.setFluid(new FluidStack(resource.getFluid(),0));
+            if (yotTank.getFluidBank().getCapacity().subtract(yotTank.getFluidBank().getStored()).compareTo(BigInteger.valueOf(resource.amount)) >= 0) {
+                if (doFill) yotTank.getFluidBank().fill(resource.amount);
+                return resource.amount;
+            } else {
+                long left=0;
+                int added = yotTank.getFluidBank().getCapacity().subtract(yotTank.getFluidBank().getStored()).intValue();
+                if (doFill)
+                    left = yotTank.getFluidBank().fill(added);
+                return (int)left;
+            }
+        }
+        return 0;
+    }
+
+    public long fill(GuiProgressBar.Direction from, IAEFluidStack resource, boolean doFill) {
+        if (yotTank == null  || !yotTank.isActive()) return 0;
+        if (yotTank.getFluid() != null && !yotTank.getFluid().getLocalizedName().equals("")
+                && !yotTank.getFluid().equals(resource.getFluid().getName()))
+            return 0;
+        if (yotTank.getFluid() == null || yotTank.getFluid().getLocalizedName().equals("")
+                || yotTank.getFluid().equals(resource.getFluid().getName())){
+            yotTank.setFluid(new FluidStack(resource.getFluid(),0));
+            if (yotTank.getFluidBank().getCapacity().subtract(yotTank.getFluidBank().getStored()).compareTo(BigInteger.valueOf(resource.getStackSize()))
+                    >= 0) {
+                if (doFill) yotTank.getFluidBank().fill(resource.getStackSize());
+                return resource.getStackSize();
+            } else {
+                long left=0;
+                long added = yotTank.getFluidBank().getCapacity().subtract(yotTank.getFluidBank().getStored()).longValue();
+                if (doFill)
+                    left = yotTank.getFluidBank().fill(added);
+                return left;
+            }
+        }
+        return 0;
+    }
     @Override
     public IAEFluidStack extractItems(IAEFluidStack iaeFluidStack, Actionable actionable, IActionSource iActionSource) {
-        return null;
+        IAEFluidStack ready = drain(null, iaeFluidStack, false);
+        if (ready != null) {
+            if (actionable.equals(Actionable.MODULATE)) drain(null, ready, true);
+            return ready;
+        } else return null;
+    }
+
+    public FluidStack drain(GuiProgressBar.Direction from, FluidStack resource, boolean doDrain) {
+        if (yotTank == null || !yotTank.isActive())
+            return null;
+        if (yotTank.getFluid() != null && !yotTank.getFluid().getLocalizedName().equals("")
+                && !yotTank.getFluid().equals(resource.getFluid().getName()))
+            return null;
+        int ready;
+        if (yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+            ready = Integer.MAX_VALUE;
+        } else ready = yotTank.getFluidBank().getStored().intValue();
+        ready = Math.min(ready, resource.amount);
+        if (doDrain) {
+            yotTank.getFluidBank().drain(ready);
+        }
+        return new FluidStack(resource.getFluid(), ready);
+    }
+
+    public IAEFluidStack drain(GuiProgressBar.Direction from, IAEFluidStack resource, boolean doDrain) {
+        if (yotTank == null || !yotTank.isActive())
+            return null;
+        if (yotTank.getFluid() != null && !yotTank.getFluid().getLocalizedName().equals("")
+                && !yotTank.getFluid().equals(resource.getFluid().getName()))
+            return null;
+        long ready;
+        if (yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
+            ready = Long.MAX_VALUE;
+        } else ready = yotTank.getFluidBank().getStored().longValue();
+        ready = Math.min(ready, resource.getStackSize());
+        if (doDrain) {
+            yotTank.getFluidBank().drain(ready);
+        }
+        IAEFluidStack copy = resource.copy();
+        copy.setStackSize(ready);
+        return copy;
     }
 
     @Override
@@ -197,7 +330,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     @Override
     public IStorageChannel<IAEFluidStack> getChannel() {
-        return null;
+        return AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class);
     }
 
     @Override

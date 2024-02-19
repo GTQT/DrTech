@@ -72,6 +72,10 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         return fluid;
     }
 
+    public void setFluid(FluidStack fluid) {
+        this.fluid = fluid;
+    }
+
     private  FluidStack fluid;
     public IMultipleTankHandler inputFluidInventory;
     public IMultipleTankHandler outputFluidInventory;
