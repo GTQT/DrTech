@@ -7,8 +7,10 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.Utils.Datas;
 import com.drppp.drtech.Utils.DrtechUtils;
+import com.drppp.drtech.api.capability.DrtechCapabilities;
 import gregtech.api.GregTechAPI;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -38,6 +40,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -64,11 +67,21 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     private static final String YOT_PART_HEADER = "YotPart_";
 
     private static final String NBT_FLUID = "Fluid";
+
+    public FluidStack getFluid() {
+        return fluid;
+    }
+
     private  FluidStack fluid;
     public IMultipleTankHandler inputFluidInventory;
     public IMultipleTankHandler outputFluidInventory;
     private YotTankFluidBank fluidBank;
     private int outputflag = 0;
+
+    public YotTankFluidBank getFluidBank() {
+        return fluidBank;
+    }
+    protected final ArrayList<MetaTileEntityYotHatch> mYottaHatch = new ArrayList<>();
     int time=0;
     public MetaTileEntityYotTank(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
@@ -247,6 +260,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                         .or(autoAbilities())
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
+                        .or(abilities(DrtechCapabilities.YOT_HATCH).setMaxGlobalLimited(1))
                 )
                 .where('G', states(getGlassState()))
                 .where('L', frames(Materials.Steel))
@@ -363,6 +377,18 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 for (int i = 0; i < wrapper.amount; i++) {
                     parts.add(wrapper.partType);
                 }
+            }
+            else if(battery.getKey().startsWith("Multi")  ) {
+                HashSet set = (HashSet) battery.getValue();
+                for (var s: set
+                     ) {
+                    if(s instanceof MetaTileEntityYotHatch)
+                    {
+                        MetaTileEntityYotHatch yotHatch = (MetaTileEntityYotHatch)s;
+                        yotHatch.setYotTank(this);
+                    }
+                }
+
             }
         }
         if (parts.isEmpty()) {

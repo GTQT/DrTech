@@ -3,37 +3,31 @@ package com.drppp.drtech.Blocks;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
+import com.drppp.drtech.Tile.TileEntityHomoEye;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BlockGravitationalAnomaly extends Block {
-    protected AxisAlignedBB boundingBox;
-    public BlockGravitationalAnomaly() {
+public class BlockHomoEye extends Block {
+    public BlockHomoEye() {
         super(Material.IRON);
-        this.setResistance(5000000.0F);
+        this.setResistance(10.0F);
         this.disableStats();
-        this.setRegistryName(Tags.MODID,"gravitational_anomaly");
+        this.setRegistryName(Tags.MODID,"homo_eye");
         this.setCreativeTab(DrTechMain.Mytab);
-        this.setTranslationKey(Tags.MODID+".gravitational_anomaly");
-        this.boundingBox =new AxisAlignedBB(0.30000001192092896, 0.30000001192092896, 0.30000001192092896, 0.6000000238418579, 0.6000000238418579, 0.6000000238418579);
-
+        this.setTranslationKey(Tags.MODID+".homo_eye");
     }
     @Nonnull
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
@@ -77,22 +71,11 @@ public class BlockGravitationalAnomaly extends Block {
     }
     @Nonnull
     public TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
-        return new TileEntityGravitationalAnomaly();
+        return new TileEntityHomoEye();
     }
     @Override
     public boolean hasTileEntity(IBlockState state) {
         return true;
-    }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        TileEntity entity = worldIn.getTileEntity(pos);
-        if(entity instanceof TileEntityGravitationalAnomaly && !worldIn.isRemote)
-        {
-            playerIn.sendStatusMessage(new TextComponentString("Weight: " + ((TileEntityGravitationalAnomaly) entity).weight), true);
-            return true;
-        }
-        return false;
     }
 
 }

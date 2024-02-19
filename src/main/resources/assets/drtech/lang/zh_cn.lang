@@ -82,10 +82,11 @@ drtech.machine.large_uu_producter.name=大型质量发生仪
 drtech.machine.large_element_duplicator.name=大型元素复制机
 drtech.machine.log_factory.name=原木拟生厂
 drtech.machine.molecular_recombination.name=大型分子重组仪
-drtech.machine.yot_tank.name=YOT储罐
+drtech.machine.yot_tank.name=YOT储罐a
 drtech.machine.mob_killer.name=怪物模拟仓
 drtech.machine.deep_ground_pump.name=深热地泵
 drtech.machine.tfft_tank.name=T.F.F.T储罐
+drtech.machine.yot_hatch.name=YOT仓
 #Materials
 gregtech.material.bedrock=基岩
 
