@@ -36,7 +36,7 @@ public final class DrtechReceipes {
                      .setSound(SoundEvents.ENTITY_GENERIC_EXPLODE);
         UU_RECIPES = new RecipeMap<>("uu_producter",2,0,1,1,(new SimpleRecipeBuilder()),false);
         COPY_RECIPES = new RecipeMap<>("uu_copy",2,1,1,1,(new SimpleRecipeBuilder()),false);
-        LOG_CREATE = new RecipeMap<>("log_create",1,1,1,1,(new SimpleRecipeBuilder()),false);
+        LOG_CREATE = new RecipeMap<>("log_create",2,2,1,1,(new SimpleRecipeBuilder()),false);
         MOLECULAR_RECOMBINATION = new RecipeMap<>("molecular_recombination",1,1,1,1,(new SimpleRecipeBuilder()),false);
         MOB_KILLER = new RecipeMap<>("mob_killer",2,6,0,1,(new SimpleRecipeBuilder()),false);
         DRRP_GROUND_PUMP = new RecipeMap<>("deep_ground_pump",1,0,1,4,(new SimpleRecipeBuilder()),false);

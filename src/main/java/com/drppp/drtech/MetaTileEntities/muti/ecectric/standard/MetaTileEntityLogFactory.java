@@ -109,9 +109,9 @@ public class MetaTileEntityLogFactory extends RecipeMapMultiblockController {
                ) {
                    int group = num/64;
                    for (int i = 0; i < group; i++) {
-                       MyitemOutputs.add(new ItemStack(item.getItem(),64));
+                       MyitemOutputs.add(new ItemStack(item.getItem(),64,item.getMetadata()));
                    }
-                   MyitemOutputs.add(new ItemStack(item.getItem(),num%64));
+                   MyitemOutputs.add(new ItemStack(item.getItem(),num%64,item.getMetadata()));
                }
                GTTransferUtils.addItemsToItemHandler(this.getOutputInventory(), false, MyitemOutputs);
            }

@@ -3,6 +3,7 @@ package com.drppp.drtech.Load;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.Linkage.GTFOLinkage;
 import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.recipes.RecipeBuilder;
@@ -174,6 +175,10 @@ public class MachineReceipe {
         if (Loader.isModLoaded(GtqtCoreLinkage.GTQTCORE_ID))
         {
             GtqtCoreLinkage.MachineRecipeInit();
+        }
+        if (Loader.isModLoaded(GTFOLinkage.GTFO_ID))
+        {
+            GTFOLinkage.MachineRecipeInit();
         }
         DRRP_GROUND_PUMP.recipeBuilder()
                 .fluidInputs(new FluidStack(FluidRegistry.WATER, 1000))
