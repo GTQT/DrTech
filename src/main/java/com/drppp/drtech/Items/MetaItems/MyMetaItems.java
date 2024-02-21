@@ -16,6 +16,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem PIPIE_1;
     public static MetaItem<?>.MetaValueItem PIPIE_5;
     public static MetaItem<?>.MetaValueItem PIPIE_10;
+    public static MetaItem<?>.MetaValueItem POS_CARD;
     public static void MetaItemsInit()
     {
        MetaItems1 metaItem = new MetaItems1();

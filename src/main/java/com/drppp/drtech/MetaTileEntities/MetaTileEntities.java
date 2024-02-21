@@ -4,6 +4,7 @@ import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Load.DrtechReceipes;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.generator.AnnihilationGenerator;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.*;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityEnergyTransTower;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetatileEntityTwentyFiveFluidTank;
 import com.drppp.drtech.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
@@ -42,6 +43,7 @@ public class MetaTileEntities {
     public static MetaTileEntityDeepGroundPump DEEP_GROUND_PUMP;
     public static MetatileEntityTwentyFiveFluidTank TFFT;
     public static MetaTileEntityYotHatch YOT_HARCH;
+    public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -70,6 +72,7 @@ public class MetaTileEntities {
         DEEP_GROUND_PUMP = registerMetaTileEntity(17063,new MetaTileEntityDeepGroundPump(getmyId("deep_ground_pump")));
         TFFT = registerMetaTileEntity(17064,new MetatileEntityTwentyFiveFluidTank(getmyId("tfft_tank")));
         YOT_HARCH = registerMetaTileEntity(17065,new MetaTileEntityYotHatch(getmyId("yot_hatch")));
+        TRANS_TOWER = registerMetaTileEntity(17066,new MetaTileEntityEnergyTransTower(getmyId("trans_tower")));
     }
 
 
