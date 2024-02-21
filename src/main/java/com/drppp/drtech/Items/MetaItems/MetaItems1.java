@@ -60,6 +60,7 @@ public  class MetaItems1 extends StandardMetaItem {
                         .addComponents(new TooltipBehavior((lines) -> {
                             lines.add(I18n.format("metaitem.pipe_10.tooltip.1", new Object[0]));
                         }));
+        MyMetaItems.POS_CARD = this.addItem(13,"pos_card").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
     }
 
     @Override

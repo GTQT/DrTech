@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "drtech:blocks/connector_3",
+    "down": "drtech:blocks/connector_3",
+    "up": "drtech:blocks/connector_3",
+    "north": "drtech:blocks/connector_3",
+    "south":"drtech:blocks/connector_3",
+    "west": "drtech:blocks/connector_3",
+    "east": "drtech:blocks/connector_3"
+  }
+}
