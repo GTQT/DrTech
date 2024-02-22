@@ -1,5 +1,7 @@
 package com.drppp.drtech.Utils;
 
+import com.drppp.drtech.Sync.SyncInit;
+import com.drppp.drtech.Sync.UpdateTileEntityPacket;
 import com.drppp.drtech.Tags;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.unification.material.Material;
@@ -10,7 +12,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -194,5 +200,47 @@ public class DrtechUtils {
             minValue = b;
         }
         return  minValue;
+    }
+
+    public static void sendTileEntityUpdate(TileEntity tileEntity,NBTTagCompound nbt) {
+        tileEntity.writeToNBT(nbt);
+        UpdateTileEntityPacket packet = new UpdateTileEntityPacket(tileEntity.getPos(), nbt);
+        SyncInit.NETWORK.sendToServer(packet);
+    }
+    public static int getPosDist(BlockPos a,BlockPos b)
+    {
+        int x = (int)Math.pow(a.getX()-b.getX(),2);
+        int y = (int)Math.pow(a.getY()-b.getY(),2);
+        int z = (int)Math.pow(a.getZ()-b.getZ(),2);
+
+        return  (int)Math.sqrt(x+y+z);
+    }
+
+    public static EnumFacing getDirectionFromB1ToB2(BlockPos b1, BlockPos b2) {
+        // 检查b1和b2是否为相同的位置
+        if (b1.equals(b2)) {
+            return EnumFacing.UP;
+        }
+
+        int diffX = b2.getX() - b1.getX();
+        int diffY = b2.getY() - b1.getY();
+        int diffZ = b2.getZ() - b1.getZ();
+
+        // Minecraft中的方向是基于玩家视角的，南北东西对应负正的Z和X轴
+        if (diffX > 0) {
+            return EnumFacing.EAST;
+        } else if (diffX < 0) {
+            return EnumFacing.WEST;
+        } else if (diffZ > 0) {
+            return EnumFacing.SOUTH;
+        } else if (diffZ < 0) {
+            return EnumFacing.NORTH;
+        } else if (diffY > 0) {
+            return EnumFacing.UP;
+        } else if (diffY < 0) {
+            return EnumFacing.DOWN;
+        } else {
+            return EnumFacing.UP;
+        }
     }
 }

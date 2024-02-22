@@ -2,16 +2,24 @@ package com.drppp.drtech.Items.MetaItems;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Items.Behavior.DataItemBehavior;
+import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
+import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,7 +68,7 @@ public  class MetaItems1 extends StandardMetaItem {
                         .addComponents(new TooltipBehavior((lines) -> {
                             lines.add(I18n.format("metaitem.pipe_10.tooltip.1", new Object[0]));
                         }));
-        MyMetaItems.POS_CARD = this.addItem(13,"pos_card").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
+        MyMetaItems.POS_CARD = this.addItem(13,"pos_card").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1).addComponents(new DataItemBehavior(true));
     }
 
     @Override
@@ -78,6 +86,46 @@ public  class MetaItems1 extends StandardMetaItem {
             }
         }
         return super.onItemRightClick(world, player, hand);
+    }
+
+    @Override
+    public @NotNull EnumActionResult onItemUse(EntityPlayer player, @NotNull World world, @NotNull BlockPos pos, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItemMainhand();
+        if(player.isSneaking() && stack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
+        {
+            if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector)
+            {
+                NBTTagCompound nbt = new NBTTagCompound();
+                nbt.setInteger("x",pos.getX());
+                nbt.setInteger("y",pos.getY());
+                nbt.setInteger("z",pos.getZ());
+                stack.setTagCompound(nbt);
+                player.sendMessage(new TextComponentString("已保存坐标: x:"+pos.getX() +"y:"+pos.getY()+"z:"+pos.getZ()));
+            }
+
+
+        }
+        else  if(stack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
+        {
+            if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector)
+            {
+                NBTTagCompound nbt = stack.getTagCompound();
+                BlockPos bpos = new BlockPos(nbt.getInteger("x"),nbt.getInteger("y"),nbt.getInteger("z"));
+
+                if(DrtechUtils.getPosDist(pos,bpos)<=100)
+                {
+                    TileEntityConnector con = ((TileEntityConnector)world.getTileEntity(pos));
+                        con.beforePos = bpos;
+                        NBTTagCompound newnbt = new NBTTagCompound();
+                        newnbt.setTag("locahost",nbt);
+                        DrtechUtils.sendTileEntityUpdate(world.getTileEntity(pos),newnbt);
+                        player.sendMessage(new TextComponentString("已写入坐标: x:"+bpos.getX() +"y:"+bpos.getY()+"z:"+bpos.getZ()));
+                }
+                else
+                    player.sendMessage(new TextComponentString("距离超过100格!"));
+            }
+        }
+        return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
     }
 
     private void enableFlyingAbility(EntityPlayer player)

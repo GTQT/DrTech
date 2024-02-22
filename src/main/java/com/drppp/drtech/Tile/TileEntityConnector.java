@@ -1,12 +1,14 @@
 package com.drppp.drtech.Tile;
 
+import com.drppp.drtech.Utils.DrtechUtils;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 
 public class TileEntityConnector extends TileEntity implements ITickable {
-    private String NBT_STORE = "StoredEnergy";
     public BlockPos selfPos;
     public BlockPos nextPos;
     public BlockPos beforePos;
@@ -14,16 +16,22 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     public long StoredEnergy=0;
 
     public int success=0;
+
+    public TileEntityConnector()
+    {
+
+    }
     public TileEntityConnector(int tire) {
         int v = (int)Math.pow(4,(4+2*tire));
         MaxEnergy =  v;
     }
 
+
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
         this.MaxEnergy = compound.getLong("MaxEnergy");
-        this.StoredEnergy = compound.getLong(NBT_STORE);
+        this.StoredEnergy = compound.getLong("StoredEnergy");
         this.success = compound.getInteger("Success");
         if(compound.hasKey("selfPos"))
         {
@@ -42,12 +50,11 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         }
 
     }
-
-    @Override
+@Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         compound.setLong("MaxEnergy",MaxEnergy);
-        compound.setLong(NBT_STORE,StoredEnergy);
+        compound.setLong("StoredEnergy",StoredEnergy);
         compound.setInteger("Success",success);
         if(this.selfPos!=null)
         {
@@ -76,38 +83,60 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         return compound;
     }
 
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        super.handleUpdateTag(tag);
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        return writeToNBT(new NBTTagCompound());
+    }
+
     @Override
     public void update() {
         if(!this.world.isRemote)
         {
-            this.StoredEnergy++;
-            if(this.beforePos!=null && this.success==1)
+
+            if(this.beforePos!=null && this.success==1 && world.getTileEntity(this.beforePos) instanceof TileEntityConnector)
             {
+                if(DrtechUtils.getPosDist(this.beforePos,this.getPos()) >100 || this.getPos().equals(this.beforePos) )
+                {
+                    this.beforePos = null;
+                    return;
+                }
                 TileEntityConnector before = (TileEntityConnector)world.getTileEntity(this.beforePos);
                 if(before.StoredEnergy>0 && this.StoredEnergy<this.MaxEnergy)
                 {
                     before.drain(this.fill(before.StoredEnergy));
                 }
             }
-            this.markDirty();
         }
     }
     //返回需要扣除的能量
     public long fill(long amount)
     {
+        int waste=0;
+        if(this.beforePos!=null)
+            waste = DrtechUtils.getPosDist(this.pos,this.beforePos);
         if(amount<=0)
             return 0;
-        if(this.StoredEnergy+amount >= this.MaxEnergy)
+
+        if(this.StoredEnergy+amount >= this.MaxEnergy+ waste)
         {
-            long left = this.MaxEnergy - this.StoredEnergy;
+            long left = this.MaxEnergy - this.StoredEnergy +waste;
             this.StoredEnergy = this.MaxEnergy;
+            this.markDirty();
             return left;
         }
         else if(this.StoredEnergy+amount <this.MaxEnergy)
         {
-            this.StoredEnergy += amount;
+            this.StoredEnergy += (amount-waste);
+            this.markDirty();
             return amount;
         }
+
         return 0;
     }
     //返回需要增加的能量
@@ -119,9 +148,11 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         {
             long left = this.StoredEnergy;
             this.StoredEnergy=0;
+            this.markDirty();
             return left;
         }
         this.StoredEnergy -= amount;
+        this.markDirty();
         return  amount;
     }
 }

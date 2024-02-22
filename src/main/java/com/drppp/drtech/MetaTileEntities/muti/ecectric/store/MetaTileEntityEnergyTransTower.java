@@ -7,6 +7,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.Tile.TileEntityConnector;
+import com.drppp.drtech.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapabilities;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
@@ -14,6 +15,11 @@ import gregtech.api.capability.IControllable;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.FluidTankList;
+import gregtech.api.gui.GuiTextures;
+import gregtech.api.gui.Widget;
+import gregtech.api.gui.widgets.ClickButtonWidget;
+import gregtech.api.gui.widgets.WidgetGroup;
+import gregtech.api.metatileentity.IFastRenderMetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
@@ -23,25 +29,45 @@ import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.unification.material.Materials;
+import gregtech.api.util.GTUtility;
+import gregtech.api.util.interpolate.Eases;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.client.shader.postprocessing.BloomEffect;
+import gregtech.client.utils.BloomEffectUtil;
+import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import gregtech.client.utils.RenderUtil;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +80,8 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     private IEnergyContainer inenergyContainer;
     private IEnergyContainer outenergyContainer;
     private TileEntityConnector connector;
+    private BlockPos pos;
+
     public MetaTileEntityEnergyTransTower(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -124,14 +152,24 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     }
     @Override
     protected void updateFormedValid() {
-        if(this.connector !=null && this.inenergyContainer!= null)
-        {
-            this.inenergyContainer.changeEnergy(-this.connector.fill(this.inenergyContainer.getEnergyStored()));
-        }
-        if(this.connector !=null && this.outenergyContainer!= null)
-        {
-            this.outenergyContainer.changeEnergy(this.connector.drain(this.outenergyContainer.getEnergyCapacity() -this.outenergyContainer.getEnergyStored()));
-        }
+
+      if(!this.getWorld().isRemote)
+      {
+          if(this.connector==null)
+          {
+              getConnectorPos();
+          }
+          if(this.connector !=null && this.inenergyContainer!= null)
+          {
+              this.inenergyContainer.changeEnergy(-this.connector.fill(this.inenergyContainer.getEnergyStored()));
+              this.connector.markDirty();
+          }
+          if(this.connector !=null && this.outenergyContainer!= null)
+          {
+              this.outenergyContainer.changeEnergy(this.connector.drain(this.outenergyContainer.getEnergyCapacity() -this.outenergyContainer.getEnergyStored()));
+              this.connector.markDirty();
+          }
+      }
     }
 
     @Override
@@ -149,6 +187,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         super.invalidateStructure();
         resetTileAbilities();
         this.connector.success = 0;
+
     }
     @Override
     protected void formStructure(PatternMatchContext context) {
@@ -158,26 +197,28 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     }
     private void getConnectorPos()
     {
-        BlockPos pos = null;
-        switch (this.getFrontFacing()){
-            case SOUTH:
-                pos = new BlockPos(this.getPos().getX(),this.getPos().getY()+10,this.getPos().getZ()-1);
-                break;
-            case NORTH:
-                pos = new BlockPos(this.getPos().getX(),this.getPos().getY()+10,this.getPos().getZ()+1);
-                break;
-            case EAST:
-                pos = new BlockPos(this.getPos().getX()-1,this.getPos().getY()+10,this.getPos().getZ());
-                break;
-            case WEST:
-                pos = new BlockPos(this.getPos().getX()+1,this.getPos().getY()+10,this.getPos().getZ());
-                break;
-        }
-        if(pos!= null && this.getWorld().getTileEntity(pos)!= null && this.getWorld().getTileEntity(pos) instanceof TileEntityConnector)
-        {
-            this.connector = (TileEntityConnector) this.getWorld().getTileEntity(pos);
-            this.connector.success = 1;
-        }
+            BlockPos pos = null;
+            switch (this.getFrontFacing()){
+                case SOUTH:
+                    pos = new BlockPos(this.getPos().getX(),this.getPos().getY()+10,this.getPos().getZ()-1);
+                    break;
+                case NORTH:
+                    pos = new BlockPos(this.getPos().getX(),this.getPos().getY()+10,this.getPos().getZ()+1);
+                    break;
+                case EAST:
+                    pos = new BlockPos(this.getPos().getX()-1,this.getPos().getY()+10,this.getPos().getZ());
+                    break;
+                case WEST:
+                    pos = new BlockPos(this.getPos().getX()+1,this.getPos().getY()+10,this.getPos().getZ());
+                    break;
+            }
+            if(pos!= null && this.getWorld().getTileEntity(pos)!= null && this.getWorld().getTileEntity(pos) instanceof TileEntityConnector)
+            {
+                this.connector = (TileEntityConnector) this.getWorld().getTileEntity(pos);
+                this.connector.success = 1;
+                this.pos = pos;
+            }
+
     }
     private void initializeAbilities() {
         this.inenergyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
@@ -225,5 +266,36 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
                                boolean advanced) {
         tooltip.add(I18n.format("drtech.machine.energytrans.tooltip.1"));
         tooltip.add(I18n.format("drtech.machine.energytrans.tooltip.2"));
+    }
+
+    @Override
+    protected void addDisplayText(List<ITextComponent> textList) {
+        super.addDisplayText(textList);
+        if(this.connector!=null)
+        {
+            textList.add(new TextComponentTranslation("drtech.machine.energytrans.connect",this.connector.beforePos==null?":无":": X:"+
+                    this.connector.beforePos.getX()+" Y:" + this.connector.beforePos.getY() +" Z:" + this.connector.beforePos.getZ()));
+            textList.add(new TextComponentTranslation("drtech.machine.energytrans.energy",String.valueOf(this.connector.StoredEnergy)));
+            if(this.connector.beforePos!=null)
+                textList.add(new TextComponentTranslation("drtech.machine.energytrans.posdist",String.valueOf(DrtechUtils.getPosDist(this.connector.beforePos,this.connector.getPos()))));
+            else
+                textList.add(new TextComponentTranslation("drtech.machine.energytrans.posdist",String.valueOf("0")));
+        }
+    }
+    @Override
+    @Nonnull
+    protected Widget getFlexButton(int x, int y, int width, int height) {
+        WidgetGroup group = new WidgetGroup(x, y, width, height);
+        group.addWidget(new ClickButtonWidget(0, 0, 18, 18, "", this::clearpos)
+                .setButtonTexture(GuiTextures.BUTTON_CLEAR_GRID)
+                .setTooltipText("gtqtcore.multiblock.energytrans.clearpos"));
+        return group;
+    }
+    private void clearpos(Widget.ClickData clickData)
+    {
+        if(this.connector!=null)
+        {
+            this.connector.beforePos = null;
+        }
     }
 }

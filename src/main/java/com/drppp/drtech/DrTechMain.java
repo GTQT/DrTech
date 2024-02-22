@@ -12,6 +12,7 @@ import com.drppp.drtech.Load.CraftingReceipe;
 import com.drppp.drtech.Load.DrTechReceipeManager;
 import com.drppp.drtech.Materials.DrtechMaterials;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
+import com.drppp.drtech.Sync.SyncInit;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -82,6 +83,7 @@ public class DrTechMain {
     public void init(FMLInitializationEvent event) {
         MetaTileEntities.Init();
         CraftingReceipe.load();
+        SyncInit.init();
     }
 
     @EventHandler
