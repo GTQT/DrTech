@@ -91,6 +91,7 @@ drtech.machine.mob_killer.name=怪物模拟仓
 drtech.machine.deep_ground_pump.name=深热地泵
 drtech.machine.tfft_tank.name=T.F.F.T储罐
 drtech.machine.yot_hatch.name=YOT仓
+drtech.machine.trans_tower.name=能量输送塔
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -153,6 +154,13 @@ gtqtcore.multiblock.tfft.isoutput=输出状态切换
 drtech.multiblock.power_substation.output=流体输出状态:%s
 drtech.multiblock.power_substation.eut=耗电量:§3%d EU/T
 drtech.universal.tooltip.energy_eut=§c单元耗电：§r%d EU/T
+drtech.machine.energytrans.connect=连接位置%s
+drtech.machine.energytrans.energy=电容存储能量:%s
+behavior.data_item.poscard.data=已存储坐标:%s
+drtech.machine.energytrans.posdist=连接距离:%s
+gtqtcore.multiblock.energytrans.clearpos=清除连接
+drtech.machine.energytrans.tooltip.1=远距离输电，可自动变压
+drtech.machine.energytrans.tooltip.2=上限100格子，请勿闭环连接
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
