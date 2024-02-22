@@ -293,9 +293,10 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     }
     private void clearpos(Widget.ClickData clickData)
     {
-        if(this.connector!=null)
-        {
-            this.connector.beforePos = null;
-        }
+        this.connector.beforePos = null;
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setInteger("ClearPos",1);
+        if(!this.getWorld().isRemote)
+            DrtechUtils.sendTileEntityClientUpdate(this.connector,nbt);
     }
 }

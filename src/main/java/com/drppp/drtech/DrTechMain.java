@@ -88,7 +88,11 @@ public class DrTechMain {
         CraftingReceipe.load();
         SyncInit.init();
     }
-
+    @EventHandler
+    // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
+    public void Clientinit(FMLInitializationEvent event) {
+        SyncInit.init();
+    }
     @EventHandler
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
     public void postInit(FMLPostInitializationEvent event) {

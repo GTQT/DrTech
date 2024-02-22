@@ -107,7 +107,7 @@ public  class MetaItems1 extends StandardMetaItem {
         }
         else  if(stack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
         {
-            if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector)
+            if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector && stack.hasTagCompound())
             {
                 NBTTagCompound nbt = stack.getTagCompound();
                 BlockPos bpos = new BlockPos(nbt.getInteger("x"),nbt.getInteger("y"),nbt.getInteger("z"));
