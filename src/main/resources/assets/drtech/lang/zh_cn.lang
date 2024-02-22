@@ -161,6 +161,7 @@ drtech.machine.energytrans.posdist=连接距离:%s
 gtqtcore.multiblock.energytrans.clearpos=清除连接
 drtech.machine.energytrans.tooltip.1=远距离输电，可自动变压！
 drtech.machine.energytrans.tooltip.2=上限100格子，请勿闭环连接
+behavior.data_item.poscard.opera=Shift+右键获取坐标，右键写入坐标
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓

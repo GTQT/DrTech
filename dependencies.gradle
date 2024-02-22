@@ -24,7 +24,7 @@
 dependencies {
     implementation 'zone.rong:mixinbooter:8.4'
     implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848")
-    implementation rfg.deobf("curse.maven:gregtech-ce-unofficial-557242:5050979")
+    implementation rfg.deobf("curse.maven:gregtech-ce-unofficial-557242:5121638")
     implementation rfg.deobf("curse.maven:ctm-267602:2915363")
     compileOnlyApi rfg.deobf("curse.maven:baubles-227083:2518667")
     implementation rfg.deobf("curse.maven:gregicality-multiblocks-564858:4910674")

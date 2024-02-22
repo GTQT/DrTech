@@ -207,6 +207,11 @@ public class DrtechUtils {
         UpdateTileEntityPacket packet = new UpdateTileEntityPacket(tileEntity.getPos(), nbt);
         SyncInit.NETWORK.sendToServer(packet);
     }
+    public static void sendTileEntityClientUpdate(TileEntity tileEntity,NBTTagCompound nbt) {
+        tileEntity.writeToNBT(nbt);
+        UpdateTileEntityPacket packet = new UpdateTileEntityPacket(tileEntity.getPos(), nbt);
+        SyncInit.NETWORK_CLIENT.sendToAll(packet);
+    }
     public static int getPosDist(BlockPos a,BlockPos b)
     {
         int x = (int)Math.pow(a.getX()-b.getX(),2);

@@ -41,6 +41,7 @@ public class DataItemBehavior implements IItemBehaviour, IDataItem {
             String name  ="无";
             if (compound != null) name = "X:"+compound.getInteger("x") +"Y:"+compound.getInteger("y")+"Z:"+compound.getInteger("z");
             lines.add(I18n.format("behavior.data_item.poscard.data", name));
+            lines.add(I18n.format("behavior.data_item.poscard.opera"));
         }
         else
         {
