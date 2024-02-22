@@ -4,6 +4,7 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.Crops.CropsInit;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Client.render.ConnectorTesr;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
@@ -13,6 +14,7 @@ import com.drppp.drtech.Load.DrTechReceipeManager;
 import com.drppp.drtech.Materials.DrtechMaterials;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.Sync.SyncInit;
+import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -56,6 +58,7 @@ public class DrTechMain {
     public void TexturesInit()
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new ConnectorTesr());
         TextureUtils.addIconRegister(Textures::register);
         Textures.init();
         LaserPipeRenderer.INSTANCE.preInit();

@@ -2,6 +2,7 @@ package com.drppp.drtech.Load;
 
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Items.ItemsInit;
+import com.drppp.drtech.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.Linkage.GTFOLinkage;
 import com.drppp.drtech.Linkage.GtqtCoreLinkage;
@@ -277,6 +278,14 @@ public class MachineReceipe {
                 .fluidInputs(Polytetrafluoroethylene.getFluid(144))
                 .outputs(new ItemStack(BlocksInit.COMMON_CASING,1,9))
                 .EUt(480)
+                .duration(100)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.plate, Polyethylene)
+                .input(Items.PAPER)
+                .output(MyMetaItems.POS_CARD)
+                .circuitMeta(1)
+                .EUt(16)
                 .duration(100)
                 .buildAndRegister();
     }

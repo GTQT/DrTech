@@ -17,6 +17,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
 
     public int success=0;
 
+    private int tick=0;
     public TileEntityConnector()
     {
 
@@ -98,20 +99,23 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     public void update() {
         if(!this.world.isRemote)
         {
-
-            if(this.beforePos!=null && this.success==1 && world.getTileEntity(this.beforePos) instanceof TileEntityConnector)
-            {
-                if(DrtechUtils.getPosDist(this.beforePos,this.getPos()) >100 || this.getPos().equals(this.beforePos) )
-                {
-                    this.beforePos = null;
-                    return;
-                }
-                TileEntityConnector before = (TileEntityConnector)world.getTileEntity(this.beforePos);
-                if(before.StoredEnergy>0 && this.StoredEnergy<this.MaxEnergy)
-                {
-                    before.drain(this.fill(before.StoredEnergy));
-                }
-            }
+           if(tick++>10)
+           {
+               tick=0;
+               if(this.beforePos!=null && this.success==1 && world.getTileEntity(this.beforePos) instanceof TileEntityConnector)
+               {
+                   if(DrtechUtils.getPosDist(this.beforePos,this.getPos()) >100 || this.getPos().equals(this.beforePos) )
+                   {
+                       this.beforePos = null;
+                       return;
+                   }
+                   TileEntityConnector before = (TileEntityConnector)world.getTileEntity(this.beforePos);
+                   if(before.StoredEnergy>0 && this.StoredEnergy<this.MaxEnergy)
+                   {
+                       before.drain(this.fill(before.StoredEnergy));
+                   }
+               }
+           }
         }
     }
     //返回需要扣除的能量
@@ -154,5 +158,8 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         this.StoredEnergy -= amount;
         this.markDirty();
         return  amount;
+    }
+    public boolean shouldRender() {
+        return this.beforePos!=null;
     }
 }
