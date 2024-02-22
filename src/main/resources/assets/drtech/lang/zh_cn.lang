@@ -159,7 +159,7 @@ drtech.machine.energytrans.energy=电容存储能量:%s
 behavior.data_item.poscard.data=已存储坐标:%s
 drtech.machine.energytrans.posdist=连接距离:%s
 gtqtcore.multiblock.energytrans.clearpos=清除连接
-drtech.machine.energytrans.tooltip.1=远距离输电，可自动变压
+drtech.machine.energytrans.tooltip.1=远距离输电，可自动变压！
 drtech.machine.energytrans.tooltip.2=上限100格子，请勿闭环连接
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓

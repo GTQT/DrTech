@@ -1,6 +1,7 @@
 package com.drppp.drtech.Load;
 
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
@@ -50,6 +51,31 @@ public class CraftingReceipe {
                 "WWW", "WSW", "WWW",
                 'W',  MetaBlocks.TRANSPARENT_CASING,
                 'S', new ItemStack(MetaBlocks.MACHINE,1,1031)
+        );
+        ModHandler.addShapedRecipe("trans_tower", MetaTileEntities.TRANS_TOWER.getStackForm(),
+                "WAW", "DSD", "WAW",
+                'W', new UnificationEntry(OrePrefix.plateDouble,Materials.Copper),
+                'D', new UnificationEntry(OrePrefix.plateDouble,Materials.Silver),
+                'S', new ItemStack(MetaBlocks.MACHINE,1,986),
+                'A', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.LV)
+        );
+        ModHandler.addShapedRecipe("connector_1", new ItemStack(BlocksInit.BLOCK_CONNECTOR1),
+                "WAW", "WSW", "WAW",
+                'W',  new UnificationEntry(OrePrefix.plate,Materials.Lead),
+                'S', new ItemStack(MetaBlocks.MACHINE,1,986),
+                'A', new UnificationEntry(OrePrefix.plate,Materials.Polyethylene)
+        );
+        ModHandler.addShapedRecipe("connector_2", new ItemStack(BlocksInit.BLOCK_CONNECTOR2),
+                "WAW", "WSW", "WAW",
+                'W',  new UnificationEntry(OrePrefix.plate,Materials.Aluminium),
+                'S', new ItemStack(MetaBlocks.MACHINE,1,987),
+                'A', new UnificationEntry(OrePrefix.plate,Materials.Polyethylene)
+        );
+        ModHandler.addShapedRecipe("connector_3", new ItemStack(BlocksInit.BLOCK_CONNECTOR3),
+                "WAW", "WSW", "WAW",
+                'W',  new UnificationEntry(OrePrefix.plate,Materials.Electrum),
+                'S', new ItemStack(MetaBlocks.MACHINE,1,988),
+                'A', new UnificationEntry(OrePrefix.plate,Materials.Polyethylene)
         );
     }
 }
