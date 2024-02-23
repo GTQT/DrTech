@@ -33,6 +33,7 @@ public class ItemsInit {
     public static  final Item ITEM_CONNECTOR1 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR1).setRegistryName(Tags.MODID,"connector_1");
     public static  final Item ITEM_CONNECTOR2 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID,"connector_2");
     public static  final Item ITEM_CONNECTOR3 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID,"connector_3");
+    public static  final Item ITEM_BLOCK_GOLDEN_SEA = new  ItemBlock(BlocksInit.BLOCK_GOLDEN_SEA).setRegistryName(Tags.MODID,"golden_sea");
     public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
@@ -47,6 +48,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_CONNECTOR1);
         event.getRegistry().register(ITEM_CONNECTOR2);
         event.getRegistry().register(ITEM_CONNECTOR3);
+        event.getRegistry().register(ITEM_BLOCK_GOLDEN_SEA);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));

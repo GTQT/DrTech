@@ -22,6 +22,7 @@ metaitem.pipe_1.name=地热管道1
 metaitem.pipe_5.name=地热管道5
 metaitem.pipe_10.name=地热管道10
 metaitem.pos_card.name=位置记录卡
+metaitem.gold_coin.name=金元宝
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
@@ -42,6 +43,7 @@ tile.my_laser_pipe_normal.name=透明激光管
 tile.drtech.connector_1.name=1级电容
 tile.drtech.connector_2.name=2级电容
 tile.drtech.connector_3.name=3级电容
+tile.drtech.golden_sea.name=聚宝盆
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
@@ -162,6 +164,7 @@ gtqtcore.multiblock.energytrans.clearpos=清除连接
 drtech.machine.energytrans.tooltip.1=远距离输电，可自动变压！
 drtech.machine.energytrans.tooltip.2=上限100格子，请勿闭环连接
 behavior.data_item.poscard.opera=Shift+右键获取坐标，右键写入坐标
+metaitem.gold_coin.tooltip.1=谁不喜欢金元宝呢！
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
