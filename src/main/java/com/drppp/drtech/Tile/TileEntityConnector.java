@@ -102,7 +102,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
            if(tick++>10)
            {
                tick=0;
-               if(this.beforePos!=null && this.success==1 && world.getTileEntity(this.beforePos) instanceof TileEntityConnector)
+               if(this.beforePos!=null && this.success==1 && this.world.isBlockLoaded(this.beforePos) && world.getTileEntity(this.beforePos) instanceof TileEntityConnector )
                {
                    if(DrtechUtils.getPosDist(this.beforePos,this.getPos()) >100 || this.getPos().equals(this.beforePos) )
                    {
@@ -112,7 +112,8 @@ public class TileEntityConnector extends TileEntity implements ITickable {
                    TileEntityConnector before = (TileEntityConnector)world.getTileEntity(this.beforePos);
                    if(before.StoredEnergy>0 && this.StoredEnergy<this.MaxEnergy)
                    {
-                       before.drain(this.fill(before.StoredEnergy));
+                       long energy = this.fill(before.StoredEnergy);
+                       before.drain(energy);
                    }
                }
            }
@@ -134,7 +135,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             this.markDirty();
             return left;
         }
-        else if(this.StoredEnergy+amount <this.MaxEnergy)
+        else if(this.StoredEnergy+amount <=this.MaxEnergy)
         {
             this.StoredEnergy += (amount-waste);
             this.markDirty();
