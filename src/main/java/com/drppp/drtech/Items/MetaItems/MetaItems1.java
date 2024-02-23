@@ -69,6 +69,11 @@ public  class MetaItems1 extends StandardMetaItem {
                             lines.add(I18n.format("metaitem.pipe_10.tooltip.1", new Object[0]));
                         }));
         MyMetaItems.POS_CARD = this.addItem(13,"pos_card").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1).addComponents(new DataItemBehavior(true));
+        MyMetaItems.GOLD_COIN = this.addItem(14,"gold_coin").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.gold_coin.tooltip.1", new Object[0]));
+                })
+        );
     }
 
     @Override

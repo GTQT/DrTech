@@ -6,9 +6,11 @@ import com.drppp.drtech.Blocks.Pipe.BlockMyLaserPipe;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityConnector;
+import com.drppp.drtech.Tile.TileEntityGoldenSea;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.Utils.Datas;
+import com.sun.jna.platform.win32.WinNT;
 import gregtech.common.pipelike.laser.LaserPipeType;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -25,6 +27,7 @@ public class BlocksInit {
     public static final BlockConnector BLOCK_CONNECTOR1 = new BlockConnector(1);
     public static final BlockConnector BLOCK_CONNECTOR2 = new BlockConnector(2);
     public static final BlockConnector BLOCK_CONNECTOR3 = new BlockConnector(3);
+    public static final BlockGoldenSea BLOCK_GOLDEN_SEA = new BlockGoldenSea();
     public static final MetaGlasses TRANSPARENT_CASING = new MetaGlasses("glasses_casing");
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
@@ -42,13 +45,13 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_CONNECTOR2);
         event.getRegistry().register(BLOCK_CONNECTOR3);
         GameRegistry.registerTileEntity(TileEntityConnector.class, new ResourceLocation(Tags.MODID, "connetor"));
+        event.getRegistry().register(BLOCK_GOLDEN_SEA);
+        GameRegistry.registerTileEntity(TileEntityGoldenSea.class, new ResourceLocation(Tags.MODID, "gold_coin"));
         event.getRegistry().register(TRANSPARENT_CASING);
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
         event.getRegistry().register(YOT_TANK);
         event.getRegistry().register(TFFT_TANK);
-
-
 
         MY_LASER_PIPE.setRegistryName("my_laser_pipe_normal");
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
