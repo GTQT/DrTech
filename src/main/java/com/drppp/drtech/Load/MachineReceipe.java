@@ -288,6 +288,12 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(100)
                 .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(Blocks.GOLD_BLOCK,64)
+                .output(MyMetaItems.GOLD_COIN)
+                .EUt(16)
+                .duration(300)
+                .buildAndRegister();
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {

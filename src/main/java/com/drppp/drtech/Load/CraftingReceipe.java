@@ -10,6 +10,7 @@ import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
@@ -76,6 +77,11 @@ public class CraftingReceipe {
                 'W',  new UnificationEntry(OrePrefix.plate,Materials.Electrum),
                 'S', new ItemStack(MetaBlocks.MACHINE,1,988),
                 'A', new UnificationEntry(OrePrefix.plate,Materials.Polyethylene)
+        );
+        ModHandler.addShapedRecipe("golden_sea", new ItemStack(BlocksInit.BLOCK_GOLDEN_SEA),
+                "WWW", "WSW", "WWW",
+                'W', Blocks.GOLD_BLOCK,
+                'S', new UnificationEntry(OrePrefix.plate,Materials.Gold)
         );
     }
 }
