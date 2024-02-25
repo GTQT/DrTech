@@ -40,7 +40,7 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
     public static int max_heat=100000;
     public int heat=0;
     public int tick=0;
-    public int eff=100;
+    public int eff=1;
     private int tire = 0;
 
     public MetaTileEntitySolarTower(ResourceLocation metaTileEntityId) {
