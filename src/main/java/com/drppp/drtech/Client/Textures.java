@@ -20,6 +20,7 @@ public class Textures {
     public static  SimpleOverlayRenderer ELEMENT_CONSTRAINS_MACHINE_CASING;
     public static  SimpleOverlayRenderer YOT_TANK_CASING;
     public static  SimpleOverlayRenderer TFFT_TANK_CASING;
+    public static  SimpleOverlayRenderer SALT_INHIBITION_CASING;
     public static  OrientedOverlayRenderer LARGE_UU_PRODUCTER;
     public static  OrientedOverlayRenderer ELECTRIC_IMPLOSION_OVERLAY;
     public static  OrientedOverlayRenderer TFFT_OVERLAY;
@@ -36,6 +37,7 @@ public class Textures {
         LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
         ELECTRIC_IMPLOSION_OVERLAY = new OrientedOverlayRenderer("multiblock/electric_implosion");
         TFFT_OVERLAY = new OrientedOverlayRenderer("multiblock/tfft_tank");
+        SALT_INHIBITION_CASING = new SimpleOverlayRenderer("casings/salt_inhibition_casing");
     }
     public static void register(TextureMap textureMap) {
 

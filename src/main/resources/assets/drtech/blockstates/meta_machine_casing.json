@@ -64,6 +64,37 @@
           "up": "drtech:blocks/yot_tank_casing_top",
           "down": "drtech:blocks/yot_tank_casing_top"
         }
+      },
+      "solar_tower_casing": {
+        "textures": {
+          "all": "drtech:blocks/solar_tower_casing"
+        }
+      },
+      "salt_inhibition_casing": {
+        "textures": {
+          "all": "drtech:blocks/salt_inhibition_casing"
+        }
+      },
+      "heat_inhibition_casing": {
+        "textures": {
+          "all": "drtech:blocks/heat_inhibition_casing"
+        }
+      },
+      "heat_cut_off_casing": {
+        "textures": {
+          "all": "drtech:blocks/heat_cut_off_casing"
+        }
+      },
+      "solar_reflection_casing": {
+        "textures": {
+          "particle": "drtech:blocks/solar_reflection_casing_side",
+          "north": "drtech:blocks/solar_reflection_casing_side",
+          "south": "drtech:blocks/solar_reflection_casing_side",
+          "west": "drtech:blocks/solar_reflection_casing_side",
+          "east": "drtech:blocks/solar_reflection_casing_side",
+          "up": "drtech:blocks/solar_reflection_casing_top",
+          "down": "drtech:blocks/solar_reflection_casing_side"
+        }
       }
     }
   }
