@@ -13,15 +13,12 @@ import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
-import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.util.GTUtility;
 
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityFluidDrill;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import static gregtech.api.util.GTUtility.gregtechId;
 import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntity;
 import static gregtech.common.metatileentities.MetaTileEntities.registerSimpleMetaTileEntity;
 
@@ -44,6 +41,8 @@ public class MetaTileEntities {
     public static MetatileEntityTwentyFiveFluidTank TFFT;
     public static MetaTileEntityYotHatch YOT_HARCH;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
+    public static MetaTileEntitySolarTower SOLAR_TOWER;
+
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -73,6 +72,7 @@ public class MetaTileEntities {
         TFFT = registerMetaTileEntity(17064,new MetatileEntityTwentyFiveFluidTank(getmyId("tfft_tank")));
         YOT_HARCH = registerMetaTileEntity(17065,new MetaTileEntityYotHatch(getmyId("yot_hatch")));
         TRANS_TOWER = registerMetaTileEntity(17066,new MetaTileEntityEnergyTransTower(getmyId("trans_tower")));
+        SOLAR_TOWER = registerMetaTileEntity(17067,new MetaTileEntitySolarTower(getmyId("solar_tower")));
     }
 
 

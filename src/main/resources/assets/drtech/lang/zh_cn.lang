@@ -7,6 +7,7 @@ recipemap.log_create.name=原木拟生
 recipemap.molecular_recombination.name=分子重组
 recipemap.mob_killer.name=怪物屠宰
 recipemap.deep_ground_pump.name=热能抽取
+recipemap.solar_tower.name=太阳之力
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
@@ -57,6 +58,11 @@ tile.Meta_Machine_Casing.element_constrains_machine_casing.name=元素约束机�
 tile.Meta_Machine_Casing.aseptic_machine_casing.name=无菌农场机械方块
 tile.Meta_Machine_Casing.yot_tank_casing.name=YOT机械方块
 tile.Meta_Machine_Casing.tfft_casing.name=TFFT机械方块
+tile.Meta_Machine_Casing.solar_tower_casing.name=太阳能热塔机械方块
+tile.Meta_Machine_Casing.salt_inhibition_casing.name=盐抑制机械方块
+tile.Meta_Machine_Casing.heat_inhibition_casing.name=热抑制机械方块
+tile.Meta_Machine_Casing.heat_cut_off_casing.name=热隔绝机械方块
+tile.Meta_Machine_Casing.solar_reflection_casing.name=太阳能反射机械方块
 #YOUT_TANK
 tile.yot_tank_part.yot_part_tier_t1.name=流体单元方块(T1)
 tile.yot_tank_part.yot_part_tier_t2.name=流体单元方块(T2)
@@ -94,6 +100,7 @@ drtech.machine.deep_ground_pump.name=深热地泵
 drtech.machine.tfft_tank.name=T.F.F.T储罐
 drtech.machine.yot_hatch.name=YOT仓
 drtech.machine.trans_tower.name=能量输送塔
+drtech.machine.solar_tower.name=太阳能集热塔
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -165,6 +172,17 @@ drtech.machine.energytrans.tooltip.1=远距离输电，可自动变压！
 drtech.machine.energytrans.tooltip.2=上限100格子，请勿闭环连接
 behavior.data_item.poscard.opera=Shift+右键获取坐标，右键写入坐标
 metaitem.gold_coin.tooltip.1=谁不喜欢金元宝呢！
+drtech.machine.solarpower.tire=反射环等级:%s
+drtech.machine.solarpower.eff=机器效率:百分之%s
+drtech.machine.solarpower.heat=内部热量:%s
+drtech.machine.solarpower.tip.1=每次循环，热量提高，并同时加热所有太阳能盐（冷）
+drtech.machine.solarpower.tip.2=将太阳能盐（冷）转化为太阳能盐（热）会降低热量，降低值等于转化量
+drtech.machine.solarpower.tip.3=如果太阳能盐（冷）的量超过热量，则热量降至0 处在最大热量一半附近时，效率最高
+drtech.machine.solarpower.tip.4=即热量为0或100000时，热效率最低；而热量为50000时效率最高
+drtech.machine.solarpower.tip.5=热效率公式：(7000-|当前热量-50000|^0.8)/7000 每次循环获得热量：反射器数量*热效率*(10+增益)
+drtech.machine.solarpower.tip.6=增益：1环=1，2环=2，3环=4，4环=8，5环=16
+
+增益：1环=1，2环=2，3环=4，4环=8，5环=16
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓

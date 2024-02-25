@@ -294,6 +294,12 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(300)
                 .buildAndRegister();
+        SOLAR_TOWER.recipeBuilder()
+                .fluidInputs(new FluidStack(FluidRegistry.WATER, 1000))
+                .fluidOutputs(new FluidStack(Steam.getFluid(), 1000))
+                .EUt(1)
+                .duration(200)
+                .buildAndRegister();
     }
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {

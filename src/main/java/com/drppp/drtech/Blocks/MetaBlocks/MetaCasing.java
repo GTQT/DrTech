@@ -44,8 +44,12 @@ public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
         ELEMENT_CONSTRAINS_MACHINE_CASING("element_constrains_machine_casing"),
         ASEPTIC_MACHINE_CASING("aseptic_machine_casing"),
         YOT_TANK_CASING("yot_tank_casing"),
-        TFFT_CASING("tfft_casing");
-
+        TFFT_CASING("tfft_casing"),
+        HEAT_CUT_OFF_CASING("heat_cut_off_casing"),
+        SOLAR_TOWER_CASING("solar_tower_casing"),
+        SALT_INHIBITION_CASING("salt_inhibition_casing"),
+        HEAT_INHIBITION_CASING("heat_inhibition_casing"),
+        SOLAR_REFLECTION_CASING("solar_reflection_casing");
         private final String name;
 
         MetalCasingType(String name) {

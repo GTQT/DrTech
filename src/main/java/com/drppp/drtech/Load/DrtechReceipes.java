@@ -20,6 +20,7 @@ public final class DrtechReceipes {
     public static final RecipeMap<SimpleRecipeBuilder> MOLECULAR_RECOMBINATION ;
     public static final RecipeMap<SimpleRecipeBuilder> MOB_KILLER ;
     public static final RecipeMap<SimpleRecipeBuilder> DRRP_GROUND_PUMP ;
+    public static final RecipeMap<SimpleRecipeBuilder> SOLAR_TOWER ;
 
     private DrtechReceipes() {
     }
@@ -40,6 +41,7 @@ public final class DrtechReceipes {
         MOLECULAR_RECOMBINATION = new RecipeMap<>("molecular_recombination",1,1,1,1,(new SimpleRecipeBuilder()),false);
         MOB_KILLER = new RecipeMap<>("mob_killer",2,6,0,1,(new SimpleRecipeBuilder()),false);
         DRRP_GROUND_PUMP = new RecipeMap<>("deep_ground_pump",1,0,1,4,(new SimpleRecipeBuilder()),false);
+        SOLAR_TOWER = new RecipeMap<>("solar_tower",0,0,1,1,(new SimpleRecipeBuilder()),false);
 
     }
 }

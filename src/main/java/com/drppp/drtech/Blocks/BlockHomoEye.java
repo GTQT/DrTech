@@ -28,47 +28,9 @@ public class BlockHomoEye extends Block {
         this.setRegistryName(Tags.MODID,"homo_eye");
         this.setCreativeTab(DrTechMain.Mytab);
         this.setTranslationKey(Tags.MODID+".homo_eye");
-    }
-    @Nonnull
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return super.getBoundingBox(state, source, pos);
+         this.setLightOpacity(255);
     }
 
-    @Nullable
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return Block.NULL_AABB;
-    }
-    @Deprecated
-    public boolean isNormalCube(IBlockState blockState) {
-        return false;
-    }
-
-    @Deprecated
-    public RayTraceResult collisionRayTrace(IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
-        return super.collisionRayTrace(state, world, pos, start, end);
-    }
-
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-        return true;
-    }
-
-    @Deprecated
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Deprecated
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-    @Nonnull
-    @Deprecated
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.INVISIBLE;
-    }
-    public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
-        return true;
-    }
     @Nonnull
     public TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
         return new TileEntityHomoEye();
