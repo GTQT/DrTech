@@ -20,6 +20,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -83,6 +84,21 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntitySolarTower(this.metaTileEntityId);
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound data) {
+        super.writeToNBT(data);
+        data.setInteger("Eff",this.eff);
+        data.setInteger("Heat",this.heat);
+        return data;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound data) {
+        super.readFromNBT(data);
+        this.heat = data.getInteger("Heat");
+        this.eff = data.getInteger("Eff");
     }
 
     @Override
