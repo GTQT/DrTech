@@ -23,7 +23,7 @@ public class ConnectorTesr extends TileEntitySpecialRenderer<TileEntityConnector
 
         if(te.shouldRender())
         {
-            renderLine(te.beforePos,te.getPos(),partialTicks);
+           // renderLine(te.beforePos,te.getPos(),partialTicks);
         }
     }
 
