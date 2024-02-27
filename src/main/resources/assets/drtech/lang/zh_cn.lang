@@ -181,8 +181,9 @@ drtech.machine.solarpower.tip.3=如果太阳能盐（冷）的量超过热量，
 drtech.machine.solarpower.tip.4=即热量为0或100000时，热效率最低；而热量为50000时效率最高
 drtech.machine.solarpower.tip.5=热效率公式：(7000-|当前热量-50000|^0.8)/7000 每次循环获得热量：反射器数量*热效率*(10+增益)
 drtech.machine.solarpower.tip.6=增益：1环=1，2环=2，3环=4，4环=8，5环=16
-
-增益：1环=1，2环=2，3环=4，4环=8，5环=16
+#流体
+gregtech.material.cold_sun_salt=冷太阳能盐
+gregtech.material.hot_sun_salt=热太阳能盐
 #Hatch
 drtech.machine.laser_hatch.source_16384a.iv.name=16384安§1IV§r激光源仓
 drtech.machine.laser_hatch.source_16384a.luv.name=16384安§dLuV§r激光源仓
