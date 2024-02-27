@@ -6,6 +6,7 @@ import com.drppp.drtech.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.Linkage.GTFOLinkage;
 import com.drppp.drtech.Linkage.GtqtCoreLinkage;
+import com.drppp.drtech.Materials.DrtechMaterials;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.recipes.RecipeBuilder;
 import gregtech.api.recipes.RecipeMaps;
@@ -295,8 +296,8 @@ public class MachineReceipe {
                 .duration(300)
                 .buildAndRegister();
         SOLAR_TOWER.recipeBuilder()
-                .fluidInputs(new FluidStack(FluidRegistry.WATER, 1000))
-                .fluidOutputs(new FluidStack(Steam.getFluid(), 1000))
+                .fluidInputs(DrtechMaterials.ColdSunSalt.getFluid(1000))
+                .fluidOutputs(DrtechMaterials.HotSunSalt.getFluid(1000))
                 .EUt(1)
                 .duration(200)
                 .buildAndRegister();

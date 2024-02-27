@@ -4,6 +4,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Load.DrtechReceipes;
+import com.drppp.drtech.Materials.DrtechMaterials;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -231,15 +232,14 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
                    {
                       int amount = Math.min( this.getInputTank().getTankAt(i).getFluidAmount(),heat);
                        this.getInputTank().getTankAt(i).drain(amount,true);
-                       fluidOutput.add(new FluidStack(Materials.Steam.getFluid(),amount));
+                       fluidOutput.add(new FluidStack(DrtechMaterials.HotSunSalt.getFluid(),amount));
                    }
                 }
                 GTTransferUtils.addFluidsToFluidHandler(this.getOutputTank(),false,fluidOutput);
             }
-            //this.completeRecipe();
         }
         public boolean isFluidSalt(Fluid fluid) {
-            return FluidRegistry.WATER.equals(fluid);
+            return DrtechMaterials.HotSunSalt.getFluid().equals(fluid);
         }
     }
 }

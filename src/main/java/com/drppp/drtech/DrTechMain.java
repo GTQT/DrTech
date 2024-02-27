@@ -66,7 +66,7 @@ public class DrTechMain {
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new ConnectorTesr());
-        //ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
         TextureUtils.addIconRegister(Textures::register);
         Textures.init();
         LaserPipeRenderer.INSTANCE.preInit();
