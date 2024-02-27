@@ -4,17 +4,14 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Blocks.BlocksInit;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
+import com.drppp.drtech.Client.Particle.DrtechLaserBeamParticle;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Utils.DrtechUtils;
-import com.drppp.drtech.api.capability.DrtechCapabilities;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IControllable;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.impl.EnergyContainerList;
-import gregtech.api.capability.impl.FluidTankList;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.ClickButtonWidget;
@@ -29,25 +26,13 @@ import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.unification.material.Materials;
-import gregtech.api.util.GTUtility;
-import gregtech.api.util.interpolate.Eases;
+import gregtech.client.particle.GTParticleManager;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
-import gregtech.client.shader.postprocessing.BloomEffect;
-import gregtech.client.utils.BloomEffectUtil;
-import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -59,19 +44,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import gregtech.client.utils.RenderUtil;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import static gregtech.api.util.RelativeDirection.*;
 
@@ -81,7 +63,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     private IEnergyContainer outenergyContainer;
     private TileEntityConnector connector;
     private BlockPos pos;
-
+    private int beamCount;
     public MetaTileEntityEnergyTransTower(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -115,30 +97,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
             }
         }
     }
-    @Override
-    public void writeInitialSyncData(PacketBuffer buf) {
-        super.writeInitialSyncData(buf);
-        buf.writeBoolean(isActive);
-        buf.writeBoolean(isWorkingEnabled);
-    }
 
-    @Override
-    public void receiveInitialSyncData(PacketBuffer buf) {
-        super.receiveInitialSyncData(buf);
-        isActive = buf.readBoolean();
-        isWorkingEnabled = buf.readBoolean();
-    }
-    @Override
-    public void receiveCustomData(int dataId, @NotNull PacketBuffer buf) {
-        super.receiveCustomData(dataId, buf);
-        if (dataId == GregtechDataCodes.WORKABLE_ACTIVE) {
-            isActive = buf.readBoolean();
-            scheduleRenderUpdate();
-        } else if (dataId == GregtechDataCodes.WORKING_ENABLED) {
-            isWorkingEnabled = buf.readBoolean();
-            scheduleRenderUpdate();
-        }
-    }
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
         if (capability == GregtechTileCapabilities.CAPABILITY_CONTROLLABLE) {
@@ -155,6 +114,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
 
       if(!this.getWorld().isRemote)
       {
+          beamCount++;
           if(this.connector==null)
           {
               getConnectorPos();
@@ -169,7 +129,12 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
               this.outenergyContainer.changeEnergy(this.connector.drain(this.outenergyContainer.getEnergyCapacity() -this.outenergyContainer.getEnergyStored()));
               this.connector.markDirty();
           }
+          if (beamCount >20) {
+              beamCount = 0;
+              writeCustomData(GregtechDataCodes.UPDATE_PARTICLE, this::writeParticles);
+          }
       }
+
     }
 
     @Override
@@ -186,7 +151,8 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     public void invalidateStructure() {
         super.invalidateStructure();
         resetTileAbilities();
-        this.connector.success = 0;
+        if(this.connector!=null)
+         this.connector.success = 0;
 
     }
     @Override
@@ -195,6 +161,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         initializeAbilities();
         getConnectorPos();
     }
+
     private void getConnectorPos()
     {
             BlockPos pos = null;
@@ -212,13 +179,13 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
                     pos = new BlockPos(this.getPos().getX()+1,this.getPos().getY()+10,this.getPos().getZ());
                     break;
             }
-            if(pos!= null && this.getWorld().getTileEntity(pos)!= null && this.getWorld().getTileEntity(pos) instanceof TileEntityConnector)
-            {
-                this.connector = (TileEntityConnector) this.getWorld().getTileEntity(pos);
-                this.connector.success = 1;
-                this.pos = pos;
-            }
 
+        if(pos!= null && this.getWorld().getTileEntity(pos)!= null && this.getWorld().getTileEntity(pos) instanceof TileEntityConnector)
+        {
+            this.connector = (TileEntityConnector) this.getWorld().getTileEntity(pos);
+            this.connector.success = 1;
+            this.pos = pos;
+        }
     }
     private void initializeAbilities() {
         this.inenergyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
@@ -299,4 +266,73 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         if(!this.getWorld().isRemote)
             DrtechUtils.sendTileEntityClientUpdate(this.connector,nbt);
     }
+    @Override
+    public void writeInitialSyncData(PacketBuffer buf) {
+        super.writeInitialSyncData(buf);
+        buf.writeBoolean(isActive);
+        buf.writeBoolean(isWorkingEnabled);
+        writeParticles(buf);
+    }
+
+    @Override
+    public void receiveInitialSyncData(PacketBuffer buf) {
+        super.receiveInitialSyncData(buf);
+        isActive = buf.readBoolean();
+        isWorkingEnabled = buf.readBoolean();
+        try {
+            readParticles(buf);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Override
+    public void receiveCustomData(int dataId, @NotNull PacketBuffer buf) {
+        super.receiveCustomData(dataId, buf);
+        if (dataId == GregtechDataCodes.WORKABLE_ACTIVE) {
+            isActive = buf.readBoolean();
+            scheduleRenderUpdate();
+        } else if (dataId == GregtechDataCodes.WORKING_ENABLED) {
+            isWorkingEnabled = buf.readBoolean();
+            scheduleRenderUpdate();
+        }
+        else if (dataId == GregtechDataCodes.UPDATE_PARTICLE) {
+            try {
+                readParticles(buf);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+    private void writeParticles(@NotNull PacketBuffer buf) {
+        //buf.writeVarInt(beamCount);
+        NBTTagCompound tag = new NBTTagCompound();
+        if(this.connector!=null && this.connector.beforePos!=null)
+        {
+            tag.setInteger("Sx",this.connector.getPos().getX());
+            tag.setInteger("Sy",this.connector.getPos().getY());
+            tag.setInteger("Sz",this.connector.getPos().getZ());
+            tag.setInteger("Ex",this.connector.beforePos.getX());
+            tag.setInteger("Ey",this.connector.beforePos.getY());
+            tag.setInteger("Ez",this.connector.beforePos.getZ());
+
+        }
+        buf.writeCompoundTag(tag);
+    }
+    @SideOnly(Side.CLIENT)
+    private void readParticles(@NotNull PacketBuffer buf) throws IOException {
+        NBTTagCompound tag = buf.readCompoundTag();
+        if(tag.hasKey("Ex"))
+        {
+            BlockPos Spos = new BlockPos(tag.getInteger("Sx"),tag.getInteger("Sy"),tag.getInteger("Sz"));
+            BlockPos Epos = new BlockPos(tag.getInteger("Ex"),tag.getInteger("Ey"),tag.getInteger("Ez"));
+            operateClient(Spos,Epos,20);
+        }
+
+    }
+    @SideOnly(Side.CLIENT)
+    public void operateClient(BlockPos Spos,BlockPos Epos,int age) {
+        GTParticleManager.INSTANCE.addEffect(new DrtechLaserBeamParticle(this,Spos,Epos,age));
+    }
+
 }
