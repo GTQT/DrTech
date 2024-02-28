@@ -27,6 +27,7 @@ metaitem.gold_coin.name=金元宝
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
+item.drtech.electric_flight_ring.name=电力飞行戒指
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃

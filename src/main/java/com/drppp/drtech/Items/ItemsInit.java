@@ -3,6 +3,7 @@ package com.drppp.drtech.Items;
 import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.Items.Baubles.ElectricFlightRing;
 import com.drppp.drtech.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.Items.ItemCropSeed.ItemRedStoneCropSeed;
@@ -37,6 +38,7 @@ public class ItemsInit {
     public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
+    public static final Item ELECTRIC_FLIGHT_RING = new ElectricFlightRing();
 
     public static void init(RegistryEvent.Register<Item> event)
     {
@@ -44,6 +46,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_HOMO_EYE);
         event.getRegistry().register(ITEM_RED_STONE_SEED);
         event.getRegistry().register(ITEM_LAPIS_SEED);
+        event.getRegistry().register(ELECTRIC_FLIGHT_RING);
         event.getRegistry().register(ITEM_FLU_SEED);
         event.getRegistry().register(ITEM_CONNECTOR1);
         event.getRegistry().register(ITEM_CONNECTOR2);
@@ -72,6 +75,7 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ELECTRIC_FLIGHT_RING, 0, new ModelResourceLocation(ELECTRIC_FLIGHT_RING.getRegistryName(), "inventory"));
 
 
     }
