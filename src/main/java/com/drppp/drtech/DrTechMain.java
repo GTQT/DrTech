@@ -95,6 +95,7 @@ public class DrTechMain {
         MetaTileEntities.Init();
         CraftingReceipe.load();
         SyncInit.init();
+        DrtechEventHandler.Keybinds.registerKeybinds();
     }
     @EventHandler
     // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
