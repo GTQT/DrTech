@@ -4,6 +4,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
+import gregicality.multiblocks.common.metatileentities.GCYMMetaTileEntities;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Materials;
@@ -86,12 +87,25 @@ public class CraftingReceipe {
                 'W', Blocks.GOLD_BLOCK,
                 'S', new UnificationEntry(OrePrefix.plate,Materials.Gold)
         );
+        ModHandler.addShapedRecipe(true, "electric_implosion_compressor", MetaTileEntities.LARGE_LARGE.getStackForm(),
+                new Object[]{"PCP", "FSF", "PCP", 'C',
+                        new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.IV),
+                        'S', gregtech.common.metatileentities.MetaTileEntities.IMPLOSION_COMPRESSOR.getStackForm(),
+                        'P', MetaItems.ELECTRIC_PISTON_EV.getStackForm(),
+                        'F', MetaItems.FIELD_GENERATOR_EV.getStackForm()});
+
         if (Loader.isModLoaded("baubles"))
         {
             ModHandler.addShapedRecipe("electric_flight_ring", MyMetaItems.FLY_RING.getStackForm(),
                     "WSW", "SCS", "WSW",
                     'W', MetaItems.FIELD_GENERATOR_HV,
                     'C', MetaItems.POWER_THRUSTER_ADVANCED,
+                    'S', MetaItems.ENERGIUM_CRYSTAL
+            );
+            ModHandler.addShapedRecipe("electric_life_support_ring", MyMetaItems.LIFE_SUPPORT_RING.getStackForm(),
+                    "WSW", "SCS", "WSW",
+                    'W', MetaItems.FIELD_GENERATOR_HV,
+                    'C', Items.NETHER_STAR,
                     'S', MetaItems.ENERGIUM_CRYSTAL
             );
         }
