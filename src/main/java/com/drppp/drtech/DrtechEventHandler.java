@@ -8,7 +8,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
+
 
 @Mod.EventBusSubscriber(modid = Tags.MODID)
 public class DrtechEventHandler {
@@ -18,6 +21,7 @@ public static int ctrlflag = 0;
         DrtechMaterials.init();
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onKeyInput(InputEvent.KeyInputEvent event) {
         if (Keybinds.CTRL.isKeyDown()) {
@@ -25,10 +29,10 @@ public static int ctrlflag = 0;
         }else
         ctrlflag = 0;
     }
-
+    @SideOnly(Side.CLIENT)
     public static class Keybinds {
 
-        public static final KeyBinding CTRL = new KeyBinding("key.ctrl", Keyboard.KEY_LCONTROL, "key.categories.your_mod");
+        public static final KeyBinding CTRL = new KeyBinding("key.ctrl", Keyboard.KEY_LCONTROL, "key.categories.drtech");
 
         public static void registerKeybinds() {
             ClientRegistry.registerKeyBinding(CTRL);

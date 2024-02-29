@@ -95,11 +95,13 @@ public class DrTechMain {
         MetaTileEntities.Init();
         CraftingReceipe.load();
         SyncInit.init();
-        DrtechEventHandler.Keybinds.registerKeybinds();
+
     }
+    @SideOnly(Side.CLIENT)
     @EventHandler
     // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
     public void Clientinit(FMLInitializationEvent event) {
+        DrtechEventHandler.Keybinds.registerKeybinds();
         SyncInit.init();
     }
     @EventHandler

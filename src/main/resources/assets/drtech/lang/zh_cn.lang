@@ -25,6 +25,7 @@ metaitem.pipe_10.name=地热管道10
 metaitem.pos_card.name=位置记录卡
 metaitem.gold_coin.name=金元宝
 metaitem.electric_flight_ring.name=电力飞行戒指
+metaitem.electric_life_support_ring.name=终极维生戒指
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
