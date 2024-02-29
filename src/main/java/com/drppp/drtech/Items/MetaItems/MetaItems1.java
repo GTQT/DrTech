@@ -2,7 +2,9 @@ package com.drppp.drtech.Items.MetaItems;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Items.Baubles.ElectricFlightRingBehavior;
+import com.drppp.drtech.Items.Baubles.ElectricLifeSupportRingBehavior;
 import com.drppp.drtech.Items.Behavior.DataItemBehavior;
+import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Utils.DrtechUtils;
 import gregtech.api.GTValues;
@@ -20,6 +22,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -73,10 +76,19 @@ public  class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.gold_coin.tooltip.1", new Object[0]));
                 })
         );
-        MyMetaItems.FLY_RING = this.addItem(15,"electric_flight_ring")
-                .setCreativeTabs(DrTechMain.Mytab)
-                .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(20000000,GTValues.HV))
-                .addComponents(new ElectricFlightRingBehavior());
+        if (Loader.isModLoaded("baubles"))
+        {
+            MyMetaItems.FLY_RING = this.addItem(15,"electric_flight_ring")
+                    .setCreativeTabs(DrTechMain.Mytab)
+                    .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000,GTValues.HV))
+                    .addComponents(new ElectricFlightRingBehavior());
+
+            MyMetaItems.LIFE_SUPPORT_RING = this.addItem(16,"electric_life_support_ring")
+                    .setCreativeTabs(DrTechMain.Mytab)
+                    .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000,GTValues.HV))
+                    .addComponents(new ElectricLifeSupportRingBehavior());
+        }
+
     }
 
     @Override

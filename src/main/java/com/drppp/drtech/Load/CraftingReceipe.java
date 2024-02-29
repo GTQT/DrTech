@@ -1,6 +1,7 @@
 package com.drppp.drtech.Load;
 
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
 import gregtech.api.recipes.ModHandler;
@@ -9,10 +10,12 @@ import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
+import gregtech.common.items.MetaItem1;
 import gregtech.common.items.MetaItems;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.Loader;
 
 public class CraftingReceipe {
     public static void load()
@@ -83,5 +86,15 @@ public class CraftingReceipe {
                 'W', Blocks.GOLD_BLOCK,
                 'S', new UnificationEntry(OrePrefix.plate,Materials.Gold)
         );
+        if (Loader.isModLoaded("baubles"))
+        {
+            ModHandler.addShapedRecipe("electric_flight_ring", MyMetaItems.FLY_RING.getStackForm(),
+                    "WSW", "SCS", "WSW",
+                    'W', MetaItems.FIELD_GENERATOR_HV,
+                    'C', MetaItems.POWER_THRUSTER_ADVANCED,
+                    'S', MetaItems.ENERGIUM_CRYSTAL
+            );
+        }
+
     }
 }
