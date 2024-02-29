@@ -1,11 +1,8 @@
 package com.drppp.drtech.Items.Baubles;
 
-import com.drppp.drtech.DrTechMain;
+import baubles.api.BaubleType;
 import com.drppp.drtech.DrtechEventHandler;
-import com.drppp.drtech.Tags;
-import gregtech.api.items.metaitem.ElectricStats;
-import gregtech.api.items.toolitem.IGTToolDefinition;
-import gregtech.api.unification.material.Material;
+import gregtech.integration.baubles.BaubleBehavior;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -16,28 +13,21 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.Random;
 
-public class ElectricFlightRing extends DrtechBaubleItem{
-    public ElectricFlightRing()
-    {
-        this.setRegistryName(Tags.MODID,getToolId());
-        this.setTranslationKey(Tags.MODID+".electric_flight_ring");
-        this.setCreativeTab(DrTechMain.Mytab);
-        this.setMaxStackSize(1);
+public class ElectricFlightRingBehavior extends BaubleBehavior {
+    public ElectricFlightRingBehavior() {
+        super(BaubleType.RING);
     }
-    @Override
-
-    public String getToolId() {
-        return "electric_flight_ring";
-    }
-
-
     @Override
     public void onWornTick(ItemStack itemstack, EntityLivingBase entity) {
-        if(entity instanceof EntityPlayer)
+        NBTTagCompound tag = itemstack.getTagCompound();
+        if(hasEnergy(itemstack))
         {
-            EntityPlayer player = (EntityPlayer)entity;
-            if(!player.isSpectator() && !player.capabilities.isCreativeMode)
+            if(entity instanceof EntityPlayer)
             {
+                long Charge = tag.getLong("Charge");
+                EntityPlayer player = (EntityPlayer)entity;
+                if(!player.isSpectator() && !player.capabilities.isCreativeMode && drainenergy(itemstack,8l,true))
+                {
                     if(!player.capabilities.allowFlying)
                     {
                         enableFlyingAbility(player);
@@ -46,7 +36,13 @@ public class ElectricFlightRing extends DrtechBaubleItem{
                     {
                         if(player.capabilities.isFlying)
                         {
-                                if(DrtechEventHandler.ctrlflag==1)
+                            if(!drainenergy(itemstack,8l,false))
+                            {
+                                disableFlyingAbility(player);
+                            }
+                            else
+                            {
+                                if(DrtechEventHandler.ctrlflag==1 && drainenergy(itemstack,8l,false))
                                 {
                                     Vec3d vec3d = player.getLookVec();
                                     player.motionX += vec3d.x * 0.4D + (vec3d.x * 1.5D - player.motionX) * 0.5D;
@@ -66,13 +62,45 @@ public class ElectricFlightRing extends DrtechBaubleItem{
                                     }
                                 }
 
+                            }
+
                         }
                     }
 
+                }
+                else
+                {
+                    disableFlyingAbility(player);
+                }
+
             }
         }
-    }
 
+    }
+    private boolean hasEnergy(ItemStack item)
+    {
+        NBTTagCompound tag = item.getTagCompound();
+        if(!tag.hasKey("Charge"))
+            return false;
+        if(tag.getLong("Charge")<=0)
+            return false;
+        return true;
+    }
+    //返回是否能消耗能量
+    private boolean drainenergy(ItemStack item,long amount,boolean simulate)
+    {
+        NBTTagCompound tag = item.getTagCompound();
+        long leftEnergy = tag.getLong("Charge");
+        if(leftEnergy<amount)
+            return false;
+        if(!simulate)
+        {
+            leftEnergy -=amount;
+            tag.setLong("Charge",leftEnergy);
+            item.setTagCompound(tag);
+        }
+        return true;
+    }
     private int getRandomFromRange(int max, int min)
     {
         return new Random().nextInt(max-min)+min;

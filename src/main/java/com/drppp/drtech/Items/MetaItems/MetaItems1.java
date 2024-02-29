@@ -1,6 +1,7 @@
 package com.drppp.drtech.Items.MetaItems;
 
 import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.Items.Behavior.DataItemBehavior;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Utils.DrtechUtils;
@@ -72,6 +73,10 @@ public  class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.gold_coin.tooltip.1", new Object[0]));
                 })
         );
+        MyMetaItems.FLY_RING = this.addItem(15,"electric_flight_ring")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(20000000,GTValues.HV))
+                .addComponents(new ElectricFlightRingBehavior());
     }
 
     @Override
