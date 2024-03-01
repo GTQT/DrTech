@@ -93,6 +93,14 @@ public  class MetaItems1 extends StandardMetaItem {
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1)
                 .addComponents(ElectricStats.createElectricItem(12800000,GTValues.HV));
+        MyMetaItems.ELECTRIC_PLASMA_GUN = this.addItem(18,"electric_plasma_gun")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(1)
+                .addComponents(ElectricStats.createElectricItem(12800000,GTValues.HV));
+        MyMetaItems.ADVANCED_TACHINO_DISRUPTOR = this.addItem(19,"advanced_tachino_disruptor")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(1)
+                .addComponents(ElectricStats.createElectricItem(51200000,GTValues.IV));
     }
 
     @Override

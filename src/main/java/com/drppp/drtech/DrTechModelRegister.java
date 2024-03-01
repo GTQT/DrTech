@@ -2,7 +2,12 @@ package com.drppp.drtech;
 
 import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.BulletRenderer;
+import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
+import com.drppp.drtech.Client.render.TachyonRenderer;
+import com.drppp.drtech.Entity.EntityGunBullet;
 import com.drppp.drtech.Entity.EntityHyperGunBullet;
+import com.drppp.drtech.Entity.EntityPlasmaBullet;
+import com.drppp.drtech.Entity.EntityTachyonBullet;
 import com.drppp.drtech.Items.ItemsInit;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
@@ -48,6 +53,23 @@ public final class DrTechModelRegister {
             public Render<EntityHyperGunBullet> createRenderFor(RenderManager manager) {
                 return (Render<EntityHyperGunBullet>) new BulletRenderer(manager,
                         new ResourceLocation(Tags.MODID, "textures/entity/hyper_bullet.png"));
+            }
+        });
+        RenderingRegistry.registerEntityRenderingHandler(EntityPlasmaBullet.class, new IRenderFactory<EntityPlasmaBullet>() {
+            public Render<EntityPlasmaBullet> createRenderFor(RenderManager manager) {
+                return (Render<EntityPlasmaBullet>) new PlasmaBulletRenderer(manager);
+            }
+        });
+        RenderingRegistry.registerEntityRenderingHandler(EntityGunBullet.class, new IRenderFactory<EntityGunBullet>() {
+            public Render<EntityGunBullet> createRenderFor(RenderManager manager) {
+                return (Render<EntityGunBullet>) new BulletRenderer(manager,
+                        new ResourceLocation(Tags.MODID, "textures/entity/bullet.png"));
+            }
+        });
+        RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBullet.class, new IRenderFactory<EntityTachyonBullet>() {
+            public Render<EntityTachyonBullet> createRenderFor(RenderManager manager) {
+                return (Render<EntityTachyonBullet>) new TachyonRenderer(manager,
+                        new ResourceLocation(Tags.MODID, "textures/entity/tachyon.png"));
             }
         });
     }
