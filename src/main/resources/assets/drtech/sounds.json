@@ -1,0 +1,30 @@
+{
+  "plasma_charge_sound": {
+    "category": "block",
+    "subtitle": "drtech.sound.plasma_charge_sound",
+    "sounds": [
+      "drtech:plasma_charge"
+    ]
+  },
+  "laser_bullet_shoot": {
+    "category": "block",
+    "subtitle": "drtech.sound.laser_bullet_shoot",
+    "sounds": [
+      "drtech:laser_bullet_shoot"
+    ]
+  },
+  "lighter_place": {
+    "category": "block",
+    "subtitle": "drtech.sound.lighter_place",
+    "sounds": [
+      "drtech:lighter_place"
+    ]
+  },
+  "plasma_launch": {
+    "category": "block",
+    "subtitle": "drtech.sound.plasma_launch",
+    "sounds": [
+      "drtech:plasma_launch"
+    ]
+  }
+}

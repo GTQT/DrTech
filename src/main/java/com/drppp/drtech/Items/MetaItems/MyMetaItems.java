@@ -20,6 +20,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem GOLD_COIN;
     public static MetaItem<?>.MetaValueItem FLY_RING;
     public static MetaItem<?>.MetaValueItem LIFE_SUPPORT_RING;
+    public static MetaItem<?>.MetaValueItem TACTICAL_LASER_SUBMACHINE_GUN ;
     public static void MetaItemsInit()
     {
        MetaItems1 metaItem = new MetaItems1();
