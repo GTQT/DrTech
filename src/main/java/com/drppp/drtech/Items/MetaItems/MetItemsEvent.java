@@ -1,14 +1,19 @@
 package com.drppp.drtech.Items.MetaItems;
 
 import com.drppp.drtech.Client.Sound.SoundManager;
+import com.drppp.drtech.Entity.EntityGunBullet;
 import com.drppp.drtech.Entity.EntityHyperGunBullet;
+import com.drppp.drtech.Entity.EntityPlasmaBullet;
+import com.drppp.drtech.Entity.EntityTachyonBullet;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Utils.DrtechUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -45,6 +50,46 @@ public class MetItemsEvent {
 
                     world.playSound((EntityPlayer)null, player.posX , player.posY, player.posZ,
                             SoundManager.laser_bullet_shoot, player.getSoundCategory(), 0.2f, 1.0F);
+                    setLastRightClick(currentGun, currentTime);
+                }
+            }
+        }else if(item.getItem()== MyMetaItems.ELECTRIC_PLASMA_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.ELECTRIC_PLASMA_GUN.getMetaValue())
+        {
+            ItemStack currentGun = player.getHeldItem(hand);
+            long lastRightClick = getLastRightClick(currentGun);
+            long currentTime = System.currentTimeMillis();
+            if(currentTime - lastRightClick > 500 && hasEnergy(currentGun))
+            {
+                lastRightClick = currentTime;
+                if(drainenergy(currentGun,5000,true))
+                {
+                    EntityPlasmaBullet entity = new EntityPlasmaBullet(world, player, 20f);
+                    entity.shoot(player.rotationYaw, player.rotationPitch, 1.5f);
+                    world.spawnEntity(entity);
+
+                    world.playSound((EntityPlayer)null, player.posX , player.posY, player.posZ,
+                            SoundManager.plasma_launch, player.getSoundCategory(), 0.5f, 0.8F);
+
+                    setLastRightClick(currentGun, lastRightClick);
+                }
+
+            }
+        }else if(item.getItem()== MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaItem() && item.getMetadata()==MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaValue())
+        {
+            ItemStack currentGun = player.getHeldItem(hand);
+            long lastRightClick = getLastRightClick(currentGun);
+            long currentTime = System.currentTimeMillis();
+            if(currentTime - lastRightClick > 250)
+            {
+                if(drainenergy(currentGun,50000,true))
+                {
+                    drainenergy(currentGun,50000,false);
+                    EntityTachyonBullet entity = new EntityTachyonBullet(world, player, 120f, 600);
+                    entity.shoot(player.rotationYaw, player.rotationPitch, 4.0f);
+                    world.spawnEntity(entity);
+
+                    world.playSound((EntityPlayer)null, player.posX , player.posY, player.posZ,
+                            SoundManager.laser_bullet_shoot, player.getSoundCategory(), 0.2f, 0.4F);
                     setLastRightClick(currentGun, currentTime);
                 }
             }
@@ -102,6 +147,18 @@ public class MetItemsEvent {
                             (-MathHelper.cos(player.rotationYaw * 0.017453292F)));
                     enemyEntity.attackEntityFrom(DamageSource.causePlayerDamage(player), 25.0f);
                 }
+            }
+        }
+        else if(stack.getItem()== MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaItem() && stack.getMetadata()==MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaValue() && targetEntity instanceof EntityLivingBase && attacker instanceof EntityPlayer)
+        {
+            EntityPlayer player = (EntityPlayer) attacker;
+            EntityLivingBase enemyEntity = (EntityLivingBase) targetEntity;
+            if (drainenergy(stack,300,true)) {
+                drainenergy(stack,300,false);
+                enemyEntity.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 30, 3));
+                enemyEntity.knockBack(attacker, 1.0f, (double) MathHelper.sin(player.rotationYaw * 0.017453292F),
+                        (double) (-MathHelper.cos(player.rotationYaw * 0.017453292F)));
+                enemyEntity.attackEntityFrom(DamageSource.causePlayerDamage(player), 35);
             }
         }
     }
