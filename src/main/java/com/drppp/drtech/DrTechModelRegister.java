@@ -1,6 +1,10 @@
 package com.drppp.drtech;
 
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Client.Particle.EntityParticleGroup;
+import com.drppp.drtech.Client.Particle.EntityParticleSpray;
+import com.drppp.drtech.Client.Particle.InstantParticleRender;
+import com.drppp.drtech.Client.Particle.ParticleRenderer;
 import com.drppp.drtech.Client.render.BulletRenderer;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
@@ -49,6 +53,11 @@ public final class DrTechModelRegister {
     @SideOnly(Side.CLIENT)
     public static void EntityRenderReg()
     {
+        RenderingRegistry.registerEntityRenderingHandler(EntityParticleGroup.class, new IRenderFactory<EntityParticleGroup>() {
+            public Render<EntityParticleGroup> createRenderFor(RenderManager manager) {
+                return (Render<EntityParticleGroup>) new ParticleRenderer(manager);
+            }
+        });
         RenderingRegistry.registerEntityRenderingHandler(EntityHyperGunBullet.class, new IRenderFactory<EntityHyperGunBullet>() {
             public Render<EntityHyperGunBullet> createRenderFor(RenderManager manager) {
                 return (Render<EntityHyperGunBullet>) new BulletRenderer(manager,
@@ -72,5 +81,11 @@ public final class DrTechModelRegister {
                         new ResourceLocation(Tags.MODID, "textures/entity/tachyon.png"));
             }
         });
+        RenderingRegistry.registerEntityRenderingHandler(EntityParticleSpray.class, new IRenderFactory<EntityParticleSpray>() {
+            public Render<EntityParticleSpray> createRenderFor(RenderManager manager) {
+                return (Render<EntityParticleSpray>) new InstantParticleRender(manager);
+            }
+        });
+
     }
 }
