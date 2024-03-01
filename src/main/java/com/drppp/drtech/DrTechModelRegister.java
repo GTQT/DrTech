@@ -1,13 +1,20 @@
 package com.drppp.drtech;
 
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Client.render.BulletRenderer;
+import com.drppp.drtech.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.Items.ItemsInit;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -19,7 +26,7 @@ public final class DrTechModelRegister {
     @SubscribeEvent
     public static void onModelReg(ModelRegistryEvent event) {
         onModelRegistration();
-
+        EntityRenderReg();
     }
     @SideOnly(Side.CLIENT)
     public static void onModelRegistration() {
@@ -33,5 +40,15 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GOLDEN_SEA), 0, new ModelResourceLocation(BlocksInit.BLOCK_GOLDEN_SEA.getRegistryName(), "inventory"));
 
         ItemsInit.registerItemModels();
+    }
+    @SideOnly(Side.CLIENT)
+    public static void EntityRenderReg()
+    {
+        RenderingRegistry.registerEntityRenderingHandler(EntityHyperGunBullet.class, new IRenderFactory<EntityHyperGunBullet>() {
+            public Render<EntityHyperGunBullet> createRenderFor(RenderManager manager) {
+                return (Render<EntityHyperGunBullet>) new BulletRenderer(manager,
+                        new ResourceLocation(Tags.MODID, "textures/entity/hyper_bullet.png"));
+            }
+        });
     }
 }

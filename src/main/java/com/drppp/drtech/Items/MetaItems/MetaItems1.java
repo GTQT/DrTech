@@ -12,6 +12,7 @@ import gregtech.api.items.metaitem.ElectricStats;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -88,79 +89,27 @@ public  class MetaItems1 extends StandardMetaItem {
                     .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000,GTValues.HV))
                     .addComponents(new ElectricLifeSupportRingBehavior());
         }
-
+        MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN = this.addItem(17,"tactical_laser_submachine_gun")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(1)
+                .addComponents(ElectricStats.createElectricItem(12800000,GTValues.HV));
     }
 
     @Override
     public @NotNull ActionResult<ItemStack> onItemRightClick(@NotNull World world, EntityPlayer player, @NotNull EnumHand hand) {
-        ItemStack item = player.getHeldItemMainhand();
-        if(player.isSneaking() && item.getItem()== MyMetaItems.GRAVITY_SHIELD.getMetaItem() && item.getMetadata()==MyMetaItems.GRAVITY_SHIELD.getMetaValue())
-        {
-            if(!player.capabilities.allowFlying)
-            {
-                enableFlyingAbility(player);
-            }
-            else
-            {
-                disableFlyingAbility(player);
-            }
-        }
+        MetItemsEvent.onItemRightClick(world,player,hand);
         return super.onItemRightClick(world, player, hand);
     }
 
     @Override
     public @NotNull EnumActionResult onItemUse(EntityPlayer player, @NotNull World world, @NotNull BlockPos pos, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItemMainhand();
-        if(player.isSneaking() && stack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
-        {
-            if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector)
-            {
-                NBTTagCompound nbt = new NBTTagCompound();
-                nbt.setInteger("x",pos.getX());
-                nbt.setInteger("y",pos.getY());
-                nbt.setInteger("z",pos.getZ());
-                stack.setTagCompound(nbt);
-                player.sendMessage(new TextComponentString("已保存坐标: x:"+pos.getX() +"y:"+pos.getY()+"z:"+pos.getZ()));
-            }
-
-
-        }
-        else  if(stack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
-        {
-            if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector && stack.hasTagCompound())
-            {
-                NBTTagCompound nbt = stack.getTagCompound();
-                BlockPos bpos = new BlockPos(nbt.getInteger("x"),nbt.getInteger("y"),nbt.getInteger("z"));
-
-                if(DrtechUtils.getPosDist(pos,bpos)<=100)
-                {
-                    TileEntityConnector con = ((TileEntityConnector)world.getTileEntity(pos));
-                        con.beforePos = bpos;
-                        NBTTagCompound newnbt = new NBTTagCompound();
-                        newnbt.setTag("locahost",nbt);
-                        DrtechUtils.sendTileEntityUpdate(world.getTileEntity(pos),newnbt);
-                        player.sendMessage(new TextComponentString("已写入坐标: x:"+bpos.getX() +"y:"+bpos.getY()+"z:"+bpos.getZ()));
-                }
-                else
-                    player.sendMessage(new TextComponentString("距离超过100格!"));
-            }
-        }
+        MetItemsEvent.onItemUse(player,world,pos,hand,facing,hitX,hitY,hitZ);
         return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
     }
 
-    private void enableFlyingAbility(EntityPlayer player)
-    {
-        player.capabilities.allowFlying = true;
-        player.capabilities.isFlying = false;
-        player.sendPlayerAbilities();
-        player.sendStatusMessage(new TextComponentString(I18n.format("metaitem.gravity_shield.info.1", new Object[0])), true);
-    }
-
-    private void disableFlyingAbility(EntityPlayer player)
-    {
-        player.capabilities.allowFlying = false;
-        player.capabilities.isFlying = false;
-        player.sendPlayerAbilities();
-        player.sendStatusMessage(new TextComponentString(I18n.format("metaitem.gravity_shield.info.2", new Object[0])), true);
+    @Override
+    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        MetItemsEvent.hitEntity(stack,target,attacker);
+        return super.hitEntity(stack, target, attacker);
     }
 }
