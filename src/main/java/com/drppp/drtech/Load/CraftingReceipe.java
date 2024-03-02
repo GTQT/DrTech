@@ -13,10 +13,13 @@ import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItem1;
 import gregtech.common.items.MetaItems;
+import gregtech.loaders.recipe.CraftingComponent;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Loader;
+
+import static gregtech.loaders.recipe.CraftingComponent.*;
 
 public class CraftingReceipe {
     public static void load()
@@ -99,7 +102,7 @@ public class CraftingReceipe {
             ModHandler.addShapedRecipe("electric_flight_ring", MyMetaItems.FLY_RING.getStackForm(),
                     "WSW", "SCS", "WSW",
                     'W', MetaItems.FIELD_GENERATOR_HV,
-                    'C', MetaItems.POWER_THRUSTER_ADVANCED,
+                    'C', MetaItems.ELECTRIC_JETPACK_ADVANCED,
                     'S', MetaItems.ENERGIUM_CRYSTAL
             );
             ModHandler.addShapedRecipe("electric_life_support_ring", MyMetaItems.LIFE_SUPPORT_RING.getStackForm(),
@@ -109,6 +112,47 @@ public class CraftingReceipe {
                     'S', MetaItems.ENERGIUM_CRYSTAL
             );
         }
+        ModHandler.addShapedRecipe(true, "electric_plasma_gun",MyMetaItems.ELECTRIC_PLASMA_GUN.getStackForm(),
+                "JTG", "LSB", "DSB",
+                        'D', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.IV),
+                        'S', MetaItems.ENERGIUM_CRYSTAL,
+                        'B', new UnificationEntry(OrePrefix.plate,Materials.Titanium),
+                        'L', MetaItems.FIELD_GENERATOR_HV,
+                        'J',new UnificationEntry(OrePrefix.plate,Materials.Titanium),
+                        'T',MetaItems.POWER_THRUSTER_ADVANCED,
+                        'G',MetaItems.EMITTER_EV
+        );
+        ModHandler.addShapedRecipe(true, "tactical_laser_submachine_gun",MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getStackForm(),
+                "JTG", "LSB", "DSB",
+                        'D', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.IV),
+                        'S', MetaItems.ENERGIUM_CRYSTAL,
+                        'B', new UnificationEntry(OrePrefix.plate,Materials.Iridium),
+                        'L', MetaItems.FIELD_GENERATOR_HV,
+                        'J',new UnificationEntry(OrePrefix.toolHeadDrill,Materials.Titanium),
+                        'T',MetaItems.POWER_THRUSTER_ADVANCED,
+                        'G',MetaItems.EMITTER_EV
+                );
+        ModHandler.addShapedRecipe(true, "advanced_tachino_disruptor",MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getStackForm(),
+                "JBG", "DSB", "DSB",
+                        'D', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.LuV),
+                        'S', MetaItems.LAPOTRON_CRYSTAL,
+                        'B', new UnificationEntry(OrePrefix.plate,Materials.Iridium),
+                        'J',MetaItems.NANO_SABER,
+                        'G',MetaItems.EMITTER_IV
+                );
 
+        gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(true, MetaTileEntities.UU_PRODUCTER,
+                "WSW", "XCX", "WSW",
+                'W',CIRCUIT,
+                'C', CASING,
+                'S', FIELD_GENERATOR,
+                'X',CABLE_QUAD);
+        gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(true, MetaTileEntities.DUPLICATOR,
+                "WSW", "XCX", "WDW",
+                'W', EMITTER,
+                'C', CASING,
+                'D',CABLE_QUAD,
+                'S', FIELD_GENERATOR,
+                'X',CIRCUIT);
     }
 }
