@@ -22,6 +22,7 @@ public class Textures {
     public static  SimpleOverlayRenderer ELEMENT_CONSTRAINS_MACHINE_CASING;
     public static  SimpleOverlayRenderer YOT_TANK_CASING;
     public static  SimpleOverlayRenderer TFFT_TANK_CASING;
+    public static  SimpleOverlayRenderer NUCLEAR_PART_CASING;
     public static  SimpleOverlayRenderer SALT_INHIBITION_CASING;
     public static  OrientedOverlayRenderer LARGE_UU_PRODUCTER;
     public static  OrientedOverlayRenderer ELECTRIC_IMPLOSION_OVERLAY;
@@ -41,6 +42,7 @@ public class Textures {
         ELECTRIC_IMPLOSION_OVERLAY = new OrientedOverlayRenderer("multiblock/electric_implosion");
         TFFT_OVERLAY = new OrientedOverlayRenderer("multiblock/tfft_tank");
         SALT_INHIBITION_CASING = new SimpleOverlayRenderer("casings/salt_inhibition_casing");
+        NUCLEAR_PART_CASING = new SimpleOverlayRenderer("casings/nuclear_part_casing");
         BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);
     }
     public static void register(TextureMap textureMap) {

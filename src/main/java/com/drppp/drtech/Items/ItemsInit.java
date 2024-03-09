@@ -51,6 +51,7 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK,  VariantItemBlock::new));
         event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
@@ -60,6 +61,7 @@ public class ItemsInit {
         registerItemModel(BlocksInit.TRANSPARENT_CASING);
         registerItemModel(BlocksInit.TRANSPARENT_CASING1);
         registerItemModel(BlocksInit.COMMON_CASING);
+        registerItemModel(BlocksInit.COMMON_CASING1);
         registerItemModel(BlocksInit.YOT_TANK);
         registerItemModel(BlocksInit.TFFT_TANK);
             BlockLaserPipe pipe = BlocksInit.MY_LASER_PIPE;

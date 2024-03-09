@@ -77,7 +77,7 @@ public class DrTechMain {
     @SubscribeEvent
     // Register recipes here (Remove if not needed)
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-        DrTechReceipeManager.init();
+
     }
 
     @SubscribeEvent
@@ -97,6 +97,7 @@ public class DrTechMain {
     public void init(FMLInitializationEvent event) {
         MetaTileEntities.Init();
         CraftingReceipe.load();
+        DrTechReceipeManager.init();
         SyncInit.init();
 
     }
