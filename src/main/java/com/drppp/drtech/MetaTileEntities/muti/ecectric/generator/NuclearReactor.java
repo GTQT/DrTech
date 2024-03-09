@@ -5,13 +5,17 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing1;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.capability.*;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
+import gregtech.api.gui.resources.TextureArea;
 import gregtech.api.gui.widgets.AdvancedTextWidget;
+import gregtech.api.gui.widgets.ImageCycleButtonWidget;
+import gregtech.api.gui.widgets.ImageWidget;
 import gregtech.api.metatileentity.IDataInfoProvider;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -38,16 +42,19 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
+import scala.reflect.internal.Trees;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BooleanSupplier;
 
 public class NuclearReactor extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
     private boolean isActive=true, isWorkingEnabled = true;
     private int process;
     private int maxProcess;
-    protected IEnergyContainer energyContainer;
+    protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());;
     private final ItemStackHandler inventory = new ItemStackHandler(81);
     private final ItemStackHandler upgradeInventory = new ItemStackHandler(5);
     private int tick=0,heat=0,outputEnergy=0;
@@ -138,14 +145,14 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
         data.setBoolean("isActive", isActive);
         data.setBoolean("isWorkingEnabled", isWorkingEnabled);
         data.setTag("inventory", inventory.serializeNBT());
-        data.setTag("inventoryUpgrade", inventory.serializeNBT());
+        data.setTag("inventoryUpgrade", upgradeInventory.serializeNBT());
         data.setInteger("Heat",this.heat);
         return data;
     }
 
     @Override
     protected void updateFormedValid() {
-        if(tick++>10)
+        if(tick++>10 )
         {
             tick=0;
             this.outputEnergy=0;
@@ -159,6 +166,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                             if(ca.getDurability()<=0)
                             {
                                 inventory.extractItem(i,1,false);
+
                                 inventory.insertItem(i, ca.outItem(),false);
                             }
                             FuelRodOperation(i,ca);
@@ -184,9 +192,20 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                             HeatExchangerOperation(i,ca);
                         }
                     }
-
+                if(this.heat>=getMaxHeat())
+                {
+                    setWorkingEnabled(false);
+                    for (int j = 0; j < inventory.getSlots(); j++) {
+                        inventory.extractItem(j,1,false);
+                    }
+                    for (int j = 0; j < upgradeInventory.getSlots(); j++) {
+                        upgradeInventory.extractItem(j,1,false);
+                    }
+                    this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 10.0F, true);
+                }
             }
         }
+        this.energyContainer.addEnergy(this.outputEnergy);
     }
     private void HeatExchangerOperation(int i, IHeatExchanger data)
     {
@@ -223,7 +242,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
             {
                 for (int loca :list)
                 {
-                    setTransHeat(data.getReactorExchangeHeatRate()/canSoreAmount,loca,data);
+                    setTransHeat(data.getElementExchangeHeatRate(),loca,data);
                 }
             }
         }else if(data.reactorInteraction()==true && data.elementInteraction()==true)
@@ -256,7 +275,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
             {
                 for (int loca :list)
                 {
-                    setTransHeat(data.getReactorExchangeHeatRate()/canSoreAmount,loca,data);
+                    setTransHeat(data.getElementExchangeHeatRate(),loca,data);
                 }
             }
         }
@@ -331,7 +350,8 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
 private void FuelRodOperation(int i, IFuelRodData data)
 {
         int outenergy=data.getBaseEnergy();
-        int outheat = data.getBaseHeat();
+        float baseHeat = data.getBaseHeat();
+        int outheat = 0;
         int amount=0;
         List<Integer> list = new ArrayList<>();
         if( i%9!=0 && inventory.getStackInSlot(i-1).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
@@ -378,12 +398,19 @@ private void FuelRodOperation(int i, IFuelRodData data)
             if(ca.getDurability()<=0)
                 inventory.extractItem(i+9,1,false);
         }
+        int x = 1+data.getPulseNum()/2+amount;
+        outheat = (int)(baseHeat*x*(x+1));//2 6 12
         if(amount!=0)
         {
             outenergy = outenergy + data.get1XEnergy()*amount*data.getPulseNum();
-            if(data.isMox())
-                outenergy = (int)(outheat * (1+4*((float)this.heat/(float)this.MaxHeat)));
-            outheat = outheat*(amount+1)*(amount+1);
+        }
+        if(data.isMox())
+        {
+            outenergy = (int)(outenergy * (1+data.getMoxMulti()*((float)this.heat/(float)this.MaxHeat)));
+            if((int)(((float)this.heat/(float)this.MaxHeat)*100)>50)
+            {
+                outheat *=2;
+            }
         }
         this.outputEnergy += outenergy;
         int num = getCanStoreHeatElementAmount(i,list,1);
@@ -455,6 +482,7 @@ private int setHeat(int heatAmount,int i)
             {
                 if(ca.getMaxHeat()-ca.getHeat()>=heatAmount)
                 {
+                    data.setHeat(Math.max(data.getHeat()-heatAmount,0));
                     ca.setHeat(ca.getHeat()+heatAmount);
                 }else
                 {
@@ -468,6 +496,7 @@ private int setHeat(int heatAmount,int i)
                 if(data.getMaxHeat()-data.getHeat()>=heatAmount)
                 {
                     data.setHeat(data.getHeat()+heatAmount);
+                    ca.setHeat(Math.max(ca.getHeat()-heatAmount,0));
                 }else
                 {
                     inventory.extractItem(i,1,false);
@@ -486,6 +515,7 @@ private int setHeat(int heatAmount,int i)
             {
                 if(ca.getMaxHeat()-ca.getHeat()>=heatAmount)
                 {
+                    data.setHeat(Math.max(data.getHeat()-heatAmount,0));
                     ca.setHeat(ca.getHeat()+heatAmount);
                 }else
                 {
@@ -496,10 +526,10 @@ private int setHeat(int heatAmount,int i)
             //吸热
             else
             {
-                int canTransHeat = Math.min(data.getMaxHeat()- data.getHeat(),heatAmount );
-                if(data.getMaxHeat()-data.getHeat()>=canTransHeat)
+                if(data.getMaxHeat()-data.getHeat()>=heatAmount)
                 {
                     data.setHeat(data.getHeat()+heatAmount);
+                    ca.setHeat(Math.max(ca.getHeat()-heatAmount,0));
                 }else
                 {
                     inventory.extractItem(i,1,false);
@@ -585,24 +615,25 @@ private int setHeat(int heatAmount,int i)
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start()
-                .aisle("XXX", "XXX", "XXX")
-                .aisle("XXX", "X#X", "XXX")
-                .aisle("XXX", "XSX", "XXX")
+                .aisle("XXX", "XXX", "XXX", "XXX")
+                .aisle("XXX", "X#X", "X#X", "XXX")
+                .aisle("XXX", "XSX", "XXX", "XXX")
                 .where('S', selfPredicate())
                 .where('X', states(getCasingState())
                         .or(abilities(MultiblockAbility.OUTPUT_ENERGY).setMaxGlobalLimited(1).setPreviewCount(1)
+                        .or(abilities(MultiblockAbility.OUTPUT_LASER).setMaxGlobalLimited(1).setPreviewCount(1)
                                 .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)))
-                )
+                ))
                 .where('#', any())
                 .build();
     }
     protected IBlockState getCasingState() {
-        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.NEUTRON_MACHINE_CASING);
+        return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.NUCLEAR_PART_CASING);
     }
 
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
-        return Textures.NEUTRON_MACHINE_CASING;
+        return Textures.NUCLEAR_PART_CASING;
     }
 
     @Override
@@ -616,6 +647,18 @@ private int setHeat(int heatAmount,int i)
             builder.slot(upgradeInventory,i,170,3+i%9*18,true,true,GuiTextures.SLOT);
         }
         builder.widget((new AdvancedTextWidget(9, 168, this::addDisplayText, 16777215)).setMaxWidthLimit(181).setClickHandler(this::handleDisplayClick));
+        IControllable controllable = (IControllable)this.getCapability(GregtechTileCapabilities.CAPABILITY_CONTROLLABLE, (EnumFacing)null);
+        TextureArea var10007;
+        BooleanSupplier var10008;
+        if (controllable != null) {
+            var10007 = GuiTextures.BUTTON_POWER;
+            Objects.requireNonNull(controllable);
+            var10008 = controllable::isWorkingEnabled;
+            Objects.requireNonNull(controllable);
+            builder.widget(new ImageCycleButtonWidget(170, 183, 18, 18, var10007, var10008, controllable::setWorkingEnabled));
+            builder.widget(new ImageWidget(170, 201, 18, 6, GuiTextures.BUTTON_POWER_DETAIL));
+        }
+
         builder.bindPlayerInventory(entityPlayer.inventory, 180);
         return builder.build(this.getHolder(), entityPlayer);
     }
@@ -629,7 +672,9 @@ private int setHeat(int heatAmount,int i)
     @Override
     protected void formStructure(PatternMatchContext context) {
         super.formStructure(context);
-        this.energyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.OUTPUT_ENERGY));
+        List<IEnergyContainer> energyContainer = new ArrayList(this.getAbilities(MultiblockAbility.OUTPUT_ENERGY));
+        energyContainer.addAll(this.getAbilities(MultiblockAbility.OUTPUT_LASER));
+        this.energyContainer=new EnergyContainerList(energyContainer);
     }
 
     @Override
@@ -640,7 +685,7 @@ private int setHeat(int heatAmount,int i)
     @Override
     public void invalidateStructure() {
         super.invalidateStructure();
-        this.energyContainer = new EnergyContainerList(new ArrayList());
+        this.energyContainer =  new EnergyContainerList(new ArrayList());
     }
 
     @SideOnly(Side.CLIENT)

@@ -18,14 +18,15 @@ import java.util.List;
 public class FuelRodBehavior  implements IItemComponent, IItemCapabilityProvider, IItemMaxStackSizeProvider,
         IItemBehaviour, ISubItemHandler {
     private int baseOutEnergy;
-    private int baseOutHeat;
+    private float baseOutHeat;
     private int pulseNum;
     private int maxDurability;
     private int X1Energy;
     private ItemStack outItem;
     private boolean isMox;
+    private float moxMulti;
     //燃料棒能量输出，燃料棒热量输出，燃料棒发射脉冲数量(默认和棒数一致1 2 4,此数值影响相邻燃料或与反射板相邻的发电),是否是MOX，最大燃烧时间，枯竭输出物品，单棒能量输出
-    public FuelRodBehavior(int baseOutEnergy, int baseOutHeat, int pulseNum,boolean isMox,  int maxDurability,ItemStack outItem,int X1Energy) {
+    public FuelRodBehavior(int baseOutEnergy, float baseOutHeat, int pulseNum,boolean isMox, float moxMulti, int maxDurability,ItemStack outItem,int X1Energy) {
         this.baseOutEnergy = baseOutEnergy;
         this.baseOutHeat = baseOutHeat;
         this.pulseNum = pulseNum;
@@ -33,6 +34,7 @@ public class FuelRodBehavior  implements IItemComponent, IItemCapabilityProvider
         this.outItem = outItem;
         this.isMox = isMox;
         this.X1Energy = X1Energy;
+        this.moxMulti = moxMulti;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class FuelRodBehavior  implements IItemComponent, IItemCapabilityProvider
 
     @Override
     public ICapabilityProvider createProvider(ItemStack itemStack) {
-        return new FuelRodItem(itemStack,baseOutEnergy,baseOutHeat,pulseNum,isMox,maxDurability,outItem,X1Energy);
+        return new FuelRodItem(itemStack,baseOutEnergy,baseOutHeat,pulseNum,isMox,moxMulti,maxDurability,outItem,X1Energy);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.drppp.drtech.Load;
 
 import com.drppp.drtech.Load.chain.FluidStoreRecpie;
 import com.drppp.drtech.Load.chain.MobsDropsRecipe;
+import com.drppp.drtech.Load.chain.NuclearRecipe;
 
 public class DrTechReceipeManager {
     public static void init()
@@ -9,5 +10,6 @@ public class DrTechReceipeManager {
         MachineReceipe.load();
         MobsDropsRecipe.load();
         FluidStoreRecpie.init();
+        NuclearRecipe.load();
     }
 }

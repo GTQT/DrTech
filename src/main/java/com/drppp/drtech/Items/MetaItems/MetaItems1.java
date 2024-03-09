@@ -4,6 +4,7 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.Items.Baubles.ElectricLifeSupportRingBehavior;
 import com.drppp.drtech.Items.Behavior.DataItemBehavior;
+import com.drppp.drtech.Items.Behavior.ElectricStatsNuclear;
 import com.drppp.drtech.Items.Behavior.FuelRodBehavior;
 import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Tile.TileEntityConnector;
@@ -102,6 +103,21 @@ public  class MetaItems1 extends StandardMetaItem {
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1)
                 .addComponents(ElectricStats.createElectricItem(51200000,GTValues.IV));
+        MyMetaItems.NULL_FUEL_ROD = this.addItem(20,"null_fuel_rod")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(64);
+        MyMetaItems.NUCLEAR_BATTERY_LV = this.addItem(21,"nuclear_battery_lv")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .addComponents(ElectricStatsNuclear.createBattery(1200000,GTValues.LV,true))
+                .setMaxStackSize(1);
+        MyMetaItems.NUCLEAR_BATTERY_MV = this.addItem(22,"nuclear_battery_mv")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .addComponents(ElectricStatsNuclear.createBattery(4200000,GTValues.MV,true))
+                .setMaxStackSize(1);
+        MyMetaItems.NUCLEAR_BATTERY_HV = this.addItem(23,"nuclear_battery_hv")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .addComponents(ElectricStatsNuclear.createBattery(32000000,GTValues.HV,true))
+                .setMaxStackSize(1);
 
     }
 

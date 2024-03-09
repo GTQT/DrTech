@@ -31,6 +31,7 @@ public class BlocksInit {
     public static final MetaGlasses TRANSPARENT_CASING = new MetaGlasses("glasses_casing");
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
+    public static final MetaCasing1 COMMON_CASING1 = new MetaCasing1();
     public static final BlockYotTankPart YOT_TANK = new BlockYotTankPart();
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
@@ -50,6 +51,7 @@ public class BlocksInit {
         event.getRegistry().register(TRANSPARENT_CASING);
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
+        event.getRegistry().register(COMMON_CASING1);
         event.getRegistry().register(YOT_TANK);
         event.getRegistry().register(TFFT_TANK);
 
