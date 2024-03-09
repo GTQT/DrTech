@@ -73,6 +73,7 @@ public class ElectricFlightRingBehavior extends BaubleBehavior {
                     disableFlyingAbility(player);
                 }
 
+
             }
         }
 

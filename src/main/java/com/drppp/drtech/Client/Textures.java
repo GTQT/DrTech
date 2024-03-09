@@ -1,5 +1,7 @@
 package com.drppp.drtech.Client;
 
+import gregtech.api.gui.resources.AdoptableTextureArea;
+import gregtech.api.gui.resources.TextureArea;
 import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -24,6 +26,7 @@ public class Textures {
     public static  OrientedOverlayRenderer LARGE_UU_PRODUCTER;
     public static  OrientedOverlayRenderer ELECTRIC_IMPLOSION_OVERLAY;
     public static  OrientedOverlayRenderer TFFT_OVERLAY;
+    public static  TextureArea BACKGROUND;
     public static void init()
     {
         NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
@@ -38,6 +41,7 @@ public class Textures {
         ELECTRIC_IMPLOSION_OVERLAY = new OrientedOverlayRenderer("multiblock/electric_implosion");
         TFFT_OVERLAY = new OrientedOverlayRenderer("multiblock/tfft_tank");
         SALT_INHIBITION_CASING = new SimpleOverlayRenderer("casings/salt_inhibition_casing");
+        BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);
     }
     public static void register(TextureMap textureMap) {
 

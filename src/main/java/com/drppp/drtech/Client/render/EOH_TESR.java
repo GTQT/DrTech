@@ -18,6 +18,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

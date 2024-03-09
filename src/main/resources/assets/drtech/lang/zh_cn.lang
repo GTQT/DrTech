@@ -32,7 +32,32 @@ metaitem.advanced_tachino_disruptor.name=先进速子裂解枪
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
-
+#FUEL_ROD
+metaitem.u_fuel_rod_1x.name=燃料棒(铀)
+metaitem.u_fuel_rod_2x.name=双联燃料棒(铀)
+metaitem.u_fuel_rod_4x.name=四联燃料棒(铀)
+metaitem.u_fuel_rod_1x_ex.name=枯竭燃料棒(铀)
+metaitem.u_fuel_rod_2x_ex.name=双联枯竭燃料棒(铀)
+metaitem.u_fuel_rod_4x_ex.name=四联枯竭燃料棒(铀)
+metaitem.heat_vent.name=散热片
+metaitem.component_heat_vent.name=元件散热片
+metaitem.advanced_component_heat_vent.name=高级元件散热片
+metaitem.overclocked_heat_vent.name=超频散热片
+metaitem.reactor_heat_vent.name=反应堆散热片
+metaitem.advanced_heat_vent.name=高级散热片
+metaitem.heat_exchanger.name=热交换器
+metaitem.advanced_heat_exchanger.name=高级热交换器
+metaitem.reactor_heat_exchanger.name=反应堆热交换器
+metaitem.component_heat_exchanger.name=元件热交换器
+metaitem.neutron_reflector1.name=中子反射板
+metaitem.thick_neutron_reflector.name=加厚中子反射板
+metaitem.iridium_neutron_reflector.name=无限中子反射板
+metaitem.he_coolant_cell_60k.name=60k氦冷却单元
+metaitem.he_coolant_cell_180k.name=180k氦冷却单元
+metaitem.he_coolant_cell_360k.name=360k氦冷却单元
+metaitem.nak_coolant_cell_60k.name=60k钠钾冷却单元
+metaitem.nak_coolant_cell_180k.name=180k钠钾冷却单元
+metaitem.nak_coolant_cell_360k.name=360k钠钾冷却单元
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃
@@ -107,6 +132,7 @@ drtech.machine.tfft_tank.name=T.F.F.T储罐
 drtech.machine.yot_hatch.name=YOT仓
 drtech.machine.trans_tower.name=能量输送塔
 drtech.machine.solar_tower.name=太阳能集热塔
+drtech.machine.nuclear_generator.name=裂变反应堆
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -187,6 +213,11 @@ drtech.machine.solarpower.tip.3=如果太阳能盐（冷）的量超过热量，
 drtech.machine.solarpower.tip.4=即热量为0或100000时，热效率最低；而热量为50000时效率最高
 drtech.machine.solarpower.tip.5=热效率公式：(7000-|当前热量-50000|^0.8)/7000 每次循环获得热量：反射器数量*热效率*(10+增益)
 drtech.machine.solarpower.tip.6=增益：1环=1，2环=2，3环=4，4环=8，5环=16
+fuelrod.date.tip1=§c当前耐久值:%s
+fuelrod.date.tip2=最大耐久值:%s
+fuelrod.date.tip3=温度影响:%s
+heatvent.date.tip1=§c当前储热:%s
+heatvent.date.tip2=最大储热:%s
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

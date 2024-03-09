@@ -128,12 +128,13 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
     }
 
     private IBlockState getCasingState() {
+
             return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.NEUTRON_MACHINE_CASING);
     }
 
     @NotNull
     private TraceabilityPredicate getFramePredicate() {
-            return frames(Materials.Neutronium);
+            return frames(Materials.NaquadahAlloy);
     }
 
     @SideOnly(Side.CLIENT)

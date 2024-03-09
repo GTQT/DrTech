@@ -12,16 +12,13 @@ import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.Load.CraftingReceipe;
 import com.drppp.drtech.Load.DrTechReceipeManager;
-import com.drppp.drtech.Materials.DrtechMaterials;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.Sync.SyncInit;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
+import com.drppp.drtech.api.capability.DrtechCapInit;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
@@ -42,6 +39,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static com.drppp.drtech.Items.MetaItems.MetaItemsReactor.FuelRodInit;
+
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]")
 public class DrTechMain {
 
@@ -54,12 +53,16 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(this);
         Mytab = new MyCreativeTabs("mytab");
         MyMetaItems.MetaItemsInit();
+        FuelRodInit();
+        DrtechCapInit.init();
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
     // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
     public void ClientpreInit(FMLPreInitializationEvent event) {
         TexturesInit();
+        ModelLoaderRegistry.registerLoader(OBJLoader.INSTANCE);
+        OBJLoader.INSTANCE.addDomain(Tags.MODID);
     }
     @SideOnly(Side.CLIENT)
     public void TexturesInit()
