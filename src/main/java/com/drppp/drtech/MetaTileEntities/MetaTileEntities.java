@@ -3,6 +3,7 @@ package com.drppp.drtech.MetaTileEntities;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Load.DrtechReceipes;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.generator.AnnihilationGenerator;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.generator.NuclearReactor;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.*;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityEnergyTransTower;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
@@ -42,6 +43,7 @@ public class MetaTileEntities {
     public static MetaTileEntityYotHatch YOT_HARCH;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntitySolarTower SOLAR_TOWER;
+    public static NuclearReactor NUCLEAR_GENERATOR;
 
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
@@ -73,6 +75,7 @@ public class MetaTileEntities {
         YOT_HARCH = registerMetaTileEntity(17065,new MetaTileEntityYotHatch(getmyId("yot_hatch")));
         TRANS_TOWER = registerMetaTileEntity(17066,new MetaTileEntityEnergyTransTower(getmyId("trans_tower")));
         SOLAR_TOWER = registerMetaTileEntity(17067,new MetaTileEntitySolarTower(getmyId("solar_tower")));
+        NUCLEAR_GENERATOR = registerMetaTileEntity(17068,new NuclearReactor(getmyId("nuclear_generator")));
     }
 
 

@@ -257,7 +257,7 @@ public class MachineReceipe {
                 .input(MetaItems.PLANT_BALL,4)
                 .input(OrePrefix.plank, Wood,3)
                 .outputs(new ItemStack(BlocksInit.COMMON_CASING,1,8))
-                .circuitMeta(3)
+                .circuitMeta(4)
                 .duration(100)
                 .EUt(64)
                 .buildAndRegister();

@@ -7,6 +7,12 @@ import gregtech.api.items.metaitem.stats.IItemColorProvider;
 import net.minecraft.item.ItemStack;
 
 public class MetaItemsReactorReg extends StandardMetaItem {
+    public IItemColorProvider fuelColor = new IItemColorProvider() {
+        @Override
+        public int getItemStackColor(ItemStack itemStack, int i) {
+            return 0xdb6ab7;
+        }
+    };
     public MetaItemsReactorReg() {
     }
 
@@ -14,35 +20,20 @@ public class MetaItemsReactorReg extends StandardMetaItem {
     public void registerSubItems() {
         MetaItemsReactor.Th_FUEL_ROD_1X_EX = this.addItem(4,"u_fuel_rod_1x_ex")
                 .setCreativeTabs(DrTechMain.Mytab)
-                .addComponents(new IItemColorProvider() {
-                    @Override
-                    public int getItemStackColor(ItemStack itemStack, int i) {
-                        return 0xdb6ab7;
-                    }
-                })
+                .addComponents(fuelColor)
                 .setMaxStackSize(64);
         MetaItemsReactor.Th_FUEL_ROD_2X_EX = this.addItem(5,"u_fuel_rod_2x_ex")
                 .setCreativeTabs(DrTechMain.Mytab)
-                .addComponents(new IItemColorProvider() {
-                    @Override
-                    public int getItemStackColor(ItemStack itemStack, int i) {
-                        return 0xdb6ab7;
-                    }
-                })
+                .addComponents(fuelColor)
                 .setMaxStackSize(64);
         MetaItemsReactor.Th_FUEL_ROD_4X_EX = this.addItem(6,"u_fuel_rod_4x_ex")
                 .setCreativeTabs(DrTechMain.Mytab)
-                .addComponents(new IItemColorProvider() {
-                    @Override
-                    public int getItemStackColor(ItemStack itemStack, int i) {
-                        return 0xdb6ab7;
-                    }
-                })
+                .addComponents(fuelColor)
                 .setMaxStackSize(64);
         MetaItemsReactor.U_FUEL_ROD_1X = this.addItem(1,"u_fuel_rod_1x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1)
-                .addComponents(new FuelRodBehavior(50,2,2,false,400000, MetaItemsReactor.Th_FUEL_ROD_1X_EX.getStackForm(),50));
+                .addComponents(new FuelRodBehavior(50,2,1,false,400000, MetaItemsReactor.Th_FUEL_ROD_1X_EX.getStackForm(),50));
         MetaItemsReactor.U_FUEL_ROD_2X = this.addItem(2,"u_fuel_rod_2x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1)
@@ -90,6 +81,8 @@ public class MetaItemsReactorReg extends StandardMetaItem {
                 .addComponents(new CoolantCellBehavior(180000));
         MetaItemsReactor.NAK_COOLANT_CELL_360K =  this.addItem(24,"nak_coolant_cell_360k").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
                 .addComponents(new CoolantCellBehavior(360000));
+        MetaItemsReactor.ADVANCED_COMPONENT_HEAT_VENT = this.addItem(25,"advanced_component_heat_vent").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
+                .addComponents(new HeatVentBehavior(0,8,0,false,true));
     }
 
 

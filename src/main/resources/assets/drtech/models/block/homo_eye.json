@@ -1,9 +1,5 @@
 {
-  "parent": "builtin/generated",
   "loader": "forge:obj",
-  "model": "drtech:models/block/homo_eye.obj",
-  "flip-v": true,
-  "textures": {
-    "particle": "drtech:blocks/spacelayer"
-  }
+  "model": "drtech:models/item/windmill.obj",
+  "flip-v": true
 }

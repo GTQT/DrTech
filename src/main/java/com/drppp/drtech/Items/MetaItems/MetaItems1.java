@@ -4,6 +4,7 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.Items.Baubles.ElectricLifeSupportRingBehavior;
 import com.drppp.drtech.Items.Behavior.DataItemBehavior;
+import com.drppp.drtech.Items.Behavior.FuelRodBehavior;
 import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Utils.DrtechUtils;
@@ -101,6 +102,7 @@ public  class MetaItems1 extends StandardMetaItem {
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1)
                 .addComponents(ElectricStats.createElectricItem(51200000,GTValues.IV));
+
     }
 
     @Override

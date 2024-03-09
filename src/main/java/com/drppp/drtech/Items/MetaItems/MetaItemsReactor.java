@@ -33,6 +33,7 @@ public class MetaItemsReactor {
     public static MetaItem<?>.MetaValueItem NAK_COOLANT_CELL_60K;
     public static MetaItem<?>.MetaValueItem NAK_COOLANT_CELL_180K;
     public static MetaItem<?>.MetaValueItem NAK_COOLANT_CELL_360K;
+    public static MetaItem<?>.MetaValueItem ADVANCED_COMPONENT_HEAT_VENT;
     public static void FuelRodInit()
     {
         MetaItemsReactorReg metaItemFuelRod = new MetaItemsReactorReg();
