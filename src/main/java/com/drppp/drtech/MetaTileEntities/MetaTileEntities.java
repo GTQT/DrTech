@@ -44,6 +44,7 @@ public class MetaTileEntities {
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntitySolarTower SOLAR_TOWER;
     public static NuclearReactor NUCLEAR_GENERATOR;
+    public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
 
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
@@ -76,6 +77,7 @@ public class MetaTileEntities {
         TRANS_TOWER = registerMetaTileEntity(17066,new MetaTileEntityEnergyTransTower(getmyId("trans_tower")));
         SOLAR_TOWER = registerMetaTileEntity(17067,new MetaTileEntitySolarTower(getmyId("solar_tower")));
         NUCLEAR_GENERATOR = registerMetaTileEntity(17068,new NuclearReactor(getmyId("nuclear_generator")));
+        LARGE_BEE_HIVE = registerMetaTileEntity(17069,new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
     }
 
 
