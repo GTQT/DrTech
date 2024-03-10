@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
-public class NuclearReactor extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
+public class NuclearReactor extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable,INuclearDataShow {
     private boolean isActive=true, isWorkingEnabled = true;
     private int process;
     private int maxProcess;
@@ -60,8 +60,18 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     private int tick=0,heat=0,outputEnergy=0;
     private final int MaxHeat = 10000;
 
+    @Override
+    public int getHeat() {
+        return this.heat;
+    }
+    @Override
     public int getMaxHeat() {
         return MaxHeat;
+    }
+
+    @Override
+    public int getEnergyOut() {
+        return this.outputEnergy;
     }
 
     public NuclearReactor(ResourceLocation metaTileEntityId) {

@@ -10,6 +10,7 @@ import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.Linkage.top.TopInit;
 import com.drppp.drtech.Load.CraftingReceipe;
 import com.drppp.drtech.Load.DrTechReceipeManager;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
@@ -99,7 +100,7 @@ public class DrTechMain {
         CraftingReceipe.load();
         DrTechReceipeManager.init();
         SyncInit.init();
-
+        TopInit.init();
     }
     @SideOnly(Side.CLIENT)
     @EventHandler
