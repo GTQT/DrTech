@@ -54,7 +54,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     private boolean isActive=true, isWorkingEnabled = true;
     private int process;
     private int maxProcess;
-    protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());;
+    protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());
     private final ItemStackHandler inventory = new ItemStackHandler(81);
     private final ItemStackHandler upgradeInventory = new ItemStackHandler(5);
     private int tick=0,heat=0,outputEnergy=0;
@@ -726,6 +726,8 @@ private int setHeat(int heatAmount,int i)
             return GregtechTileCapabilities.CAPABILITY_CONTROLLABLE.cast(this);
         }else if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.inventory);
+        }else if(capability == DrtechCapabilities.CAPABILITY_NUCLEAR_DATA) {
+            return DrtechCapabilities.CAPABILITY_NUCLEAR_DATA.cast(this);
         }
         return super.getCapability(capability, side);
     }
