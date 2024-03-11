@@ -1,8 +1,11 @@
 package com.drppp.drtech.Linkage.top.provider;
 
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.Tags;
 import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.util.GTUtility;
 import gregtech.common.blocks.BlockLamp;
+import gregtech.common.pipelike.cable.tile.TileEntityCable;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
@@ -19,15 +22,13 @@ public class YotTankProvider implements IProbeInfoProvider {
 
     @Override
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, EntityPlayer entityPlayer, World world, IBlockState iBlockState, IProbeHitData iProbeHitData) {
-        if (iBlockState instanceof MetaTileEntity) {
-            BlockLamp lamp = (BlockLamp) iBlockState.getBlock();
-            boolean inverted = lamp.isInverted(iBlockState);
-            boolean bloomEnabled = lamp.isBloomEnabled(iBlockState);
-            boolean lightEnabled = lamp.isLightEnabled(iBlockState);
-
-            if (inverted) iProbeInfo.text("{*tile.gregtech_lamp.tooltip.inverted*}");
-            if (!bloomEnabled) iProbeInfo.text("{*tile.gregtech_lamp.tooltip.no_bloom*}");
-            if (!lightEnabled) iProbeInfo.text("{*tile.gregtech_lamp.tooltip.no_light*}");
+        if (GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityYotTank) {
+            var s = (MetaTileEntityYotTank)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
+            if(s.isActive() && s.isWorkingEnabled())
+            {
+                iProbeInfo.text("流体:"+s.getFluid().getLocalizedName());
+                iProbeInfo.text("容量"+s.getFluidBank().getStored()+"/"+s.getFluidBank().getCapacity());
+            }
         }
     }
 }

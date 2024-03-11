@@ -29,6 +29,7 @@ metaitem.electric_life_support_ring.name=终极维生戒指
 metaitem.tactical_laser_submachine_gun.name=铱制刺刀战术激光镭射步枪
 metaitem.electric_plasma_gun.name=电力等离子电浆发射器
 metaitem.advanced_tachino_disruptor.name=先进速子裂解枪
+metaitem.telepathic_necklace.name=心灵感应头带
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
@@ -292,3 +293,9 @@ drtech.machine.duplicator.uev.name=史诗复制机 II
 drtech.machine.duplicator.uiv.name=史诗复制机 III
 drtech.machine.duplicator.uxv.name=史诗复制机 IV
 drtech.machine.duplicator.opv.name=传奇复制机
+
+
+
+#comb
+item.drt.comb.borax.name=硼砂蜂窝
+item.drt.comb.ether.name=以太蜂窝

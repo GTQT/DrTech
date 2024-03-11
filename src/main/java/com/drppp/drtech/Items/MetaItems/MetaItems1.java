@@ -1,5 +1,6 @@
 package com.drppp.drtech.Items.MetaItems;
 
+import baubles.api.BaubleType;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.Items.Baubles.ElectricLifeSupportRingBehavior;
@@ -13,6 +14,7 @@ import gregtech.api.GTValues;
 import gregtech.api.items.metaitem.ElectricStats;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
+import gregtech.integration.baubles.BaubleBehavior;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -88,8 +90,11 @@ public  class MetaItems1 extends StandardMetaItem {
 
             MyMetaItems.LIFE_SUPPORT_RING = this.addItem(16,"electric_life_support_ring")
                     .setCreativeTabs(DrTechMain.Mytab)
-                    .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000,GTValues.HV))
-                    .addComponents(new ElectricLifeSupportRingBehavior());
+                    .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000,GTValues.HV));
+        MyMetaItems.TELEPATHIC_NECKLACE = this.addItem(24,"telepathic_necklace")
+                    .setCreativeTabs(DrTechMain.Mytab)
+                    .setMaxStackSize(1)
+                    .addComponents(new BaubleBehavior(BaubleType.HEAD));
         }
         MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN = this.addItem(17,"tactical_laser_submachine_gun")
                 .setCreativeTabs(DrTechMain.Mytab)
