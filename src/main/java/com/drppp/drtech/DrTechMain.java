@@ -9,7 +9,9 @@ import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
+import com.drppp.drtech.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.Linkage.Forestry.DrtBeeDefinition;
 import com.drppp.drtech.Linkage.top.TopInit;
 import com.drppp.drtech.Load.CraftingReceipe;
 import com.drppp.drtech.Load.DrTechReceipeManager;
@@ -19,7 +21,9 @@ import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.api.capability.DrtechCapInit;
+import forestry.core.items.IColoredItem;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
@@ -28,6 +32,7 @@ import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -40,6 +45,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static com.drppp.drtech.Items.MetaItems.ItemCombs.ITEM_COMBS;
 import static com.drppp.drtech.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]")
@@ -56,6 +62,7 @@ public class DrTechMain {
         MyMetaItems.MetaItemsInit();
         FuelRodInit();
         DrtechCapInit.init();
+        ItemCombs.init();
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
@@ -108,6 +115,15 @@ public class DrTechMain {
     public void Clientinit(FMLInitializationEvent event) {
         DrtechEventHandler.Keybinds.registerKeybinds();
         SyncInit.init();
+        if(Loader.isModLoaded("forestry"))
+        {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack, tintIndex) -> {
+                if (stack.getItem() instanceof IColoredItem coloredItem) {
+                    return coloredItem.getColorFromItemstack(stack, tintIndex);
+                }
+                return 0xFFFFFF;
+            }, ITEM_COMBS);
+        }
     }
     @EventHandler
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)

@@ -5,18 +5,24 @@ import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.Items.ItemCropSeed.ItemRedStoneCropSeed;
+import com.drppp.drtech.Linkage.Forestry.DrtCombItem;
+import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Tags;
+import forestry.api.core.ForestryAPI;
+import forestry.core.items.IColoredItem;
 import gregtech.api.block.VariantItemBlock;
 import gregtech.client.model.SimpleStateMapper;
 import gregtech.common.pipelike.laser.BlockLaserPipe;
 import gregtech.common.pipelike.laser.ItemBlockLaserPipe;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -24,6 +30,7 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static com.drppp.drtech.Items.MetaItems.ItemCombs.ITEM_COMBS;
 import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
@@ -36,6 +43,7 @@ public class ItemsInit {
     public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
+
 
     public static void init(RegistryEvent.Register<Item> event)
     {
@@ -55,6 +63,10 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK,  VariantItemBlock::new));
         event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
+        if(Loader.isModLoaded("forestry"))
+        {
+            event.getRegistry().register(ITEM_COMBS);
+        }
     }
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
@@ -73,7 +85,10 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
-
+        if(Loader.isModLoaded("forestry"))
+        {
+            ((DrtCombItem)ITEM_COMBS).registerModel(ITEM_COMBS, ForestryAPI.modelManager);
+        }
 
     }
     @SideOnly(Side.CLIENT)

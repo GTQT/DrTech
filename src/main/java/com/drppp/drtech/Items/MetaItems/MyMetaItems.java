@@ -27,6 +27,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_LV ;
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_MV ;
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_HV ;
+    public static MetaItem<?>.MetaValueItem TELEPATHIC_NECKLACE ;
 
     public static void MetaItemsInit()
     {

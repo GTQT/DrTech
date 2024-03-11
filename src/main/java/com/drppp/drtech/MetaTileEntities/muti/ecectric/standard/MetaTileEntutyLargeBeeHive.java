@@ -7,6 +7,10 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing1;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
+import forestry.api.apiculture.BeeManager;
+import forestry.api.apiculture.EnumBeeType;
+import forestry.api.apiculture.IBee;
+import forestry.apiculture.genetics.Bee;
 import gregtech.api.block.IHeatingCoilBlockStats;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -20,8 +24,11 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.util.GTTransferUtils;
+import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
@@ -35,6 +42,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,18 +51,20 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
     protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());
     protected ItemHandlerList itemImportInventory;
     protected ItemHandlerList itemExportInventory;
+    public int process=0;
+    public int maxProcess = 100;
     public MetaTileEntutyLargeBeeHive(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
 
     @Override
     public int getProgress() {
-        return 0;
+        return this.process;
     }
 
     @Override
     public int getMaxProgress() {
-        return 0;
+        return this.maxProcess;
     }
 
     @Override
@@ -195,7 +205,22 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
 
     @Override
     protected void updateFormedValid() {
+        if(process++>=maxProcess)
+        {
+            process=0;
+            for (int i = 0; i < itemImportInventory.getSlots(); i++) {
+                ItemStack is = itemImportInventory.getStackInSlot(i);
+                EnumBeeType beeType = BeeManager.beeRoot.getType(is);
+                if(beeType == EnumBeeType.QUEEN)
+                {
+                    IBee bee = BeeManager.beeRoot.getMember(is);
 
+                    GTTransferUtils.addItemsToItemHandler(this.itemExportInventory, false, bee.getProduceList());
+                    GTTransferUtils.addItemsToItemHandler(this.itemExportInventory, false, bee.getSpecialtyList());
+                    bee.getGeneration();
+                }
+            }
+        }
     }
 
 }

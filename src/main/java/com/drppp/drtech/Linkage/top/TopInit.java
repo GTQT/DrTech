@@ -1,6 +1,7 @@
 package com.drppp.drtech.Linkage.top;
 
 import com.drppp.drtech.Linkage.top.provider.NuclearInfoProvider;
+import com.drppp.drtech.Linkage.top.provider.TopCommonProvider;
 import com.drppp.drtech.Linkage.top.provider.YotTankProvider;
 import mcjty.theoneprobe.TheOneProbe;
 import mcjty.theoneprobe.api.ITheOneProbe;
@@ -12,6 +13,7 @@ public class TopInit {
         ITheOneProbe oneProbe = TheOneProbe.theOneProbeImp;
         oneProbe.registerProvider(new NuclearInfoProvider());
         oneProbe.registerProvider(new YotTankProvider());
+        oneProbe.registerProvider(new TopCommonProvider());
 
     }
 }
