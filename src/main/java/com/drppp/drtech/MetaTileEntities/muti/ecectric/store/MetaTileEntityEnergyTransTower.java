@@ -166,6 +166,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     {
             BlockPos pos = null;
             switch (this.getFrontFacing()){
+
                 case SOUTH:
                     pos = new BlockPos(this.getPos().getX(),this.getPos().getY()+10,this.getPos().getZ()-1);
                     break;

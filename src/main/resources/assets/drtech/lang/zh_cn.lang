@@ -96,6 +96,7 @@ tile.drtech.connector_1.name=1级电容
 tile.drtech.connector_2.name=2级电容
 tile.drtech.connector_3.name=3级电容
 tile.drtech.golden_sea.name=聚宝盆
+tile.drtech.peaceful_table.name=和平者之桌
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块

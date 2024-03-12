@@ -11,7 +11,6 @@ import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
-import com.drppp.drtech.Linkage.Forestry.DrtBeeDefinition;
 import com.drppp.drtech.Linkage.top.TopInit;
 import com.drppp.drtech.Load.CraftingReceipe;
 import com.drppp.drtech.Load.DrTechReceipeManager;
@@ -21,7 +20,6 @@ import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import forestry.core.items.IColoredItem;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
@@ -62,7 +60,10 @@ public class DrTechMain {
         MyMetaItems.MetaItemsInit();
         FuelRodInit();
         DrtechCapInit.init();
-        ItemCombs.init();
+        if(Loader.isModLoaded("forestry"))
+        {
+             ItemCombs.init();
+        }
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
@@ -118,7 +119,7 @@ public class DrTechMain {
         if(Loader.isModLoaded("forestry"))
         {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack, tintIndex) -> {
-                if (stack.getItem() instanceof IColoredItem coloredItem) {
+                if (stack.getItem() instanceof forestry.core.items.IColoredItem coloredItem) {
                     return coloredItem.getColorFromItemstack(stack, tintIndex);
                 }
                 return 0xFFFFFF;

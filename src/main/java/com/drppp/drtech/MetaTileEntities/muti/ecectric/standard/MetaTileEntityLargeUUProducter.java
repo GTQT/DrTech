@@ -126,6 +126,7 @@ public class MetaTileEntityLargeUUProducter extends RecipeMapMultiblockControlle
                 if(GTValues.V[i]==this.getMaxVoltage())
                     tire = i;
             }
+
             return tire*8;
         }
     }

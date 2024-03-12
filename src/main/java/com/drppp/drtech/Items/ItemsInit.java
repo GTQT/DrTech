@@ -5,18 +5,13 @@ import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.Items.ItemCropSeed.ItemRedStoneCropSeed;
-import com.drppp.drtech.Linkage.Forestry.DrtCombItem;
-import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Tags;
-import forestry.api.core.ForestryAPI;
-import forestry.core.items.IColoredItem;
 import gregtech.api.block.VariantItemBlock;
 import gregtech.client.model.SimpleStateMapper;
 import gregtech.common.pipelike.laser.BlockLaserPipe;
 import gregtech.common.pipelike.laser.ItemBlockLaserPipe;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -30,7 +25,6 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static com.drppp.drtech.Items.MetaItems.ItemCombs.ITEM_COMBS;
 import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
@@ -40,6 +34,7 @@ public class ItemsInit {
     public static  final Item ITEM_CONNECTOR2 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID,"connector_2");
     public static  final Item ITEM_CONNECTOR3 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID,"connector_3");
     public static  final Item ITEM_BLOCK_GOLDEN_SEA = new  ItemBlock(BlocksInit.BLOCK_GOLDEN_SEA).setRegistryName(Tags.MODID,"golden_sea");
+    public static  final Item ITEM_BLOCK_PEACEFUL_TABLE = new  ItemBlock(BlocksInit.BLOCK_PEACEFUL_TABLE).setRegistryName(Tags.MODID,"peaceful_table");
     public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
@@ -56,6 +51,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_CONNECTOR2);
         event.getRegistry().register(ITEM_CONNECTOR3);
         event.getRegistry().register(ITEM_BLOCK_GOLDEN_SEA);
+        event.getRegistry().register(ITEM_BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
@@ -65,7 +61,7 @@ public class ItemsInit {
         event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
         if(Loader.isModLoaded("forestry"))
         {
-            event.getRegistry().register(ITEM_COMBS);
+            event.getRegistry().register(com.drppp.drtech.Items.MetaItems.ItemCombs.ITEM_COMBS);
         }
     }
     @SideOnly(Side.CLIENT)
@@ -87,7 +83,7 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
         if(Loader.isModLoaded("forestry"))
         {
-            ((DrtCombItem)ITEM_COMBS).registerModel(ITEM_COMBS, ForestryAPI.modelManager);
+            ((com.drppp.drtech.Linkage.Forestry.DrtCombItem)com.drppp.drtech.Items.MetaItems.ItemCombs.ITEM_COMBS).registerModel(com.drppp.drtech.Items.MetaItems.ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);
         }
 
     }
