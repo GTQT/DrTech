@@ -1,0 +1,12 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"particle": "drtech:blocks/table_side",
+		"down": "drtech:blocks/table_bottom",
+		"up": "drtech:blocks/table_top",
+		"north": "drtech:blocks/table_side",
+		"south":"drtech:blocks/table_side",
+		"west": "drtech:blocks/table_side",
+		"east": "drtech:blocks/table_side"
+	}
+}

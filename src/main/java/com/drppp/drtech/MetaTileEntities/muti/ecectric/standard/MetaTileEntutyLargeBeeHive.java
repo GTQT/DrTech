@@ -7,9 +7,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing1;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
-import forestry.api.apiculture.BeeManager;
-import forestry.api.apiculture.EnumBeeType;
-import forestry.api.apiculture.IBee;
+import forestry.api.apiculture.*;
 import forestry.apiculture.genetics.Bee;
 import gregtech.api.block.IHeatingCoilBlockStats;
 import gregtech.api.capability.*;
@@ -45,6 +43,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static com.drppp.drtech.Utils.DrtechUtils.readItemStackFromNBT;
+import static com.drppp.drtech.Utils.DrtechUtils.writeItemStackToNBT;
+import static forestry.api.apiculture.BeeManager.beeRoot;
 
 public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
     private boolean isActive, isWorkingEnabled = true;
@@ -210,17 +212,203 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
             process=0;
             for (int i = 0; i < itemImportInventory.getSlots(); i++) {
                 ItemStack is = itemImportInventory.getStackInSlot(i);
-                EnumBeeType beeType = BeeManager.beeRoot.getType(is);
+                EnumBeeType beeType = beeRoot.getType(is);
                 if(beeType == EnumBeeType.QUEEN)
                 {
-                    IBee bee = BeeManager.beeRoot.getMember(is);
-
-                    GTTransferUtils.addItemsToItemHandler(this.itemExportInventory, false, bee.getProduceList());
-                    GTTransferUtils.addItemsToItemHandler(this.itemExportInventory, false, bee.getSpecialtyList());
-                    bee.getGeneration();
+                    IBee bee = beeRoot.getMember(is);
+                    BeeSimulator bs = new BeeSimulator(is.copy() , this.getWorld(), 16);
+                    List<ItemStack> listdrops = new ArrayList<>();
+                    for (var drop :bs.drops)
+                    {
+                        listdrops.add(drop.get((int)drop.getAmount(bee.getGenome().getSpeed())));
+                    }
+                    for (var drop :bs.specialDrops)
+                    {
+                        listdrops.add(drop.get((int)drop.getAmount(bee.getGenome().getSpeed())));
+                    }
+                    GTTransferUtils.addItemsToItemHandler(this.itemExportInventory, false, listdrops);
                 }
             }
         }
     }
 
+
+
+    private static class BeeSimulator {
+
+        public final ItemStack queenStack;
+        boolean isValid;
+        List<BeeDrop> drops = new ArrayList<>();
+        List<BeeDrop> specialDrops = new ArrayList<>();
+        float beeSpeed;
+
+        float maxBeeCycles;
+        String flowerType;
+        String flowerTypeDescription;
+        private static IBeekeepingMode mode;
+
+        public BeeSimulator(ItemStack queenStack, World world, float t) {
+            isValid = false;
+            this.queenStack = queenStack.copy();
+            this.queenStack.setCount(1);
+            generate(world, t);
+            isValid = true;
+            queenStack.setCount(queenStack.getCount()-1);
+        }
+
+        public void generate(World world, float t) {
+            if (mode == null) mode = beeRoot.getBeekeepingMode(world);
+            drops.clear();
+            specialDrops.clear();
+            if (beeRoot.getType(this.queenStack) != EnumBeeType.QUEEN) return;
+            IBee queen = beeRoot.getMember(this.queenStack);
+            IBeeModifier beeModifier = mode.getBeeModifier();
+            float mod = beeModifier.getLifespanModifier(null, null, 1.f);
+            int h = queen.getMaxHealth();
+            maxBeeCycles = (float) h / (1.f / mod);
+            IBeeGenome genome = queen.getGenome();
+            this.flowerType = genome.getFlowerProvider()
+                    .getFlowerType();
+            this.flowerTypeDescription = genome.getFlowerProvider()
+                    .getDescription();
+            IAlleleBeeSpecies primary = genome.getPrimary();
+            beeSpeed = genome.getSpeed();
+            genome.getPrimary()
+                    .getProductChances()
+                    .forEach((key, value) -> drops.add(new BeeDrop(key, value, beeSpeed, t)));
+            genome.getSecondary()
+                    .getProductChances()
+                    .forEach((key, value) -> drops.add(new BeeDrop(key, value / 2.f, beeSpeed, t)));
+            primary.getSpecialtyChances()
+                    .forEach((key, value) -> specialDrops.add(new BeeDrop(key, value, beeSpeed, t)));
+        }
+
+        public BeeSimulator(NBTTagCompound tag) {
+            queenStack = readItemStackFromNBT(tag.getCompoundTag("queenStack"));
+            isValid = tag.getBoolean("isValid");
+            drops = new ArrayList<>();
+            specialDrops = new ArrayList<>();
+            for (int i = 0, isize = tag.getInteger("dropssize"); i < isize; i++)
+                drops.add(new BeeDrop(tag.getCompoundTag("drops" + i)));
+            for (int i = 0, isize = tag.getInteger("specialDropssize"); i < isize; i++)
+                specialDrops.add(new BeeDrop(tag.getCompoundTag("specialDrops" + i)));
+            beeSpeed = tag.getFloat("beeSpeed");
+            maxBeeCycles = tag.getFloat("maxBeeCycles");
+            if (tag.hasKey("flowerType") && tag.hasKey("flowerTypeDescription")) {
+                flowerType = tag.getString("flowerType");
+                flowerTypeDescription = tag.getString("flowerTypeDescription");
+            } else {
+                IBee queen = beeRoot.getMember(this.queenStack);
+                IBeeGenome genome = queen.getGenome();
+                this.flowerType = genome.getFlowerProvider()
+                        .getFlowerType();
+                this.flowerTypeDescription = genome.getFlowerProvider()
+                        .getDescription();
+            }
+        }
+
+        public NBTTagCompound toNBTTagCompound() {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setTag("queenStack", writeItemStackToNBT(queenStack));
+            tag.setBoolean("isValid", isValid);
+            tag.setInteger("dropssize", drops.size());
+            for (int i = 0; i < drops.size(); i++) tag.setTag(
+                    "drops" + i,
+                    drops.get(i)
+                            .toNBTTagCompound());
+            tag.setInteger("specialDropssize", specialDrops.size());
+            for (int i = 0; i < specialDrops.size(); i++) tag.setTag(
+                    "specialDrops" + i,
+                    specialDrops.get(i)
+                            .toNBTTagCompound());
+            tag.setFloat("beeSpeed", beeSpeed);
+            tag.setFloat("maxBeeCycles", maxBeeCycles);
+            tag.setString("flowerType", flowerType);
+            tag.setString("flowerTypeDescription", flowerTypeDescription);
+            return tag;
+        }
+
+        public ItemStack createIgnobleCopy() {
+            IBee princess = beeRoot.getMember(queenStack);
+            princess.setIsNatural(false);
+            return beeRoot.getMemberStack(princess, EnumBeeType.PRINCESS);
+        }
+
+        public void updateTVar(World world, float t) {
+            if (mode == null) mode = beeRoot.getBeekeepingMode(world);
+            drops.forEach(d -> d.updateTVar(t));
+            specialDrops.forEach(d -> d.updateTVar(t));
+        }
+
+        private static class BeeDrop {
+
+            private static final float MAX_PRODUCTION_MODIFIER_FROM_UPGRADES = 17.19926784f; // 4*1.2^8
+            final ItemStack stack;
+            double amount;
+            final ItemStack id;
+
+            final float chance;
+            final float beeSpeed;
+            float t;
+
+            public BeeDrop(ItemStack stack, float chance, float beeSpeed, float t) {
+                this.stack = stack;
+                this.chance = chance;
+                this.beeSpeed = beeSpeed;
+                this.t = t;
+                id = this.stack.copy();
+                evaluate();
+            }
+
+            public void updateTVar(float t) {
+                if (this.t != t) {
+                    this.t = t;
+                    evaluate();
+                }
+            }
+
+            public void evaluate() {
+
+                this.amount = getFinalChance();
+            }
+            public double getFinalChance()
+            {
+                double d = (1+(MAX_PRODUCTION_MODIFIER_FROM_UPGRADES)/6)*(Math.pow(chance,0.5))*2*(1+beeSpeed)+Math.pow(chance,Math.pow(chance,0.333))-3;
+                return d;
+            }
+            public double getAmount(double speedModifier) {
+                return amount * speedModifier;
+            }
+
+            public ItemStack get(int amount) {
+                ItemStack r = stack.copy();
+                r.setCount(amount);
+                return r;
+            }
+
+            public BeeDrop(NBTTagCompound tag) {
+                stack = readItemStackFromNBT(tag.getCompoundTag("stack"));
+                chance = tag.getFloat("chance");
+                beeSpeed = tag.getFloat("beeSpeed");
+                t = tag.getFloat("t");
+                amount = tag.getDouble("amount");
+                id = stack.copy();
+            }
+
+            public NBTTagCompound toNBTTagCompound() {
+                NBTTagCompound tag = new NBTTagCompound();
+                tag.setTag("stack", writeItemStackToNBT(stack));
+                tag.setFloat("chance", chance);
+                tag.setFloat("beeSpeed", beeSpeed);
+                tag.setFloat("t", t);
+                tag.setDouble("amount", amount);
+                return tag;
+            }
+
+            @Override
+            public int hashCode() {
+                return id.hashCode();
+            }
+        }
+    }
 }

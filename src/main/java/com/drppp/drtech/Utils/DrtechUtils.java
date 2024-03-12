@@ -347,4 +347,23 @@ public class DrtechUtils {
         else
             return tire;
     }
+
+    public static NBTTagCompound writeItemStackToNBT(ItemStack stack) {
+        NBTTagCompound compound = new NBTTagCompound();
+
+        stack.writeToNBT(compound);
+        compound.setInteger("IntCount", stack.getCount());
+
+        return compound;
+    }
+
+    public static ItemStack readItemStackFromNBT(NBTTagCompound compound) {
+        ItemStack stack = new ItemStack(compound);
+
+        if (stack == null) return null;
+
+        if (compound.hasKey("IntCount")) stack.setCount(compound.getInteger("IntCount"));
+
+        return stack;
+    }
 }

@@ -1,6 +1,7 @@
 package com.drppp.drtech.Load;
 
 import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.Items.ItemsInit;
 import com.drppp.drtech.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
@@ -140,7 +141,7 @@ public class CraftingReceipe {
                         'J',MetaItems.NANO_SABER,
                         'G',MetaItems.EMITTER_IV
                 );
-
+        ModHandler.addShapelessRecipe("peaceful_table", new ItemStack(ItemsInit.ITEM_BLOCK_PEACEFUL_TABLE),Blocks.CRAFTING_TABLE,Items.IRON_SWORD);
         gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(true, MetaTileEntities.UU_PRODUCTER,
                 "WSW", "XCX", "WSW",
                 'W',CIRCUIT,
