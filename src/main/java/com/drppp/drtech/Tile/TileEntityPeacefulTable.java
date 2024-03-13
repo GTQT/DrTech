@@ -31,7 +31,7 @@ public class TileEntityPeacefulTable extends TileEntity implements ITickable {
         if(!this.getWorld().isRemote && this.getWorld().getDifficulty()== EnumDifficulty.PEACEFUL && tick++>200)
         {
             tick=0;
-            if(this.getWorld().getTileEntity(this.getPos().offset(EnumFacing.UP,1)).hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,null))
+            if(this.getWorld().getTileEntity(this.getPos().offset(EnumFacing.UP,1))!=null && this.getWorld().getTileEntity(this.getPos().offset(EnumFacing.UP,1)).hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,null))
             {
                 var ca = this.getWorld().getTileEntity(this.getPos().offset(EnumFacing.UP,1)).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,null);
 
