@@ -3,6 +3,7 @@ package com.drppp.drtech.Linkage.top.provider;
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntutyLargeBeeHive;
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.Tags;
 import gregtech.api.util.GTUtility;
@@ -41,8 +42,17 @@ public class TopCommonProvider implements IProbeInfoProvider {
         {
             addProbeInfoWithGlassOrSneak(probeMode,iProbeInfo,entityPlayer,world,iBlockState,iProbeHitData);
         }
-    }
+    }//MetaTileEntutyLargeBeeHive
     public void addProbeInfoWithGlassOrSneak(ProbeMode probeMode, IProbeInfo iProbeInfo, EntityPlayer entityPlayer, World world, IBlockState iBlockState, IProbeHitData iProbeHitData) {
-
+        if (GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntutyLargeBeeHive) {
+            var s = (MetaTileEntutyLargeBeeHive)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
+            if(s.isActive() && s.isWorkingEnabled())
+            {
+                iProbeInfo.text("产出物品:");
+                for (var is:s.listdrops) {
+                    iProbeInfo.text(is.getDisplayName()+is.getCount());
+                }
+            }
+        }
     }
 }
