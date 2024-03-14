@@ -1,6 +1,7 @@
 package com.drppp.drtech.loaders;
 
 
+import com.drppp.drtech.api.recipes.builder.DronePadRecipeBuilder;
 import com.drppp.drtech.loaders.builder.EImplosionRecipeBuilder;
 import gregtech.api.GTValues;
 import gregtech.api.gui.GuiTextures;
@@ -18,10 +19,15 @@ public final class DrtechReceipes {
     public static final RecipeMap<SimpleRecipeBuilder> DRRP_GROUND_PUMP ;
     public static final RecipeMap<SimpleRecipeBuilder> SOLAR_TOWER ;
 
+
+    public static final RecipeMap<DronePadRecipeBuilder> DRONE_PAD = new RecipeMap<>("drone_pad", 4, 9, 0, 0, new DronePadRecipeBuilder(), false);
+
+
     private DrtechReceipes() {
     }
 
     static {
+
              EIMPLOSION_RECIPES = (new RecipeMap
                      ("eimplosion_compressor", 3, 2, 0, 0,
                              (EImplosionRecipeBuilder)((EImplosionRecipeBuilder)(new EImplosionRecipeBuilder())
