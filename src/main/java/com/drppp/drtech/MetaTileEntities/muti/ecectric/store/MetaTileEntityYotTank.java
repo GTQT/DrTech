@@ -7,6 +7,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.Utils.Datas;
 import com.drppp.drtech.Utils.DrtechUtils;
@@ -47,6 +48,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -276,6 +278,10 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     }
 
     protected IBlockState getGlassState() {
+        if(Loader.isModLoaded(GtqtCoreLinkage.GTQTCORE_ID))
+        {
+            return keqing.gtqtcore.common.block.GTQTMetaBlocks.GLASS_CASING.getState( keqing.gtqtcore.common.block.blocks.GTQTBlockGlassCasing.CasingType.TI_BORON_SILICATE_GLASS);
+        }
         return BlocksInit.TRANSPARENT_CASING.getState(MetaGlasses.CasingType.TI_BORON_SILICATE_GLASS_BLOCK);
     }
     @Override

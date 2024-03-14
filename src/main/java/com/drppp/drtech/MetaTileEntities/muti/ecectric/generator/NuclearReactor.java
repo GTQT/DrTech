@@ -7,6 +7,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing1;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.api.ItemHandler.SingleItemStackHandler;
 import com.drppp.drtech.api.capability.*;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -55,8 +56,8 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     private int process;
     private int maxProcess;
     protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());
-    private final ItemStackHandler inventory = new ItemStackHandler(81);
-    private final ItemStackHandler upgradeInventory = new ItemStackHandler(5);
+    private final SingleItemStackHandler inventory = new SingleItemStackHandler(81);
+    private final SingleItemStackHandler upgradeInventory = new SingleItemStackHandler(5);
     private int tick=0,heat=0,outputEnergy=0;
     private final int MaxHeat = 10000;
 

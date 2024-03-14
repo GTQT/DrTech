@@ -5,13 +5,14 @@ import com.drppp.drtech.api.capability.HeatExchangerItem;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.api.items.metaitem.stats.IItemCapabilityProvider;
 import gregtech.api.items.metaitem.stats.IItemComponent;
+import gregtech.api.items.metaitem.stats.IItemMaxStackSizeProvider;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import java.util.List;
 
-public class HeatExchangerBehavior implements IItemComponent, IItemCapabilityProvider, IItemBehaviour {
+public class HeatExchangerBehavior implements IItemComponent, IItemCapabilityProvider, IItemBehaviour, IItemMaxStackSizeProvider {
     private int reactorExchangeHeatRate;
     private int elementExchangeHeatRate;
     private int maxHeat;
@@ -36,5 +37,10 @@ public class HeatExchangerBehavior implements IItemComponent, IItemCapabilityPro
         lines.add(I18n.format("heatvent.date.tip1",ca.getHeat()));
         lines.add(I18n.format("heatvent.date.tip2",ca.getMaxHeat()));
         IItemBehaviour.super.addInformation(itemStack, lines);
+    }
+
+    @Override
+    public int getMaxStackSize(ItemStack itemStack, int i) {
+        return 64;
     }
 }

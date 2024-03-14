@@ -7,6 +7,7 @@ import com.drppp.drtech.MetaTileEntities.muti.ecectric.standard.MetaTileEntutyLa
 import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.Tags;
 import gregtech.api.util.GTUtility;
+import gregtech.api.util.TextFormattingUtil;
 import gregtech.common.pipelike.cable.tile.TileEntityCable;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -14,9 +15,13 @@ import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TopCommonProvider implements IProbeInfoProvider {
     @Override
@@ -48,9 +53,35 @@ public class TopCommonProvider implements IProbeInfoProvider {
             var s = (MetaTileEntutyLargeBeeHive)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
             if(s.isActive() && s.isWorkingEnabled())
             {
-                iProbeInfo.text("产出物品:");
-                for (var is:s.listdrops) {
-                    iProbeInfo.text(is.getDisplayName()+is.getCount());
+
+                List<String> list = new ArrayList<>();
+                List<Integer> listNum = new ArrayList<>();
+                for (var is:s.listdrops)
+                {
+                    if(!list.contains(is.getDisplayName()))
+                    {
+                        list.add(is.getDisplayName());
+                        listNum.add(is.getCount());
+                    }
+                    else
+                    {
+                        int loca = list.indexOf(is.getDisplayName());
+                        int num = listNum.remove(loca);
+                        listNum.add(loca,num+is.getCount());
+                    }
+                }
+                int maxprocess = s.maxProcess;
+               if( s.workType==1 && s.productType==1)
+                   maxprocess*=4;
+                iProbeInfo.progress(s.getProgress(), maxprocess, iProbeInfo.defaultProgressStyle()
+                        .suffix(" / " + TextFormattingUtil.formatNumbers(maxprocess) + " %")
+                        .filledColor(0xFFEEE600)
+                        .alternateFilledColor(0xFFEEE600)
+                        .borderColor(0xFF555555).numberFormat(mcjty.theoneprobe.api.NumberFormat.COMMAS));
+                for (int i = 0; i < listNum.size(); i++) {
+                    String item = list.get(i);
+                    int num = listNum.get(i);
+                    iProbeInfo.text("产出物品:"+item +"*"+num);
                 }
             }
         }

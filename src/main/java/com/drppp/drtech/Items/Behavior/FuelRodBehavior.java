@@ -53,7 +53,7 @@ public class FuelRodBehavior  implements IItemComponent, IItemCapabilityProvider
 
     @Override
     public int getMaxStackSize(ItemStack itemStack, int i) {
-        return 1;
+        return 64;
     }
 
     @Override
