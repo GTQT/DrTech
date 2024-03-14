@@ -1,15 +1,12 @@
-package com.drppp.drtech.MetaTileEntities.muti.ecectric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.drppp.drtech.Blocks.BlocksInit;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing1;
-import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
-import com.drppp.drtech.Linkage.GtqtCoreLinkage;
-import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.api.ItemHandler.SingleItemStackHandler;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaGlasses;
+import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import forestry.api.apiculture.*;
 import forestry.apiculture.genetics.Bee;
 import gregtech.api.GTValues;
@@ -62,8 +59,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static com.drppp.drtech.Utils.DrtechUtils.readItemStackFromNBT;
-import static com.drppp.drtech.Utils.DrtechUtils.writeItemStackToNBT;
 import static forestry.api.apiculture.BeeManager.beeRoot;
 import static gregtech.api.util.RelativeDirection.*;
 
@@ -109,7 +104,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
     @Override
     protected void formStructure(PatternMatchContext context) {
         super.formStructure(context);
-        List<IEnergyContainer> energyContainer = new ArrayList(this.getAbilities(MultiblockAbility.OUTPUT_ENERGY));
+                List<IEnergyContainer> energyContainer = new ArrayList(this.getAbilities(MultiblockAbility.INPUT_ENERGY));
         this.energyContainer=new EnergyContainerList(energyContainer);
         this.itemImportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
         this.itemExportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.EXPORT_ITEMS));
@@ -273,10 +268,10 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         WidgetGroup group = new WidgetGroup(x, y, width, height);
         group.addWidget(new ClickButtonWidget(0, 0, 18, 18, "", this::changeProductType)
                 .setButtonTexture(GuiTextures.BUTTON_CLEAR_GRID)
-                .setTooltipText("gtqtcore.multiblock.tfft.clearfluid"));
+                .setTooltipText("drtech.multiblock.lbh.changep"));
         group.addWidget(new ClickButtonWidget(0, 18, 18, 18, "", this::changeWorkType)
                 .setButtonTexture(GuiTextures.LOCK)
-                .setTooltipText("gtqtcore.multiblock.tfft.isoutput"));
+                .setTooltipText("drtech.multiblock.lbh.changew"));
         return group;
     }
     private void changeProductType(Widget.ClickData clickData)
@@ -306,7 +301,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
 
     @Override
     protected void updateFormedValid() {
-        if(this.isWorkingEnabled)
+        if(this.isWorkingEnabled && !this.getWorld().isRemote)
         if(workType==0)
         {
             process=0;
@@ -343,10 +338,11 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         }//产出蜂窝
         else if(this.workType==1 && this.productType==0)
         {
-            long maxslot = Math.min(this.energyContainer.getEnergyStored()/GTValues.V[GTValues.IV],1024);
-            if(maxslot>0)
+            long maxslot = Math.min(this.energyContainer.getInputAmperage()*this.energyContainer.getInputVoltage()/GTValues.V[GTValues.IV],1024);
+            long dradinEnergy = (long) (GTValues.V[GTValues.IV]*maxslot);
+            if(maxslot>0 &&  this.energyContainer.getEnergyStored()>=dradinEnergy)
             {
-                this.energyContainer.removeEnergy(GTValues.V[GTValues.IV]*maxslot);
+                this.energyContainer.removeEnergy(dradinEnergy);
             }
             else
             {
