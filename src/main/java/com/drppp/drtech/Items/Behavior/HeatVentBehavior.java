@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class HeatVentBehavior implements IItemComponent, IItemCapabilityProvider, IItemBehaviour
+public class HeatVentBehavior implements IItemComponent, IItemCapabilityProvider, IItemBehaviour,IItemMaxStackSizeProvider
 {
     private int HeatAbsorptionRate;
     private int HeatDissipationRate;
@@ -37,5 +37,10 @@ public class HeatVentBehavior implements IItemComponent, IItemCapabilityProvider
         lines.add(I18n.format("heatvent.date.tip1",ca.getHeat()));
         lines.add(I18n.format("heatvent.date.tip2",ca.getMaxHeat()));
         IItemBehaviour.super.addInformation(itemStack, lines);
+    }
+
+    @Override
+    public int getMaxStackSize(ItemStack itemStack, int i) {
+        return 64;
     }
 }

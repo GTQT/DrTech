@@ -7,6 +7,7 @@ import com.drppp.drtech.Blocks.BlocksInit;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Linkage.GtqtCoreLinkage;
 import com.drppp.drtech.Utils.Datas;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -43,6 +44,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -249,7 +251,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     @NotNull
     @Override
     protected BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, UP, FRONT)
+        return FactoryBlockPattern.start(RIGHT, DOWN, FRONT)
                 .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
                 .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG").setRepeatable(3, 14)
                 .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
@@ -270,6 +272,10 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     }
 
     protected IBlockState getGlassState() {
+        if(Loader.isModLoaded(GtqtCoreLinkage.GTQTCORE_ID))
+        {
+            return keqing.gtqtcore.common.block.GTQTMetaBlocks.GLASS_CASING.getState( keqing.gtqtcore.common.block.blocks.GTQTBlockGlassCasing.CasingType.TI_BORON_SILICATE_GLASS);
+        }
         return BlocksInit.TRANSPARENT_CASING.getState(MetaGlasses.CasingType.TI_BORON_SILICATE_GLASS_BLOCK);
     }
     @Override
