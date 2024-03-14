@@ -30,10 +30,19 @@ import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.material.info.MaterialFlags.EXPLOSIVE;
 import static gregtech.api.unification.material.info.MaterialFlags.FLAMMABLE;
 import static gregtech.api.unification.ore.OrePrefix.dust;
+import static gregtech.api.unification.ore.OrePrefix.ingot;
 
 public class MachineReceipe {
     public static void load()
     {
+        DRONE_PAD.recipeBuilder()
+                .input(ingot, Materials.Iron)
+                .output(Items.BEEF, 16)
+                .duration(10)
+                .dimension(0)
+                .EUt(2)
+                .buildAndRegister();
+
         MACERATOR_RECIPES.recipeBuilder()
                 .input(Items.SKULL,1,1)
                 .output(MyMetaItems.SKULL_DUST,2)

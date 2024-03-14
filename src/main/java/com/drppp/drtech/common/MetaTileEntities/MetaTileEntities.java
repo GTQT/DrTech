@@ -24,7 +24,7 @@ import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTile
 import static gregtech.common.metatileentities.MetaTileEntities.registerSimpleMetaTileEntity;
 
 public class MetaTileEntities {
-
+    public static MetaTileEntityDronePad DRONE_PAD;
     public static  AnnihilationGenerator ANNIHILATION_GENERATOR;
     public static MetaTileEntityAdvancedProsscessArray ADVANCED_PROCESS_ARRAY;
     public static MetaTileEntityElectricImplosionCompressor LARGE_LARGE;
@@ -78,6 +78,7 @@ public class MetaTileEntities {
         SOLAR_TOWER = registerMetaTileEntity(17067,new MetaTileEntitySolarTower(getmyId("solar_tower")));
         NUCLEAR_GENERATOR = registerMetaTileEntity(17068,new NuclearReactor(getmyId("nuclear_generator")));
         LARGE_BEE_HIVE = registerMetaTileEntity(17069,new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
+        DRONE_PAD = registerMetaTileEntity(17070, new MetaTileEntityDronePad(getmyId("drone_pad")));
     }
 
 

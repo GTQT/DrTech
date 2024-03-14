@@ -1,6 +1,8 @@
 package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
+import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.Client.Textures;
@@ -8,9 +10,11 @@ import com.drppp.drtech.Client.render.ConnectorTesr;
 import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
+import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
@@ -33,6 +37,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -49,8 +54,21 @@ import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodIn
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]")
 public class DrTechMain {
 
+
     public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
     public static CreativeTabs Mytab;
+
+    @Mod.Instance(DrTechMain.MODID)
+    public static DrTechMain instance;
+
+
+    public static final String MODID = "drtech";
+    public static final String NAME = "drtech";
+    public static final String VERSION = "1.0";
+
+
+    public static CommonProxy proxy;
+    public static ClientProxy cproxy;
     @EventHandler
     // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
     public void preInit(FMLPreInitializationEvent event) {
@@ -70,8 +88,15 @@ public class DrTechMain {
     // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
     public void ClientpreInit(FMLPreInitializationEvent event) {
         TexturesInit();
+        drtMetaEntities.initRenderers();
         ModelLoaderRegistry.registerLoader(OBJLoader.INSTANCE);
         OBJLoader.INSTANCE.addDomain(Tags.MODID);
+    }
+    @Mod.EventHandler
+    public void onPreInit( FMLPreInitializationEvent event) {
+
+        drtMetaEntities.init();
+        SusySounds.registerSounds();
     }
     @SideOnly(Side.CLIENT)
     public void TexturesInit()
