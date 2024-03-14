@@ -26,5 +26,23 @@
     "sounds": [
       "drtech:plasma_launch"
     ]
+  },
+  "entity.rocket_loop": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "drtech:rocket_loop",
+        "stream": false
+      }
+    ]
+  },
+  "entity.drone_takeoff": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "drtech:drone_takeoff",
+        "stream": true
+      }
+    ]
   }
 }
