@@ -1,8 +1,7 @@
 package com.drppp.drtech.Tile;
 
-import com.drppp.drtech.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
