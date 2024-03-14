@@ -1,6 +1,6 @@
 package com.drppp.drtech;
 
-import com.drppp.drtech.Materials.DrtechMaterials;
+import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import gregtech.api.unification.material.event.MaterialEvent;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.registry.ClientRegistry;

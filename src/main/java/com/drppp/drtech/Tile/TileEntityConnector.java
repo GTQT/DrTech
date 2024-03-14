@@ -1,12 +1,10 @@
 package com.drppp.drtech.Tile;
 
-import com.drppp.drtech.Utils.DrtechUtils;
+import com.drppp.drtech.api.Utils.DrtechUtils;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
 
 public class TileEntityConnector extends TileEntity implements ITickable {
     public BlockPos selfPos;
