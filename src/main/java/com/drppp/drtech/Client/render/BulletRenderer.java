@@ -1,6 +1,6 @@
 package com.drppp.drtech.Client.render;
 
-import com.drppp.drtech.Entity.EntityGunBullet;
+import com.drppp.drtech.common.Entity.EntityGunBullet;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

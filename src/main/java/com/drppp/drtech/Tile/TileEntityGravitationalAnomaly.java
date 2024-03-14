@@ -1,6 +1,6 @@
 package com.drppp.drtech.Tile;
 
-import com.drppp.drtech.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.Particle.GravitationalAnomalyParticle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
