@@ -2,6 +2,7 @@ package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -94,9 +95,9 @@ public class DrTechMain {
     }
     @Mod.EventHandler
     public void onPreInit( FMLPreInitializationEvent event) {
-
         drtMetaEntities.init();
         SusySounds.registerSounds();
+        TileEntityUIFactory.INSTANCE.init();
     }
     @SideOnly(Side.CLIENT)
     public void TexturesInit()
