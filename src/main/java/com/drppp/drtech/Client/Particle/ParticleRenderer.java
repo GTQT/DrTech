@@ -1,6 +1,6 @@
 package com.drppp.drtech.Client.Particle;
 
-import com.drppp.drtech.Utils.DrtechMathUtils;
+import com.drppp.drtech.api.Utils.DrtechMathUtils;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;

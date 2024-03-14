@@ -1,20 +1,20 @@
 package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
-import com.drppp.drtech.Blocks.BlocksInit;
-import com.drppp.drtech.Blocks.Crops.CropsInit;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Client.render.ConnectorTesr;
 import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
-import com.drppp.drtech.Items.ItemsInit;
-import com.drppp.drtech.Items.MetaItems.ItemCombs;
-import com.drppp.drtech.Items.MetaItems.MyMetaItems;
-import com.drppp.drtech.Linkage.top.TopInit;
-import com.drppp.drtech.Load.CraftingReceipe;
-import com.drppp.drtech.Load.DrTechReceipeManager;
-import com.drppp.drtech.MetaTileEntities.MetaTileEntities;
+import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
+import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.intergations.top.TopInit;
+import com.drppp.drtech.loaders.CraftingReceipe;
+import com.drppp.drtech.loaders.DrTechReceipeManager;
+import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.Sync.SyncInit;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
@@ -43,8 +43,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static com.drppp.drtech.Items.MetaItems.ItemCombs.ITEM_COMBS;
-import static com.drppp.drtech.Items.MetaItems.MetaItemsReactor.FuelRodInit;
+import static com.drppp.drtech.common.Items.MetaItems.ItemCombs.ITEM_COMBS;
+import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]")
 public class DrTechMain {
