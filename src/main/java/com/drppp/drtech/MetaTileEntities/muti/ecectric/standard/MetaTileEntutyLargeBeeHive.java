@@ -12,6 +12,7 @@ import com.drppp.drtech.MetaTileEntities.muti.ecectric.store.MetaTileEntityYotTa
 import com.drppp.drtech.api.ItemHandler.SingleItemStackHandler;
 import forestry.api.apiculture.*;
 import forestry.apiculture.genetics.Bee;
+import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -342,10 +343,20 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         }//产出蜂窝
         else if(this.workType==1 && this.productType==0)
         {
-
+            long maxslot = Math.min(this.energyContainer.getEnergyStored()/GTValues.V[GTValues.IV],1024);
+            if(maxslot>0)
+            {
+                this.energyContainer.removeEnergy(GTValues.V[GTValues.IV]*maxslot);
+            }
+            else
+            {
+                listdrops.clear();
+                process=0;
+                this.setWorkingEnabled(false);
+            }
             if(listdrops.size()==0)
             {
-                for (int i = 0; i < inventory.getSlots(); i++)
+                for (int i = 0; i < maxslot; i++)
                 {
                     ItemStack is = inventory.getStackInSlot(i);
                     EnumBeeType beeType = beeRoot.getType(is);
@@ -368,7 +379,15 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                 listdrops.clear();
             }
             //产出公主蜂
-        } else if (this.workType==1 && this.productType==1) {
+        } else if (this.workType==1 && this.productType==1 && this.energyContainer.getInputVoltage()>= GTValues.V[GTValues.IV]) {
+            if(this.energyContainer.getEnergyStored()>=GTValues.V[GTValues.IV])
+                this.energyContainer.removeEnergy(GTValues.V[GTValues.IV]);
+            else
+            {
+                listdrops.clear();
+                process=0;
+                this.setWorkingEnabled(false);
+            }
             if(process++>=maxProcess*4)
             {
                 listdrops.clear();
