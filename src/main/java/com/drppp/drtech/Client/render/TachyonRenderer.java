@@ -1,7 +1,7 @@
 package com.drppp.drtech.Client.render;
 
 
-import com.drppp.drtech.Entity.EntityTachyonBullet;
+import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
