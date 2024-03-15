@@ -39,10 +39,10 @@ public class TileEntityStoragePail extends TileEntityWithUI {
     @Override
     public ModularUI createUI(EntityPlayer entityPlayer) {
         ModularUI.Builder builder;
-        builder = ModularUI.builder(GuiTextures.BACKGROUND, 198, 208);
-        for (int i = 0; i < 20; i++) {
-            builder.slot(inventory,i,i%10*9,i/10*9,true,true, GuiTextures.SLOT);
-        }
+        builder = ModularUI.builder(GuiTextures.BACKGROUND, 298, 208);
+        for (int y = 0; y < 9; y++)
+            for (int x = 0; x < 27; x++)
+                builder.slot(inventory, y * 27 + x, 8 + (18 * x), 18 + (18 * y));
         builder.bindPlayerInventory(entityPlayer.inventory, 180);
         return builder.build(this, entityPlayer);
     }
