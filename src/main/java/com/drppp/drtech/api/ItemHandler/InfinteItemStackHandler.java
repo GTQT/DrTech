@@ -5,9 +5,10 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class InfinteItemStackHandler extends ItemStackHandler {
-
+    //test
     public InfinteItemStackHandler()
     {
+
         this(1);
     }
 

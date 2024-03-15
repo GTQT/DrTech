@@ -13,7 +13,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-
+//test
 public class TileEntityUIFactory extends UIFactory<TileEntityWithUI> {
     public static final TileEntityUIFactory INSTANCE = new TileEntityUIFactory();
     public void init() {

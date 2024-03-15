@@ -155,7 +155,6 @@ drtech.machine.yot_hatch.name=YOT仓
 drtech.machine.trans_tower.name=能量输送塔
 drtech.machine.solar_tower.name=太阳能集热塔
 drtech.machine.nuclear_generator.name=裂变反应堆
-drtech.machine.large_bee_hive.name=巨型工业蜂箱
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -241,8 +240,6 @@ fuelrod.date.tip2=最大耐久值:%s
 fuelrod.date.tip3=温度影响:%s
 heatvent.date.tip1=§c当前储热:%s
 heatvent.date.tip2=最大储热:%s
-drtech.multiblock.lbh.changep=切换生产方式
-drtech.multiblock.lbh.changew=切换工作方式
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
