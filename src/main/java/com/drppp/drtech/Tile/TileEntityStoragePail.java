@@ -1,11 +1,11 @@
 package com.drppp.drtech.Tile;
 
+import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.TileEntity.TileEntityWithUI;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.IUIHolder;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
-import gregtech.client.renderer.texture.Textures;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -39,11 +39,11 @@ public class TileEntityStoragePail extends TileEntityWithUI {
     @Override
     public ModularUI createUI(EntityPlayer entityPlayer) {
         ModularUI.Builder builder;
-        builder = ModularUI.builder(GuiTextures.BACKGROUND, 298, 208);
+        builder = ModularUI.builder(Textures.PAIL_BACKGROUND, 500, 500);
         for (int y = 0; y < 9; y++)
             for (int x = 0; x < 27; x++)
-                builder.slot(inventory, y * 27 + x, 8 + (18 * x), 18 + (18 * y));
-        builder.bindPlayerInventory(entityPlayer.inventory, 180);
+                builder.slot(inventory, y * 27 + x, 7 + (18 * x), 130+18 + (18 * y));
+        builder.bindPlayerInventory(entityPlayer.inventory,GuiTextures.SLOT,169, 312);
         return builder.build(this, entityPlayer);
     }
 
