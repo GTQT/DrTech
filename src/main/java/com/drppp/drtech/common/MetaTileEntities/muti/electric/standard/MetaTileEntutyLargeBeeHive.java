@@ -499,7 +499,9 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
             }
             public double getAmount() {
                 if(chance>=0.4)
-                    return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES/3 ;
+                    return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES*0.333;
+                else if(chance>=0.2)
+                    return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES*0.8;
                 else if(chance<0.01)
                     return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES*10;
                 return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES ;

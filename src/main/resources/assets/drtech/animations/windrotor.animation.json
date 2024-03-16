@@ -1,0 +1,20 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.model.working": {
+			"animation_length": 20,
+			"bones": {
+				"wind": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"20.0": {
+							"vector": [0, 0, 7200]
+						}
+					}
+				}
+			}
+		}
+	}
+}

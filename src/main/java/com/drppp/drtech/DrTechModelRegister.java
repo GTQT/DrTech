@@ -12,6 +12,7 @@ import com.drppp.drtech.common.Entity.EntityGunBullet;
 import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
 import com.drppp.drtech.common.Entity.EntityTachyonBullet;
+import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
@@ -50,6 +51,7 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_STORAGE_PAIL), 0, new ModelResourceLocation(BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName(), "inventory"));
 
         ItemsInit.registerItemModels();
+        GeoItemsInit.onModelRegistry();
     }
     @SideOnly(Side.CLIENT)
     public static void EntityRenderReg()

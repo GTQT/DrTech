@@ -18,6 +18,7 @@ public final class DrtechReceipes {
     public static final RecipeMap<SimpleRecipeBuilder> MOB_KILLER ;
     public static final RecipeMap<SimpleRecipeBuilder> DRRP_GROUND_PUMP ;
     public static final RecipeMap<SimpleRecipeBuilder> SOLAR_TOWER ;
+   // public static final RecipeMap<SimpleRecipeBuilder> WIND_DRIVEN ;
 
 
     public static final RecipeMap<DronePadRecipeBuilder> DRONE_PAD = new RecipeMap<>("drone_pad", 4, 9, 0, 0, new DronePadRecipeBuilder(), false);
@@ -44,6 +45,7 @@ public final class DrtechReceipes {
         MOB_KILLER = new RecipeMap<>("mob_killer",2,6,0,1,(new SimpleRecipeBuilder()),false);
         DRRP_GROUND_PUMP = new RecipeMap<>("deep_ground_pump",1,0,1,4,(new SimpleRecipeBuilder()),false);
         SOLAR_TOWER = new RecipeMap<>("solar_tower",0,0,1,1,(new SimpleRecipeBuilder()),false);
+       // WIND_DRIVEN = new RecipeMap<>("wind_driven",2,0,1,0,(new SimpleRecipeBuilder()),false);
 
     }
 }
