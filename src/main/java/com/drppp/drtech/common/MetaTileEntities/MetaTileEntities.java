@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.MetaTileEntities;
 
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
@@ -45,6 +46,7 @@ public class MetaTileEntities {
     public static MetaTileEntitySolarTower SOLAR_TOWER;
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
+    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR;
 
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
@@ -79,6 +81,7 @@ public class MetaTileEntities {
         NUCLEAR_GENERATOR = registerMetaTileEntity(17068,new NuclearReactor(getmyId("nuclear_generator")));
         LARGE_BEE_HIVE = registerMetaTileEntity(17069,new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
         DRONE_PAD = registerMetaTileEntity(17070, new MetaTileEntityDronePad(getmyId("drone_pad")));
+        WIND_DRIVEN_GENERATOR = registerMetaTileEntity(17071, new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
     }
 
 

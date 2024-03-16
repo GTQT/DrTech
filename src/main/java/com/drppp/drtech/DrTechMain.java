@@ -12,6 +12,7 @@ import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.common.CommonProxy;
+import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
@@ -119,7 +120,7 @@ public class DrTechMain {
     // Register items here (Remove if not needed)
     public void registerItems(RegistryEvent.Register<Item> event) {
         ItemsInit.init(event);
-
+        GeoItemsInit.init(event);
     }
     @SubscribeEvent
     // Register blocks here (Remove if not needed)

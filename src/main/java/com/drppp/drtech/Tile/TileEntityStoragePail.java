@@ -1,6 +1,7 @@
 package com.drppp.drtech.Tile;
 
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.api.ItemHandler.PailItemStackHandler;
 import com.drppp.drtech.api.TileEntity.TileEntityWithUI;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.IUIHolder;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TileEntityStoragePail extends TileEntityWithUI {
 
-    public  ItemStackHandler inventory = new ItemStackHandler(243);
+    public PailItemStackHandler inventory = new PailItemStackHandler(243);
     public TileEntityStoragePail(){
 
     }

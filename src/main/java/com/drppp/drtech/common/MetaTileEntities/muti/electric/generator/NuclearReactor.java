@@ -49,7 +49,8 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 public class NuclearReactor extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable,INuclearDataShow {
-    private boolean isActive=true, isWorkingEnabled = true;
+    private boolean isActive = false;
+    private boolean isWorkingEnabled = true;
     private int process;
     private int maxProcess;
     protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());
@@ -101,11 +102,9 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
         return this.maxProcess;
     }
 
-    @Override
     public boolean isActive() {
-        return super.isActive() && this.isActive;
+        return this.isActive&&isStructureFormed();
     }
-
     public void setActive(boolean active) {
         if (this.isActive != active) {
             this.isActive = active;
@@ -160,6 +159,8 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
 
     @Override
     protected void updateFormedValid() {
+        if(!isActive)
+            setActive(true);
         if(tick++>10 )
         {
             tick=0;
@@ -700,9 +701,10 @@ private int setHeat(int heatAmount,int i)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), this.isActive(),
-                this.isWorkingEnabled());
+        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), isActive(),
+                isWorkingEnabled());
     }
+
     @Override
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
@@ -726,6 +728,10 @@ private int setHeat(int heatAmount,int i)
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.inventory);
         }else if(capability == DrtechCapabilities.CAPABILITY_NUCLEAR_DATA) {
             return DrtechCapabilities.CAPABILITY_NUCLEAR_DATA.cast(this);
+        }else if (capability == GregtechTileCapabilities.CAPABILITY_WORKABLE) {
+            return GregtechTileCapabilities.CAPABILITY_WORKABLE.cast(this);
+        }else if (capability == GregtechTileCapabilities.CAPABILITY_COVER_HOLDER) {
+            return GregtechTileCapabilities.CAPABILITY_COVER_HOLDER.cast(this);
         }
         return super.getCapability(capability, side);
     }
