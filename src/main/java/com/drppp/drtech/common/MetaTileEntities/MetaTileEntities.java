@@ -46,7 +46,9 @@ public class MetaTileEntities {
     public static MetaTileEntitySolarTower SOLAR_TOWER;
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
-    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR;
+    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
+    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_EV;
+    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_IV;
 
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
@@ -81,7 +83,8 @@ public class MetaTileEntities {
         NUCLEAR_GENERATOR = registerMetaTileEntity(17068,new NuclearReactor(getmyId("nuclear_generator")));
         LARGE_BEE_HIVE = registerMetaTileEntity(17069,new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
         DRONE_PAD = registerMetaTileEntity(17070, new MetaTileEntityDronePad(getmyId("drone_pad")));
-        WIND_DRIVEN_GENERATOR = registerMetaTileEntity(17071, new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
+        WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(17071, new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator"),1));
+
     }
 
 

@@ -90,7 +90,7 @@ public class GeoItem extends Item implements IAnimatable {
             controller.markNeedsReload();
             // Set the animation to open the jackinthebox which will start playing music and
             // eventually do the actual animation. Also sets it to not loop
-            controller.setAnimation(new AnimationBuilder().addAnimation("Soaryn_chest_popup", false));
+            controller.setAnimation(new AnimationBuilder().addAnimation("animation.model.working", false));
         }
         return super.onItemRightClick(worldIn, player, hand);
     }
