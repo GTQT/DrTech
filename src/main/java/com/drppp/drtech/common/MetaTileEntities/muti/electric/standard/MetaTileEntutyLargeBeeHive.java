@@ -8,6 +8,8 @@ import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import forestry.api.apiculture.*;
+import forestry.apiculture.ModuleApiculture;
+import forestry.apiculture.blocks.BlockAlvearyType;
 import forestry.apiculture.genetics.Bee;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
@@ -244,12 +246,12 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                 .where('B', blocks(Blocks.DIRT,Blocks.GRASS))
                 .where('H', blocks(Blocks.PLANKS))
                 .where('I', blocks(Blocks.WOODEN_SLAB))
-                .where('J',blocks(Blocks.LOG) )
-                .where('K',blocks(Blocks.LOG) )
-                .where('L',blocks(Blocks.LOG) )
-                .where('N',blocks(Blocks.LOG) )
-                .where('O',blocks(Blocks.LOG) )
-                .where('P',blocks(Blocks.LOG) )
+                .where('J',blocks(ModuleApiculture.getBlocks().apiary) )
+                .where('K',blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN) ))
+                .where('L',blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HYGRO)) )
+                .where('N',blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.STABILISER)) )
+                .where('O',blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HEATER)) )
+                .where('P',blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.FAN)) )
                 .where('F',blocks(Blocks.LOG) )
                 .where('W',blocks(Blocks.WATER) )
 

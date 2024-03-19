@@ -156,6 +156,9 @@ drtech.machine.yot_hatch.name=YOT仓
 drtech.machine.trans_tower.name=能量输送塔
 drtech.machine.solar_tower.name=太阳能集热塔
 drtech.machine.nuclear_generator.name=裂变反应堆
+drtech.machine.large_bee_hive.name=巨型养蜂场
+drtech.machine.drone_pad.name=无人机平台
+drtech.machine.wind_driven_generator.name=风力发电机
 #Materials
 gregtech.material.bedrock=基岩
 
