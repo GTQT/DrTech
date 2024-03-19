@@ -1,6 +1,5 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.generator;
 
-import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.common.Entity.EntityDrone;
@@ -9,6 +8,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileE
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityLogFactory;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.GTValues;
+import gregtech.api.block.IHeatingCoilBlockStats;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -17,11 +17,15 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
+import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
+import gregtech.client.renderer.texture.Textures;
+import gregtech.common.blocks.BlockMetalCasing;
+import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import gregtech.common.items.behaviors.TurbineRotorBehavior;
 import net.minecraft.block.state.IBlockState;
@@ -53,61 +57,73 @@ public class MeTaTileEntityWindDrivenGenerator extends MetaTileEntityBaseWithCon
     public int outEnergyRate=0;
     public int[] outEnergyBase= {60,180,360};
     private int tick=0;
-    private int level;
-    public MeTaTileEntityWindDrivenGenerator(ResourceLocation metaTileEntityId,int level) {
+    private int level=0;
+    public MeTaTileEntityWindDrivenGenerator(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
-        this.level = level;
     }
 
 
     @Override
     protected BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start()
-                .aisle(" XX", "XXX", "XX ")
-                .aisle(" XX", "X#X", "XX ")
-                .aisle(" XX", "X#X", "XX ")
-                .aisle(" XX", "X#X", "XX ")
-                .aisle(" XX", "XSX", "XX ")
+                .aisle(" X ", "XXX", " X ")
+                .aisle(" X ", "X#X", " X ")
+                .aisle(" X ", "X#X", " X ")
+                .aisle(" X ", "X#X", " X ")
+                .aisle(" X ", "XSX", " X ")
                 .where('S', selfPredicate())
                 .where('X', states(getCasingState()).setMinGlobalLimited(4)
                         .or(abilities(MultiblockAbility.OUTPUT_ENERGY).setExactLimit(1))
                         .or(abilities(MultiblockAbility.IMPORT_ITEMS).setExactLimit(1))
                         .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
                 )
-                .where('#', air())
+                .where('#', heatingCoils())
                 .where(' ', any())
                 .build();
     }
 
+
+    private static IBlockState getCasingState() {
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
+    }
     @SideOnly(Side.CLIENT)
     @Override
-    public ICubeRenderer getBaseTexture(IMultiblockPart sourcePart) {
-        return Textures.ASEPTIC_MACHINE_CASING;
+    public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
+        return Textures.SOLID_STEEL_CASING;
     }
-    protected IBlockState getCasingState() {
-        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.ASEPTIC_MACHINE_CASING);
+
+    @Override
+    protected void formStructure(PatternMatchContext context) {
+        super.formStructure(context);
+        Object type = context.get("CoilType");
+        if (type instanceof IHeatingCoilBlockStats) {
+            this.level = ((IHeatingCoilBlockStats)type).getLevel();
+        } else {
+            this.level = 1;
+        }
+        this.level=Math.max(this.level,2);
     }
 
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
-        return new MeTaTileEntityWindDrivenGenerator(this.metaTileEntityId,this.level);
+        return new MeTaTileEntityWindDrivenGenerator(this.metaTileEntityId);
     }
     public Vec3d getDroneSpawnPosition( ) {
 
-        double altitude =  this.getPos().getY() + 3;
+        double altitude =  this.getPos().getY();
 
         switch (this.getFrontFacing()) {
             case EAST -> {
-                return new Vec3d(this.getPos().getX() - 1.5, altitude, this.getPos().getZ() + 0.5);
+                return new Vec3d(this.getPos().getX() - 4, altitude, this.getPos().getZ()+1);
             }
             case SOUTH -> {
-                return new Vec3d(this.getPos().getX() + 0.5, altitude, this.getPos().getZ() - 1.5);
+                return new Vec3d(this.getPos().getX() , altitude, this.getPos().getZ() - 4);
             }
             case WEST -> {
-                return new Vec3d(this.getPos().getX() + 2.5, altitude, this.getPos().getZ() + 0.5);
+                return new Vec3d(this.getPos().getX() + 5, altitude, this.getPos().getZ());
             }
             default -> {
-                return new Vec3d(this.getPos().getX() + 0.5, altitude, this.getPos().getZ() + 2.5);
+                return new Vec3d(this.getPos().getX()+1 , altitude, this.getPos().getZ() + 5);
             }
         }
 
@@ -120,10 +136,24 @@ public class MeTaTileEntityWindDrivenGenerator extends MetaTileEntityBaseWithCon
         nbttagcompound.setString("id", "drtech:wind_rotor");
         Vec3d pos = this.getDroneSpawnPosition();
 
-       // rotor = (EntityWindRotor) AnvilChunkLoader.readWorldEntityPos(nbttagcompound, this.getWorld(), pos.x, pos.y, pos.z, true);
         rotor = (EntityWindRotor) createEntityFromNBT(nbttagcompound,this.getWorld());
         rotor.setPosition(pos.x,pos.y,pos.z);
-        rotor.rotationYaw=180;
+        switch (this.getFrontFacing()) {
+            case EAST :
+                rotor.rotationYaw=90;
+                break;
+            case SOUTH :
+                rotor.rotationYaw=180;
+                break;
+            case WEST:
+                rotor.rotationYaw=270;
+                break;
+            default :
+                rotor.rotationYaw=0;
+                break;
+        }
+
+        markDirty();
         spawnEntity(rotor,this.getWorld());
         rotor.machinePos = new BlockPos(this.getPos().getX(),this.getPos().getY(),this.getPos().getZ());
     }
@@ -168,7 +198,7 @@ public class MeTaTileEntityWindDrivenGenerator extends MetaTileEntityBaseWithCon
                     float height = Math.min(1.5f,Math.max(1f,this.getPos().getY()*0.01f));
                     float eff = TurbineRotorBehavior.getRotorEfficiency(stack)*0.01f;
                     float pow = TurbineRotorBehavior.getRotorPower(stack)*0.01f;
-                    this.outEnergyRate=(int)(outEnergyBase[level-1]*weight*height*eff*pow);
+                    this.outEnergyRate=(int)(outEnergyBase[level]*weight*height*eff*pow);
                     if(tick>=25){
                         tick=0;
                         new TurbineRotorBehavior().applyRotorDamage(stack,1);
