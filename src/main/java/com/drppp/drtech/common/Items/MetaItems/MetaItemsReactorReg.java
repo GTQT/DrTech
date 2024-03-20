@@ -146,6 +146,10 @@ public class MetaItemsReactorReg extends StandardMetaItem {
         MetaItemsReactor.COOLANT_NULL_CELL_3 = this.addItem(40,"coolant_null_cell_3")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64);
+        MetaItemsReactor.UPGRADE_IO = this.addItem(41,"upgrade_io").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
+        MetaItemsReactor.UPGRADE_STOP = this.addItem(42,"upgrade_stop").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
+        MetaItemsReactor.UPGRADE_CATCH = this.addItem(43,"upgrade_catch").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
+        MetaItemsReactor.UPGRADE_REFLECT = this.addItem(44,"upgrade_reflect").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
     }
 
 

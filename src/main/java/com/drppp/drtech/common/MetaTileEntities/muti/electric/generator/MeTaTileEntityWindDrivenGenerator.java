@@ -57,7 +57,7 @@ public class MeTaTileEntityWindDrivenGenerator extends MetaTileEntityBaseWithCon
     public int outEnergyRate=0;
     public int[] outEnergyBase= {60,180,360};
     private int tick=0;
-    private int level=0;
+    private int level=1;
     public MeTaTileEntityWindDrivenGenerator(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -95,13 +95,13 @@ public class MeTaTileEntityWindDrivenGenerator extends MetaTileEntityBaseWithCon
     @Override
     protected void formStructure(PatternMatchContext context) {
         super.formStructure(context);
-        Object type = context.get("CoilType");
-        if (type instanceof IHeatingCoilBlockStats) {
-            this.level = ((IHeatingCoilBlockStats)type).getLevel();
-        } else {
-            this.level = 1;
-        }
-        this.level=Math.max(this.level,2);
+//        Object type = context.get("CoilType");
+//        if (type instanceof IHeatingCoilBlockStats) {
+//            this.level = ((IHeatingCoilBlockStats)type).getLevel();
+//        } else {
+//            this.level = 1;
+//        }
+//        this.level=Math.max(this.level,2);
     }
 
     @Override
