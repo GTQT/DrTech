@@ -50,6 +50,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import software.bernie.geckolib3.GeckoLib;
 
 import static com.drppp.drtech.common.Items.MetaItems.ItemCombs.ITEM_COMBS;
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
@@ -85,6 +86,7 @@ public class DrTechMain {
         {
              ItemCombs.init();
         }
+        GeckoLib.initialize();
     }
     @EventHandler
     @SideOnly(Side.CLIENT)

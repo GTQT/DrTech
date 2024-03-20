@@ -78,6 +78,10 @@ metaitem.coolant_null_cell_1.name=30k冷却单元外壳
 metaitem.coolant_null_cell_2.name=180k冷却单元外壳
 metaitem.coolant_null_cell_3.name=360k冷却单元外壳
 metaitem.null_fuel_rod.name=空燃料棒
+metaitem.upgrade_io.name=输入输出升级
+metaitem.upgrade_stop.name=停机升级
+metaitem.upgrade_catch.name=中子捕获升级
+metaitem.upgrade_reflect.name=反射效率升级
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃

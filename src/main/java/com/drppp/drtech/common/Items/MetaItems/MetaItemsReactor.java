@@ -43,6 +43,10 @@ public class MetaItemsReactor {
     public static MetaItem<?>.MetaValueItem COOLANT_NULL_CELL_1;
     public static MetaItem<?>.MetaValueItem COOLANT_NULL_CELL_2;
     public static MetaItem<?>.MetaValueItem COOLANT_NULL_CELL_3;
+    public static MetaItem<?>.MetaValueItem UPGRADE_IO;
+    public static MetaItem<?>.MetaValueItem UPGRADE_CATCH;
+    public static MetaItem<?>.MetaValueItem UPGRADE_STOP;
+    public static MetaItem<?>.MetaValueItem UPGRADE_REFLECT;
     public static void FuelRodInit()
     {
         MetaItemsReactorReg metaItemFuelRod = new MetaItemsReactorReg();
