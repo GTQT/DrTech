@@ -8,14 +8,18 @@ import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing1;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.ItemHandler.SingleItemStackHandler;
 import com.drppp.drtech.api.capability.*;
+import com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
+import gregtech.api.capability.impl.FluidTankList;
+import gregtech.api.capability.impl.ItemHandlerList;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.resources.TextureArea;
 import gregtech.api.gui.widgets.AdvancedTextWidget;
 import gregtech.api.gui.widgets.ImageCycleButtonWidget;
 import gregtech.api.gui.widgets.ImageWidget;
+import gregtech.api.items.itemhandlers.GTItemStackHandler;
 import gregtech.api.metatileentity.IDataInfoProvider;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -25,9 +29,12 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -37,9 +44,11 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,10 +63,22 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     private int process;
     private int maxProcess;
     protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());
+    protected IItemHandlerModifiable inputInventory;
+    protected IItemHandlerModifiable outputInventory;
+    protected IMultipleTankHandler inputFluidInventory;
+    protected IMultipleTankHandler outputFluidInventory;
     private final SingleItemStackHandler inventory = new SingleItemStackHandler(81);
     private final SingleItemStackHandler upgradeInventory = new SingleItemStackHandler(5);
     private int tick=0,heat=0,outputEnergy=0;
     private final int MaxHeat = 10000;
+    private boolean ioUpgrade=false;
+    private boolean stopUpgrade=false;
+    private boolean reflectUpgrade=false;
+    private int reflectAmount=0;
+    private boolean catchUpgrade=false;
+    private int catchAmount=0;
+    //散热片散发出的热量 用于热核电计算
+    private int emitHeat=0;
 
     @Override
     public int getHeat() {
@@ -165,8 +186,67 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
         {
             tick=0;
             this.outputEnergy=0;
+            this.emitHeat=0;
+            ioUpgrade=false;
+            stopUpgrade=false;
+            reflectUpgrade=false;
+            reflectAmount=0;
+            catchUpgrade=false;
+            catchAmount=0;
+            //查找升级物品栏
+            for (int i = 0; i < upgradeInventory.getSlots(); i++) {
+                ItemStack up = upgradeInventory.getStackInSlot(i);
+                if(up.getItem()== MetaItemsReactor.UPGRADE_IO.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_IO.getMetaValue())
+                {
+                    ioUpgrade=true;
+                }else if(up.getItem()== MetaItemsReactor.UPGRADE_STOP.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_STOP.getMetaValue())
+                {
+                    stopUpgrade=true;
+                }else if(up.getItem()== MetaItemsReactor.UPGRADE_CATCH.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_CATCH.getMetaValue())
+                {
+                    catchUpgrade=true;
+                    catchAmount++;
+                }else if(up.getItem()== MetaItemsReactor.UPGRADE_REFLECT.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_REFLECT.getMetaValue())
+                {
+                    reflectUpgrade=true;
+                    reflectAmount++;
+                }
+            }
+            //IO升级
+            if(ioUpgrade)
+            {
+                for (int i = 0; i < inventory.getSlots(); i++)
+                {
+                    ItemStack stack = inventory.getStackInSlot(i);
+                    if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null))
+                    {
+                        List<ItemStack> outlist = new ArrayList<>();
+                        outlist.add(stack);
+                        var ca = stack.getCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null);
+                        if(((float)ca.getDurability()/(float)ca.getMaxDurability())>=0.85f && this.outputInventory!=null && GTTransferUtils.addItemsToItemHandler(outputInventory,true,outlist))
+                        {
+                            GTTransferUtils.addItemsToItemHandler(outputInventory,false,outlist);
+                        }
+
+                    }
+                    if(stack==null ||stack.getItem()== Items.AIR ||  stack.getCount()==0 )
+                    {
+                        for (int ii = 0; ii < inventory.getSlots(); ii++) {
+                            ItemStack son = inputInventory.getStackInSlot(ii);
+                            if(stack!=null && stack.getItem()!= Items.AIR &&   stack.getCount()>0 )
+                            {
+                                inputInventory.extractItem(ii,1,false);
+                                inventory.insertItem(i,son,false);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            //查找反应仓
             for (int i = 0; i < inventory.getSlots(); i++) {
                 ItemStack stack = inventory.getStackInSlot(i);
+                //燃料棒
                     if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null) && this.isWorkingEnabled())
                     {
                         var ca = stack.getCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null);
@@ -175,11 +255,27 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                             if(ca.getDurability()<=0)
                             {
                                 inventory.extractItem(i,1,false);
-
-                                inventory.insertItem(i, ca.outItem(),false);
+                                List<ItemStack> outlist = new ArrayList<>();
+                                outlist.add(stack);
+                                if(!ioUpgrade || this.outputInventory==null || !GTTransferUtils.addItemsToItemHandler(outputInventory,true,outlist))
+                                    inventory.insertItem(i, ca.outItem(),false);
+                                else
+                                {
+                                    GTTransferUtils.addItemsToItemHandler(outputInventory,false,outlist);
+                                }
                             }
                             FuelRodOperation(i,ca);
                         }
+                        //检测热量 判断是否需要停机
+                        if(stopUpgrade && this.heat>9900)
+                        {
+                            this.outputEnergy=0;
+                            if(this.heat>=10000)
+                                this.heat=9999;
+                            this.setWorkingEnabled(false);
+                        }
+
+                        //散热片
                     }else if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
                     {
                         var ca = stack.getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null);
@@ -190,6 +286,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                             }
                             HeatVentOperation(i,ca);
                         }
+                        //热交换
                     }else if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null))
                     {
                         var ca = stack.getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null);
@@ -201,6 +298,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                             HeatExchangerOperation(i,ca);
                         }
                     }
+                    //热量过线 爆炸  暂时没有添加配置文件 控制范围
                 if(this.heat>=getMaxHeat())
                 {
                     setWorkingEnabled(false);
@@ -212,6 +310,20 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                     }
                     this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 10.0F, true);
                 }
+            }
+        }
+        if(catchUpgrade)
+            this.outputEnergy = (int)(this.outputEnergy*(1+0.1*catchAmount));
+        //判断动力舱能量是否停机
+        if(stopUpgrade)
+        {
+            if(this.energyContainer.getEnergyStored()+this.outputEnergy>=this.energyContainer.getEnergyCapacity())
+            {
+                this.setWorkingEnabled(false);
+            }else
+            {
+                if(this.heat<9900)
+                    this.setWorkingEnabled(true);
             }
         }
         this.energyContainer.addEnergy(this.outputEnergy);
@@ -296,6 +408,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
       if(data.reactorInteraction()==false && data.elementInteraction()==false)
       {
           data.setHeat(Math.max(0,data.getHeat()-data.getHeatDissipationRate()));
+          this.emitHeat+=data.getHeatDissipationRate();
       }else if(data.reactorInteraction()==true && data.elementInteraction()==false)
       {
 
@@ -306,6 +419,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
             if(data.getHeat()>=data.getMaxHeat())
                 inventory.extractItem(i,1,false);
             data.setHeat(data.getHeat()-data.getHeatDissipationRate());
+          this.emitHeat+=data.getHeatDissipationRate();
 
       }else if(data.reactorInteraction()==false && data.elementInteraction()==true)
       {
@@ -313,171 +427,177 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                {
                    var ca = inventory.getStackInSlot(i-1).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
 
                }else if(i%9!=0 && inventory.getStackInSlot(i-1).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null))
                {
                    var ca = inventory.getStackInSlot(i-1).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
                }
 
                 if((i+1)%9!=0 && inventory.getStackInSlot(i+1).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
                {
                    var ca = inventory.getStackInSlot(i+1).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
                }
                else if((i+1)%9!=0 &&  inventory.getStackInSlot(i+1).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null))
                {
                    var ca = inventory.getStackInSlot(i+1).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
                }
 
                 if(i>8 && inventory.getStackInSlot(i-9).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
                {
                    var ca = inventory.getStackInSlot(i-9).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
                }
                else if(i>8 && inventory.getStackInSlot(i-9).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null))
                {
                    var ca = inventory.getStackInSlot(i-9).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
                }
 
                if(i<72 && inventory.getStackInSlot(i+9).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
                {
                    var ca = inventory.getStackInSlot(i+9).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
                }
                else if(i<72 && inventory.getStackInSlot(i+9).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null))
                {
                    var ca = inventory.getStackInSlot(i+9).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null);
                    ca.setHeat(Math.max(0,ca.getHeat()-data.getHeatDissipationRate()));
+                   this.emitHeat+=data.getHeatDissipationRate();
                }
-
-
       }
     }
-private void FuelRodOperation(int i, IFuelRodData data)
-{
-        int outenergy=data.getBaseEnergy();
-        float baseHeat = data.getBaseHeat();
-        int outheat = 0;
-        int amount=0;
-        List<Integer> list = new ArrayList<>();
-        if( i%9!=0 && inventory.getStackInSlot(i-1).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
-            amount++;
-        else if( i%9!=0 && inventory.getStackInSlot(i-1).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
-        {
-            amount++;
-            INeutronReflector ca= inventory.getStackInSlot(i-1).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
-            if(ca.getMaxDurability()!=999999999)
-                ca.setDurability(ca.getDurability()-data.getPulseNum());
-            if(ca.getDurability()<=0)
-                inventory.extractItem(i-1,1,false);
-        }
-        if((i+1)%9!=0 && inventory.getStackInSlot(i+1).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
-            amount++;
-        else if((i+1)%9!=0 &&  inventory.getStackInSlot(i+1).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
-        {
-            amount++;
-            INeutronReflector ca= inventory.getStackInSlot(i+1).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
-            if(ca.getMaxDurability()!=999999999)
-                ca.setDurability(ca.getDurability()-data.getPulseNum());
-            if(ca.getDurability()<=0)
-                inventory.extractItem(i+1,1,false);
-        }
-        if(i>8 && inventory.getStackInSlot(i-9).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
-            amount++;
-        else if(i>8 && inventory.getStackInSlot(i-9).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
-        {
-            amount++;
-            INeutronReflector ca= inventory.getStackInSlot(i-9).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
-            if(ca.getMaxDurability()!=999999999)
-                ca.setDurability(ca.getDurability()-data.getPulseNum());
-            if(ca.getDurability()<=0)
-                inventory.extractItem(i-9,1,false);
-        }
-        if(i<72 && inventory.getStackInSlot(i+9).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
-            amount++;
-        else if(i<72 && inventory.getStackInSlot(i+9).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
-        {
-            amount++;
-            INeutronReflector ca= inventory.getStackInSlot(i+9).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
-            if(ca.getMaxDurability()!=999999999)
-                ca.setDurability(ca.getDurability()-data.getPulseNum());
-            if(ca.getDurability()<=0)
-                inventory.extractItem(i+9,1,false);
-        }
-        int x = 1+data.getPulseNum()/2+amount;
-        outheat = (int)(baseHeat*x*(x+1));//2 6 12
-        if(amount!=0)
-        {
-            outenergy = outenergy + data.get1XEnergy()*amount*data.getPulseNum();
-        }
-        if(data.isMox())
-        {
-            outenergy = (int)(outenergy * (1+data.getMoxMulti()*((float)this.heat/(float)this.MaxHeat)));
-            if((int)(((float)this.heat/(float)this.MaxHeat)*100)>50)
+    private void FuelRodOperation(int i, IFuelRodData data)
+    {
+            int outenergy=data.getBaseEnergy();
+            float baseHeat = data.getBaseHeat();
+            int outheat = 0;
+            int amount=0;
+            List<Integer> list = new ArrayList<>();
+            if( i%9!=0 && inventory.getStackInSlot(i-1).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
+                amount++;
+            else if( i%9!=0 && inventory.getStackInSlot(i-1).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
             {
-                outheat *=2;
+                amount++;
+                INeutronReflector ca= inventory.getStackInSlot(i-1).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
+                if(ca.getMaxDurability()!=999999999)
+                    ca.setDurability(ca.getDurability()-data.getPulseNum());
+                if(ca.getDurability()<=0)
+                    inventory.extractItem(i-1,1,false);
             }
-        }
-        this.outputEnergy += outenergy;
-        int num = getCanStoreHeatElementAmount(i,list,1);
-        int leftheat=0;
-       if(num==0)
-           this.heat+=outheat;
-       else
-       {
-           leftheat = outheat%num;
-           for (int j = 0; j < list.size(); j++) {
-               leftheat = setHeat((int)((float)outheat/(float)num)+leftheat,list.get(j));
-           }
-           this.heat+=leftheat;
-       }
-}
-//返回没有写入的热量
-private int setHeat(int heatAmount,int i)
-{
-     if(  inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER ,null))
-        {
-            IHeatExchanger ca =  inventory.getStackInSlot(i).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null);
-            if(ca.getMaxHeat()-ca.getHeat()>=heatAmount)
+            if((i+1)%9!=0 && inventory.getStackInSlot(i+1).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
+                amount++;
+            else if((i+1)%9!=0 &&  inventory.getStackInSlot(i+1).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
             {
-                ca.setHeat(ca.getHeat()+heatAmount);
+                amount++;
+                INeutronReflector ca= inventory.getStackInSlot(i+1).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
+                if(ca.getMaxDurability()!=999999999)
+                    ca.setDurability(ca.getDurability()-data.getPulseNum());
+                if(ca.getDurability()<=0)
+                    inventory.extractItem(i+1,1,false);
+            }
+            if(i>8 && inventory.getStackInSlot(i-9).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
+                amount++;
+            else if(i>8 && inventory.getStackInSlot(i-9).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
+            {
+                amount++;
+                INeutronReflector ca= inventory.getStackInSlot(i-9).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
+                if(ca.getMaxDurability()!=999999999)
+                    ca.setDurability(ca.getDurability()-data.getPulseNum());
+                if(ca.getDurability()<=0)
+                    inventory.extractItem(i-9,1,false);
+            }
+            if(i<72 && inventory.getStackInSlot(i+9).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
+                amount++;
+            else if(i<72 && inventory.getStackInSlot(i+9).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
+            {
+                amount++;
+                INeutronReflector ca= inventory.getStackInSlot(i+9).getCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null);
+                if(ca.getMaxDurability()!=999999999)
+                    ca.setDurability(ca.getDurability()-data.getPulseNum());
+                if(ca.getDurability()<=0)
+                    inventory.extractItem(i+9,1,false);
+            }
+            int x = 1+data.getPulseNum()/2+amount;
+            outheat = (int)(baseHeat*x*(x+1));//2 6 12
+            if(amount!=0)
+            {
+                outenergy = outenergy + data.get1XEnergy()*amount*data.getPulseNum();
+            }
+            if(data.isMox())
+            {
+                outenergy = (int)(outenergy * (1+data.getMoxMulti()*((float)this.heat/(float)this.MaxHeat)));
+                if((int)(((float)this.heat/(float)this.MaxHeat)*100)>50)
+                {
+                    outheat *=2;
+                }
+            }
+            this.outputEnergy += outenergy;
+            int num = getCanStoreHeatElementAmount(i,list,1);
+            int leftheat=0;
+           if(num==0)
+               this.heat+=outheat;
+           else
+           {
+               leftheat = outheat%num;
+               for (int j = 0; j < list.size(); j++) {
+                   leftheat = setHeat((int)((float)outheat/(float)num)+leftheat,list.get(j));
+               }
+               this.heat+=leftheat;
+           }
+    }
+    //返回没有写入的热量
+    private int setHeat(int heatAmount,int i)
+    {
+         if(  inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER ,null))
+            {
+                IHeatExchanger ca =  inventory.getStackInSlot(i).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null);
+                if(ca.getMaxHeat()-ca.getHeat()>=heatAmount)
+                {
+                    ca.setHeat(ca.getHeat()+heatAmount);
+                }else
+                {
+                    inventory.extractItem(i,1,false);
+                    return  heatAmount-(ca.getMaxHeat()-ca.getHeat());
+                }
+            }
+        else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null))
+        {
+            var ca =  inventory.getStackInSlot(i).getCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null);
+            if(ca.getMaxDurability()-ca.getDurability()>=heatAmount)
+            {
+                ca.setDurability(ca.getDurability()+heatAmount);
             }else
             {
                 inventory.extractItem(i,1,false);
-                return  heatAmount-(ca.getMaxHeat()-ca.getHeat());
+                return  heatAmount-(ca.getMaxDurability()-ca.getDurability());
             }
-        }
-    else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null))
-    {
-        var ca =  inventory.getStackInSlot(i).getCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null);
-        if(ca.getMaxDurability()-ca.getDurability()>=heatAmount)
+        }else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
         {
-            ca.setDurability(ca.getDurability()+heatAmount);
-        }else
-        {
-            inventory.extractItem(i,1,false);
-            return  heatAmount-(ca.getMaxDurability()-ca.getDurability());
-        }
-    }else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
-    {
-        var ca =  inventory.getStackInSlot(i).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null);
-          if(ca.getMaxHeat()>0)
-          {
-              if(ca.getMaxHeat()-ca.getHeat()>=heatAmount)
+            var ca =  inventory.getStackInSlot(i).getCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null);
+              if(ca.getMaxHeat()>0)
               {
-                  ca.setHeat(ca.getHeat()+heatAmount);
-              }else
-              {
-                  inventory.extractItem(i,1,false);
-                  return  heatAmount-(ca.getMaxHeat()-ca.getHeat());
+                  if(ca.getMaxHeat()-ca.getHeat()>=heatAmount)
+                  {
+                      ca.setHeat(ca.getHeat()+heatAmount);
+                  }else
+                  {
+                      inventory.extractItem(i,1,false);
+                      return  heatAmount-(ca.getMaxHeat()-ca.getHeat());
+                  }
               }
-          }
+        }
+        return 0;
     }
-    return 0;
-}
     //返回没有写入的热量
     private int setTransHeat(int heatAmount,int i,IHeatExchanger data)
     {
@@ -684,6 +804,10 @@ private int setHeat(int heatAmount,int i)
         List<IEnergyContainer> energyContainer = new ArrayList(this.getAbilities(MultiblockAbility.OUTPUT_ENERGY));
         energyContainer.addAll(this.getAbilities(MultiblockAbility.OUTPUT_LASER));
         this.energyContainer=new EnergyContainerList(energyContainer);
+        this.inputInventory = new ItemHandlerList(this.getAbilities(MultiblockAbility.IMPORT_ITEMS));
+        this.inputFluidInventory = new FluidTankList(true,this.getAbilities(MultiblockAbility.IMPORT_FLUIDS));
+        this.outputInventory = new ItemHandlerList(this.getAbilities(MultiblockAbility.EXPORT_ITEMS));
+        this.outputFluidInventory = new FluidTankList(true,this.getAbilities(MultiblockAbility.EXPORT_FLUIDS));
     }
 
     @Override
@@ -695,6 +819,10 @@ private int setHeat(int heatAmount,int i)
     public void invalidateStructure() {
         super.invalidateStructure();
         this.energyContainer =  new EnergyContainerList(new ArrayList());
+        this.inputInventory = new GTItemStackHandler(this, 0);
+        this.inputFluidInventory = new FluidTankList(true, new IFluidTank[0]);
+        this.outputInventory = new GTItemStackHandler(this, 0);
+        this.outputFluidInventory = new FluidTankList(true, new IFluidTank[0]);
     }
 
     @SideOnly(Side.CLIENT)
