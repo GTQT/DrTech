@@ -22,14 +22,10 @@ public class FuelRodItem implements IFuelRodData, ICapabilityProvider {
     private int pulseNum;
     private int durability;
     private int maxDurability;
-    private ItemStack outItem;
+    private final ItemStack outItem;
     private boolean isMox;
     private float moxMulti;
     protected final List<BiConsumer<ItemStack, Integer>> listeners = new ArrayList<>();
-    public FuelRodItem(){
-
-        this.itemStack =ItemStack.EMPTY;
-    }
     public FuelRodItem(ItemStack itemStack, int baseOutEnergy, float baseOutHeat, int pulseNum, boolean isMox,float moxMulti, int maxDurability,ItemStack item,int x1Energy) {
         this.itemStack = itemStack;
         this.baseOutEnergy = baseOutEnergy;
