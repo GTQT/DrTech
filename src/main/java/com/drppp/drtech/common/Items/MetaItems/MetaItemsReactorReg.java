@@ -4,6 +4,8 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.common.Items.Behavior.*;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.api.items.metaitem.stats.IItemColorProvider;
+import gregtech.common.items.behaviors.TooltipBehavior;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
 public class MetaItemsReactorReg extends StandardMetaItem {
@@ -146,10 +148,22 @@ public class MetaItemsReactorReg extends StandardMetaItem {
         MetaItemsReactor.COOLANT_NULL_CELL_3 = this.addItem(40,"coolant_null_cell_3")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64);
-        MetaItemsReactor.UPGRADE_IO = this.addItem(41,"upgrade_io").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
-        MetaItemsReactor.UPGRADE_STOP = this.addItem(42,"upgrade_stop").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
-        MetaItemsReactor.UPGRADE_CATCH = this.addItem(43,"upgrade_catch").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
-        MetaItemsReactor.UPGRADE_REFLECT = this.addItem(44,"upgrade_reflect").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1);
+        MetaItemsReactor.UPGRADE_IO = this.addItem(41,"upgrade_io").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
+                .addComponents(new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.nuclear.upgrade.io", new Object[0]));
+                }));
+        MetaItemsReactor.UPGRADE_STOP = this.addItem(42,"upgrade_stop").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
+                .addComponents(new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.nuclear.upgrade.stop", new Object[0]));
+                }));
+        MetaItemsReactor.UPGRADE_CATCH = this.addItem(43,"upgrade_catch").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
+                .addComponents(new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.nuclear.upgrade.catch", new Object[0]));
+                }));
+        MetaItemsReactor.UPGRADE_REFLECT = this.addItem(44,"upgrade_reflect").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
+                .addComponents(new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.nuclear.upgrade.reflect", new Object[0]));
+                }));
     }
 
 

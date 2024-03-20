@@ -248,6 +248,10 @@ fuelrod.date.tip2=最大耐久值:%s
 fuelrod.date.tip3=温度影响:%s
 heatvent.date.tip1=§c当前储热:%s
 heatvent.date.tip2=最大储热:%s
+metaitem.nuclear.upgrade.io=自动从输入总线输入物品,自动输出枯竭燃料棒和过热冷却单元
+metaitem.nuclear.upgrade.stop=过热停机和满能量停机
+metaitem.nuclear.upgrade.catch=增加发电效率(每个10%)
+metaitem.nuclear.upgrade.reflect=增加燃烧时间
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
