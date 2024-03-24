@@ -255,6 +255,8 @@ metaitem.nuclear.upgrade.catch=增加发电效率(每个10%)
 metaitem.nuclear.upgrade.reflect=增加燃烧时间
 behavior.data_item.wireless_panel.username=网络所有者:%s
 behavior.data_item.wireless_panel.data=UUID:%s
+behavior.data_item.wireless_panel.data.2=shift+右键绑定自身网络,左键将无线仓绑定到网络
+behavior.data_item.wireless_panel.data.3=右键打开GUI
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
