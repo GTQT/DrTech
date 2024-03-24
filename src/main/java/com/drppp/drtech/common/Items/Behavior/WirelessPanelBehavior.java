@@ -83,6 +83,7 @@ public class WirelessPanelBehavior implements IItemBehaviour, ItemUIFactory {
         {
             lines.add(I18n.format("behavior.data_item.wireless_panel.data.2"));
             lines.add(I18n.format("behavior.data_item.wireless_panel.data.3"));
+            lines.add(I18n.format("behavior.data_item.wireless_panel.data.4"));
             NBTTagCompound compound = itemStack.getTagCompound();
             if(compound!=null && compound.hasKey("PUUIDMost"))
             {

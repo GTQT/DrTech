@@ -110,10 +110,10 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl{
         WidgetGroup group = new WidgetGroup(x, y, width, height);
         group.addWidget(new ClickButtonWidget(0, 0, 9, 9, "", this::decrementThreshold)
                 .setButtonTexture(GuiTextures.BUTTON_THROTTLE_MINUS)
-                .setTooltipText("drtech.1"));
+                .setTooltipText("drtech.machine.player_beacon.btn1"));
         group.addWidget(new ClickButtonWidget(9, 0, 9, 9, "", this::incrementThreshold)
                 .setButtonTexture(GuiTextures.BUTTON_THROTTLE_PLUS)
-                .setTooltipText("drtech.2"));
+                .setTooltipText("drtech.machine.player_beacon.btn2"));
         return group;
     }
     private void incrementThreshold(Widget.ClickData clickData) {
