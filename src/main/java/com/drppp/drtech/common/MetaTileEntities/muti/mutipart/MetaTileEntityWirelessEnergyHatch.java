@@ -132,6 +132,6 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
     }
 
     public void addInformation(ItemStack stack, World player, List<String> tooltip, boolean advanced) {
-        tooltip.add(I18n.format(this.isExport ? "gregtech.machine.wireless.export.tooltip" : "gregtech.machine.wireless.import.tooltip", new Object[0]));
+        tooltip.add(I18n.format(this.isExport ? "drtech.machine.wireless.export.tooltip" : "drtech.machine.wireless.import.tooltip", new Object[0]));
     }
 }
