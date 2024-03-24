@@ -261,6 +261,8 @@ behavior.data_item.wireless_panel.data.3=右键打开GUI
 behavior.data_item.wireless_panel.data.4=shift+左键将自身绑定到供电信标
 drtech.machine.player_beacon.btn1=清空列表
 drtech.machine.player_beacon.btn2=无
+drtech.machine.wireless.export.tooltip=§c无线动力仓(需要绑定频道)
+drtech.machine.wireless.import.tooltip=§a无线能源仓(需要绑定频道)
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
