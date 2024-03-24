@@ -5,12 +5,15 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.api.WirelessNetwork.WirelessNetworkManager;
 import com.drppp.drtech.api.capability.impl.EnergyContainerWireless;
 import com.drppp.drtech.common.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import gregtech.api.GTValues;
 import gregtech.api.capability.IEnergyContainer;
+import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
+import gregtech.api.gui.widgets.AdvancedTextWidget;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
@@ -24,6 +27,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -48,7 +53,16 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
     
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
-        return null;
+        ModularUI.Builder builder;
+        builder = ModularUI.builder(GuiTextures.BACKGROUND, 198, 208);
+        builder.widget((new AdvancedTextWidget(9, 8, this::addDisplayText, 16777215)).setMaxWidthLimit(181));
+        return builder.build(this.getHolder(), entityPlayer);
+    }
+    protected void addDisplayText(List<ITextComponent> textList) {
+        WirelessNetworkManager.strongCheckOrAddUser(this.ownerUuid);
+        textList.add(new TextComponentString("网络UUID:"+this.ownerUuid.toString()));
+        textList.add(new TextComponentString("网络存储能量:"+WirelessNetworkManager.getUserEU(this.ownerUuid).toString()));
+
     }
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
