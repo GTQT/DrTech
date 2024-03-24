@@ -164,6 +164,7 @@ drtech.machine.nuclear_generator.name=裂变反应堆
 drtech.machine.large_bee_hive.name=巨型养蜂场
 drtech.machine.drone_pad.name=无人机平台
 drtech.machine.wind_driven_generator.name=风力发电机
+drtech.machine.player_beacon.name=无线供电信标
 #Materials
 gregtech.material.bedrock=基岩
 

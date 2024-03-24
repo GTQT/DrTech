@@ -17,45 +17,49 @@ public class ElectricLifeSupportRingBehavior extends BaubleBehavior {
     public void onWornTick(ItemStack stack, EntityLivingBase player) {
         if(!player.world.isRemote && player instanceof EntityPlayer)
         {
-            EntityPlayer player1 = (EntityPlayer)player;
-            boolean haveInfoUpdated = false;
-
-            long ratio = 2000;
-
-            float currentHealth = player.getHealth();
-            if(currentHealth < player.getMaxHealth())
+            if(hasEnergy(stack))
             {
-                if (drainenergy(stack,ratio,true)) {
-                    drainenergy(stack,ratio,false);
-                    if(player1.getHealth()>0)
-                        player1.setHealth(currentHealth+1);
-                    haveInfoUpdated = true;
+                EntityPlayer player1 = (EntityPlayer)player;
+                boolean haveInfoUpdated = false;
+
+                long ratio = 2000;
+
+                float currentHealth = player.getHealth();
+                if(currentHealth < player.getMaxHealth())
+                {
+                    if (drainenergy(stack,ratio,true)) {
+                        drainenergy(stack,ratio,false);
+                        if(player1.getHealth()>0)
+                            player1.setHealth(currentHealth+1);
+                        haveInfoUpdated = true;
+                    }
                 }
-            }
 
-            FoodStats foodStats = player1.getFoodStats();
-            if(foodStats.needFood())
-            {
-                if (drainenergy(stack,ratio,true)) {
-                    drainenergy(stack,ratio,false);
-                    foodStats.addStats(1, 0.2f);
-                    haveInfoUpdated = true;
+                FoodStats foodStats = player1.getFoodStats();
+                if(foodStats.needFood())
+                {
+                    if (drainenergy(stack,ratio,true)) {
+                        drainenergy(stack,ratio,false);
+                        foodStats.addStats(1, 0.2f);
+                        haveInfoUpdated = true;
+                    }
                 }
-            }
 
-            float currentAbsAmount = player.getAbsorptionAmount();
-            if(currentAbsAmount < 20.0f)
-            {
-                if (drainenergy(stack,ratio,true)) {
-                    drainenergy(stack,ratio,false);
-                    player.setAbsorptionAmount(currentAbsAmount + 0.5f);
-                    haveInfoUpdated = true;
+                float currentAbsAmount = player.getAbsorptionAmount();
+                if(currentAbsAmount < 20.0f)
+                {
+                    if (drainenergy(stack,ratio,true)) {
+                        drainenergy(stack,ratio,false);
+                        player.setAbsorptionAmount(currentAbsAmount + 0.5f);
+                        haveInfoUpdated = true;
+                    }
                 }
-            }
 
-            if(haveInfoUpdated)
-            {
-                player1.inventoryContainer.detectAndSendChanges();
+                if(haveInfoUpdated)
+                {
+                    player1.inventoryContainer.detectAndSendChanges();
+                }
+
             }
 
         }
@@ -63,7 +67,7 @@ public class ElectricLifeSupportRingBehavior extends BaubleBehavior {
     private boolean hasEnergy(ItemStack item)
     {
         NBTTagCompound tag = item.getTagCompound();
-        if(!tag.hasKey("Charge"))
+        if(tag!=null&&!tag.hasKey("Charge"))
             return false;
         if(tag.getLong("Charge")<=0)
             return false;

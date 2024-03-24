@@ -3,6 +3,7 @@ package com.drppp.drtech.common.Items.MetaItems;
 import baubles.api.BaubleType;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.common.Items.Baubles.ElectricFlightRingBehavior;
+import com.drppp.drtech.common.Items.Baubles.ElectricLifeSupportRingBehavior;
 import com.drppp.drtech.common.Items.Behavior.DataItemBehavior;
 import com.drppp.drtech.common.Items.Behavior.ElectricStatsNuclear;
 import com.drppp.drtech.common.Items.Behavior.WirelessPanelBehavior;
@@ -84,7 +85,8 @@ public  class MetaItems1 extends StandardMetaItem {
 
             MyMetaItems.LIFE_SUPPORT_RING = this.addItem(16,"electric_life_support_ring")
                     .setCreativeTabs(DrTechMain.Mytab)
-                    .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000,GTValues.HV));
+                    .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000,GTValues.HV))
+                    .addComponents(new ElectricLifeSupportRingBehavior());
         MyMetaItems.TELEPATHIC_NECKLACE = this.addItem(24,"telepathic_necklace")
                     .setCreativeTabs(DrTechMain.Mytab)
                     .setMaxStackSize(1)

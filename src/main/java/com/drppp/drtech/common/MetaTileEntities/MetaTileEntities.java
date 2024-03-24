@@ -51,6 +51,7 @@ public class MetaTileEntities {
     public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
     public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_RECEIVER = new MetaTileEntityWirelessEnergyHatch[10];
     public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_TRANSMITTER= new MetaTileEntityWirelessEnergyHatch[10];
+    public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
 
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
@@ -92,6 +93,7 @@ public class MetaTileEntities {
             WIRELESS_EMERGY_HATCH_RECEIVER[i-1] = registerMetaTileEntity(17072 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.receiver." + tierName), i, false));
             WIRELESS_EMERGY_HATCH_TRANSMITTER[i-1] = registerMetaTileEntity(17082 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.transmitter." + tierName), i, true));
         }
+        PLAYER_BEACON = registerMetaTileEntity(17093,new MetaTileEntityPlayerBeacon(getmyId("player_beacon")));
     }
 
 
