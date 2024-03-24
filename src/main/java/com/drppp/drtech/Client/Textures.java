@@ -29,6 +29,7 @@ public class Textures {
     public static  OrientedOverlayRenderer TFFT_OVERLAY;
     public static  TextureArea BACKGROUND;
     public static  TextureArea PAIL_BACKGROUND;
+    public static SimpleOverlayRenderer WIRELESS_HATCH_HATCH;
     public static void init()
     {
         NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
@@ -46,6 +47,7 @@ public class Textures {
         NUCLEAR_PART_CASING = new SimpleOverlayRenderer("casings/nuclear_part_casing");
         BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);
         PAIL_BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/pail_background.png", 500, 500, 3, 3);
+        WIRELESS_HATCH_HATCH = new SimpleOverlayRenderer("overlay/wireless_hatch/overlay_front");
     }
     public static void register(TextureMap textureMap) {
 

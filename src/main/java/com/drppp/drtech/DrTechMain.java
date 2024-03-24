@@ -4,6 +4,7 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
+import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -139,6 +140,7 @@ public class DrTechMain {
         DrTechReceipeManager.init();
         SyncInit.init();
         TopInit.init();
+        MinecraftForge.EVENT_BUS.register(new GlobalEnergyWorldSavedData());
     }
     @SideOnly(Side.CLIENT)
     @EventHandler
