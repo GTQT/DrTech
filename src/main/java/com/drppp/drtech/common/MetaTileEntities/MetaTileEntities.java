@@ -3,6 +3,7 @@ package com.drppp.drtech.common.MetaTileEntities;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
+import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearReactor;
@@ -18,6 +19,7 @@ import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.util.GTUtility;
 
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
+import keqing.gtqtcore.api.GTQTValue;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +49,8 @@ public class MetaTileEntities {
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
     public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
-    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_EV;
-    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_IV;
+    public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_RECEIVER = new MetaTileEntityWirelessEnergyHatch[10];
+    public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_TRANSMITTER= new MetaTileEntityWirelessEnergyHatch[10];
 
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
@@ -84,7 +86,12 @@ public class MetaTileEntities {
         LARGE_BEE_HIVE = registerMetaTileEntity(17069,new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
         DRONE_PAD = registerMetaTileEntity(17070, new MetaTileEntityDronePad(getmyId("drone_pad")));
         WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(17071, new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
-
+        String tierName;
+        for(int i = 1; i <= 10; ++i) {
+            tierName = GTValues.VN[i].toLowerCase();
+            WIRELESS_EMERGY_HATCH_RECEIVER[i-1] = registerMetaTileEntity(17072 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.receiver." + tierName), i, false));
+            WIRELESS_EMERGY_HATCH_TRANSMITTER[i-1] = registerMetaTileEntity(17082 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.transmitter." + tierName), i, true));
+        }
     }
 
 

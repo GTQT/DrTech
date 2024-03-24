@@ -82,6 +82,7 @@ metaitem.upgrade_io.name=输入输出升级
 metaitem.upgrade_stop.name=停机升级
 metaitem.upgrade_catch.name=中子捕获升级
 metaitem.upgrade_reflect.name=反射效率升级
+metaitem.wireless_network_control_panel.name=无线网络控制面板
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃
@@ -252,6 +253,8 @@ metaitem.nuclear.upgrade.io=自动从输入总线输入物品,自动输出枯竭
 metaitem.nuclear.upgrade.stop=过热停机和满能量停机
 metaitem.nuclear.upgrade.catch=增加发电效率(每个10%)
 metaitem.nuclear.upgrade.reflect=增加燃烧时间
+behavior.data_item.wireless_panel.username=网络所有者:%s
+behavior.data_item.wireless_panel.data=UUID:%s
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
@@ -307,7 +310,29 @@ drtech.machine.duplicator.uiv.name=史诗复制机 III
 drtech.machine.duplicator.uxv.name=史诗复制机 IV
 drtech.machine.duplicator.opv.name=传奇复制机
 
+drtech.machine.wireless_energy_hatch.receiver.lv.name=无线能源输入端口（§7LV§r）
+drtech.machine.wireless_energy_hatch.receiver.mv.name=无线能源输入端口（§bMV§r）
+drtech.machine.wireless_energy_hatch.receiver.hv.name=无线能源输入端口（§6HV§r）
+drtech.machine.wireless_energy_hatch.receiver.ev.name=无线能源输入端口（§5EV§r）
+drtech.machine.wireless_energy_hatch.receiver.iv.name=无线能源输入端口（§1IV§r）
+drtech.machine.wireless_energy_hatch.receiver.luv.name=无线能源输入端口（§dLuV§r）
+drtech.machine.wireless_energy_hatch.receiver.zpm.name=无线能源输入端口（§cZPM§r）
+drtech.machine.wireless_energy_hatch.receiver.uv.name=无线能源输入端口（§3UV§r）
+drtech.machine.wireless_energy_hatch.receiver.uhv.name=无线能源输入端口（§4UHV§r）
+drtech.machine.wireless_energy_hatch.receiver.uev.name=无线能源输入端口（§4UEV§r）
+drtech.machine.wireless_energy_hatch.receiver.uiv.name=无线能源输入端口（§4UIV§r）
 
+drtech.machine.wireless_energy_hatch.transmitter.lv.name=无线能源输出端口（§7LV§r）
+drtech.machine.wireless_energy_hatch.transmitter.mv.name=无线能源输出端口（§bMV§r）
+drtech.machine.wireless_energy_hatch.transmitter.hv.name=无线能源输出端口（§6HV§r）
+drtech.machine.wireless_energy_hatch.transmitter.ev.name=无线能源输出端口（§5EV§r）
+drtech.machine.wireless_energy_hatch.transmitter.iv.name=无线能源输出端口（§1IV§r）
+drtech.machine.wireless_energy_hatch.transmitter.luv.name=无线能源输出端口（§dLuV§r）
+drtech.machine.wireless_energy_hatch.transmitter.zpm.name=无线能源输出端口（§cZPM§r）
+drtech.machine.wireless_energy_hatch.transmitter.uv.name=无线能源输出端口（§3UV§r）
+drtech.machine.wireless_energy_hatch.transmitter.uhv.name=无线能源输出端口（§4UHV§r）
+drtech.machine.wireless_energy_hatch.transmitter.uev.name=无线能源输出端口（§4UEV§r）
+drtech.machine.wireless_energy_hatch.transmitter.uiv.name=无线能源输出端口（§4UIV§r）
 
 #comb
 item.drt.comb.borax.name=硼砂蜂窝

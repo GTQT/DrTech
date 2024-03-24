@@ -64,12 +64,12 @@ public class MachineReceipe {
                 .duration(100)
                 .EUt(7680)
                 .buildAndRegister();
+        OrePrefix.dust.addProcessingHandler(PropertyKey.DUST, MachineReceipe::processDust);
         EIMPLOSION_RECIPES.recipeBuilder()
                 .input(OrePrefix.dust,Carbon,63)
                 .output(Items.DIAMOND)
                 .explosivesAmount(OreDictUnifier.get(OrePrefix.dust, Carbon))
                 .buildAndRegister();
-        OrePrefix.dust.addProcessingHandler(PropertyKey.DUST, MachineReceipe::processDust);
         //160秒
         UU_RECIPES.recipeBuilder()
                 .circuitMeta(1)

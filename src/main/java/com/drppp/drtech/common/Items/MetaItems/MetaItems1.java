@@ -5,6 +5,7 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.common.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.common.Items.Behavior.DataItemBehavior;
 import com.drppp.drtech.common.Items.Behavior.ElectricStatsNuclear;
+import com.drppp.drtech.common.Items.Behavior.WirelessPanelBehavior;
 import gregtech.api.GTValues;
 import gregtech.api.items.metaitem.ElectricStats;
 import gregtech.api.items.metaitem.StandardMetaItem;
@@ -115,6 +116,10 @@ public  class MetaItems1 extends StandardMetaItem {
         MyMetaItems.NUCLEAR_BATTERY_HV = this.addItem(23,"nuclear_battery_hv")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .addComponents(ElectricStatsNuclear.createBattery(32000000,GTValues.HV,true))
+                .setMaxStackSize(1);
+        MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL = this.addItem(25,"wireless_network_control_panel")
+                .addComponents(new WirelessPanelBehavior())
+                .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1);
 
     }
