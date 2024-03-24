@@ -20,7 +20,7 @@ public class ElectricFlightRingBehavior extends BaubleBehavior {
     @Override
     public void onWornTick(ItemStack itemstack, EntityLivingBase entity) {
         NBTTagCompound tag = itemstack.getTagCompound();
-        if(hasEnergy(itemstack))
+        if(tag!=null && hasEnergy(itemstack))
         {
             if(entity instanceof EntityPlayer)
             {
