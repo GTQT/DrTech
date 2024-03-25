@@ -36,6 +36,8 @@ public class MetItemsEvent {
         }else if(item.getItem()== MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue())
         {
             ItemStack currentGun = player.getHeldItem(hand);
+            if(!hasEnergy(currentGun))
+                return;
             long lastRightClick = getLastRightClick(currentGun);
             long currentTime = System.currentTimeMillis();
             if(currentTime - lastRightClick > 150 && hasEnergy(currentGun))
@@ -55,6 +57,8 @@ public class MetItemsEvent {
         }else if(item.getItem()== MyMetaItems.ELECTRIC_PLASMA_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.ELECTRIC_PLASMA_GUN.getMetaValue())
         {
             ItemStack currentGun = player.getHeldItem(hand);
+            if(!hasEnergy(currentGun))
+                return;
             long lastRightClick = getLastRightClick(currentGun);
             long currentTime = System.currentTimeMillis();
             if(currentTime - lastRightClick > 500 && hasEnergy(currentGun))
@@ -76,6 +80,8 @@ public class MetItemsEvent {
         }else if(item.getItem()== MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaItem() && item.getMetadata()==MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaValue())
         {
             ItemStack currentGun = player.getHeldItem(hand);
+            if(!hasEnergy(currentGun))
+                return;
             long lastRightClick = getLastRightClick(currentGun);
             long currentTime = System.currentTimeMillis();
             if(currentTime - lastRightClick > 250)
@@ -152,6 +158,8 @@ public class MetItemsEvent {
         {
             EntityPlayer player = (EntityPlayer) attacker;
             EntityLivingBase enemyEntity = (EntityLivingBase) targetEntity;
+            if(!hasEnergy(stack))
+                return;
             if (drainenergy(stack,300,true)) {
                 drainenergy(stack,300,false);
                 enemyEntity.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 30, 3));
@@ -180,7 +188,7 @@ public class MetItemsEvent {
     private static boolean hasEnergy(ItemStack item)
     {
         NBTTagCompound tag = item.getTagCompound();
-        if(!tag.hasKey("Charge"))
+        if(tag!=null && !tag.hasKey("Charge"))
             return false;
         if(tag.getLong("Charge")<=0)
             return false;

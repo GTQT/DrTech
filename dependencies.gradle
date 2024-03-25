@@ -35,5 +35,6 @@ dependencies {
     implementation rfg.deobf(files("libs/gtqtcore-1.0.jar"))
     implementation rfg.deobf(files("libs/Thaumcraft-1.12.2-6.1.BETA26.jar"))
     implementation rfg.deobf(files("libs/binnie-mods-1.7.10-2.0.22.7.jar"))
+    implementation rfg.deobf(files("libs/FluxNetworks-1.12.2-4.1.1.34.jar"))
     implementation rfg.deobf("curse.maven:forestry-59751:2684780")
 }
