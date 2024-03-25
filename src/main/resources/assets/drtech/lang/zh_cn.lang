@@ -345,3 +345,6 @@ drtech.machine.wireless_energy_hatch.transmitter.uiv.name=无线能源输出端�
 #comb
 item.drt.comb.borax.name=硼砂蜂窝
 item.drt.comb.ether.name=以太蜂窝
+
+#Entity
+entity.UTi Golem.name=铀钛合金傀儡

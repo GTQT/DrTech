@@ -5,6 +5,7 @@ import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
+import com.drppp.drtech.api.capability.IAssembly;
 import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -28,6 +29,7 @@ import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.api.capability.DrtechCapInit;
+import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
@@ -53,6 +55,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.geckolib3.GeckoLib;
 
+import static com.drppp.drtech.api.Muti.DrtMultiblockAbility.EXPORT_ASSEMBLY;
+import static com.drppp.drtech.api.Muti.DrtMultiblockAbility.IMPORT_ASSEMBLY;
 import static com.drppp.drtech.common.Items.MetaItems.ItemCombs.ITEM_COMBS;
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
@@ -100,9 +104,12 @@ public class DrTechMain {
     }
     @Mod.EventHandler
     public void onPreInit( FMLPreInitializationEvent event) {
+        EXPORT_ASSEMBLY = new MultiblockAbility<>("export_assembly");
+        IMPORT_ASSEMBLY = new MultiblockAbility<>("import_assembly");
         drtMetaEntities.init();
         SusySounds.registerSounds();
         TileEntityUIFactory.INSTANCE.init();
+
     }
     @SideOnly(Side.CLIENT)
     public void TexturesInit()

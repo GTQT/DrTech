@@ -3,6 +3,7 @@ package com.drppp.drtech.common.MetaTileEntities;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
+import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityInputAssembly;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
@@ -18,6 +19,7 @@ import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.util.GTUtility;
 
+import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityItemBus;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
 import keqing.gtqtcore.api.GTQTValue;
 import net.minecraft.util.ResourceLocation;
@@ -52,6 +54,7 @@ public class MetaTileEntities {
     public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_RECEIVER = new MetaTileEntityWirelessEnergyHatch[10];
     public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_TRANSMITTER= new MetaTileEntityWirelessEnergyHatch[10];
     public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
+    public static final MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
 
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
