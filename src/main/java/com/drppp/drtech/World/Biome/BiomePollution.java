@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class BiomePollution extends Biome {
     public BiomePollution() {
-        super(new Biome.BiomeProperties("Custom Biome").setWaterColor(0x3DFF00));
+        super(new Biome.BiomeProperties("Pollution_Biome").setWaterColor(0x3DFF00));
         // 清除所有自然生成的生物列表
         this.spawnableCreatureList.clear();
         this.spawnableWaterCreatureList.clear();
@@ -25,8 +25,8 @@ public class BiomePollution extends Biome {
         this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntityZombie.class, 100, 1, 4));
         this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntitySkeleton.class, 100, 1, 4));
         this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntityCreeper.class, 100, 1, 4));
-        this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntityWitherSkeleton.class, 10, 1, 4));
-        this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntityUTiGolem.class, 120, 1, 2));
+        this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntityWitherSkeleton.class, 100, 1, 1));
+        this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntityUTiGolem.class, 10, 1, 2));
 
     }
 

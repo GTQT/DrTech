@@ -1,0 +1,12 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"particle": "drtech:blocks/grass_side",
+		"down": "drtech:blocks/grass_side",
+		"up": "drtech:blocks/grass_top",
+		"north": "drtech:blocks/grass_side",
+		"south":"drtech:blocks/grass_side",
+		"west": "drtech:blocks/grass_side",
+		"east": "drtech:blocks/grass_side"
+	}
+}
