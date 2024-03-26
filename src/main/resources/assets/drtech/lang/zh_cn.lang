@@ -33,6 +33,8 @@ metaitem.telepathic_necklace.name=心灵感应头带
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
+
+
 #FUEL_ROD
 metaitem.u_fuel_rod_1x.name=燃料棒(铀)
 metaitem.u_fuel_rod_2x.name=双联燃料棒(铀)
@@ -103,6 +105,7 @@ tile.drtech.connector_3.name=3级电容
 tile.drtech.golden_sea.name=聚宝盆
 tile.drtech.peaceful_table.name=和平者之桌
 tile.drtech.storage_compress.name=存储桶
+tile.drtech.waste_dirt.name=废土泥土
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
