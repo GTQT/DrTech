@@ -9,6 +9,7 @@ import com.drppp.drtech.api.Utils.DrtechUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,6 +18,8 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,13 +28,23 @@ public class MetItemsEvent {
         ItemStack item = player.getHeldItem(hand);
         if(player.isSneaking() && item.getItem()== MyMetaItems.GRAVITY_SHIELD.getMetaItem() && item.getMetadata()==MyMetaItems.GRAVITY_SHIELD.getMetaValue())
         {
-            if(!player.capabilities.allowFlying)
-            {
-                enableFlyingAbility(player);
-            }
-            else
-            {
-                disableFlyingAbility(player);
+            if (!world.isRemote) {
+                if (player instanceof EntityPlayerMP) {
+                    EntityPlayerMP playerMP = (EntityPlayerMP)player;
+                    int currentDimension = playerMP.dimension;
+                    int targetDimension;
+
+                    // 根据当前维度设置目标维度，这里是如果玩家在主世界，则传送到Nether，否则传送回主世界
+                    if (currentDimension != 300) {
+                        targetDimension = 300;
+                    } else {
+                        targetDimension = DimensionType.OVERWORLD.getId();
+                    }
+
+                    // 传送玩家到目标维度
+                    playerMP.getServer().getPlayerList().transferPlayerToDimension(playerMP, targetDimension, new Teleporter(playerMP.getServer().getWorld(targetDimension)));
+                    playerMP.timeUntilPortal = 10; // 冷却时间，防止连续传送
+                }
             }
         }else if(item.getItem()== MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue())
         {

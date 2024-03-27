@@ -2,6 +2,7 @@ package com.drppp.drtech.intergations.top.provider;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import com.drppp.drtech.Tile.TileEntitySapBag;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntutyLargeBeeHive;
 import com.drppp.drtech.Tags;
@@ -16,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +83,15 @@ public class TopCommonProvider implements IProbeInfoProvider {
                     iProbeInfo.text("产出物品:"+item +"*"+num);
                 }
             }
+        }
+        else if(world.getTileEntity(iProbeHitData.getPos()) instanceof TileEntitySapBag)
+        {
+            ItemStackHandler inventory = ((TileEntitySapBag)(world.getTileEntity(iProbeHitData.getPos()))).inventory;
+            for (int i = 0; i < inventory.getSlots(); i++) {
+                ItemStack s  =inventory.getStackInSlot(i).copy();
+                iProbeInfo.text("贮存物品:"+ s.getDisplayName() +"*"+s.getCount());
+            }
+
         }
     }
 }

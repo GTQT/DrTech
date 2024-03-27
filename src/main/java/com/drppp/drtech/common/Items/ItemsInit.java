@@ -38,7 +38,7 @@ public class ItemsInit {
     public static  final Item ITEM_BLOCK_PEACEFUL_TABLE = new  ItemBlock(BlocksInit.BLOCK_PEACEFUL_TABLE).setRegistryName(Tags.MODID,"peaceful_table");
     public static  final Item ITEM_BLOCK_STORAGE_PAIL = new  ItemBlock(BlocksInit.BLOCK_STORAGE_PAIL).setRegistryName(Tags.MODID,BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName().getPath());
     public static  final Item ITEM_BLOCK_WASTE_DIRT = new  ItemBlock(BlocksInit.BLOCK_WASTE_DIRT).setRegistryName(Tags.MODID,BlocksInit.BLOCK_WASTE_DIRT.getRegistryName().getPath());
-
+    public static final  Item ITEM_BLOCK_SAP_BAG =  new  ItemBlock(BlocksInit.BLOCK_SAP_BAG).setRegistryName(Tags.MODID,BlocksInit.BLOCK_SAP_BAG.getRegistryName().getPath());
     public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
@@ -58,6 +58,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(ITEM_BLOCK_STORAGE_PAIL);
         event.getRegistry().register(ITEM_BLOCK_WASTE_DIRT);
+        event.getRegistry().register(ITEM_BLOCK_SAP_BAG);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
