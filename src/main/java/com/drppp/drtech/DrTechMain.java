@@ -22,6 +22,7 @@ import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.drtMetaEntities;
+import com.drppp.drtech.common.enent.PollutionEffectHandler;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
@@ -150,6 +151,7 @@ public class DrTechMain {
         SyncInit.init();
         TopInit.init();
         MinecraftForge.EVENT_BUS.register(new GlobalEnergyWorldSavedData());
+        MinecraftForge.EVENT_BUS.register(new PollutionEffectHandler());
     }
     @SideOnly(Side.CLIENT)
     @EventHandler

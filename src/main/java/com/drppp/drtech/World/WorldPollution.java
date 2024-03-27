@@ -14,7 +14,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.IChunkGenerator;
 
 public class WorldPollution extends WorldProvider {
-
+    private int skylightSubtracted=10;
     @Override
     public void init() {
         this.hasSkyLight = true;
@@ -26,14 +26,20 @@ public class WorldPollution extends WorldProvider {
         return DimensionType.OVERWORLD;
     }
 
-//    @Override
-//    public float calculateCelestialAngle(long worldTime, float partialTicks) {
-//        return 18000;
-//    }
+    @Override
+    public float calculateCelestialAngle(long worldTime, float partialTicks) {
+        // 返回一个表示夜晚某个时间点的值，比如 0.75 代表深夜
+        return 0.7512f;
+    }
+    @Override
+    public boolean isDaytime() {
+        // 永远返回 false，模拟永远是夜晚
+        return false;
+    }
 
     @Override
     public boolean isSurfaceWorld() {
-        return true; // 使得天空变暗
+        return false; // 使得天空变暗
     }
 
     // 重写返回天空颜色的方法，可以进一步暗化天空
@@ -52,33 +58,16 @@ public class WorldPollution extends WorldProvider {
         return new Vec3d(0, 0.9, 0);
     }
 
-    // 重写getSunBrightnessFactor和getSunBrightnessBody来控制白天亮度
-//    @Override
-//    public float getSunBrightnessFactor(float par1) {
-//        return 0.9F; // 根据需要调整值
-//    }
-
-//    @Override
-//    public float getSunBrightness(float par1) {
-//        return 2.0F; // 白天最亮
-//    }
-
-    // 重写以取消维度中的下雨效果
-    @Override
-    public boolean canDoRainSnowIce(Chunk chunk) {
-        return true;
-    }
-
     // 重写以确定玩家是否能够睡觉
     @Override
     public boolean canRespawnHere() {
         return false;
     }
-
-    // 如果你想要永远白天且不会变成夜晚，你可以重写这个方法
     @Override
-    public boolean isDaytime() {
-        return false;
+    public void updateWeather() {
+        // 忽略原来的天气更新逻辑，强制设置为下雨状态
+        if(!this.world.getWorldInfo().isRaining())
+         this.world.getWorldInfo().setRaining(true); // 强制设置为下雨状态
     }
 
     @Override

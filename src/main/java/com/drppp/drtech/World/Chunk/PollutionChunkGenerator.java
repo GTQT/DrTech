@@ -57,7 +57,7 @@ public class PollutionChunkGenerator extends ChunkGeneratorOverworld {
             for (int j = 0; j < 16; ++j)
             {
                 // 这里我们从最大高度（通常是世界的海平面高度）开始向下检查，找到第一个非空气方块
-                int y = 88;
+                int y = 150;
                 boolean replace = false;
 
                 // 循环向下直到找到非空气方块
