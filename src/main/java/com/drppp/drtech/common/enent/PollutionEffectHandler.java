@@ -21,7 +21,7 @@ public class PollutionEffectHandler {
             BlockPos pos = new BlockPos(player.posX, player.posY, player.posZ);
 
             // 确保玩家在水中
-            if (player.isInWater()) {
+            if (player.isInWater() || player.isInLava()) {
                 // 获取当前的群系
                 Biome biome = player.world.getBiome(pos);
 
