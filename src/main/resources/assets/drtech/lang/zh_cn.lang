@@ -106,6 +106,7 @@ tile.drtech.golden_sea.name=聚宝盆
 tile.drtech.peaceful_table.name=和平者之桌
 tile.drtech.storage_compress.name=存储桶
 tile.drtech.waste_dirt.name=废土泥土
+tile.drtech.SapBag.name=树脂收集器
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
