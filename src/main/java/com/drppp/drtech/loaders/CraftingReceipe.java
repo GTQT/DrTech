@@ -11,6 +11,7 @@ import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
+import gregtech.common.items.ToolItems;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -151,5 +152,13 @@ public class CraftingReceipe {
                 'D',CABLE_QUAD,
                 'S', FIELD_GENERATOR,
                 'X',CIRCUIT);
+
+
+        ModHandler.addShapedRecipe("sap_bag", new ItemStack(BlocksInit.BLOCK_SAP_BAG),
+                "WWW", "SCS", "SSS",
+                'W', Items.LEATHER,
+                'S', Blocks.HARDENED_CLAY,
+                'C', ToolItems.SAW
+        );
     }
 }
