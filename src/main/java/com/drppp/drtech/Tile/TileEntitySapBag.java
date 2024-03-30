@@ -27,6 +27,7 @@ public class TileEntitySapBag  extends TileEntity implements ITickable{
     @Override
     public void update() {
         if (!world.isRemote && ++ticks > 300) {
+            boolean flag=false;
             ticks = 0;
             // 定义所有六个方向
             EnumFacing[] directions = EnumFacing.values();
@@ -36,12 +37,16 @@ public class TileEntitySapBag  extends TileEntity implements ITickable{
 
                 Block block = world.getBlockState(checkPos).getBlock();
                 if (block == MetaBlocks.RUBBER_LOG) {
-                    List<ItemStack> list = new ArrayList<>();
-                    list.add(new ItemStack(MetaItems.STICKY_RESIN.getMetaItem(), 1, 438));
+                    flag=true;
+                }
+            }
+            if(flag)
+            {
+                List<ItemStack> list = new ArrayList<>();
+                list.add(new ItemStack(MetaItems.STICKY_RESIN.getMetaItem(), 1, 438));
 
-                    if (GTTransferUtils.addItemsToItemHandler(inventory, true, list)) {
-                        GTTransferUtils.addItemsToItemHandler(inventory, false, list);
-                    }
+                if (GTTransferUtils.addItemsToItemHandler(inventory, true, list)) {
+                    GTTransferUtils.addItemsToItemHandler(inventory, false, list);
                 }
             }
         }

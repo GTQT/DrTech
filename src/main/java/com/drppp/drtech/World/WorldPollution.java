@@ -5,6 +5,7 @@ import com.drppp.drtech.World.Biome.BiomeHandler;
 import com.drppp.drtech.World.Chunk.PollutionChunkGenerator;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Biomes;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
@@ -42,12 +43,26 @@ public class WorldPollution extends WorldProvider {
         return false; // 使得天空变暗
     }
 
-    // 重写返回天空颜色的方法，可以进一步暗化天空
-    @Override
-    public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks) {
-        return new float[]{0.486f, 0.988f, 0.0f, 0.5f}; // 红，绿，蓝，Alpha（不透明）
-    }
 
+    @Override
+    public Vec3d getFogColor(float p_76562_1_, float p_76562_2_) {
+        float angle = MathHelper.cos(p_76562_1_ * (float) Math.PI * 2.0F) * 2.0F + 0.5F;
+
+        if (angle < 0.0F) {
+            angle = 0.0F;
+        }
+
+        if (angle > 1.0F) {
+            angle = 1.0F;
+        }
+
+        float red = 80 / 255f;
+        float green = 200 / 255f;
+        float blue = 0.0F;
+        red *= angle * 0.94F + 0.06F;
+        green *= angle * 0.94F + 0.06F;
+        return new Vec3d(red, green, blue);
+    }
     @Override
     public Vec3d getCloudColor(float partialTicks) {
         return new Vec3d(1, 0.2, 0.1);
