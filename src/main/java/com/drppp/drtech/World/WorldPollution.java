@@ -3,6 +3,7 @@ package com.drppp.drtech.World;
 
 import com.drppp.drtech.World.Biome.BiomeHandler;
 import com.drppp.drtech.World.Chunk.PollutionChunkGenerator;
+import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.math.MathHelper;
@@ -24,7 +25,7 @@ public class WorldPollution extends WorldProvider {
 
     @Override
     public DimensionType getDimensionType() {
-        return DimensionType.OVERWORLD;
+        return DrtDimType.POLLUTION;
     }
 
     @Override
