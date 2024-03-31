@@ -4,6 +4,7 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
 import com.drppp.drtech.World.Biome.BiomeHandler;
+import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
@@ -113,6 +114,7 @@ public class DrTechMain {
         drtMetaEntities.init();
         SusySounds.registerSounds();
         TileEntityUIFactory.INSTANCE.init();
+        DrtDimType.init();
         WorldRegisterHandler.init();
     }
     @SideOnly(Side.CLIENT)

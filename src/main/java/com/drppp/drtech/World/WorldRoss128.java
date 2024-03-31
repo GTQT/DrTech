@@ -3,12 +3,16 @@ package com.drppp.drtech.World;
 import codechicken.lib.vec.Vector3;
 import com.drppp.drtech.World.Chunk.PollutionChunkGenerator;
 import com.drppp.drtech.World.Chunk.Ross128ChunkGenerator;
+import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.IChunkGenerator;
+
+import java.util.Random;
 
 public class WorldRoss128  extends WorldProvider {
     public WorldRoss128() {
@@ -18,7 +22,7 @@ public class WorldRoss128  extends WorldProvider {
 
     @Override
     public DimensionType getDimensionType() {
-        return DimensionType.OVERWORLD;
+        return DrtDimType.ROSS128B;
     }
 
     @Override
@@ -64,6 +68,11 @@ public class WorldRoss128  extends WorldProvider {
 
     @Override
     public IChunkGenerator createChunkGenerator() {
-        return new Ross128ChunkGenerator(this.world,this.getSeed(),true,"{ \"useLavaOceans\": false,\"seaLevel\": 63,\"useVillages\": false}");
+        return new Ross128ChunkGenerator(this.world,new Random().nextLong(),true,"{ \"useLavaOceans\": false,\"seaLevel\": 63,\"useVillages\": false}");
+    }
+
+    @Override
+    public BiomeProvider getBiomeProvider() {
+        return super.getBiomeProvider();
     }
 }
