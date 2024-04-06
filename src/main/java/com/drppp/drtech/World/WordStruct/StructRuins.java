@@ -3,6 +3,7 @@ package com.drppp.drtech.World.WordStruct;
 
 import com.drppp.drtech.api.Utils.Pair;
 import gregtech.api.GTValues;
+import gregtech.api.metatileentity.MetaTileEntityHolder;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
@@ -98,6 +99,8 @@ public abstract class StructRuins extends WorldGenerator {
     protected void setGTCablekWChance(World worldObj, BlockPos pos, Random rand, int airchance, int meta) {
         if (rand.nextInt(100) > airchance) {
             this.setBlock(worldObj, pos, MetaBlocks.CABLES.get("gregtech")[7],meta);
+            //MetaTileEntityHolder tile = MetaBlocks.CABLES.get("gregtech")[7];
+           // worldObj.setTileEntity(pos,);
         } else this.setBlock(worldObj, pos, Blocks.AIR, 0);
     }
 

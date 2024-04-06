@@ -1,6 +1,10 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "drtech:items/homo_eye"
-  }
+  "parent": "drtech:block/homo_eye",
+
+  "overrides": [
+    {
+      "predicate": { "fill": 0 },
+      "model": "drtech:block/homo_eye"
+    }
+  ]
 }
