@@ -1,10 +1,6 @@
 {
-  "parent": "drtech:block/homo_eye",
-
-  "overrides": [
-    {
-      "predicate": { "fill": 0 },
-      "model": "drtech:block/homo_eye"
-    }
-  ]
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "drtech:items/gravitational_anomaly"
+  }
 }
