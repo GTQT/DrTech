@@ -79,12 +79,12 @@ public class EOH_RenderingUtils {
         GL11.glDisable(GL11.GL_LIGHTING);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         GL11.glScalef(blockSize, blockSize, blockSize);
-        GlStateManager.enableTexture2D();
+        //GlStateManager.enableTexture2D();
     }
 
     public static void endRenderingBlocksInWorld() {
         Tessellator.getInstance().draw();
-        GlStateManager.disableTexture2D();
+        //GlStateManager.disableTexture2D();
         GL11.glPopAttrib();
         GL11.glPopMatrix();
     }
@@ -97,21 +97,47 @@ public class EOH_RenderingUtils {
                                                final double z) {
         final Tessellator tessellator = Tessellator.getInstance();
         final BufferBuilder bufferBuilder = tessellator.getBuffer();
-        ResourceLocation resourceLocation = Blocks.GRASS.getRegistryName();
         TextureMap textureMap = Minecraft.getMinecraft().getTextureMapBlocks();
-        TextureAtlasSprite texture = textureMap.getAtlasSprite(resourceLocation.toString());
-        TextureAtlasSprite grassTopTexture = textureMap.getAtlasSprite("minecraft:blocks/grass_top");
-        TextureAtlasSprite grassSideTexture = textureMap.getAtlasSprite("minecraft:blocks/grass_side");
+        TextureAtlasSprite texture= textureMap.getAtlasSprite("drtech:blocks/grass_top");
+        switch (meta)
+        {
+            case 1:
+                texture = textureMap.getAtlasSprite("drtech:blocks/connector_1");
+                break;
+            case 2:
+                texture = textureMap.getAtlasSprite("drtech:blocks/connector_2");
+                break;
+            case 3:
+                texture = textureMap.getAtlasSprite("drtech:blocks/connector_3");
+                break;
+            case 4:
+                texture = textureMap.getAtlasSprite("drtech:blocks/grass_top");
+                break;
+            case 5:
+                texture = textureMap.getAtlasSprite("drtech:blocks/cauldron_inner");
+                break;
+            case 6:
+                texture = textureMap.getAtlasSprite("drtech:blocks/solar_reflection_casing_side");
+                break;
+            case 7:
+                texture = textureMap.getAtlasSprite("drtech:blocks/resonator_casing");
+                break;
+            case 0:
+                texture = textureMap.getAtlasSprite("drtech:blocks/grass_top");
+                break;
+
+
+        }
         double minU;
         double maxU;
         double minV;
         double maxV;
 
         {
-            minU = grassTopTexture.getMinU();
-            maxU = grassTopTexture.getMaxU();
-            minV = grassTopTexture.getMinV();
-            maxV = grassTopTexture.getMaxV();
+            minU = texture.getMinU();
+            maxU = texture.getMaxU();
+            minV = texture.getMinV();
+            maxV = texture.getMaxV();
 
             bufferBuilder.pos(x + BLOCK_X[1], y + BLOCK_Y[1], z + BLOCK_Z[1]).tex( maxU, maxV).endVertex();
             bufferBuilder.pos(x + BLOCK_X[0], y + BLOCK_Y[0], z + BLOCK_Z[0]).tex(  maxU, minV).endVertex();
@@ -119,13 +145,10 @@ public class EOH_RenderingUtils {
             bufferBuilder.pos(x + BLOCK_X[6], y + BLOCK_Y[6], z + BLOCK_Z[6]).tex(  minU, maxV).endVertex();
         }
         {
-            // Bottom face.
-            //texture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(block.getStateFromMeta(meta).getBlock().getRegistryName().toString());
-
-            minU = grassSideTexture.getMinU();
-            maxU = grassSideTexture.getMaxU();
-            minV = grassSideTexture.getMinV();
-            maxV = grassSideTexture.getMaxV();
+            minU = texture.getMinU();
+            maxU = texture.getMaxU();
+            minV = texture.getMinV();
+            maxV = texture.getMaxV();
 
             bufferBuilder.pos(x + BLOCK_X[5], y + BLOCK_Y[5], z + BLOCK_Z[5]).tex( maxU, minV).endVertex();
             bufferBuilder.pos(x + BLOCK_X[2], y + BLOCK_Y[2], z + BLOCK_Z[2]).tex( maxU, maxV).endVertex();
@@ -134,12 +157,10 @@ public class EOH_RenderingUtils {
         }
 
         {
-            //texture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(block.getStateFromMeta(meta).getBlock().getRegistryName().toString());
-
-            minU = grassSideTexture.getMinU();
-            maxU = grassSideTexture.getMaxU();
-            minV = grassSideTexture.getMinV();
-            maxV = grassSideTexture.getMaxV();
+            minU = texture.getMinU();
+            maxU = texture.getMaxU();
+            minV = texture.getMinV();
+            maxV = texture.getMaxV();
 
             bufferBuilder.pos(x + BLOCK_X[6], y + BLOCK_Y[6], z + BLOCK_Z[6]).tex( maxU, maxV).endVertex();
             bufferBuilder.pos(x + BLOCK_X[7], y + BLOCK_Y[7], z + BLOCK_Z[7]).tex( maxU, minV).endVertex();
@@ -148,12 +169,10 @@ public class EOH_RenderingUtils {
         }
 
         {
-            //texture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(block.getStateFromMeta(meta).getBlock().getRegistryName().toString());
-
-            minU = grassSideTexture.getMinU();
-            maxU = grassSideTexture.getMaxU();
-            minV = grassSideTexture.getMinV();
-            maxV = grassSideTexture.getMaxV();
+            minU = texture.getMinU();
+            maxU = texture.getMaxU();
+            minV = texture.getMinV();
+            maxV = texture.getMaxV();
 
             bufferBuilder.pos(x + BLOCK_X[5], y + BLOCK_Y[5], z + BLOCK_Z[5]).tex( maxU, maxV).endVertex();
             bufferBuilder.pos(x + BLOCK_X[4], y + BLOCK_Y[4], z + BLOCK_Z[4]).tex( maxU, minV).endVertex();
@@ -162,12 +181,10 @@ public class EOH_RenderingUtils {
         }
 
         {
-            //texture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(block.getStateFromMeta(meta).getBlock().getRegistryName().toString());
-
-            minU = grassSideTexture.getMinU();
-            maxU = grassSideTexture.getMaxU();
-            minV = grassSideTexture.getMinV();
-            maxV = grassSideTexture.getMaxV();
+            minU = texture.getMinU();
+            maxU = texture.getMaxU();
+            minV = texture.getMinV();
+            maxV = texture.getMaxV();
 
             bufferBuilder.pos(x + BLOCK_X[3], y + BLOCK_Y[3], z + BLOCK_Z[3]).tex( maxU, maxV).endVertex();
             bufferBuilder.pos(x + BLOCK_X[4], y + BLOCK_Y[4], z + BLOCK_Z[4]).tex( maxU, minV).endVertex();
@@ -176,12 +193,10 @@ public class EOH_RenderingUtils {
         }
 
         {
-            //texture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(block.getStateFromMeta(meta).getBlock().getRegistryName().toString());
-
-            minU = grassSideTexture.getMinU();
-            maxU = grassSideTexture.getMaxU();
-            minV = grassSideTexture.getMinV();
-            maxV = grassSideTexture.getMaxV();
+            minU = texture.getMinU();
+            maxU = texture.getMaxU();
+            minV = texture.getMinV();
+            maxV = texture.getMaxV();
 
             bufferBuilder.pos(x + BLOCK_X[2], y + BLOCK_Y[2], z + BLOCK_Z[2]).tex( maxU, maxV).endVertex();
             bufferBuilder.pos(x + BLOCK_X[3], y + BLOCK_Y[3], z + BLOCK_Z[3]).tex( maxU, minV).endVertex();
