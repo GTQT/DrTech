@@ -155,6 +155,7 @@ public class DrTechMain {
         TopInit.init();
         MinecraftForge.EVENT_BUS.register(new GlobalEnergyWorldSavedData());
         MinecraftForge.EVENT_BUS.register(new PollutionEffectHandler());
+        MinecraftForge.EVENT_BUS.register(new NuclearItemsRender());
         StructUtil.init();
     }
     @SideOnly(Side.CLIENT)
@@ -172,6 +173,7 @@ public class DrTechMain {
                 return 0xFFFFFF;
             }, ITEM_COMBS);
         }
+
     }
     @EventHandler
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)

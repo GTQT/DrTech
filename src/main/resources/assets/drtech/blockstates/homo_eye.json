@@ -1,18 +1,11 @@
 {
   "forge_marker": 1,
-  "defaults":
-  {
-    "model": "drtech:homo_eye",
-    "transform": "forge:default-block"
+  "defaults": {
+    "model": "drtech:base/sphere"
   },
   "variants": {
-    "facing=north": { "model": "drtech:homo_eye",
-      "transform": "forge:default-block"},
-    "facing=south": { "model": "drtech:homo_eye",
-      "transform": "forge:default-block" },
-    "facing=west": { "model": "drtech:homo_eye",
-      "transform": "forge:default-block" },
-    "facing=east": { "model": "drtech:homo_eye",
-      "transform": "forge:default-block"}
+    "normal": {
+      "model": "drtech:base/sphere"
+    }
   }
 }

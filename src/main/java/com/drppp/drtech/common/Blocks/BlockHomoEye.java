@@ -31,7 +31,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BlockHomoEye extends Block {
-    public static final IProperty<EnumFacing> FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public BlockHomoEye() {
         super(Material.IRON);
         this.setResistance(10.0F);
@@ -39,7 +38,6 @@ public class BlockHomoEye extends Block {
         this.setRegistryName(Tags.MODID,"homo_eye");
         this.setCreativeTab(DrTechMain.Mytab);
         this.setTranslationKey(Tags.MODID+".homo_eye");
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING,EnumFacing.NORTH));
     }
 
     @Nonnull
@@ -51,22 +49,14 @@ public class BlockHomoEye extends Block {
         return true;
     }
 
-
-    public SoundType getSoundType() {
-        return SoundType.GLASS;
+    @Nullable
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return Block.NULL_AABB;
     }
-
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return new AxisAlignedBB(0.1875, 0.0, 0.1875, 0.8125, 0.75, 0.8125);
-    }
-
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-        return BlockFaceShape.UNDEFINED;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
+    @Nonnull
+    @Deprecated
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.INVISIBLE;
     }
 
     public boolean isOpaqueCube(IBlockState state) {
@@ -76,32 +66,8 @@ public class BlockHomoEye extends Block {
     public boolean isFullCube(IBlockState state) {
         return false;
     }
-
-    @Nonnull
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, FACING);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return state.getValue(FACING).getHorizontalIndex();
-    }
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(FACING, EnumFacing.byHorizontalIndex(meta));
-    }
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.MODEL;
+    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+        return true;
     }
 
 }

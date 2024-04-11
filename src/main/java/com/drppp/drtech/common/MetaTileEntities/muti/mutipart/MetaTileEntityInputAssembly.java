@@ -86,6 +86,8 @@ public class MetaTileEntityInputAssembly extends MetaTileEntityMultiblockNotifia
         super.initializeInventory();
 
     }
+    
+
     @Override
     public void setWorkingEnabled(boolean workingEnabled) {
         this.workingEnabled = workingEnabled;
