@@ -3,6 +3,7 @@ package com.drppp.drtech.Client.render;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -52,14 +53,15 @@ public class EOH_TESR extends TileEntitySpecialRenderer<TileEntityHomoEye> {
             if (EOHRenderTile.getOrbitingObjects().size() == 0) {
                 EOHRenderTile.generateImportantInfo();
             }
-
+            int num=0;
             for (TileEntityHomoEye.OrbitingObject t : EOHRenderTile.getOrbitingObjects()) {
-                renderOrbit(EOHRenderTile, t);
+                renderOrbit(EOHRenderTile, t,num);
+                num = (++num)%8;
             }
         }
     }
 
-    void renderOrbit(final TileEntityHomoEye EOHRenderTile, final TileEntityHomoEye.OrbitingObject orbitingObject) {
+    void renderOrbit(final TileEntityHomoEye EOHRenderTile, final TileEntityHomoEye.OrbitingObject orbitingObject,int num) {
         // Render orbiting body.
         GL11.glPushMatrix();
 
@@ -68,9 +70,7 @@ public class EOH_TESR extends TileEntitySpecialRenderer<TileEntityHomoEye> {
         GL11.glRotatef((orbitingObject.rotationSpeed * 0.1f * EOHRenderTile.angle) % 360.0f, 0F, 1F, 0F);
         GL11.glTranslated(-0.2 - orbitingObject.distance - STAR_RESCALE * EOHRenderTile.getSize(), 0, 0);
         GL11.glRotatef((orbitingObject.orbitSpeed * 0.1f * EOHRenderTile.angle) % 360.0f, 0F, 1F, 0F);
-
-        this.bindTexture(new ResourceLocation(Tags.MODID,"waste_dirt"));
-        renderBlockInWorld(orbitingObject.block, 0, orbitingObject.scale);
+        renderBlockInWorld(orbitingObject.block, num, orbitingObject.scale);
 
         GL11.glPopMatrix();
     }

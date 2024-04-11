@@ -49,14 +49,12 @@ public class TileEntityHomoEye extends TileEntity implements ITickable {
 
     // Fun fact, these methods were entirely written by ChatGPT3... Take that as you will.
     public static <T> ArrayList<T> selectNRandomElements(Collection<T> inputList, long n) {
-        ArrayList<T> randomElements = new ArrayList<>((int) n);
+        ArrayList<T> randomElements = new ArrayList<>(8);
         ArrayList<T> inputArray = new ArrayList<>(inputList);
-        Random rand = new Random();
-        IntStream.range(0, (int) n).forEach(i -> {
-            int randomIndex = rand.nextInt(inputArray.size());
-            randomElements.add(inputArray.get(randomIndex));
-            inputArray.remove(randomIndex);
-        });
+       for (var s:inputArray)
+       {
+           randomElements.add(s);
+       }
         return randomElements;
     }
 
@@ -123,6 +121,13 @@ public class TileEntityHomoEye extends TileEntity implements ITickable {
 
     static {
         BLOCKS.put("dim1", Blocks.GRASS);
+        BLOCKS.put("dim2", Blocks.GRASS);
+        BLOCKS.put("dim3", Blocks.GRASS);
+        BLOCKS.put("dim4", Blocks.GRASS);
+        BLOCKS.put("dim5", Blocks.GRASS);
+        BLOCKS.put("dim6", Blocks.GRASS);
+        BLOCKS.put("dim7", Blocks.GRASS);
+        BLOCKS.put("dim8", Blocks.GRASS);
     }
 
     private static final float MAX_ANGLE = 30;
