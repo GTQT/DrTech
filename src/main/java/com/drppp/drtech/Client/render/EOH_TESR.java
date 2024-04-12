@@ -74,4 +74,9 @@ public class EOH_TESR extends TileEntitySpecialRenderer<TileEntityHomoEye> {
 
         GL11.glPopMatrix();
     }
+
+    @Override
+    public boolean isGlobalRenderer(TileEntityHomoEye te) {
+        return true;
+    }
 }
