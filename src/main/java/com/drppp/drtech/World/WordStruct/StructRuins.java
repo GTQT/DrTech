@@ -16,14 +16,25 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import static com.drppp.drtech.World.WordStruct.StructUtil.machines;
+import static net.minecraft.world.storage.loot.LootTableList.CHESTS_SPAWN_BONUS_CHEST;
+import static net.minecraft.world.storage.loot.LootTableList.CHESTS_VILLAGE_BLACKSMITH;
 
 public abstract class StructRuins extends WorldGenerator {
 
@@ -91,7 +102,7 @@ public abstract class StructRuins extends WorldGenerator {
 
 
     public void setGTMachineBlock(World worldObj,BlockPos pos, int tire) {
-        int meta = StructUtil.machines.get(tire).get(new Random().nextInt(StructUtil.machines.get(tire).size()));
+        int meta = machines.get(tire).get(new Random().nextInt(machines.get(tire).size()));
         setBlock(worldObj,pos, Block.getBlockFromName("gregtech:machine"),meta);
     }
 
@@ -203,9 +214,17 @@ public abstract class StructRuins extends WorldGenerator {
                                 }
                                 if (dx == -3 && (dz == -3 || dz == -2)) {
                                     this.setBlock(worldObj, new BlockPos(pos.add(-3, dy, dz)), Blocks.CHEST, 5);
-                                    IInventory chest = (IInventory) worldObj.getTileEntity(new BlockPos(pos.add(dx, dy, dz)));
+                                    TileEntityChest chest = (TileEntityChest) worldObj.getTileEntity(new BlockPos(pos.add(dx, dy, dz)));
                                     if (chest != null) {
                                         //箱子填充物品
+                                        List<ItemStack> loots = new ArrayList<>();
+                                        for (int i = 0; i < 8; i++) {
+                                            var s = machines.get(tier).get(rand.nextInt(machines.get(tier).size()));
+                                            loots.add(new ItemStack(Item.getByNameOrId("gregtech:machine") ,1,s));
+                                        }
+                                        GTTransferUtils.addItemsToItemHandler(chest.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,null),false,loots);
+                                        chest.setLootTable(CHESTS_VILLAGE_BLACKSMITH, worldObj.rand.nextLong());
+
                                     }
                                 }
 
