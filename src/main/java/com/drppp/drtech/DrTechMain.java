@@ -3,6 +3,9 @@ package com.drppp.drtech;
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
+import com.drppp.drtech.Farm.FungusTypes;
+import com.drppp.drtech.Farm.TesrFungus;
+import com.drppp.drtech.Farm.TileFungus;
 import com.drppp.drtech.World.Biome.BiomeHandler;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
@@ -97,6 +100,7 @@ public class DrTechMain {
              ItemCombs.init();
         }
         GeckoLib.initialize();
+        FungusTypes.init();
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
@@ -123,6 +127,7 @@ public class DrTechMain {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new ConnectorTesr());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileFungus.class, new TesrFungus());
         TextureUtils.addIconRegister(Textures::register);
         Textures.init();
         LaserPipeRenderer.INSTANCE.preInit();
