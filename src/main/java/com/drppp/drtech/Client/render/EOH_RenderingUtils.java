@@ -77,14 +77,15 @@ public class EOH_RenderingUtils {
         GL11.glPushMatrix();
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_BLEND);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         GL11.glScalef(blockSize, blockSize, blockSize);
-        //GlStateManager.enableTexture2D();
     }
 
     public static void endRenderingBlocksInWorld() {
         Tessellator.getInstance().draw();
-        //GlStateManager.disableTexture2D();
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_BLEND);
         GL11.glPopAttrib();
         GL11.glPopMatrix();
     }
