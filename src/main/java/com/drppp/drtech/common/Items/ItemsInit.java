@@ -1,6 +1,5 @@
 package com.drppp.drtech.common.Items;
 
-import com.drppp.drtech.Farm.ItemFungus;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemFluStoneCropSeed;
@@ -43,7 +42,6 @@ public class ItemsInit {
     public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
-    public static  final Item ITEM_FUNGUS = new ItemFungus();
 
 
     public static void init(RegistryEvent.Register<Item> event)
@@ -53,7 +51,6 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_RED_STONE_SEED);
         event.getRegistry().register(ITEM_LAPIS_SEED);
         event.getRegistry().register(ITEM_FLU_SEED);
-        event.getRegistry().register(ITEM_FUNGUS);
         event.getRegistry().register(ITEM_CONNECTOR1);
         event.getRegistry().register(ITEM_CONNECTOR2);
         event.getRegistry().register(ITEM_CONNECTOR3);
@@ -91,7 +88,6 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(ITEM_FUNGUS, 0, new ModelResourceLocation(ITEM_FUNGUS.getRegistryName(), "inventory"));
         if(Loader.isModLoaded("forestry"))
         {
             ((com.drppp.drtech.intergations.Forestry.DrtCombItem) ItemCombs.ITEM_COMBS).registerModel(ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);
