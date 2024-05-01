@@ -3,11 +3,14 @@ package com.drppp.drtech.common.MetaTileEntities.Logic;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import gregtech.api.capability.GregtechDataCodes;
+import gregtech.api.worldgen.config.OreDepositDefinition;
+import gregtech.api.worldgen.config.WorldGenRegistry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 public class AnnihilationGeneratorLogic {
     private final AnnihilationGenerator host;

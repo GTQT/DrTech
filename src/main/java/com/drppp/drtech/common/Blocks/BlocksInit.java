@@ -1,7 +1,6 @@
 package com.drppp.drtech.common.Blocks;
 
-import com.drppp.drtech.Farm.BlockFungus;
-import com.drppp.drtech.Farm.TileFungus;
+
 import com.drppp.drtech.common.Blocks.MetaBlocks.*;
 import com.drppp.drtech.common.Blocks.Pipe.BlockMyLaserPipe;
 import com.drppp.drtech.DrTechMain;
@@ -25,7 +24,6 @@ public class BlocksInit {
     public static final BlockConnector BLOCK_CONNECTOR2 = new BlockConnector(2);
     public static final BlockConnector BLOCK_CONNECTOR3 = new BlockConnector(3);
     public static final BlockGoldenSea BLOCK_GOLDEN_SEA = new BlockGoldenSea();
-    public static final BlockFungus BLOCK_FUNGUS = new BlockFungus();
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
@@ -53,12 +51,10 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_STORAGE_PAIL);
         event.getRegistry().register(BLOCK_WASTE_DIRT);
         event.getRegistry().register(BLOCK_SAP_BAG);
-        event.getRegistry().register(BLOCK_FUNGUS);
         GameRegistry.registerTileEntity(TileEntityGoldenSea.class, new ResourceLocation(Tags.MODID, "gold_coin"));
         GameRegistry.registerTileEntity(TileEntityPeacefulTable.class, new ResourceLocation(Tags.MODID, "peaceful_table"));
         GameRegistry.registerTileEntity(TileEntityStoragePail.class, new ResourceLocation(Tags.MODID, "storage_pail"));
         GameRegistry.registerTileEntity(TileEntitySapBag.class, new ResourceLocation(Tags.MODID, "sap_bag"));
-        GameRegistry.registerTileEntity(TileFungus.class, new ResourceLocation(Tags.MODID, "fungus"));
         event.getRegistry().register(TRANSPARENT_CASING);
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);

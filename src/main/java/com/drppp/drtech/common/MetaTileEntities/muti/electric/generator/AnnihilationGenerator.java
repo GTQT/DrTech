@@ -11,10 +11,7 @@ import com.drppp.drtech.common.MetaTileEntities.Logic.AnnihilationGeneratorLogic
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
-import gregtech.api.capability.GregtechTileCapabilities;
-import gregtech.api.capability.IControllable;
-import gregtech.api.capability.IEnergyContainer;
-import gregtech.api.capability.IWorkable;
+import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.ItemHandlerList;
 import gregtech.api.metatileentity.IDataInfoProvider;
@@ -26,11 +23,15 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
+import gregtech.api.worldgen.config.OreDepositDefinition;
+import gregtech.api.worldgen.config.WorldGenRegistry;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
+import gregtech.integration.jei.basic.GTOreInfo;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -61,6 +62,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
     private final AnnihilationGeneratorLogic logic;
     protected IEnergyContainer energyContainer = new EnergyContainerList(new ArrayList());
     protected ItemHandlerList itemImportInventory;
+    protected ItemHandlerList itemOutInventory;
     protected TileEntity entity;
     private int leve;
     public AnnihilationGenerator(ResourceLocation metaTileEntityId) {
@@ -137,6 +139,23 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
             }
             this.markDirty();
             logic.updateLogic((TileEntityGravitationalAnomaly)entity);
+            List<OreDepositDefinition> oreVeins = WorldGenRegistry.getOreDeposits();
+            List<GTOreInfo> oreInfoList = new ArrayList<>();
+            for (OreDepositDefinition vein : oreVeins) {
+                if(  vein.getDimensionFilter().equals(this.getWorld().provider))
+                {
+                    var ore = new GTOreInfo(vein);
+                    var items = ore.findComponentBlocksAsItemStacks();
+                    if(this.itemOutInventory!=null && this.itemOutInventory.getSlots()>0)
+                        GTTransferUtils.addItemsToItemHandler(this.itemOutInventory,false,items);
+                }
+            }
+
+
+
+
+
+
         }
 
     }
@@ -160,6 +179,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
                                 .or(abilities(MultiblockAbility.OUTPUT_LASER).setMaxGlobalLimited(1))
                                 .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1))
                                 .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMinGlobalLimited(1))
+                                .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMaxGlobalLimited(1))
                                 .or(states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE)))
                         )
                 .where('#', any())
@@ -237,6 +257,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
         super.invalidateStructure();
         this.energyContainer = new EnergyContainerList(new ArrayList());
         this.itemImportInventory =  new ItemHandlerList(Collections.emptyList());
+        this.itemOutInventory =  new ItemHandlerList(Collections.emptyList());
     }
     @Override
     protected void formStructure(PatternMatchContext context) {
@@ -245,6 +266,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
         energyContainer.addAll(this.getAbilities(MultiblockAbility.OUTPUT_LASER));
         this.energyContainer=new EnergyContainerList(energyContainer);
         this.itemImportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
+        this.itemOutInventory = new ItemHandlerList(getAbilities(MultiblockAbility.EXPORT_ITEMS));
 
         Object type = context.get("CoilType");
         if (type instanceof IHeatingCoilBlockStats) {
