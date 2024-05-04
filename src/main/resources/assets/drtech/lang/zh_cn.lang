@@ -352,3 +352,20 @@ item.drt.comb.ether.name=以太蜂窝
 
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡
+
+# Commands
+
+drtech.command.horde.usage=/mobHorde <start/stop>
+drtech.command.horde.start.usage=/mobHorde start <名称>
+drtech.command.horde.start.argument_required=用法：/mobHorde start <名称>.
+drtech.command.horde.start.no_such_horde=不存在名为%s的军团
+drtech.command.horde.start.unable_to_run=无法生成%s军团，这可能是由维度限制或光照等原因造成。
+drtech.command.horde.start.error_executing_horde=军团生物未正确生成。
+drtech.command.horde.start.has_active_invasion=已有正在进行中的%s入侵。
+drtech.command.horde.start.started=%s入侵已开始。
+drtech.command.horde.stop.usage=/mobHorde stop
+drtech.command.horde.stop.has_active_no_invasion=没有正在进行中的入侵。
+drtech.command.horde.stop.stopped=%s入侵已结束。
+drtech.command.horde.status.usage=/mobHorde status <player>
+drtech.command.horde.status.has_active_invasion=Player %s has an active %s invasion for %d ticks. It will time out in %s ticks.
+drtech.command.horde.status.no_active_invasion=Player %s has no active invasion.

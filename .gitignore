@@ -81,3 +81,4 @@ local.properties
 run/
 
 logs/
+gradle/wrapper/gradle-wrapper.properties

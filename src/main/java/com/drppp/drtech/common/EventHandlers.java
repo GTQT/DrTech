@@ -2,14 +2,18 @@ package com.drppp.drtech.common;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Entity.EntityDropPod;
+import com.drppp.drtech.common.enent.MobHordeWorldData;
 import gregtech.api.util.GTTeleporter;
 import gregtech.api.util.TeleportHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.management.PlayerList;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -38,5 +42,28 @@ public class EventHandlers {
             event.player.startRiding(dropPod);
         }
     }
+    @SubscribeEvent
+    public static void on(TickEvent.WorldTickEvent event) {
 
+        World world = event.world;
+
+        if (world.isRemote) {
+            return;
+        }
+
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
+
+        if (world.provider.getDimension() != 0) {
+            return;
+        }
+
+        if (world instanceof WorldServer server) {
+            PlayerList list = server.getMinecraftServer().getPlayerList();
+            MobHordeWorldData mobHordeWorldData = MobHordeWorldData.get(world);
+            list.getPlayers().forEach(p -> mobHordeWorldData.getPlayerData(p.getPersistentID()).update(p));
+            mobHordeWorldData.markDirty();
+        }
+    }
 }

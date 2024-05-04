@@ -21,6 +21,10 @@ import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.command.CommandHordeBase;
+import com.drppp.drtech.common.command.CommandHordeStart;
+import com.drppp.drtech.common.command.CommandHordeStatus;
+import com.drppp.drtech.common.command.CommandHordeStop;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.enent.PollutionEffectHandler;
 import com.drppp.drtech.intergations.top.TopInit;
@@ -77,7 +81,7 @@ public class DrTechMain {
     public static final String MODID = "drtech";
     public static final String NAME = "drtech";
     public static final String VERSION = "1.0";
-
+    @SidedProxy(modId = MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
 
     public static CommonProxy proxy;
     public static ClientProxy cproxy;
@@ -120,7 +124,7 @@ public class DrTechMain {
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new ConnectorTesr());
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
+        //ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
         TextureUtils.addIconRegister(Textures::register);
         Textures.init();
         LaserPipeRenderer.INSTANCE.preInit();
@@ -182,7 +186,20 @@ public class DrTechMain {
     // register server commands in this event handler (Remove if not needed)
     public void serverStarting(FMLServerStartingEvent event) {
     }
+    @Mod.EventHandler
+    public void onInit( FMLInitializationEvent event) {
+        proxy.load();
 
+    }
+    @Mod.EventHandler
+    public void onServerStarting( FMLServerStartingEvent event) {
+        CommandHordeBase hordeCommand = new CommandHordeBase();
+        event.registerServerCommand(hordeCommand);
+
+        hordeCommand.addSubcommand(new CommandHordeStart());
+        hordeCommand.addSubcommand(new CommandHordeStop());
+        hordeCommand.addSubcommand(new CommandHordeStatus());
+    }
 
 
 }
