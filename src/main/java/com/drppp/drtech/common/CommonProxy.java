@@ -11,6 +11,9 @@ public class CommonProxy {
 
     }
     public void load() {
-        new MobHordeEvent((p) -> new EntityZombie(p.world), 4, 8, "zombies").setMaximumDistanceUnderground(10).setNightOnly(true);
+        new MobHordeEvent((p) -> new EntityZombie(p.world), 4, 8, "zombies_a").setMaximumDistanceUnderground(10).setNightOnly(true);
+        new MobHordeEvent((p) -> new EntityZombie(p.world), 8, 16, "zombies_b").setMaximumDistanceUnderground(15).setNightOnly(true);
+        new MobHordeEvent((p) -> new EntityZombie(p.world), 16, 32, "zombies_c").setMaximumDistanceUnderground(20).setNightOnly(true);
+        new MobHordeEvent((p) -> new EntityZombie(p.world), 32, 64, "zombies_d").setMaximumDistanceUnderground(25).setNightOnly(true);
     }
 }

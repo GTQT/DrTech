@@ -25,7 +25,7 @@ public class CommandHordeBase extends CommandTreeBase {
     @NotNull
     @Override
     public String getUsage(@NotNull ICommandSender sender) {
-        return "susy.command.horde.usage";
+        return "drtech.command.horde.usage";
     }
 
     @Override
