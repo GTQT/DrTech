@@ -1,8 +1,6 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
-
 import com.drppp.drtech.api.recipes.properties.DroneDimensionProperty;
 import com.drppp.drtech.common.Entity.EntityDrone;
-import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -19,24 +17,27 @@ import gregtech.common.blocks.MetaBlocks;
 import it.unimi.dsi.fastutil.ints.IntLists;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.util.List;
+import java.util.UUID;
+
+import static com.drppp.drtech.loaders.DrtechReceipes.DRONE_PAD;
 
 public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
 
     private AxisAlignedBB landingAreaBB;
-    public EntityDrone drone = null;
+    private EntityDrone drone = null;
+    private UUID droneUUID = null;
     public boolean droneReachedSky;
 
     public MetaTileEntityDronePad(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId, DrtechReceipes.DRONE_PAD);
+        super(metaTileEntityId, DRONE_PAD);
         this.recipeMapWorkable = new DronePadWorkable(this);
     }
 
@@ -67,7 +68,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     }
 
     protected IBlockState getPadState() {
-        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN);
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.PTFE_INERT_CASING);
     }
 
     @Override
@@ -90,10 +91,31 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         return true;
     }
 
+    public EntityDrone getDrone() {
+        if (this.drone == null && this.droneUUID != null) {
+            this.drone = findDrone(this.droneUUID);
+        }
+        return this.drone;
+    }
+
+    public void setDrone(EntityDrone drone) {
+        this.drone = drone;
+        this.droneUUID = drone.getUniqueID();
+    }
+
+    public void setDroneDead(boolean setReachedSky) {
+        if (this.drone != null) {
+            this.drone.setDead();
+            this.drone = null;
+            this.droneUUID = null;
+        }
+        this.droneReachedSky = setReachedSky;
+    }
+
     public boolean hasDrone() {
-        if (this.drone != null && !this.drone.isDead) {
+        if (getDrone() != null && !getDrone().isDead) {
             for (EntityDrone entity : this.getWorld().getEntitiesWithinAABB(EntityDrone.class, this.landingAreaBB)) {
-                if (entity == this.drone) {
+                if (entity == getDrone()) {
                     return true;
                 }
             }
@@ -104,16 +126,16 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     public void spawnDroneEntity(boolean descending) {
 
         NBTTagCompound nbttagcompound = new NBTTagCompound();
-        nbttagcompound.setString("id", "drtech:drone");
+        nbttagcompound.setString("id", "susy:drone");
         Vec3d pos = this.getDroneSpawnPosition(descending);
 
-        drone = (EntityDrone) AnvilChunkLoader.readWorldEntityPos(nbttagcompound, this.getWorld(), pos.x, pos.y, pos.z, true);
+        setDrone((EntityDrone) AnvilChunkLoader.readWorldEntityPos(nbttagcompound, this.getWorld(), pos.x, pos.y, pos.z, true));
 
-        if (drone != null) {
-            drone.setRotationFromFacing(this.getFrontFacing());
+        if (getDrone() != null) {
+            getDrone().setRotationFromFacing(this.getFrontFacing());
             if (descending) {
-                drone.setDescendingMode();
-                drone.setPadAltitude(this.getPos().getY());
+                getDrone().setDescendingMode();
+                getDrone().setPadAltitude(this.getPos().getY());
             }
         }
     }
@@ -136,7 +158,6 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
                 return new Vec3d(this.getPos().getX() + 0.5, altitude, this.getPos().getZ() + 2.5);
             }
         }
-
     }
 
     @Override
@@ -178,6 +199,56 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         return false;
     }
 
+    private EntityDrone findDrone(UUID droneUUID) {
+        for (EntityDrone entity: this.getWorld().getEntitiesWithinAABB(EntityDrone.class, this.landingAreaBB.setMaxY(301))) {
+            if (entity.getUniqueID().equals(droneUUID)) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(@NotNull NBTTagCompound data) {
+        super.writeToNBT(data);
+        if (this.droneUUID != null) {
+            data.setUniqueId("droneUUID", this.droneUUID);
+        }
+        data.setBoolean("droneReachedSky", this.droneReachedSky);
+        return data;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound data) {
+        super.readFromNBT(data);
+        if (data.hasUniqueId("droneUUID")) {
+            this.droneUUID = data.getUniqueId("droneUUID");
+        }
+        this.droneReachedSky = data.getBoolean("droneReachedSky");
+    }
+
+    @Override
+    public void writeInitialSyncData(PacketBuffer buf) {
+        super.writeInitialSyncData(buf);
+        if (this.droneUUID != null) {
+            buf.writeUniqueId(this.droneUUID);
+        }
+        buf.writeBoolean(this.droneReachedSky);
+    }
+
+    @Override
+    public void receiveInitialSyncData(PacketBuffer buf) {
+        super.receiveInitialSyncData(buf);
+        try {
+            this.droneUUID = buf.readUniqueId();
+        } catch (Exception ignored) {}
+        this.droneReachedSky = buf.readBoolean();
+    }
+
+    public boolean allowsExtendedFacing() {
+        return false;
+    }
+
     public static class DronePadWorkable extends MultiblockRecipeLogic {
 
         public DronePadWorkable(RecipeMapMultiblockController tileEntity) {
@@ -210,7 +281,9 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         protected void updateRecipeProgress() {
             super.updateRecipeProgress();
 
-            this.getMetaTileEntity().droneReachedSky |= this.getMetaTileEntity().drone != null && this.getMetaTileEntity().drone.reachedSky();
+            if (!this.getMetaTileEntity().droneReachedSky && this.getMetaTileEntity().getDrone() != null && this.getMetaTileEntity().getDrone().reachedSky()) {
+                this.getMetaTileEntity().setDroneDead(true);
+            }
 
             if (maxProgressTime - progressTime == 240 && this.getMetaTileEntity().droneReachedSky) {
                 this.getMetaTileEntity().spawnDroneEntity(true);
@@ -232,9 +305,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
                 this.parallelRecipesPerformed = 0;
                 this.overclockResults = new int[]{0, 0};
             }
-            if(this.getMetaTileEntity().drone != null) this.getMetaTileEntity().drone.setDead();
-            this.getMetaTileEntity().droneReachedSky = false;
+            this.getMetaTileEntity().setDroneDead(false);
         }
     }
-
 }
