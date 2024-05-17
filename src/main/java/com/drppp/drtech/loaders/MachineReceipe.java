@@ -276,7 +276,7 @@ public class MachineReceipe {
                 .input(OrePrefix.plate, Polyethylene)
                 .input(Items.PAPER)
                 .output(MyMetaItems.POS_CARD)
-                .circuitMeta(1)
+                .circuitMeta(24)
                 .EUt(16)
                 .duration(100)
                 .buildAndRegister();

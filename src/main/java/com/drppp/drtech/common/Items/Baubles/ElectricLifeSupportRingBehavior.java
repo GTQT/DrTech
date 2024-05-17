@@ -67,6 +67,8 @@ public class ElectricLifeSupportRingBehavior extends BaubleBehavior {
     private boolean hasEnergy(ItemStack item)
     {
         NBTTagCompound tag = item.getTagCompound();
+        if(tag==null)
+            return  false;
         if(tag!=null&&!tag.hasKey("Charge"))
             return false;
         if(tag.getLong("Charge")<=0)
@@ -77,6 +79,8 @@ public class ElectricLifeSupportRingBehavior extends BaubleBehavior {
     private boolean drainenergy(ItemStack item,long amount,boolean simulate)
     {
         NBTTagCompound tag = item.getTagCompound();
+        if(tag==null)
+            return  false;
         long leftEnergy = tag.getLong("Charge");
         if(leftEnergy<amount)
             return false;

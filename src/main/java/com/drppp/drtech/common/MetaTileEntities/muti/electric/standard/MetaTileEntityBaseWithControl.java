@@ -219,4 +219,14 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         }
         return super.getCapability(capability, side);
     }
+
+    public boolean drainEnergy(long energy)
+    {
+        if(this.energyContainer==null)
+            return false;
+        if(this.energyContainer.getEnergyStored()<energy)
+           return  false;
+        this.energyContainer.changeEnergy(-energy);
+        return true;
+    }
 }
