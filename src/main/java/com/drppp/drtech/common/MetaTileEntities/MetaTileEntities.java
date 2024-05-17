@@ -5,6 +5,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTile
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityInputAssembly;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearReactor;
@@ -16,12 +17,14 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
+import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.util.GTUtility;
 
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityItemBus;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
 import keqing.gtqtcore.api.GTQTValue;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +58,7 @@ public class MetaTileEntities {
     public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_TRANSMITTER= new MetaTileEntityWirelessEnergyHatch[10];
     public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
     public static final MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
-
+    public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[4];
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -97,6 +100,9 @@ public class MetaTileEntities {
             WIRELESS_EMERGY_HATCH_TRANSMITTER[i-1] = registerMetaTileEntity(17082 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.transmitter." + tierName), i, true));
         }
         PLAYER_BEACON = registerMetaTileEntity(17093,new MetaTileEntityPlayerBeacon(getmyId("player_beacon")));
+        for (int i = 0; i < 4; i++) {
+            UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector"+(i+1)),i+1, gregtech.client.renderer.texture.Textures.FLUID_RIG_OVERLAY));
+        }
     }
 
 
