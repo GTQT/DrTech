@@ -26,7 +26,7 @@ public class TileEntitySapBag  extends TileEntity implements ITickable{
     private int ticks=0;
     @Override
     public void update() {
-        if (!world.isRemote && ++ticks > 300) {
+        if (!world.isRemote && ++ticks > 3600) {
             boolean flag=false;
             ticks = 0;
             // 定义所有六个方向
