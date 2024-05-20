@@ -1,6 +1,10 @@
 package com.drppp.drtech.common.MetaTileEntities.single;
 
+import codechicken.lib.render.CCRenderState;
+import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Client.Textures;
+import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IWorkable;
@@ -21,6 +25,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.common.metatileentities.storage.MetaTileEntityQuantumChest;
 import gregtech.common.metatileentities.storage.MetaTileEntityQuantumTank;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
@@ -33,6 +38,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +51,8 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     ItemStackHandler inventory = new ItemStackHandler(45);
     private final FluidTankList fluidTankList;
     int tick=0;
+    private int range=0;
+    private int lx=0,ly=0,lz=0;
     public MetaTileEntityUniversalCollector(ResourceLocation metaTileEntityId, int tier, ICubeRenderer renderer) {
         super(metaTileEntityId, tier);
         this.renderer = renderer;
@@ -53,12 +61,22 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
             fluidsHandlers[i] = new NotifiableFluidTank(16000, this, true);
         }
         this.fluidTankList = new FluidTankList(false, fluidsHandlers);
+        this.range =(int) Math.pow((getTier()+1),2);
     }
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityUniversalCollector(this.metaTileEntityId,getTier(),renderer);
     }
 
+    @Override
+    public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
+        super.renderMetaTileEntity(renderState, translation, pipeline);
+        this.renderOverlays(renderState, translation, pipeline);
+
+    }
+    protected void renderOverlays(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
+        this.renderer.renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), isActive(), isWorkingEnabled());
+    }
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
         ModularUI.Builder builder;
@@ -80,28 +98,30 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     @Override
     public void update() {
         super.update();
-        if(energyContainer.getEnergyStored()<100)
+        if(!getWorld().isRemote)
         {
-            isActive=false;
-            isWorkingEnabled=isActive;
-        }
-        if(!getWorld().isRemote&&isWorkingEnabled)
-        {
-            energyContainer.changeEnergy(-100);
-            if(++tick>20)
+            if(energyContainer.getEnergyStored()<GTValues.V[getTier()]/4)
             {
-                tick=0;
-                getRangeTileentities();
+                isWorkingEnabled=false;
+            }
+            if(isWorkingEnabled)
+            {
+                energyContainer.changeEnergy(-GTValues.V[getTier()]/4);
+                if(++tick>80)
+                {
+                    tick=0;
+                    getRangeTileentities();
+                }
             }
         }
+
     }
     private void getRangeTileentities()
     {
-
-            int range =(int) Math.pow((getTier()+1),2);
             BlockPos centerPos=this.getPos() ;
             int radius = range;
             for (int x = -radius; x <= radius; x++) {
+
                 for (int y = -radius; y <= radius; y++) {
                     for (int z = -radius; z <= radius; z++) {
                         BlockPos currentPos = centerPos.add(x, y, z);
@@ -211,4 +231,13 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
             writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(isWorkingEnabled));
         }
     }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World player, @NotNull List<String> tooltip, boolean advanced) {
+        super.addInformation(stack, player, tooltip, advanced);
+        tooltip.add("等级:"+GTValues.VN[getTier()]);
+        tooltip.add("收集范围:"+range);
+        tooltip.add("耗电:"+(GTValues.V[getTier()]/4));
+    }
+
 }
