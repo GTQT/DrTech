@@ -345,7 +345,21 @@ drtech.machine.wireless_energy_hatch.transmitter.uv.name=无线能源输出端�
 drtech.machine.wireless_energy_hatch.transmitter.uhv.name=无线能源输出端口（§4UHV§r）
 drtech.machine.wireless_energy_hatch.transmitter.uev.name=无线能源输出端口（§4UEV§r）
 drtech.machine.wireless_energy_hatch.transmitter.uiv.name=无线能源输出端口（§4UIV§r）
-
+#收集器
+drtech.machine.universal_collector.ulv.name=简易通用收集器
+drtech.machine.universal_collector.lv.name=基础通用收集器
+drtech.machine.universal_collector.mv.name=进阶通用收集器
+drtech.machine.universal_collector.hv.name=进阶通用收集器 II
+drtech.machine.universal_collector.ev.name=进阶通用收集器 III
+drtech.machine.universal_collector.iv.name=精英通用收集器
+drtech.machine.universal_collector.luv.name=精英通用收集器 II
+drtech.machine.universal_collector.zpm.name=精英通用收集器 III
+drtech.machine.universal_collector.uv.name=终极通用收集器
+drtech.machine.universal_collector.uhv.name=史诗通用收集器
+drtech.machine.universal_collector.uev.name=史诗通用收集器 II
+drtech.machine.universal_collector.uiv.name=史诗通用收集器 III
+drtech.machine.universal_collector.uxv.name=史诗通用收集器 IV
+drtech.machine.universal_collector.opv.name=传奇通用收集器
 #comb
 item.drt.comb.borax.name=硼砂蜂窝
 item.drt.comb.ether.name=以太蜂窝

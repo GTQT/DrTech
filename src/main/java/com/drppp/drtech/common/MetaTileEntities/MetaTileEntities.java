@@ -58,7 +58,7 @@ public class MetaTileEntities {
     public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_TRANSMITTER= new MetaTileEntityWirelessEnergyHatch[10];
     public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
     public static final MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
-    public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[4];
+    public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -100,8 +100,9 @@ public class MetaTileEntities {
             WIRELESS_EMERGY_HATCH_TRANSMITTER[i-1] = registerMetaTileEntity(17082 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.transmitter." + tierName), i, true));
         }
         PLAYER_BEACON = registerMetaTileEntity(17093,new MetaTileEntityPlayerBeacon(getmyId("player_beacon")));
-        for (int i = 0; i < 4; i++) {
-            UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector"+(i+1)),i+1, gregtech.client.renderer.texture.Textures.FLUID_RIG_OVERLAY));
+        for (int i = 0; i < 10; i++) {
+            tierName = GTValues.VN[i].toLowerCase();
+            UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector."+tierName),i+1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
         }
     }
 
