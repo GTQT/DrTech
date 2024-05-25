@@ -56,9 +56,11 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     private MetaTileEntityYotTank yotTank;
     private  IAEFluidStack iaeFluidContainer;
     private final MEInventoryHandler<IAEFluidStack> meInventoryHandler;
+    protected static final IStorageChannel<IAEFluidStack> FLUID_NET = AEApi.instance().storage()
+            .getStorageChannel(IFluidStorageChannel.class);
     private int priority=10;
     public MetaTileEntityYotHatch(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId, GTValues.UV, false);
+        super(metaTileEntityId, GTValues.UV, false,IFluidStorageChannel.class);
         this.setWorkingEnabled(true);
         iaeFluidContainer =null;
         this.meInventoryHandler = new MEInventoryHandler<>(this, FLUID_NET);

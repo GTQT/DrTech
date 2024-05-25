@@ -12,10 +12,8 @@ import gregtech.api.capability.impl.FluidTankList;
 import gregtech.api.capability.impl.NotifiableFluidTank;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
-import gregtech.api.gui.widgets.PhantomTankWidget;
-import gregtech.api.gui.widgets.SlotWidget;
-import gregtech.api.gui.widgets.TankWidget;
-import gregtech.api.gui.widgets.ToggleButtonWidget;
+import gregtech.api.gui.Widget;
+import gregtech.api.gui.widgets.*;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.TieredMetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -25,12 +23,15 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.common.metatileentities.storage.MetaTileEntityQuantumChest;
 import gregtech.common.metatileentities.storage.MetaTileEntityQuantumTank;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidTank;
@@ -42,6 +43,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity implements IWorkable {
@@ -51,14 +53,15 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     ItemStackHandler inventory = new ItemStackHandler(45);
     private final FluidTankList fluidTankList;
     int tick=0;
+    boolean autooutput=true;
     private int range=0;
     private int lx=0,ly=0,lz=0;
     public MetaTileEntityUniversalCollector(ResourceLocation metaTileEntityId, int tier, ICubeRenderer renderer) {
         super(metaTileEntityId, tier);
         this.renderer = renderer;
-        FluidTank[] fluidsHandlers = new FluidTank[9];
+        FluidTank[] fluidsHandlers = new FluidTank[18];
         for (int i = 0; i < fluidsHandlers.length; i++) {
-            fluidsHandlers[i] = new NotifiableFluidTank(16000, this, true);
+            fluidsHandlers[i] = new NotifiableFluidTank(16000 +16000*getTier(), this, true);
         }
         this.fluidTankList = new FluidTankList(false, fluidsHandlers);
         this.range =(int) Math.pow((getTier()+1),2);
@@ -80,8 +83,7 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
         ModularUI.Builder builder;
-        TankWidget tankWidget;
-        builder = ModularUI.builder(Textures.BACKGROUND, 198, 208);
+        builder = ModularUI.builder(Textures.BACKGROUND, 198, 218);
         for (int i = 0; i < 45; i++) {
             builder.slot(inventory,i,5+i%9*18,3+i/9*18,true,true, GuiTextures.SLOT);
         }
@@ -92,8 +94,45 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
                                     .setContainerClicking(true, true)
                                     .setAlwaysShowFull(true));
         }
-        builder.bindPlayerInventory(entityPlayer.inventory, 117);
+        for (int i = 0; i < 9; i++) {
+            builder.widget(
+                    new TankWidget(fluidTankList.getTankAt(i+9),  i* 18+5, 95+18 , 18, 18)
+                            .setBackgroundTexture(GuiTextures.FLUID_SLOT)
+                            .setContainerClicking(true, true)
+                            .setAlwaysShowFull(true));
+        }
+        builder.widget(new IncrementButtonWidget(165, 3, 30, 20, 1, 4, 16, 64, this::setCurrentParallel)
+                .setDefaultTooltip()
+                .setShouldClientCallback(false));
+        builder.widget(new IncrementButtonWidget(165, 36, 30, 20, -1, -4, -16, -64, this::setCurrentParallel)
+                        .setDefaultTooltip()
+                        .setShouldClientCallback(false));
+
+        builder.widget(new TextFieldWidget2(175, 66, 51, 20, this::getParallelAmountToString, val -> {
+                    if (val != null && !val.isEmpty()) {
+                        setCurrentParallel(Integer.parseInt(val));
+                    }
+                }));
+        builder.widget(new ClickButtonWidget(165,87,30,20,"弹出",this::setAuto));
+        builder.widget(new AdvancedTextWidget(172,107,this::addDisplayText,0x161655));
+        builder.bindPlayerInventory(entityPlayer.inventory, 117+18);
         return builder.build(this.getHolder(), entityPlayer);
+    }
+    public void setCurrentParallel(int parallelAmount) {
+        this.range = Math.min(Math.max(this.range + parallelAmount,1),(int) Math.pow((getTier()+1),2));
+    }
+    public String getParallelAmountToString() {
+        return Integer.toString(this.range);
+    }
+    public void setAuto(Widget.ClickData clickData)
+    {
+        this.autooutput = !this.autooutput;
+    }
+    protected void addDisplayText(List<ITextComponent> textList) {
+        if(this.autooutput)
+            textList.add(new TextComponentString("YES"));
+        else
+            textList.add(new TextComponentString("NO"));
     }
     @Override
     public void update() {
@@ -103,6 +142,9 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
             if(energyContainer.getEnergyStored()<GTValues.V[getTier()]/4)
             {
                 isWorkingEnabled=false;
+            }else
+            {
+                isWorkingEnabled=true;
             }
             if(isWorkingEnabled)
             {
@@ -112,6 +154,12 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
                     tick=0;
                     getRangeTileentities();
                 }
+				//是否开启自动弹出 开启就查找有没有挨着的容器 并把物品/流体弹出
+				if(autooutput)
+				{
+                    energyContainer.changeEnergy(-GTValues.V[getTier()]/4);
+                    getStorageContainer(this.getWorld(),this.getPos());
+				}
             }
         }
 
@@ -126,7 +174,7 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
                     for (int z = -radius; z <= radius; z++) {
                         BlockPos currentPos = centerPos.add(x, y, z);
                         MetaTileEntity te = GTUtility.getMetaTileEntity(this.getWorld(),currentPos);
-                        if(te != null && !(te instanceof MetaTileEntityQuantumTank) &&!(te instanceof MetaTileEntityQuantumChest))
+                        if(te != null && !(te instanceof MetaTileEntityQuantumTank) &&!(te instanceof MetaTileEntityQuantumChest) && currentPos!=centerPos)
                         {
                             GTTransferUtils.moveInventoryItems(te.getExportItems(),inventory);
                             GTTransferUtils.transferFluids(te.getExportFluids(),this.fluidTankList);
@@ -135,6 +183,23 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
                 }
             }
     }
+    public  void getStorageContainer(World world, BlockPos center) {
+        for (EnumFacing facing : EnumFacing.values()) {
+            BlockPos adjacentPos = center.offset(facing);
+            if (world.getTileEntity(adjacentPos)!=null && world.getTileEntity(adjacentPos).hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,facing)) {
+                var iInventory = world.getTileEntity(adjacentPos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,facing);
+                GTTransferUtils.moveInventoryItems(inventory,iInventory);
+            }
+            if(world.getTileEntity(adjacentPos)!=null && world.getTileEntity(adjacentPos).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,facing)){
+                var fluidinventory = world.getTileEntity(adjacentPos).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,facing);
+                GTTransferUtils.transferFluids(this.fluidTankList,fluidinventory);
+            }
+            if( GTUtility.getMetaTileEntity(this.getWorld(),adjacentPos)!=null && GTUtility.getMetaTileEntity(this.getWorld(),adjacentPos) instanceof MetaTileEntityQuantumTank){
+                var s = GTUtility.getMetaTileEntity(this.getWorld(),adjacentPos);
+                GTTransferUtils.transferFluids(this.fluidTankList,s.getFluidInventory());
+            }
+        }
+    }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
@@ -142,6 +207,8 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
         data.setTag("inventory", inventory.serializeNBT());
         data.setBoolean("isActive", isActive);
         data.setBoolean("isWorkingEnabled", isWorkingEnabled);
+        data.setInteger("range",range);
+        data.setBoolean("auto",this.autooutput);
         if(fluidTankList!=null)
            data.setTag("fluidlist", fluidTankList.serializeNBT());
         return data;
@@ -157,6 +224,8 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
             fluidTankList.deserializeNBT(data.getCompoundTag("fluidlist"));
         isActive = data.getBoolean("isActive");
         isWorkingEnabled = data.getBoolean("isWorkingEnabled");
+        this.range = data.getInteger("range");
+        this.autooutput = data.getBoolean("auto");
     }
     @Override
     public void writeInitialSyncData(PacketBuffer buf) {
