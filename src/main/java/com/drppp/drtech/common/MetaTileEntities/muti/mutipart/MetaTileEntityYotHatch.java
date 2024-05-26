@@ -132,6 +132,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
                     ready = Integer.MAX_VALUE;
                 } else ready = yotTank.getFluidBank().getStored().intValue();
                 this.iaeFluidContainer = WrappedFluidStack.fromFluidStack(new FluidStack(yotTank.getFluid(),ready));
+
             }
             if (!getWorld().isRemote && this.isWorkingEnabled() && this.shouldSyncME()&&updateMEStatus()) {
                 try {
