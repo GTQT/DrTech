@@ -17,6 +17,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static com.drppp.drtech.DrtConfig.onPlayerLoggedInEvent;
+
 @Mod.EventBusSubscriber(modid = Tags.MODID)
 public class EventHandlers {
 
@@ -24,7 +26,7 @@ public class EventHandlers {
 
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-
+        if(!onPlayerLoggedInEvent)return;
         NBTTagCompound playerData = event.player.getEntityData();
         NBTTagCompound data = playerData.hasKey(EntityPlayer.PERSISTED_NBT_TAG) ? playerData.getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG) : new NBTTagCompound();
 
