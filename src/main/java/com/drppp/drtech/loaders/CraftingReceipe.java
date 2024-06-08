@@ -24,10 +24,10 @@ public class CraftingReceipe {
     {
         ModHandler.addShapedRecipe("log_factory", MetaTileEntities.LOG_FACTORY.getStackForm(),
                 "WMW", "EFE", "WMW",
-                'W', MetaItems.FIELD_GENERATOR_MV,
-                'E', new UnificationEntry(OrePrefix.plate, Materials.Aluminium),
+                'W', MetaItems.FIELD_GENERATOR_IV,
+                'E', new UnificationEntry(OrePrefix.plate, Materials.Iridium),
                 'F', new ItemStack(BlocksInit.COMMON_CASING,1,8),
-                'M', MetaItems.CONVEYOR_MODULE_LV);
+                'M', MetaItems.CONVEYOR_MODULE_IV);
         ModHandler.addShapedRecipe("yot_tank", MetaTileEntities.YOUT_TANK.getStackForm(),
                 "WAW", "EFE", "MBM",
                 'W', new UnificationEntry(OrePrefix.screw,Materials.TungstenSteel),
