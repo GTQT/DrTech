@@ -12,4 +12,19 @@ public class DrtConfig {
     @Config.Comment("Mob Horde Event")
     @Config.RequiresMcRestart
     public static boolean MobHordeEvent=true;
+
+    @Config.LangKey("僵尸袭击")
+    @Config.Comment("Zombie Horde Event")
+    @Config.RequiresMcRestart
+    public static boolean ZombieHordeEvent=true;
+
+    @Config.LangKey("骷髅袭击")
+    @Config.Comment("Skeleton Horde Event")
+    @Config.RequiresMcRestart
+    public static boolean SkeletonMobHordeEvent=true;
+
+    @Config.LangKey("爬行者袭击")
+    @Config.Comment("Creeper Horde Event")
+    @Config.RequiresMcRestart
+    public static boolean CreeperMobHordeEvent=false;
 }
