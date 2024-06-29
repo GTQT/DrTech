@@ -23,9 +23,10 @@ public class OrePrefixRecipes {
     public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
     {
         ItemStack dustStack = OreDictUnifier.get(dustPrefix, mat);
-        if (!mat.hasFlag(EXPLOSIVE) && !mat.hasFlag(FLAMMABLE))
+        ItemStack gemStack = OreDictUnifier.get(OrePrefix.gem, mat);
+        if (!mat.hasFlag(EXPLOSIVE) && !mat.hasFlag(FLAMMABLE) && gemStack!=ItemStack.EMPTY)
         {
-            ItemStack gemStack = OreDictUnifier.get(OrePrefix.gem, mat);
+
             EIMPLOSION_RECIPES.recipeBuilder()
                     .inputs(GTUtility.copy(3, dustStack))
                     .outputs(GTUtility.copy(3, gemStack))
