@@ -82,3 +82,4 @@ run/
 
 logs/
 gradle/wrapper/gradle-wrapper.properties
+dependencies.gradle
