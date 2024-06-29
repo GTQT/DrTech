@@ -29,7 +29,8 @@ import java.util.UUID;
 public class WirelessPanelBehavior implements IItemBehaviour, ItemUIFactory {
 
     private ItemStack stack=null;
-
+    private int mode = 0;
+    private int bind_mode = -1;
     public WirelessPanelBehavior() {
     }
 
@@ -52,8 +53,9 @@ public class WirelessPanelBehavior implements IItemBehaviour, ItemUIFactory {
 
     @Override
     public ModularUI createUI(PlayerInventoryHolder playerInventoryHolder, EntityPlayer entityPlayer) {
+        var item = playerInventoryHolder.getCurrentItem();
         ModularUI.Builder builder;
-        builder = ModularUI.builder(GuiTextures.BACKGROUND, 198, 208);
+        builder = ModularUI.builder(GuiTextures.BACKGROUND, 209, 242);
         builder.widget((new AdvancedTextWidget(9, 8, this::addDisplayText, 16777215)).setMaxWidthLimit(181));
         return builder.build(playerInventoryHolder, entityPlayer);
     }
