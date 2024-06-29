@@ -36,6 +36,7 @@ import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.api.capability.DrtechCapInit;
+import com.drppp.drtech.loaders.OrePrefixRecipes;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -132,7 +133,7 @@ public class DrTechMain {
     @SubscribeEvent
     // Register recipes here (Remove if not needed)
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-
+        OrePrefixRecipes.init();
     }
 
     @SubscribeEvent

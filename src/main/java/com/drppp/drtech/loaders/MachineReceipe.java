@@ -5,10 +5,12 @@ import com.drppp.drtech.intergations.GTFOLinkage;
 import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.api.Utils.DrtechUtils;
+import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.material.properties.DustProperty;
+import gregtech.api.unification.material.properties.OreProperty;
 import gregtech.api.unification.material.properties.PropertyKey;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.util.GTUtility;
@@ -64,7 +66,7 @@ public class MachineReceipe {
                 .duration(100)
                 .EUt(7680)
                 .buildAndRegister();
-        OrePrefix.dust.addProcessingHandler(PropertyKey.DUST, MachineReceipe::processDust);
+
         EIMPLOSION_RECIPES.recipeBuilder()
                 .input(OrePrefix.dust,Carbon,63)
                 .output(Items.DIAMOND)
@@ -293,20 +295,5 @@ public class MachineReceipe {
                 .duration(200)
                 .buildAndRegister();
     }
-    public static void processDust(OrePrefix dustPrefix, Material mat, DustProperty property)
-    {
-        ItemStack dustStack = OreDictUnifier.get(dustPrefix, mat);
-        if (mat.hasProperty(PropertyKey.GEM))
-        {
-            ItemStack gemStack = OreDictUnifier.get(OrePrefix.gem, mat);
-            if (!mat.hasFlag(EXPLOSIVE) && !mat.hasFlag(FLAMMABLE)) {
-               EIMPLOSION_RECIPES.recipeBuilder()
-                        .inputs(GTUtility.copy(3, dustStack))
-                        .outputs(GTUtility.copy(3, gemStack))
-                        .chancedOutput(dust, Materials.DarkAsh, 2500, 0)
-                       .explosivesAmount(dustStack)
-                        .buildAndRegister();
-            }
-        }
-    }
+
 }
