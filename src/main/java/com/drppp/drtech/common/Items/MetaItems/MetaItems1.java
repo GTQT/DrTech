@@ -6,9 +6,11 @@ import com.drppp.drtech.common.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.common.Items.Baubles.ElectricLifeSupportRingBehavior;
 import com.drppp.drtech.common.Items.Behavior.DataItemBehavior;
 import com.drppp.drtech.common.Items.Behavior.ElectricStatsNuclear;
+import com.drppp.drtech.common.Items.Behavior.HandPumpBehavior;
 import com.drppp.drtech.common.Items.Behavior.WirelessPanelBehavior;
 import gregtech.api.GTValues;
 import gregtech.api.items.metaitem.ElectricStats;
+import gregtech.api.items.metaitem.FilteredFluidStats;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
 import gregtech.integration.baubles.BaubleBehavior;
@@ -121,6 +123,11 @@ public  class MetaItems1 extends StandardMetaItem {
                 .setMaxStackSize(1);
         MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL = this.addItem(25,"wireless_network_control_panel")
                 .addComponents(new WirelessPanelBehavior())
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(1);
+        MyMetaItems.HAND_PUMP = this.addItem(26,"hand_pump")
+                .addComponents(new HandPumpBehavior())
+                .addComponents(new FilteredFluidStats(128000, 2600, true, false, false, false, true))
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1);
 

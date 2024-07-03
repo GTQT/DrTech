@@ -30,6 +30,7 @@ metaitem.tactical_laser_submachine_gun.name=铱制刺刀战术激光镭射步枪
 metaitem.electric_plasma_gun.name=电力等离子电浆发射器
 metaitem.advanced_tachino_disruptor.name=先进速子裂解枪
 metaitem.telepathic_necklace.name=心灵感应头带
+metaitem.hand_pump.name=手泵
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
@@ -267,6 +268,9 @@ drtech.machine.player_beacon.btn1=清空列表
 drtech.machine.player_beacon.btn2=无
 drtech.machine.wireless.export.tooltip=§c无线动力仓(需要绑定频道)
 drtech.machine.wireless.import.tooltip=§a无线能源仓(需要绑定频道)
+behavior.data_item.hand_pump.data.1=容积为128,000 mB的流体转运工具，也可以视为一种多功能的便携式储罐。
+behavior.data_item.hand_pump.data.2=最大的特点是可以从输入仓中抽取流体，解决流体冗余难于清理的情况。
+behavior.data_item.hand_pump.data.3=右键储有流体的设备抽取流体，将尽可能满载自身；潜行右键流体存储设备以输出流体。
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
