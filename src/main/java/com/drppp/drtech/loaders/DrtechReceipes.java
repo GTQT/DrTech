@@ -5,8 +5,10 @@ import com.drppp.drtech.api.recipes.builder.DronePadRecipeBuilder;
 import com.drppp.drtech.loaders.builder.EImplosionRecipeBuilder;
 import gregtech.api.GTValues;
 import gregtech.api.gui.GuiTextures;
+import gregtech.api.gui.widgets.ProgressWidget;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.recipes.builders.SimpleRecipeBuilder;
+import gregtech.client.renderer.texture.Textures;
 import net.minecraft.init.SoundEvents;
 
 public final class DrtechReceipes {
@@ -18,7 +20,10 @@ public final class DrtechReceipes {
     public static final RecipeMap<SimpleRecipeBuilder> MOB_KILLER ;
     public static final RecipeMap<SimpleRecipeBuilder> DRRP_GROUND_PUMP ;
     public static final RecipeMap<SimpleRecipeBuilder> SOLAR_TOWER ;
-   // public static final RecipeMap<SimpleRecipeBuilder> WIND_DRIVEN ;
+    public static final RecipeMap<SimpleRecipeBuilder> DISASSEMBLER_RECIPES = new RecipeMap<>("disassembler", 1, 9, 0, 0,new SimpleRecipeBuilder(),false)
+            .setSlotOverlay(false, false, GuiTextures.CIRCUIT_OVERLAY)
+            .setSlotOverlay(true, false, GuiTextures.CIRCUIT_OVERLAY)
+            .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, ProgressWidget.MoveType.HORIZONTAL);
 
 
     public static final RecipeMap<DronePadRecipeBuilder> DRONE_PAD = new RecipeMap<>("drone_pad", 4, 9, 0, 0, new DronePadRecipeBuilder(), false);
@@ -45,7 +50,7 @@ public final class DrtechReceipes {
         MOB_KILLER = new RecipeMap<>("mob_killer",2,6,0,1,(new SimpleRecipeBuilder()),false);
         DRRP_GROUND_PUMP = new RecipeMap<>("deep_ground_pump",1,0,1,4,(new SimpleRecipeBuilder()),false);
         SOLAR_TOWER = new RecipeMap<>("solar_tower",0,0,1,1,(new SimpleRecipeBuilder()),false);
-       // WIND_DRIVEN = new RecipeMap<>("wind_driven",2,0,1,0,(new SimpleRecipeBuilder()),false);
+
 
     }
 }
