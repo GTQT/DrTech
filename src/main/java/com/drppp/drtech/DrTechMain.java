@@ -134,7 +134,6 @@ public class DrTechMain {
     // Register recipes here (Remove if not needed)
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         OrePrefixRecipes.init();
-        DisassemblyHandler.buildDisassemblerRecipes();
     }
 
     @SubscribeEvent
@@ -161,6 +160,7 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(new PollutionEffectHandler());
         MinecraftForge.EVENT_BUS.register(new NuclearItemsRender());
         StructUtil.init();
+
     }
     @SideOnly(Side.CLIENT)
     @EventHandler
@@ -182,6 +182,8 @@ public class DrTechMain {
     @EventHandler
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
     public void postInit(FMLPostInitializationEvent event) {
+        if(DrtConfig.EnableDisassembly)
+            DisassemblyHandler.buildDisassemblerRecipes();
     }
 
     @EventHandler
