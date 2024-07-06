@@ -2,6 +2,7 @@ package com.drppp.drtech.loaders;
 
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import gregtech.api.recipes.ModHandler;
@@ -160,5 +161,9 @@ public class CraftingReceipe {
                 'S', Blocks.HARDENED_CLAY,
                 'C', ToolItems.SAW
         );
+        gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(MetaTileEntities.DISASSEMBLY, "AVA", "VMV", "WCW", 'M', HULL, 'V', CONVEYOR, 'A', ROBOT_ARM,
+                'C', CIRCUIT, 'W', CABLE);
+        gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(MetaTileEntities.UNIVERSAL_COLLECTORS, "WFW", "VHP", "WCW", 'W', Blocks.IRON_BARS, 'F',
+                MetaItems.FLUID_FILTER, 'P', PUMP, 'H', HULL, 'C', CIRCUIT,'V', CONVEYOR);
     }
 }

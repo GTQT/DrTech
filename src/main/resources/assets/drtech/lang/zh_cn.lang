@@ -365,6 +365,21 @@ drtech.machine.universal_collector.uev.name=史诗通用收集器 II
 drtech.machine.universal_collector.uiv.name=史诗通用收集器 III
 drtech.machine.universal_collector.uxv.name=史诗通用收集器 IV
 drtech.machine.universal_collector.opv.name=传奇通用收集器
+#拆解
+drtech.machine.disassembly.ulv.name=简易拆解机
+drtech.machine.disassembly.lv.name=基础拆解机
+drtech.machine.disassembly.mv.name=进阶拆解机
+drtech.machine.disassembly.hv.name=进阶拆解机 II
+drtech.machine.disassembly.ev.name=进阶拆解机 III
+drtech.machine.disassembly.iv.name=精英拆解机
+drtech.machine.disassembly.luv.name=精英拆解机 II
+drtech.machine.disassembly.zpm.name=精英拆解机 III
+drtech.machine.disassembly.uv.name=终极拆解机
+drtech.machine.disassembly.uhv.name=史诗通用收集器
+drtech.machine.disassembly.uev.name=史诗拆解机 II
+drtech.machine.disassembly.uiv.name=史诗拆解机 III
+drtech.machine.disassembly.uxv.name=史诗拆解机 IV
+drtech.machine.disassembly.opv.name=传奇拆解机
 #comb
 item.drt.comb.borax.name=硼砂蜂窝
 item.drt.comb.ether.name=以太蜂窝

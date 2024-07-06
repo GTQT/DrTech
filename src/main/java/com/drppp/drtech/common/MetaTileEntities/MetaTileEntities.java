@@ -59,6 +59,7 @@ public class MetaTileEntities {
     public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
     public static final MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
     public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
+    public static final SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -104,6 +105,8 @@ public class MetaTileEntities {
             tierName = GTValues.VN[i].toLowerCase();
             UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector."+tierName),i+1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
         }
+        registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, gregtech.client.renderer.texture.Textures.ASSEMBLER_OVERLAY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+
     }
 
 
