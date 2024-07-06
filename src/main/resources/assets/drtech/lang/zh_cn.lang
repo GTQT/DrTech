@@ -8,6 +8,7 @@ recipemap.molecular_recombination.name=分子重组
 recipemap.mob_killer.name=怪物屠宰
 recipemap.deep_ground_pump.name=热能抽取
 recipemap.solar_tower.name=太阳之力
+recipemap.disassembler.name=拆解机
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素

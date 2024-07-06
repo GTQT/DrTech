@@ -27,4 +27,9 @@ public class DrtConfig {
     @Config.Comment("Creeper Horde Event")
     @Config.RequiresMcRestart
     public static boolean CreeperMobHordeEvent=false;
+
+    @Config.LangKey("拆解机开启")
+    @Config.Comment("Enable Disassembly")
+    @Config.RequiresMcRestart
+    public static boolean EnableDisassembly=true;
 }
