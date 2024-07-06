@@ -1,19 +1,22 @@
 package com.drppp.drtech.loaders;
 
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.intergations.GTFOLinkage;
 import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.api.Utils.DrtechUtils;
-import gregtech.api.recipes.RecipeMaps;
+import forestry.apiculture.ModuleApiculture;
+import forestry.apiculture.blocks.BlockAlvearyType;
+import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.OreDictUnifier;
+import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
-import gregtech.api.unification.material.properties.DustProperty;
-import gregtech.api.unification.material.properties.OreProperty;
 import gregtech.api.unification.material.properties.PropertyKey;
 import gregtech.api.unification.ore.OrePrefix;
-import gregtech.api.util.GTUtility;
+import gregtech.common.blocks.BlockMachineCasing;
+import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import net.minecraft.init.Blocks;
@@ -27,12 +30,17 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.Loader;
 
 import static com.drppp.drtech.loaders.DrtechReceipes.*;
+import static gregtech.api.GTValues.*;
 import static gregtech.api.recipes.RecipeMaps.*;
 import static gregtech.api.unification.material.Materials.*;
-import static gregtech.api.unification.material.info.MaterialFlags.EXPLOSIVE;
-import static gregtech.api.unification.material.info.MaterialFlags.FLAMMABLE;
-import static gregtech.api.unification.ore.OrePrefix.dust;
-import static gregtech.api.unification.ore.OrePrefix.ingot;
+import static gregtech.api.unification.ore.OrePrefix.*;
+import static gregtech.api.unification.ore.OrePrefix.wireGtSingle;
+import static gregtech.common.blocks.BlockFusionCasing.CasingType.SUPERCONDUCTOR_COIL;
+import static gregtech.common.blocks.MetaBlocks.FUSION_CASING;
+import static gregtech.common.items.MetaItems.FIELD_GENERATOR_IV;
+import static gregtech.common.items.MetaItems.ULTRA_HIGH_POWER_INTEGRATED_CIRCUIT;
+import static gregtech.common.metatileentities.MetaTileEntities.FUSION_REACTOR;
+import static gregtech.loaders.recipe.CraftingComponent.PUMP;
 
 public class MachineReceipe {
     public static void load()
@@ -294,6 +302,33 @@ public class MachineReceipe {
                 .EUt(1)
                 .duration(200)
                 .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(MetaItems.ELECTRIC_PUMP_LV)
+                .inputs(MetaItems.FLUID_CELL_LARGE_ALUMINIUM.getStackForm(2))
+                .input(OrePrefix.stick, Iron)
+                .output(MyMetaItems.HAND_PUMP)
+                .fluidInputs(Tin.getFluid(1440))
+                .input(OrePrefix.ring, Rubber)
+                .EUt(30)
+                .duration(200)
+                .buildAndRegister();
+        ASSEMBLY_LINE_RECIPES.recipeBuilder()
+                .inputs(MetaBlocks.MACHINE_CASING.getItemVariant(BlockMachineCasing.MachineCasingType.IV))
+                .input(circuit, MarkerMaterials.Tier.IV, 64)
+                .input(circuit, MarkerMaterials.Tier.LuV, 4)
+                .inputs(MetaBlocks.METAL_CASING.getItemVariant(BlockMetalCasing.MetalCasingType.BRONZE_BRICKS,32))
+                .input(MetaItems.ELECTRIC_PUMP_IV)
+                .input(MetaItems.CONVEYOR_MODULE_IV)
+                .input(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN),16)
+                .input(ModuleApiculture.getBlocks().apiary,16)
+                .fluidInputs(SolderingAlloy.getFluid(1152))
+                .fluidInputs()
+                .outputs(MetaTileEntities.LARGE_BEE_HIVE.getStackForm())
+                .scannerResearch(b -> b
+                        .researchStack(new ItemStack(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN)))
+                        .duration(1200)
+                        .EUt(VA[IV]))
+                .duration(800).EUt(VA[LuV]).buildAndRegister();
     }
 
 }

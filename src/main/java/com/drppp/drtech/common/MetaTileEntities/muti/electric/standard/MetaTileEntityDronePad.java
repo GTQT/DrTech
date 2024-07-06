@@ -38,7 +38,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     public boolean droneReachedSky;
 
     public MetaTileEntityDronePad(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId,DISASSEMBLER_RECIPES);
+        super(metaTileEntityId,DRONE_PAD);
         this.recipeMapWorkable = new DronePadWorkable(this);
     }
 
