@@ -37,6 +37,7 @@ import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.loaders.OrePrefixRecipes;
+import com.drppp.drtech.loaders.builder.DisassemblyHandler;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -125,7 +126,6 @@ public class DrTechMain {
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new ConnectorTesr());
-        //ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
         TextureUtils.addIconRegister(Textures::register);
         Textures.init();
         LaserPipeRenderer.INSTANCE.preInit();
@@ -134,6 +134,7 @@ public class DrTechMain {
     // Register recipes here (Remove if not needed)
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         OrePrefixRecipes.init();
+        DisassemblyHandler.buildDisassemblerRecipes();
     }
 
     @SubscribeEvent

@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import java.util.UUID;
 
+import static com.drppp.drtech.loaders.DrtechReceipes.DISASSEMBLER_RECIPES;
 import static com.drppp.drtech.loaders.DrtechReceipes.DRONE_PAD;
 
 public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
@@ -37,7 +38,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     public boolean droneReachedSky;
 
     public MetaTileEntityDronePad(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId, DRONE_PAD);
+        super(metaTileEntityId,DISASSEMBLER_RECIPES);
         this.recipeMapWorkable = new DronePadWorkable(this);
     }
 
