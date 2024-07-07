@@ -13,6 +13,7 @@ import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.MetaTileEntities;
 import gregtech.common.metatileentities.electric.MetaTileEntityHull;
+import keqing.gtqtcore.GTQTCore;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
@@ -40,7 +41,13 @@ public class DisassemblyHandler {
             MetaItems.WETWARE_PROCESSOR_LUV.getStackForm(),
             MetaItems.WETWARE_PROCESSOR_ASSEMBLY_ZPM.getStackForm(),
             MetaItems.WETWARE_SUPER_COMPUTER_UV.getStackForm(),
+            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
+            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
+            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
+            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
+            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
             MetaItems.WETWARE_MAINFRAME_UHV.getStackForm()
+
     ));
 
     public static void buildDisassemblerRecipes() {

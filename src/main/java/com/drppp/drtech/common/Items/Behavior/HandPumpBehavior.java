@@ -4,7 +4,9 @@ import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntityHolder;
+import gregtech.api.util.GTUtility;
 import gregtech.common.metatileentities.multi.MetaTileEntityTankValve;
+import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMaintenanceHatch;
 import gregtech.common.metatileentities.storage.MetaTileEntityDrum;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+import static gregtech.api.unification.material.Materials.SolderingAlloy;
+
 public class HandPumpBehavior implements IItemBehaviour {
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         if (!world.isRemote && !world.isAirBlock(pos)) {
@@ -44,9 +48,9 @@ public class HandPumpBehavior implements IItemBehaviour {
                 } else {
                     FluidStack fluidStack;
                     if (content == null) {
-                        fluidStack = metaTileEntity.getExportFluids().drain(64000, true);
+                        fluidStack = metaTileEntity.getExportFluids().drain(128000, true);
                         if (fluidStack == null) {
-                            fluidStack = metaTileEntity.getImportFluids().drain(64000, true);
+                            fluidStack = metaTileEntity.getImportFluids().drain(128000, true);
                         }
                     } else {
                         FluidStack toDrain = content.copy();
@@ -62,6 +66,13 @@ public class HandPumpBehavior implements IItemBehaviour {
             } else if (tileEntity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null)) {
                 drainFromCapabilities(tileEntity, player, fluidHandlerItem, capacity, content);
                 return EnumActionResult.SUCCESS;
+            }else if(GTUtility.getMetaTileEntity(world,pos) instanceof MetaTileEntityMaintenanceHatch)
+            {
+                if(fluidHandlerItem.getTankProperties()[0].getContents().getFluid().equals(SolderingAlloy.getFluid()) && fluidHandlerItem.getTankProperties()[0].getContents().amount>=144)
+                {
+                    fluidHandlerItem.drain(144,true);
+                    ((MetaTileEntityMaintenanceHatch)(GTUtility.getMetaTileEntity(world,pos))).fixAllMaintenanceProblems();
+                }
             }
 
         }
@@ -82,7 +93,7 @@ public class HandPumpBehavior implements IItemBehaviour {
         } else {
             FluidStack fluidStack;
             if (content == null) {
-                fluidStack = fluidHandler.drain(64000, true);
+                fluidStack = fluidHandler.drain(128000, true);
             } else {
                 FluidStack toDrain = content.copy();
                 toDrain.amount = capacity - toDrain.amount;
@@ -98,5 +109,6 @@ public class HandPumpBehavior implements IItemBehaviour {
          lines.add(I18n.format("behavior.data_item.hand_pump.data.1"));
          lines.add(I18n.format("behavior.data_item.hand_pump.data.2"));
          lines.add(I18n.format("behavior.data_item.hand_pump.data.3"));
+         lines.add(I18n.format("behavior.data_item.hand_pump.data.4"));
     }
 }

@@ -322,7 +322,7 @@ public class MachineReceipe {
                 .input(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN),16)
                 .input(ModuleApiculture.getBlocks().apiary,16)
                 .fluidInputs(SolderingAlloy.getFluid(1152))
-                .fluidInputs()
+                .fluidInputs(UUMatter.getFluid(144))
                 .outputs(MetaTileEntities.LARGE_BEE_HIVE.getStackForm())
                 .scannerResearch(b -> b
                         .researchStack(new ItemStack(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN)))

@@ -272,6 +272,7 @@ drtech.machine.wireless.import.tooltip=§a无线能源仓(需要绑定频道)
 behavior.data_item.hand_pump.data.1=容积为128,000 mB的流体转运工具，也可以视为一种多功能的便携式储罐。
 behavior.data_item.hand_pump.data.2=最大的特点是可以从输入仓中抽取流体，解决流体冗余难于清理的情况。
 behavior.data_item.hand_pump.data.3=右键储有流体的设备抽取流体，将尽可能满载自身；潜行右键流体存储设备以输出流体。
+behavior.data_item.hand_pump.data.4=如果内有超过144mb焊锡，shift+右键可修复维护仓。
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
