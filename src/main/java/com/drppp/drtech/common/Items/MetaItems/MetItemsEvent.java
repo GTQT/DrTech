@@ -26,27 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public class MetItemsEvent {
     public static void  onItemRightClick( World world, EntityPlayer player, EnumHand hand) {
         ItemStack item = player.getHeldItem(hand);
-        if(player.isSneaking() && item.getItem()== MyMetaItems.GRAVITY_SHIELD.getMetaItem() && item.getMetadata()==MyMetaItems.GRAVITY_SHIELD.getMetaValue())
-        {
-            if (!world.isRemote) {
-                if (player instanceof EntityPlayerMP) {
-                    EntityPlayerMP playerMP = (EntityPlayerMP)player;
-                    int currentDimension = playerMP.dimension;
-                    int targetDimension;
-
-                    // 根据当前维度设置目标维度，这里是如果玩家在主世界，则传送到Nether，否则传送回主世界
-                    if (currentDimension != 300) {
-                        targetDimension = 300;
-                    } else {
-                        targetDimension = DimensionType.OVERWORLD.getId();
-                    }
-
-                    // 传送玩家到目标维度
-                    playerMP.getServer().getPlayerList().transferPlayerToDimension(playerMP, targetDimension, new Teleporter(playerMP.getServer().getWorld(targetDimension)));
-                    playerMP.timeUntilPortal = 10; // 冷却时间，防止连续传送
-                }
-            }
-        }else if(item.getItem()== MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue())
+        if(item.getItem()== MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue())
         {
             ItemStack currentGun = player.getHeldItem(hand);
             if(!hasEnergy(currentGun))

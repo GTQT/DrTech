@@ -4,10 +4,7 @@ import baubles.api.BaubleType;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.common.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.common.Items.Baubles.ElectricLifeSupportRingBehavior;
-import com.drppp.drtech.common.Items.Behavior.DataItemBehavior;
-import com.drppp.drtech.common.Items.Behavior.ElectricStatsNuclear;
-import com.drppp.drtech.common.Items.Behavior.HandPumpBehavior;
-import com.drppp.drtech.common.Items.Behavior.WirelessPanelBehavior;
+import com.drppp.drtech.common.Items.Behavior.*;
 import gregtech.api.GTValues;
 import gregtech.api.items.metaitem.ElectricStats;
 import gregtech.api.items.metaitem.FilteredFluidStats;
@@ -55,7 +52,7 @@ public  class MetaItems1 extends StandardMetaItem {
         MyMetaItems.GRAVITY_SHIELD = this.addItem(5,"gravity_shield").setMaxStackSize(1).setCreativeTabs(DrTechMain.Mytab)
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.gravity_shield.tooltip.1", new Object[0]));
-                }));
+                })).addComponents(new ChunkRemoveBehavior());
                 MyMetaItems.SKULL_DUST = this.addItem(6,"skull_dust").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
                 MyMetaItems.SCRAP = this.addItem(7,"scrap").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
                 MyMetaItems.CD_ROM = this.addItem(8,"cd_rom").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(16).addComponents(new DataItemBehavior(true));

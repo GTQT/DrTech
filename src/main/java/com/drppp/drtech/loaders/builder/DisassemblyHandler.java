@@ -10,11 +10,8 @@ import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.recipes.RecipeBuilder;
 import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.util.GTUtility;
-import gregtech.common.items.MetaItems;
-import gregtech.common.metatileentities.MetaTileEntities;
 import gregtech.common.metatileentities.electric.MetaTileEntityHull;
-import keqing.gtqtcore.GTQTCore;
-import net.minecraft.init.Items;
+import keqing.gtqtcore.common.items.GTQTMetaItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.item.crafting.IRecipe;
@@ -30,24 +27,20 @@ import static gregtech.api.unification.ore.OrePrefix.dustTiny;
 
 public class DisassemblyHandler {
     private static final Map<String, Tuple<ItemStack, Integer>> circuitToUse = createCircuitMap(Arrays.asList(
-            MetaItems.BASIC_CIRCUIT_BOARD.getStackForm(),
-            MetaItems.INTEGRATED_CIRCUIT_MV.getStackForm(),
-            MetaItems.PROCESSOR_ASSEMBLY_HV.getStackForm(),
-            MetaItems.WORKSTATION_EV.getStackForm(),
-            MetaItems.MAINFRAME_IV.getStackForm(),
-            MetaItems.NANO_MAINFRAME_LUV.getStackForm(),
-            MetaItems.QUANTUM_MAINFRAME_ZPM.getStackForm(),
-            MetaItems.CRYSTAL_MAINFRAME_UV.getStackForm(),
-            MetaItems.WETWARE_PROCESSOR_LUV.getStackForm(),
-            MetaItems.WETWARE_PROCESSOR_ASSEMBLY_ZPM.getStackForm(),
-            MetaItems.WETWARE_SUPER_COMPUTER_UV.getStackForm(),
-            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
-            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
-            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
-            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
-            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm(),
-            MetaItems.WETWARE_MAINFRAME_UHV.getStackForm()
-
+            GTQTMetaItems.GENERAL_CIRCUIT_LV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_MV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_HV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_EV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_IV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_LuV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_ZPM.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_UV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_UHV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_UEV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_UIV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_UXV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_OpV.getStackForm(),
+            GTQTMetaItems.GENERAL_CIRCUIT_MAX.getStackForm()
     ));
 
     public static void buildDisassemblerRecipes() {
