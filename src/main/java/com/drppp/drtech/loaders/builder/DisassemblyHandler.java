@@ -7,10 +7,15 @@ import gregtech.api.capability.impl.EnergyContainerHandler;
 import gregtech.api.items.toolitem.ItemGTTool;
 import gregtech.api.metatileentity.*;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
+import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeBuilder;
+import gregtech.api.recipes.RecipeMap;
+import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.util.GTUtility;
+import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.electric.MetaTileEntityHull;
+import keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps;
 import keqing.gtqtcore.common.items.GTQTMetaItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
@@ -67,6 +72,66 @@ public class DisassemblyHandler {
             }
         });
         recipeMap.forEach(DisassemblyHandler::buildDisassemblerRecipe);
+        //组装机配方拆解
+        Collection<RecipeMap> Recipes = new ArrayList<>();
+        Recipes.add(RecipeMaps.ASSEMBLER_RECIPES);
+        Recipes.add(GTQTcoreRecipeMaps.COMPONENT_ASSEMBLER_RECIPES);
+        for(RecipeMap map:Recipes)
+        {
+            Collection<Recipe> rc = map.getRecipeList();
+            rc.forEach(DisassemblyHandler::buildAssDisassemblerRecipe);
+        }
+    }
+
+    private static void buildAssDisassemblerRecipe(Recipe recipe) {
+        if(recipe!=null)
+        {
+            List<ItemStack> outputItems = recipe.getOutputs();
+            List<ItemStack[]> inItems = new ArrayList<>();
+            long voltage = recipe.getEUt();
+            int duration = recipe.getDuration();
+            if(outputItems.size()>0 && recipe.getInputs().size()>0)
+            {
+                recipe.getInputs().forEach(x->inItems.add(x.getInputStacks().clone()));
+                //排除编程电路
+                for (var s:inItems)
+                {
+                      if(s.length>0)
+                      {
+
+                          if(s[0].getItem() == MetaItems.INTEGRATED_CIRCUIT.getMetaItem() && s[0].getMetadata()== MetaItems.INTEGRATED_CIRCUIT.getMetaValue())
+                              s[0] = ItemStack.EMPTY;
+
+                          if ( s[0].getItem() instanceof ItemTool || s[0].getItem() instanceof ItemGTTool)
+                              s[0] = OreDictUnifier.get(dustTiny, Ash).copy();
+                          else
+                          {
+                              Tuple<Boolean, String> isCircuit = isCircuit(s[0]);
+                              if (isCircuit.getFirst())
+                              {
+                                  int count = s[0].getCount();
+                                  ItemStack ciru = circuitToUse.get(isCircuit.getSecond()).getFirst();
+                                  s[0] = new ItemStack(ciru.getItem(),count,ciru.getMetadata());
+                                  if(s.length>1)
+                                  {
+                                      for (int i = 1; i < s.length; i++) {
+                                          s[i] = ItemStack.EMPTY;
+                                      }
+                                  }
+                              }
+                          }
+                      }
+
+                }
+                RecipeBuilder<?> builder = DISASSEMBLER_RECIPES.recipeBuilder()
+                        .EUt((int) voltage)
+                        .duration(duration) // 5s per output item
+                        .inputs(outputItems.get(0));
+                inItems.forEach(x->builder.outputs(x));
+                builder.buildAndRegister();
+            }
+
+        }
     }
 
     public static void buildDisassemblerRecipe(MetaTileEntity mte, IRecipe recipe) {
