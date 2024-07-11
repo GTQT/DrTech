@@ -71,8 +71,9 @@ public class DisassemblyHandler {
                 }
             }
         });
+		//合成拆解 仅限GT MetileEntity
         recipeMap.forEach(DisassemblyHandler::buildDisassemblerRecipe);
-        //组装机配方拆解
+        //RecipeMap拆解 不拆出流体
         Collection<RecipeMap> Recipes = new ArrayList<>();
         Recipes.add(RecipeMaps.ASSEMBLER_RECIPES);
         Recipes.add(GTQTcoreRecipeMaps.COMPONENT_ASSEMBLER_RECIPES);
@@ -93,25 +94,27 @@ public class DisassemblyHandler {
             if(outputItems.size()>0 && recipe.getInputs().size()>0)
             {
                 recipe.getInputs().forEach(x->inItems.add(x.getInputStacks().clone()));
-                //排除编程电路
                 for (var s:inItems)
                 {
                       if(s.length>0)
                       {
-
+						  //排除编程电路
                           if(s[0].getItem() == MetaItems.INTEGRATED_CIRCUIT.getMetaItem() && s[0].getMetadata()== MetaItems.INTEGRATED_CIRCUIT.getMetaValue())
                               s[0] = ItemStack.EMPTY;
-
+						  //排除工具
                           if ( s[0].getItem() instanceof ItemTool || s[0].getItem() instanceof ItemGTTool)
                               s[0] = OreDictUnifier.get(dustTiny, Ash).copy();
+						  //电路板处理
                           else
                           {
                               Tuple<Boolean, String> isCircuit = isCircuit(s[0]);
                               if (isCircuit.getFirst())
                               {
+								  //转换为通用电路
                                   int count = s[0].getCount();
                                   ItemStack ciru = circuitToUse.get(isCircuit.getSecond()).getFirst();
                                   s[0] = new ItemStack(ciru.getItem(),count,ciru.getMetadata());
+								  //消除矿磁带入的多余物品
                                   if(s.length>1)
                                   {
                                       for (int i = 1; i < s.length; i++) {
@@ -125,7 +128,7 @@ public class DisassemblyHandler {
                 }
                 RecipeBuilder<?> builder = DISASSEMBLER_RECIPES.recipeBuilder()
                         .EUt((int) voltage)
-                        .duration(duration) // 5s per output item
+                        .duration(duration) 
                         .inputs(outputItems.get(0));
                 inItems.forEach(x->builder.outputs(x));
                 builder.buildAndRegister();
@@ -139,9 +142,11 @@ public class DisassemblyHandler {
             List<ItemStack> outputItems = new ArrayList<>();
             recipe.getIngredients().forEach(ingredient -> {
                 ItemStack[] itemStacks = ingredient.getMatchingStacks();
+				//工具替换成灰烬
                 if (itemStacks.length == 0 || itemStacks[0].getItem() instanceof ItemTool || itemStacks[0].getItem() instanceof ItemGTTool)
                     outputItems.add(OreDictUnifier.get(dustTiny, Ash));
                 else {
+					//如果是电路替换为通用电路 否接直接添加
                     Tuple<Boolean, String> isCircuit = isCircuit(itemStacks[0]);
                     if (isCircuit.getFirst())
                         outputItems.add(circuitToUse.get(isCircuit.getSecond()).getFirst());
@@ -149,7 +154,7 @@ public class DisassemblyHandler {
                         outputItems.add(itemStacks[0]);
                 }
             });
-
+			//获取电压
             long voltage = 0;
             if (mte instanceof ITieredMetaTileEntity) {
                 voltage = GTValues.V[((ITieredMetaTileEntity) mte).getTier()];
@@ -180,6 +185,7 @@ public class DisassemblyHandler {
                 }
             }
             voltage = Math.max(voltage, 32);
+			//拆解物品数量
             int itemCount = recipe.getIngredients().size();
 
             RecipeBuilder<?> builder = DISASSEMBLER_RECIPES.recipeBuilder()
