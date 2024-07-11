@@ -105,7 +105,7 @@ public class MetaTileEntities {
             tierName = GTValues.VN[i].toLowerCase();
             UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector."+tierName),i+1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
         }
-        registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, gregtech.client.renderer.texture.Textures.ASSEMBLER_OVERLAY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
 
     }
 

@@ -30,11 +30,13 @@ public class Textures {
     public static  TextureArea BACKGROUND;
     public static  TextureArea PAIL_BACKGROUND;
     public static SimpleOverlayRenderer WIRELESS_HATCH_HATCH;
+    public static OrientedOverlayRenderer DISASSEMBLY;
     public static void init()
     {
         NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
         UUPRODUCTER_OVERLAY= new OrientedOverlayRenderer("machines/uu_producter");
         DUPLICATOR = new OrientedOverlayRenderer("machines/duplicator");
+        DISASSEMBLY = new OrientedOverlayRenderer("machines/disassembly");
         MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
         ASEPTIC_MACHINE_CASING = new SimpleOverlayRenderer("casings/aseptic_machine_casing");
         ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
