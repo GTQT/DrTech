@@ -21,7 +21,7 @@ public class DrtConfig {
     @Config.LangKey("骷髅袭击")
     @Config.Comment("Skeleton Horde Event")
     @Config.RequiresMcRestart
-    public static boolean SkeletonMobHordeEvent=true;
+    public static boolean SkeletonMobHordeEvent=false;
 
     @Config.LangKey("爬行者袭击")
     @Config.Comment("Creeper Horde Event")
