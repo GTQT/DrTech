@@ -17,12 +17,13 @@ import net.minecraftforge.common.BiomeDictionary;
 import java.util.Random;
 
 public class Ross128ChunkGenerator extends ChunkGeneratorOverworld {
-    private Random rand = new Random();
+    private Random rand;
     private final World world;
     private final StructRuins.RuinsBase ruinsBase = new StructRuins.RuinsBase();
     public Ross128ChunkGenerator(World worldIn, long seed, boolean mapFeaturesEnabledIn, String generatorOptions) {
         super(worldIn, seed, mapFeaturesEnabledIn, generatorOptions);
         this.world = worldIn;
+        this.rand = world.rand;
     }
 
 
