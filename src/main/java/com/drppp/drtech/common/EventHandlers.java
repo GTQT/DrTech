@@ -21,7 +21,6 @@ import static com.drppp.drtech.DrtConfig.onPlayerLoggedInEvent;
 
 @Mod.EventBusSubscriber(modid = Tags.MODID)
 public class EventHandlers {
-
     private static final String FIRST_SPAWN = Tags.MODID + ".first_spawn";
 
     @SubscribeEvent
@@ -68,4 +67,6 @@ public class EventHandlers {
             mobHordeWorldData.markDirty();
         }
     }
+
+   
 }

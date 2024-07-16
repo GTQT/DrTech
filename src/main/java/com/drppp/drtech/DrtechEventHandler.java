@@ -31,11 +31,11 @@ public static int ctrlflag = 0;
     }
     @SideOnly(Side.CLIENT)
     public static class Keybinds {
-
         public static final KeyBinding CTRL = new KeyBinding("key.ctrl", Keyboard.KEY_LCONTROL, "key.categories.drtech");
-
         public static void registerKeybinds() {
             ClientRegistry.registerKeyBinding(CTRL);
         }
     }
+	
+	
 }
