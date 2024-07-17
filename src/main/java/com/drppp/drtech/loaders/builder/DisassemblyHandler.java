@@ -98,6 +98,14 @@ public class DisassemblyHandler {
                 {
                       if(s.length>0)
                       {
+                          //消除矿磁带入的多余物品
+                          s[0] = new ItemStack(s[0].getItem(),s[0].getCount(),s[0].getMetadata());
+                          if(s.length>1)
+                          {
+                              for (int i = 1; i < s.length; i++) {
+                                  s[i] = ItemStack.EMPTY;
+                              }
+                          }
 						  //排除编程电路
                           if(s[0].getItem() == MetaItems.INTEGRATED_CIRCUIT.getMetaItem() && s[0].getMetadata()== MetaItems.INTEGRATED_CIRCUIT.getMetaValue())
                               s[0] = ItemStack.EMPTY;
@@ -114,17 +122,9 @@ public class DisassemblyHandler {
                                   int count = s[0].getCount();
                                   ItemStack ciru = circuitToUse.get(isCircuit.getSecond()).getFirst();
                                   s[0] = new ItemStack(ciru.getItem(),count,ciru.getMetadata());
-								  //消除矿磁带入的多余物品
-                                  if(s.length>1)
-                                  {
-                                      for (int i = 1; i < s.length; i++) {
-                                          s[i] = ItemStack.EMPTY;
-                                      }
-                                  }
                               }
                           }
                       }
-
                 }
                 RecipeBuilder<?> builder = DISASSEMBLER_RECIPES.recipeBuilder()
                         .EUt((int) voltage)
