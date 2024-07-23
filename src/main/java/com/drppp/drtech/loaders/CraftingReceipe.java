@@ -13,6 +13,7 @@ import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import gregtech.common.items.ToolItems;
+import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -165,5 +166,13 @@ public class CraftingReceipe {
                 'C', CIRCUIT, 'W', CABLE);
         gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(MetaTileEntities.UNIVERSAL_COLLECTORS, "WFW", "VHP", "WCW", 'W', Blocks.IRON_BARS, 'F',
                 MetaItems.FLUID_FILTER, 'P', PUMP, 'H', HULL, 'C', CIRCUIT,'V', CONVEYOR);
+
+        ModHandler.addShapedRecipe(true,"large_alloy_smelter", MetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm(),
+                "ADA", "WSW", "WWW",
+                'W',  new ItemStack(MetaBlocks.METAL_CASING,1,2),
+                'A',   new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.MV),
+                'S', GTQTMetaTileEntities.ALLOY_KILN.getStackForm(),
+                'D',new UnificationEntry(OrePrefix.plate, Materials.Aluminium)
+        );
     }
 }
