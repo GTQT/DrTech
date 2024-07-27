@@ -171,6 +171,7 @@ drtech.machine.large_bee_hive.name=巨型养蜂场
 drtech.machine.drone_pad.name=无人机平台
 drtech.machine.wind_driven_generator.name=风力发电机
 drtech.machine.player_beacon.name=无线供电信标
+drtech.machine.large_alloy_smelter.name=大型合金窑
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -274,6 +275,9 @@ behavior.data_item.hand_pump.data.1=容积为128,000 mB的流体转运工具，�
 behavior.data_item.hand_pump.data.2=最大的特点是可以从输入仓中抽取流体，解决流体冗余难于清理的情况。
 behavior.data_item.hand_pump.data.3=右键储有流体的设备抽取流体，将尽可能满载自身；潜行右键流体存储设备以输出流体。
 behavior.data_item.hand_pump.data.4=如果内有超过144mb焊锡，shift+右键可修复维护仓。
+drtech.machine.large_alloy_smelter.tooltip.1=§6大型的合金炉,然后没有了
+drtech.machine.large_alloy_smelter.tooltip.2=§6尽情的冶炼需要的合金吧
+drtech.machine.large_alloy_smelter.tooltip.3=§6并行=2*(电压等级+线圈等级)
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

@@ -87,6 +87,10 @@ public class DisassemblyHandler {
     private static void buildAssDisassemblerRecipe(Recipe recipe) {
         if(recipe!=null)
         {
+            if(DISASSEMBLER_RECIPES.findRecipe(recipe.getEUt(),recipe.getOutputs(),recipe.getFluidOutputs()) != null)
+            {
+                return;
+            }
             List<ItemStack> outputItems = recipe.getOutputs();
             List<ItemStack[]> inItems = new ArrayList<>();
             long voltage = recipe.getEUt();

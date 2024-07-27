@@ -19,6 +19,7 @@ import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
+import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.util.GTUtility;
 
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityItemBus;
@@ -60,6 +61,7 @@ public class MetaTileEntities {
     public static final MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
     public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
     public static final SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
+    public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -106,7 +108,7 @@ public class MetaTileEntities {
             UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector."+tierName),i+1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
         }
         registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
-
+      LARGE_ALLOY_SMELTER = registerMetaTileEntity(17114, new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
     }
 
 
