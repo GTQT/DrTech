@@ -30,6 +30,7 @@ import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.renderer.ICubeRenderer;
+import gregtech.client.utils.TooltipHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -309,8 +310,9 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
-        tooltip.add(I18n.format("gregtech.machine.yot_tank.tooltip1"));
-        tooltip.add(I18n.format("gregtech.machine.yot_tank.tooltip2"));
+        tooltip.add(TooltipHelper.RAINBOW_SLOW + I18n.format("超超超超级量子缸！", new Object[0]));
+        tooltip.add(I18n.format("能存储25种流体的超级储罐，容量由多方块内的流体单元决定"));
+        tooltip.add(I18n.format("在UI中通过按钮进行流体操作"));
     }
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {
