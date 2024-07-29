@@ -6,6 +6,7 @@ import com.drppp.drtech.intergations.GTFOLinkage;
 import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.intergations.HarvestcraftLinkage;
 import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.blocks.BlockAlvearyType;
 import gregtech.api.recipes.ModHandler;
@@ -182,6 +183,10 @@ public class MachineReceipe {
         if (Loader.isModLoaded(GTFOLinkage.GTFO_ID))
         {
             GTFOLinkage.MachineRecipeInit();
+        }
+        if (Loader.isModLoaded(HarvestcraftLinkage.CRAFT_ID))
+        {
+            HarvestcraftLinkage.MachineRecipeInit();
         }
         DRRP_GROUND_PUMP.recipeBuilder()
                 .fluidInputs(new FluidStack(FluidRegistry.WATER, 1000))
