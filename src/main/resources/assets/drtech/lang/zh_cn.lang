@@ -87,6 +87,7 @@ metaitem.upgrade_stop.name=停机升级
 metaitem.upgrade_catch.name=中子捕获升级
 metaitem.upgrade_reflect.name=反射效率升级
 metaitem.wireless_network_control_panel.name=无线网络控制面板
+metaitem.grass_killer.name=杂草终结者
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃
@@ -207,7 +208,7 @@ drtech.machine.uuproducter.tip.1=§6享受大机器的快乐
 drtech.machine.uuproducter.tip.2=§6耗电量为原本一半
 drtech.machine.uuproducter.tip.3=§6并行=8*电压等级
 drtech.machine.duplicator.tip.1=§6享受大机器的快乐
-drtech.machine.duplicator.tip.2=§6速度提升2倍
+drtech.machine.duplicator.tip.2=§6速度为原有的2倍
 drtech.machine.duplicator.tip.3=§6并行=8*电压等级
 drtech.machine.logcreate.tip.1=§1产量公式：(2×电压等级2-2×电压等级+5)×5×输出系数
 drtech.machine.logcreate.tip.2=§3锯 = 1x  圆锯 = 2x  链锯 = 4x
@@ -276,7 +277,7 @@ behavior.data_item.hand_pump.data.3=右键储有流体的设备抽取流体，�
 behavior.data_item.hand_pump.data.4=如果内有超过144mb焊锡，shift+右键可修复维护仓。
 drtech.machine.large_alloy_smelter.tooltip.1=§6大型的合金炉,然后没有了
 drtech.machine.large_alloy_smelter.tooltip.2=§6尽情的冶炼需要的合金吧
-drtech.machine.large_alloy_smelter.tooltip.3=§6并行=2*(电压等级+线圈等级)
+drtech.machine.large_alloy_smelter.tooltip.3=§6并行=2*(电压等级+线圈等级-1)
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

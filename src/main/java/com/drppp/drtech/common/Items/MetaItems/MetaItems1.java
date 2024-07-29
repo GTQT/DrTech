@@ -127,6 +127,10 @@ public  class MetaItems1 extends StandardMetaItem {
                 .addComponents(new FilteredFluidStats(128000, 2600, true, false, false, false, true))
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1);
+        MyMetaItems.GRASS_KILLER = this.addItem(27,"grass_killer")
+                .addComponents(new KillGrassBehavior())
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(1);
 
     }
 

@@ -62,15 +62,15 @@ public class MetaItemsReactorReg extends StandardMetaItem {
         MetaItemsReactor.U_FUEL_ROD_1X = this.addItem(1,"u_fuel_rod_1x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(50,2,1,false,0,400000, MetaItemsReactor.U_FUEL_ROD_1X_EX.getStackForm(),50));
+                .addComponents(new FuelRodBehavior(75,2,1,false,0,400000, MetaItemsReactor.U_FUEL_ROD_1X_EX.getStackForm(),75));
         MetaItemsReactor.U_FUEL_ROD_2X = this.addItem(2,"u_fuel_rod_2x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(200,4,2,false,0,400000, MetaItemsReactor.U_FUEL_ROD_2X_EX.getStackForm(),50));
+                .addComponents(new FuelRodBehavior(300,4,2,false,0,400000, MetaItemsReactor.U_FUEL_ROD_2X_EX.getStackForm(),75));
         MetaItemsReactor.U_FUEL_ROD_4X = this.addItem(3,"u_fuel_rod_4x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(600,8,4,false,0,400000, MetaItemsReactor.U_FUEL_ROD_4X_EX.getStackForm(),50));
+                .addComponents(new FuelRodBehavior(900,8,4,false,0,400000, MetaItemsReactor.U_FUEL_ROD_4X_EX.getStackForm(),75));
         MetaItemsReactor.HEAT_VENT = this.addItem(7,"heat_vent").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64)
                 .addComponents(new HeatVentBehavior(0,6,1000,false,false));
         MetaItemsReactor.COMPONENT_HEAT_VENT = this.addItem(8,"component_heat_vent").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64)
@@ -117,28 +117,28 @@ public class MetaItemsReactorReg extends StandardMetaItem {
         MetaItemsReactor.U_MOX_FUEL_ROD_1X = this.addItem(32,"u_mox_fuel_rod_1x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(50,2,1,true,4,200000, MetaItemsReactor.U_MOX_FUEL_ROD_1X_EX.getStackForm(),50));
+                .addComponents(new FuelRodBehavior(75,2,1,true,4,200000, MetaItemsReactor.U_MOX_FUEL_ROD_1X_EX.getStackForm(),75));
         MetaItemsReactor.U_MOX_FUEL_ROD_2X = this.addItem(33,"u_mox_fuel_rod_2x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(200,4,2,true,4,200000, MetaItemsReactor.U_MOX_FUEL_ROD_2X_EX.getStackForm(),50));
+                .addComponents(new FuelRodBehavior(300,4,2,true,4,200000, MetaItemsReactor.U_MOX_FUEL_ROD_2X_EX.getStackForm(),75));
         MetaItemsReactor.U_MOX_FUEL_ROD_4X = this.addItem(34,"u_mox_fuel_rod_4x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(600,8,4,true,4,200000, MetaItemsReactor.U_MOX_FUEL_ROD_4X_EX.getStackForm(),50));
+                .addComponents(new FuelRodBehavior(900,8,4,true,4,200000, MetaItemsReactor.U_MOX_FUEL_ROD_4X_EX.getStackForm(),75));
         //Th
         MetaItemsReactor.Th_FUEL_ROD_1X = this.addItem(35,"th_fuel_rod_1x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(10,0.5f,1,false,0,1000000, MetaItemsReactor.Th_FUEL_ROD_1X_EX.getStackForm(),10));
+                .addComponents(new FuelRodBehavior(20,0.5f,1,false,0,1000000, MetaItemsReactor.Th_FUEL_ROD_1X_EX.getStackForm(),20));
         MetaItemsReactor.Th_FUEL_ROD_2X = this.addItem(36,"th_fuel_rod_2x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(40,1,2,false,0,1000000, MetaItemsReactor.Th_FUEL_ROD_2X_EX.getStackForm(),10));
+                .addComponents(new FuelRodBehavior(80,1,2,false,0,1000000, MetaItemsReactor.Th_FUEL_ROD_2X_EX.getStackForm(),20));
         MetaItemsReactor.Th_FUEL_ROD_4X = this.addItem(37,"th_fuel_rod_4x")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64)
-                .addComponents(new FuelRodBehavior(120,2,4,false,0,1000000, MetaItemsReactor.Th_FUEL_ROD_4X_EX.getStackForm(),10));
+                .addComponents(new FuelRodBehavior(240,2,4,false,0,1000000, MetaItemsReactor.Th_FUEL_ROD_4X_EX.getStackForm(),20));
         MetaItemsReactor.COOLANT_NULL_CELL_1 = this.addItem(38,"coolant_null_cell_1")
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(64);

@@ -174,5 +174,10 @@ public class CraftingReceipe {
                 'S', GTQTMetaTileEntities.ALLOY_KILN.getStackForm(),
                 'D',new UnificationEntry(OrePrefix.plate, Materials.Aluminium)
         );
+        ModHandler.addShapedRecipe("grass_killer", MyMetaItems.GRASS_KILLER.getStackForm(),
+                "WSW", "SSS", "WSW",
+                'W', Blocks.GRASS,
+                'S', Items.IRON_INGOT
+        );
     }
 }
