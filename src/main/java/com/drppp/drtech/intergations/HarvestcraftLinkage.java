@@ -35,7 +35,8 @@ public class HarvestcraftLinkage {
         ImmutableList<String> cropNuts = ImmutableList.of("peanut");
         ImmutableList<String> nuts = ImmutableList.of("walnut", "almond", "cashew", "chestnut", "pecan", "pistachio", "cherry");
         Fluid seedOil = FluidRegistry.getFluid("seed.oil");
-        int seedamount = ForestryAPI.activeMode.getIntegerSetting("squeezer.liquid.seed");
+        //int seedamount = ForestryAPI.activeMode.getIntegerSetting("squeezer.liquid.seed");
+        int seedamount = 10;
         UnmodifiableIterator var24;
         String Name;
         ItemStack mustardFruit;
