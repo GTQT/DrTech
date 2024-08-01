@@ -173,6 +173,7 @@ drtech.machine.drone_pad.name=无人机平台
 drtech.machine.wind_driven_generator.name=风力发电机
 drtech.machine.player_beacon.name=无线供电信标
 drtech.machine.large_alloy_smelter.name=大型合金窑
+drtech.machine.matrix_solver.name=不定元矩阵运算器
 #Materials
 gregtech.material.bedrock=基岩
 

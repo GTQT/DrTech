@@ -62,6 +62,7 @@ public class MetaTileEntities {
     public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
     public static final SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
+    public static MetaTileEntityMatrixSolver MATRIX_SOLVER;
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -109,6 +110,7 @@ public class MetaTileEntities {
         }
         registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
       LARGE_ALLOY_SMELTER = registerMetaTileEntity(17114, new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
+        MATRIX_SOLVER = registerMetaTileEntity(17115, new MetaTileEntityMatrixSolver(getmyId("matrix_solver")));
     }
 
 
