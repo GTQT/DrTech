@@ -101,6 +101,7 @@ public class DrTechMain {
              ItemCombs.init();
         }
         GeckoLib.initialize();
+        Textures.init();
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
@@ -127,7 +128,6 @@ public class DrTechMain {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new ConnectorTesr());
         TextureUtils.addIconRegister(Textures::register);
-        Textures.init();
         LaserPipeRenderer.INSTANCE.preInit();
     }
     @SubscribeEvent

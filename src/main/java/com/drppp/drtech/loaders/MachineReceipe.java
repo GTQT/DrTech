@@ -2,6 +2,7 @@ package com.drppp.drtech.loaders;
 
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
+import com.drppp.drtech.intergations.Forestry.ForestryLinkage;
 import com.drppp.drtech.intergations.GTFOLinkage;
 import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
@@ -187,6 +188,10 @@ public class MachineReceipe {
         if (Loader.isModLoaded(HarvestcraftLinkage.CRAFT_ID))
         {
             HarvestcraftLinkage.MachineRecipeInit();
+        }
+        if(Loader.isModLoaded("forestry"))
+        {
+            ForestryLinkage.MachineRecipeInit();
         }
         DRRP_GROUND_PUMP.recipeBuilder()
                 .fluidInputs(new FluidStack(FluidRegistry.WATER, 1000))
