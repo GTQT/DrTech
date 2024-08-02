@@ -31,15 +31,6 @@ public class Pair<A, B> implements Map.Entry<A, B> {
         return Arrays.equals(this.pair, pair1.pair);
     }
 
-//    @Override
-//    public int hashCode() {
-//        return MurmurHash3.murmurhash3_x86_32(
-//                ByteBuffer.allocate(8).putInt(this.pair[0].hashCode()).putInt(this.pair[1].hashCode()).array(),
-//                0,
-//                8,
-//                31);
-//    }
-
     @Override
     public A getKey() {
         return (A) this.pair[0];
