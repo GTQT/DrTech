@@ -56,6 +56,7 @@ public class MetaTileEntities {
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
     public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
+    public static MetaTileEntityMatrixSolver MATRIX_SOLVER;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -132,7 +133,7 @@ public class MetaTileEntities {
         }
         registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(17114, new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
-
+        MATRIX_SOLVER = registerMetaTileEntity(17115, new MetaTileEntityMatrixSolver(getmyId("matrix_solver")));
         //  ULV-MAX Wireless Energy/Dynamo Hatch (consist of high-amp version)
         for (int i = 0; i < 15; i++) {
             String tier = VN[i].toLowerCase();
