@@ -28,7 +28,7 @@ public class DroneDimensionProperty extends RecipeProperty<IntList> {
 
     @Override
     public void drawInfo(Minecraft minecraft, int x, int y, int color, Object value) {
-        minecraft.fontRenderer.drawString(I18n.format("susy.recipe.dimensions",
+        minecraft.fontRenderer.drawString(I18n.format("维度：%s",
                 getDimensionsForRecipe(castValue(value))), x, y, color);
     }
 

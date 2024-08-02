@@ -27,7 +27,6 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-
 public class EntityDrone extends EntityLiving implements IAnimatable {
 
     private static final DataParameter<Integer> AGE = EntityDataManager.<Integer>createKey(EntityDrone.class, DataSerializers.VARINT);

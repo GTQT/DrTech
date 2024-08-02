@@ -34,29 +34,35 @@ import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTile
 import static gregtech.common.metatileentities.MetaTileEntities.registerSimpleMetaTileEntity;
 
 public class MetaTileEntities {
-    public static MetaTileEntityDronePad DRONE_PAD;
-    public static  AnnihilationGenerator ANNIHILATION_GENERATOR;
+    public static AnnihilationGenerator ANNIHILATION_GENERATOR;
     public static MetaTileEntityAdvancedProsscessArray ADVANCED_PROCESS_ARRAY;
-    public static MetaTileEntityElectricImplosionCompressor LARGE_LARGE;
-    public static MetaTileEntityLaserHatch[] LASER_OUTPUT_HATCH_16384 = new MetaTileEntityLaserHatch[10];
-    public static final SimpleMachineMetaTileEntity[] UU_PRODUCTER = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
-    public static final SimpleMachineMetaTileEntity[] DUPLICATOR = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
-    public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
-    public static MetaTileEntityLargeUUProducter LARGE_UU_PRODUCTER;
-    public static MetaTileEntityLargeElementDuplicator LARGE_ELEMENT_DUPLICATOR;
-    public static MetaTileEntityLogFactory LOG_FACTORY;
-    public static MetaTileEntityLargeMolecularRecombination LARGE_MOLECULAR_RECOMBINATION;
-    public static MetaTileEntityYotTank YOUT_TANK;
-    public static MetaTileEntityMobsKiller MOB_KILLER;
     public static MetaTileEntityDeepGroundPump DEEP_GROUND_PUMP;
-    public static MetatileEntityTwentyFiveFluidTank TFFT;
-    public static MetaTileEntityYotHatch YOT_HARCH;
+    public static MetaTileEntityDronePad DRONE_PAD;
+    public static MetaTileEntityElectricImplosionCompressor LARGE_LARGE;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
-    public static MetaTileEntitySolarTower SOLAR_TOWER;
-    public static NuclearReactor NUCLEAR_GENERATOR;
-    public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
-    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
+    public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
+    public static MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
+    public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
+    public static MetaTileEntityLargeElementDuplicator LARGE_ELEMENT_DUPLICATOR;
+    public static MetaTileEntityLargeMolecularRecombination LARGE_MOLECULAR_RECOMBINATION;
+    public static MetaTileEntityLargeUUProducter LARGE_UU_PRODUCTER;
+    public static MetaTileEntityLaserHatch[] LASER_OUTPUT_HATCH_16384 = new MetaTileEntityLaserHatch[10];
+    public static MetaTileEntityLogFactory LOG_FACTORY;
     public static MetaTileEntityMatrixSolver MATRIX_SOLVER;
+    public static MetaTileEntityMobsKiller MOB_KILLER;
+    public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
+    public static MetaTileEntitySolarTower SOLAR_TOWER;
+    public static MetatileEntityTwentyFiveFluidTank TFFT;
+    public static MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
+    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
+    public static MetaTileEntityYotHatch YOT_HARCH;
+    public static MetaTileEntityYotTank YOUT_TANK;
+    public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
+    public static NuclearReactor NUCLEAR_GENERATOR;
+    public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
+    public static SimpleMachineMetaTileEntity[] DUPLICATOR = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
+    public static SimpleMachineMetaTileEntity[] UU_PRODUCTER = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
+
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -80,61 +86,68 @@ public class MetaTileEntities {
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
 
-    public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
-    public static final MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
-    public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
-    public static final SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
-    public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
-
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
         if (id > 1000)
             return null;
-        return registerMetaTileEntity(id + 28000, mte);
+        return registerMetaTileEntity(id + 17300, mte);
+    }
+    static int startID=16999;
+    public static int getID()
+    {
+        startID++;
+        return startID;
     }
     public static void Init() {
-        ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
-        ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
-        LARGE_LARGE = registerMetaTileEntity(17002, new MetaTileEntityElectricImplosionCompressor(getmyId("electric_implosion_compressor")));
+        String tierName;
         int endPos = GregTechAPI.isHighTier() ? LASER_OUTPUT_HATCH_16384.length - 1 :
                 Math.min(LASER_OUTPUT_HATCH_16384.length - 1, GTValues.UHV - GTValues.IV);
+
+        //Common ID 17000
+        ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(getID(), new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
+        ANNIHILATION_GENERATOR = registerMetaTileEntity(getID(), new AnnihilationGenerator(getmyId("annihilation_generator")));
+        DEEP_GROUND_PUMP = registerMetaTileEntity(getID(),new MetaTileEntityDeepGroundPump(getmyId("deep_ground_pump")));
+        DRONE_PAD = registerMetaTileEntity(getID(), new MetaTileEntityDronePad(getmyId("drone_pad")));
+        INFINITE_FLUID_DRILLING_RIG =registerMetaTileEntity(getID(), new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
+        LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
+        LARGE_BEE_HIVE = registerMetaTileEntity(getID(),new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
+        LARGE_ELEMENT_DUPLICATOR = registerMetaTileEntity(getID(),new MetaTileEntityLargeElementDuplicator(getmyId("large_element_duplicator")));
+        LARGE_LARGE = registerMetaTileEntity(getID(), new MetaTileEntityElectricImplosionCompressor(getmyId("electric_implosion_compressor")));
+        LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(),new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
+        LARGE_UU_PRODUCTER = registerMetaTileEntity(getID(),new MetaTileEntityLargeUUProducter(getmyId("large_uu_producter")));
+        LOG_FACTORY = registerMetaTileEntity(getID(),new MetaTileEntityLogFactory(getmyId("log_factory")));
+        MATRIX_SOLVER = registerMetaTileEntity(getID(), new MetaTileEntityMatrixSolver(getmyId("matrix_solver")));
+        MOB_KILLER = registerMetaTileEntity(getID(),new MetaTileEntityMobsKiller(getmyId("mob_killer")));
+        NUCLEAR_GENERATOR = registerMetaTileEntity(getID(),new NuclearReactor(getmyId("nuclear_generator")));
+        PLAYER_BEACON = registerMetaTileEntity(getID(),new MetaTileEntityPlayerBeacon(getmyId("player_beacon")));
+        SOLAR_TOWER = registerMetaTileEntity(getID(),new MetaTileEntitySolarTower(getmyId("solar_tower")));
+        TFFT = registerMetaTileEntity(getID(),new MetatileEntityTwentyFiveFluidTank(getmyId("tfft_tank")));
+        TRANS_TOWER = registerMetaTileEntity(getID(),new MetaTileEntityEnergyTransTower(getmyId("trans_tower")));
+        WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(getID(), new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
+        YOT_HARCH = registerMetaTileEntity(getID(),new MetaTileEntityYotHatch(getmyId("yot_hatch")));
+        YOUT_TANK = registerMetaTileEntity(getID(),new MetaTileEntityYotTank(getmyId("yot_tank")));
+
+
+        //人工分配 ID 17100
+        for (int i = 0; i < 10; i++) {
+            tierName = GTValues.VN[i].toLowerCase();
+            UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17100+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector."+tierName),i+1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
+        }
+
         for (int i = 0; i < endPos; i++) {
             int v = i + GTValues.IV;
             String voltageName = GTValues.VN[v].toLowerCase();
-            LASER_OUTPUT_HATCH_16384[i] = registerMetaTileEntity(17003 + i, new MetaTileEntityLaserHatch(
+            LASER_OUTPUT_HATCH_16384[i] = registerMetaTileEntity(17115 + i, new MetaTileEntityLaserHatch(
                     getmyId("laser_hatch.target_16384a." + voltageName), false, v, 16384));
-            LASER_OUTPUT_HATCH_16384[i] = registerMetaTileEntity(17012 + i,
+            LASER_OUTPUT_HATCH_16384[i] = registerMetaTileEntity(17130 + i,
                     new MetaTileEntityLaserHatch(getmyId("laser_hatch.source_16384a." + voltageName), true, v, 16384));
         }
-        registerSimpleMetaTileEntity(UU_PRODUCTER, 17012 +endPos, "uu_producter", DrtechReceipes.UU_RECIPES, Textures.UUPRODUCTER_OVERLAY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
-        //17024
-        registerSimpleMetaTileEntity(DUPLICATOR, 17035, "duplicator", DrtechReceipes.COPY_RECIPES, Textures.DUPLICATOR, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
-        //17032
-        INFINITE_FLUID_DRILLING_RIG =registerMetaTileEntity(17056, new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
-        LARGE_UU_PRODUCTER = registerMetaTileEntity(17057,new MetaTileEntityLargeUUProducter(getmyId("large_uu_producter")));
-        LARGE_ELEMENT_DUPLICATOR = registerMetaTileEntity(17058,new MetaTileEntityLargeElementDuplicator(getmyId("large_element_duplicator")));
-        LOG_FACTORY = registerMetaTileEntity(17059,new MetaTileEntityLogFactory(getmyId("log_factory")));
-        LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(17060,new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
-        YOUT_TANK = registerMetaTileEntity(17061,new MetaTileEntityYotTank(getmyId("yot_tank")));
-        MOB_KILLER = registerMetaTileEntity(17062,new MetaTileEntityMobsKiller(getmyId("mob_killer")));
-        DEEP_GROUND_PUMP = registerMetaTileEntity(17063,new MetaTileEntityDeepGroundPump(getmyId("deep_ground_pump")));
-        TFFT = registerMetaTileEntity(17064,new MetatileEntityTwentyFiveFluidTank(getmyId("tfft_tank")));
-        YOT_HARCH = registerMetaTileEntity(17065,new MetaTileEntityYotHatch(getmyId("yot_hatch")));
-        TRANS_TOWER = registerMetaTileEntity(17066,new MetaTileEntityEnergyTransTower(getmyId("trans_tower")));
-        SOLAR_TOWER = registerMetaTileEntity(17067,new MetaTileEntitySolarTower(getmyId("solar_tower")));
-        NUCLEAR_GENERATOR = registerMetaTileEntity(17068,new NuclearReactor(getmyId("nuclear_generator")));
-        LARGE_BEE_HIVE = registerMetaTileEntity(17069,new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
-        DRONE_PAD = registerMetaTileEntity(17070, new MetaTileEntityDronePad(getmyId("drone_pad")));
-        WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(17071, new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
-        String tierName;
-        PLAYER_BEACON = registerMetaTileEntity(17093,new MetaTileEntityPlayerBeacon(getmyId("player_beacon")));
-        for (int i = 0; i < 10; i++) {
-            tierName = GTValues.VN[i].toLowerCase();
-            UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector."+tierName),i+1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
-        }
-        registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
-        LARGE_ALLOY_SMELTER = registerMetaTileEntity(17114, new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
-        MATRIX_SOLVER = registerMetaTileEntity(17115, new MetaTileEntityMatrixSolver(getmyId("matrix_solver")));
-        //  ULV-MAX Wireless Energy/Dynamo Hatch (consist of high-amp version)
+        //单方块机器 ID 17200
+        registerSimpleMetaTileEntity(UU_PRODUCTER, 17200, "uu_producter", DrtechReceipes.UU_RECIPES, Textures.UUPRODUCTER_OVERLAY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerSimpleMetaTileEntity(DUPLICATOR, 17215, "duplicator", DrtechReceipes.COPY_RECIPES, Textures.DUPLICATOR, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerSimpleMetaTileEntity(DISASSEMBLY, 17230 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+
+
+        //  ULV-MAX Wireless Energy/Dynamo Hatch (consist of high-amp version) ID 17300
         for (int i = 0; i < 15; i++) {
             String tier = VN[i].toLowerCase();
             WIRELESS_INPUT_ENERGY_HATCH[i]          = registerPartMetaTileEntity( i,       new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input."          + tier), i, 2,       false));
