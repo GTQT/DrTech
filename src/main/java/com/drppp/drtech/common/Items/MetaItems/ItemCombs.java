@@ -9,6 +9,7 @@ public class ItemCombs {
         if(Loader.isModLoaded("forestry"))
         {
             ITEM_COMBS =  new com.drppp.drtech.intergations.Forestry.DrtCombItem();
+
         }
     }
 }

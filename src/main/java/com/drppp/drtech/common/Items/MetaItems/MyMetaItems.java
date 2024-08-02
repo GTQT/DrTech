@@ -30,6 +30,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem TELEPATHIC_NECKLACE ;
     public static MetaItem<?>.MetaValueItem WIRELESS_NETWORK_CONTROL_PANEL ;
     public static MetaItem<?>.MetaValueItem HAND_PUMP ;
+    public static MetaItem<?>.MetaValueItem GRASS_KILLER ;
 
     public static void MetaItemsInit()
     {

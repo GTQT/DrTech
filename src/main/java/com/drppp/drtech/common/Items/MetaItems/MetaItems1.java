@@ -124,7 +124,11 @@ public  class MetaItems1 extends StandardMetaItem {
                 .setMaxStackSize(1);
         MyMetaItems.HAND_PUMP = this.addItem(26,"hand_pump")
                 .addComponents(new HandPumpBehavior())
-                .addComponents(new FilteredFluidStats(128000, 2600, true, false, false, false, true))
+                .addComponents(new FilteredFluidStats(128000, 2600, true, true, false, false, true))
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(1);
+        MyMetaItems.GRASS_KILLER = this.addItem(27,"grass_killer")
+                .addComponents(new KillGrassBehavior())
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1);
 
