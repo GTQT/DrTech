@@ -222,7 +222,7 @@ drtech.multiblock.yot_tank.fluid_type=流体类型:%s
 gregtech.machine.yot_tank.tooltip1=§9超超超超级量子缸！
 gregtech.machine.yot_tank.tooltip2=§9存储任意搭配,运行不耗电!
 
-drtech.machine.mobskiller.tip.1=§3根据电路板和生物群系产出掉落物!
+drtech.machine.mobskiller.tip.1=§3根据电路板和生物群系产出掉落物(地狱 沼泽 末地)!输入总线放一把剑！
 drtech.machine.mobskiller.tip.2=§3按照电路1-14分别是:僵尸、骷髅、爬行者、女巫、烈焰人、猪人、凋零骷髅、恶魂、末影人、史莱姆、牛、鸡、羊、猪
 metaitem.pipe_1.tooltip.1=管道长度:1
 metaitem.pipe_5.tooltip.1=管道长度:5
@@ -267,7 +267,7 @@ metaitem.nuclear.upgrade.catch=增加发电效率(每个10%)
 metaitem.nuclear.upgrade.reflect=增加燃烧时间
 behavior.data_item.wireless_panel.username=网络所有者:%s
 behavior.data_item.wireless_panel.data=UUID:%s
-behavior.data_item.wireless_panel.data.2=shift+右键绑定自身网络,左键将无线仓和供电信标绑定到网络
+behavior.data_item.wireless_panel.data.2=shift+右键绑定自身网络,右键将无线仓和供电信标绑定到网络
 behavior.data_item.wireless_panel.data.3=右键打开GUI
 behavior.data_item.wireless_panel.data.4=shift+左键将自身绑定到供电信标
 drtech.machine.player_beacon.btn1=清空列表
