@@ -3,7 +3,6 @@ package com.drppp.drtech.common.MetaTileEntities;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityInputAssembly;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
 import com.drppp.drtech.loaders.DrtechReceipes;
@@ -19,13 +18,8 @@ import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
-import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.util.GTUtility;
-
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityItemBus;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
-import keqing.gtqtcore.api.GTQTValue;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +35,6 @@ public class MetaTileEntities {
     public static MetaTileEntityElectricImplosionCompressor LARGE_LARGE;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
-    public static MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
     public static MetaTileEntityLargeElementDuplicator LARGE_ELEMENT_DUPLICATOR;
     public static MetaTileEntityLargeMolecularRecombination LARGE_MOLECULAR_RECOMBINATION;
