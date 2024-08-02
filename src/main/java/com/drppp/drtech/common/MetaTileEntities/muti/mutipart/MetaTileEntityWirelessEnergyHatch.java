@@ -62,10 +62,12 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
         return builder.build(this.getHolder(), entityPlayer);
     }
     protected void addDisplayText(List<ITextComponent> textList) {
-        WirelessNetworkManager.strongCheckOrAddUser(this.ownerUuid);
-        textList.add(new TextComponentString("网络UUID:"+this.ownerUuid.toString()));
-        textList.add(new TextComponentString("网络存储能量:"+WirelessNetworkManager.getUserEU(this.ownerUuid).toString()));
-
+        if(this.ownerUuid!=null)
+        {
+            WirelessNetworkManager.strongCheckOrAddUser(this.ownerUuid);
+            textList.add(new TextComponentString(this.ownerUuid.toString()));
+            textList.add(new TextComponentString("网络存储能量:"+WirelessNetworkManager.getUserEU(this.ownerUuid).toString()));
+        }
     }
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
@@ -102,8 +104,8 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
 
     }
     @Override
-    public void onLeftClick(EntityPlayer player, EnumFacing facing, CuboidRayTraceResult hitResult) {
-        ItemStack is = player.getHeldItem(EnumHand.MAIN_HAND);
+    public boolean onRightClick(EntityPlayer playerIn, EnumHand hand, EnumFacing facing, CuboidRayTraceResult hitResult) {
+        ItemStack is = playerIn.getHeldItem(EnumHand.MAIN_HAND);
         if(is.getItem()== MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && is.getMetadata()==MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue())
         {
             NBTTagCompound compound = is.getTagCompound();
@@ -114,7 +116,7 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
             }
 
         }
-        super.onLeftClick(player, facing, hitResult);
+        return super.onRightClick(playerIn, hand, facing, hitResult);
     }
 
     @Override
@@ -137,8 +139,7 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
     public void receiveCustomData(int dataId, PacketBuffer buf) {
         super.receiveCustomData(dataId, buf);
         if (dataId == 1919) {
-            this.ownerUuid = buf.readUniqueId();
-            this.energyContainer.ownerUuid= buf.readUniqueId();
+            this.energyContainer.ownerUuid= this.ownerUuid = buf.readUniqueId();
         }
 
     }
