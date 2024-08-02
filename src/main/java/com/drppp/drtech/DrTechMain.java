@@ -64,8 +64,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.geckolib3.GeckoLib;
 
-import static com.drppp.drtech.api.Muti.DrtMultiblockAbility.EXPORT_ASSEMBLY;
-import static com.drppp.drtech.api.Muti.DrtMultiblockAbility.IMPORT_ASSEMBLY;
 import static com.drppp.drtech.common.Items.MetaItems.ItemCombs.ITEM_COMBS;
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
@@ -114,8 +112,6 @@ public class DrTechMain {
     }
     @Mod.EventHandler
     public void onPreInit( FMLPreInitializationEvent event) {
-        EXPORT_ASSEMBLY = new MultiblockAbility<>("export_assembly");
-        IMPORT_ASSEMBLY = new MultiblockAbility<>("import_assembly");
         drtMetaEntities.init();
         SusySounds.registerSounds();
         TileEntityUIFactory.INSTANCE.init();
