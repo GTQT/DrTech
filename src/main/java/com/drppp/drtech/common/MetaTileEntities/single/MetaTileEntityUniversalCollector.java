@@ -36,6 +36,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
@@ -304,6 +306,7 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     @Override
     public void addInformation(ItemStack stack, @Nullable World player, @NotNull List<String> tooltip, boolean advanced) {
         super.addInformation(stack, player, tooltip, advanced);
+        tooltip.add("收集范围内的小机器、输出总线/仓的物品/流体");
         tooltip.add("等级:"+GTValues.VN[getTier()]);
         tooltip.add("收集范围:"+range);
         tooltip.add("耗电:"+(GTValues.V[getTier()]/4));
