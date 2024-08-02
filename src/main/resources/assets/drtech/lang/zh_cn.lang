@@ -389,6 +389,7 @@ drtech.machine.disassembly.uiv.name=史诗拆解机 III
 drtech.machine.disassembly.uxv.name=史诗拆解机 IV
 drtech.machine.disassembly.opv.name=传奇拆解机
 
+drtech.machine.matrix_solver.name=不定元矩阵运算器
 
 drtech.machine.wireless_energy_hatch.input.ulv.name=无线能源仓（§8ULV§r）
 drtech.machine.wireless_energy_hatch.input.lv.name=无线能源仓（§7LV§r）
