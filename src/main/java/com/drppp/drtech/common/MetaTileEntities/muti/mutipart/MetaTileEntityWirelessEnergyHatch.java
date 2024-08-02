@@ -18,6 +18,7 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
+import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockPart;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,20 +36,22 @@ import java.util.List;
 import java.util.UUID;
 
 public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockPart implements IMultiblockAbilityPart<IEnergyContainer> {
-    
+    private final int amperage;
     private final boolean isExport;
     private final EnergyContainerWireless energyContainer;
     private UUID ownerUuid=null;
     
-    public MetaTileEntityWirelessEnergyHatch(ResourceLocation metaTileEntityId, int tier,boolean isExport) {
+    public MetaTileEntityWirelessEnergyHatch(ResourceLocation metaTileEntityId, int tier, int amperage,boolean isExport) {
         super(metaTileEntityId, tier);
         this.isExport = isExport;
-        energyContainer = new EnergyContainerWireless(this,isExport, GTValues.V[tier],2);
+        this.amperage = amperage;
+        energyContainer = new EnergyContainerWireless(this,isExport, GTValues.V[tier],this.amperage);
+
     }
     
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
-        return new MetaTileEntityWirelessEnergyHatch(this.metaTileEntityId,this.getTier(),this.isExport);
+        return new MetaTileEntityWirelessEnergyHatch(this.metaTileEntityId,this.getTier(),this.amperage,this.isExport);
     }
     
     @Override
@@ -67,8 +70,35 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
         if (this.shouldRenderOverlay()) {
-            Textures.WIRELESS_HATCH_HATCH.renderSided(this.getFrontFacing(), renderState, translation, pipeline);
+            getOverlay().renderSided(getFrontFacing(),renderState,translation,pipeline);
         }
+
+    }
+    private SimpleOverlayRenderer getOverlay() {
+        if (amperage == 2) {
+            return Textures.MULTIPART_WIRELESS_ENERGY;
+        } else if (amperage == 4) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_4x;
+        } else if (amperage == 16) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_16x;
+        } else if (amperage == 64) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_64x;
+        } else if (amperage == 256) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_256x;
+        } else if (amperage == 1024) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_1024x;
+        } else if (amperage == 4096) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_4096x;
+        } else if (amperage == 16384) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_16384x;
+        } else if (amperage == 65536) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_65536x;
+        } else if (amperage == 262144) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_262144x;
+        } else if (amperage == 1048576) {
+            return Textures.MULTIPART_WIRELESS_ENERGY_1048576x;
+        }
+        else return Textures.MULTIPART_WIRELESS_ENERGY;
 
     }
     @Override

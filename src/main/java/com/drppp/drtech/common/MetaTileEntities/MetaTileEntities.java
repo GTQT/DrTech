@@ -29,6 +29,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import static gregtech.api.GTValues.VN;
 import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntity;
 import static gregtech.common.metatileentities.MetaTileEntities.registerSimpleMetaTileEntity;
 
@@ -55,13 +56,40 @@ public class MetaTileEntities {
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
     public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
-    public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_RECEIVER = new MetaTileEntityWirelessEnergyHatch[10];
-    public static MetaTileEntityWirelessEnergyHatch[] WIRELESS_EMERGY_HATCH_TRANSMITTER= new MetaTileEntityWirelessEnergyHatch[10];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_16A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_16A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_64A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_64A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_256A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_256A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_1024A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_1024A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4096A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_4096A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_16384A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_16384A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_65536A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_65536A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_262144A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_262144A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
+
     public static MetaTileEntityPlayerBeacon PLAYER_BEACON;
     public static final MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
     public static final MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
     public static final SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
+
+    private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
+        if (id > 1000)
+            return null;
+        return registerMetaTileEntity(id + 28000, mte);
+    }
     public static void Init() {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(17000, new AnnihilationGenerator(getmyId("annihilation_generator")));
         ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(17001, new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"),1));
@@ -97,18 +125,41 @@ public class MetaTileEntities {
         DRONE_PAD = registerMetaTileEntity(17070, new MetaTileEntityDronePad(getmyId("drone_pad")));
         WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(17071, new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
         String tierName;
-        for(int i = 1; i <= 10; ++i) {
-            tierName = GTValues.VN[i].toLowerCase();
-            WIRELESS_EMERGY_HATCH_RECEIVER[i-1] = registerMetaTileEntity(17072 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.receiver." + tierName), i, false));
-            WIRELESS_EMERGY_HATCH_TRANSMITTER[i-1] = registerMetaTileEntity(17082 + i - 1, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.transmitter." + tierName), i, true));
-        }
         PLAYER_BEACON = registerMetaTileEntity(17093,new MetaTileEntityPlayerBeacon(getmyId("player_beacon")));
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();
             UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(17094+i,new MetaTileEntityUniversalCollector(getmyId("universal_collector."+tierName),i+1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
         }
         registerSimpleMetaTileEntity(DISASSEMBLY, 17104 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
-      LARGE_ALLOY_SMELTER = registerMetaTileEntity(17114, new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
+        LARGE_ALLOY_SMELTER = registerMetaTileEntity(17114, new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
+
+        //  ULV-MAX Wireless Energy/Dynamo Hatch (consist of high-amp version)
+        for (int i = 0; i < 15; i++) {
+            String tier = VN[i].toLowerCase();
+            WIRELESS_INPUT_ENERGY_HATCH[i]          = registerPartMetaTileEntity( i,       new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input."          + tier), i, 2,       false));
+            WIRELESS_INPUT_ENERGY_HATCH_4A[i]       = registerPartMetaTileEntity( 15 + i,  new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_4a."       + tier), i, 4,       false));
+            WIRELESS_INPUT_ENERGY_HATCH_16A[i]      = registerPartMetaTileEntity( 30 + i,  new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_16a."      + tier), i, 16,      false));
+            WIRELESS_INPUT_ENERGY_HATCH_64A[i]      = registerPartMetaTileEntity( 45 + i,  new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_64a."      + tier), i, 64,      false));
+            WIRELESS_INPUT_ENERGY_HATCH_256A[i]     = registerPartMetaTileEntity( 60 + i,  new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_256a."     + tier), i, 256,     false));
+            WIRELESS_INPUT_ENERGY_HATCH_1024A[i]    = registerPartMetaTileEntity( 75 + i,  new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_1024a."    + tier), i, 1024,    false));
+            WIRELESS_INPUT_ENERGY_HATCH_4096A[i]    = registerPartMetaTileEntity( 90 + i,  new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_4096a."    + tier), i, 4096,    false));
+            WIRELESS_INPUT_ENERGY_HATCH_16384A[i]   = registerPartMetaTileEntity( 105 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_16384a."   + tier), i, 16384,   false));
+            WIRELESS_INPUT_ENERGY_HATCH_65536A[i]   = registerPartMetaTileEntity( 120 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_65536a."   + tier), i, 65536,   false));
+            WIRELESS_INPUT_ENERGY_HATCH_262144A[i]  = registerPartMetaTileEntity( 135 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_262144a."  + tier), i, 262144,  false));
+            WIRELESS_INPUT_ENERGY_HATCH_1048576A[i] = registerPartMetaTileEntity( 150 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.input_1048576a." + tier), i, 1048576, false));
+
+            WIRELESS_OUTPUT_ENERGY_HATCH[i]          = registerPartMetaTileEntity( 165 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output."          + tier), i, 2,       true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_4A[i]       = registerPartMetaTileEntity( 180 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_4a."       + tier), i, 4,       true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_16A[i]      = registerPartMetaTileEntity( 195 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_16a."      + tier), i, 16,      true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_64A[i]      = registerPartMetaTileEntity( 210 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_64a."      + tier), i, 64,      true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_256A[i]     = registerPartMetaTileEntity( 225 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_256a."     + tier), i, 256,     true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_1024A[i]    = registerPartMetaTileEntity( 240 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_1024a."    + tier), i, 1024,    true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_4096A[i]    = registerPartMetaTileEntity( 255 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_4096a."    + tier), i, 4096,    true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_16384A[i]   = registerPartMetaTileEntity( 270 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_16384a."   + tier), i, 16384,   true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_65536A[i]   = registerPartMetaTileEntity( 285 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_65536a."   + tier), i, 65536,   true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_262144A[i]  = registerPartMetaTileEntity( 300 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_262144a."  + tier), i, 262144,  true));
+            WIRELESS_OUTPUT_ENERGY_HATCH_1048576A[i] = registerPartMetaTileEntity( 315 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_1048576a." + tier), i, 1048576, true));
+        }
     }
 
 
