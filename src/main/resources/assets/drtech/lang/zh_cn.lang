@@ -176,6 +176,7 @@ drtech.machine.player_beacon.name=无线供电信标
 drtech.machine.large_alloy_smelter.name=大型合金窑
 drtech.machine.matrix_solver.name=不定元矩阵运算器
 drtech.machine.large_extruder.name=大型压模机
+drtech.machine.passthrough_computationhatch.name=算力通行仓
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -285,6 +286,8 @@ drtech.machine.large_alloy_smelter.tooltip.3=§6并行=2*(电压等级+线圈等
 drtech.machine.large_extruder.tooltip.1=§6大型的压模机,比单方块快2.5倍
 drtech.machine.large_extruder.tooltip.2=§6尽情的压模吧
 drtech.machine.large_extruder.tooltip.3=§6并行UV以下电压等级*4,以上电压等级*8
+drtech.machine.passthrough_computationhatch.tooltip.1=§d超净间的算力传递方式
+drtech.machine.passthrough_computationhatch.tooltip.2=§d正向接收反向输送
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

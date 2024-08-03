@@ -4,6 +4,7 @@ import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
+import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileeneityPassthroughHatchComputationHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
@@ -56,6 +57,7 @@ public class MetaTileEntities {
     public static SimpleMachineMetaTileEntity[] DUPLICATOR = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
     public static SimpleMachineMetaTileEntity[] UU_PRODUCTER = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
     public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
+    public static MetaTileeneityPassthroughHatchComputationHatch PASSTHROUGH_COMPUTER;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -119,7 +121,7 @@ public class MetaTileEntities {
         YOT_HARCH = registerMetaTileEntity(getID(),new MetaTileEntityYotHatch(getmyId("yot_hatch")));
         YOUT_TANK = registerMetaTileEntity(getID(),new MetaTileEntityYotTank(getmyId("yot_tank")));
         LARGE_EXTRUDER = registerMetaTileEntity(getID(),new MetaTileentityLargeExtruder(getmyId("large_extruder")));
-
+        PASSTHROUGH_COMPUTER = registerMetaTileEntity(getID(),new MetaTileeneityPassthroughHatchComputationHatch(getmyId("passthrough_computationhatch")));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();
