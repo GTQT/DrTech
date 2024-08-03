@@ -5,6 +5,7 @@ import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
+import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Materials;
@@ -19,6 +20,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Loader;
 
+import static gregtech.common.metatileentities.MetaTileEntities.ELECTRIC_BLAST_FURNACE;
+import static gregtech.common.metatileentities.MetaTileEntities.IMPLOSION_COMPRESSOR;
 import static gregtech.loaders.recipe.CraftingComponent.*;
 
 public class CraftingReceipe {
@@ -93,7 +96,7 @@ public class CraftingReceipe {
         ModHandler.addShapedRecipe(true, "electric_implosion_compressor", MetaTileEntities.LARGE_LARGE.getStackForm(),
                 new Object[]{"PCP", "FSF", "PCP", 'C',
                         new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.IV),
-                        'S', gregtech.common.metatileentities.MetaTileEntities.IMPLOSION_COMPRESSOR.getStackForm(),
+                        'S', IMPLOSION_COMPRESSOR.getStackForm(),
                         'P', MetaItems.ELECTRIC_PISTON_EV.getStackForm(),
                         'F', MetaItems.FIELD_GENERATOR_EV.getStackForm()});
 
@@ -171,7 +174,7 @@ public class CraftingReceipe {
                 "ADA", "WSW", "WWW",
                 'W',  new ItemStack(MetaBlocks.METAL_CASING,1,2),
                 'A',   new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.MV),
-                'S', GTQTMetaTileEntities.ALLOY_KILN.getStackForm(),
+                'S',    ELECTRIC_BLAST_FURNACE.getStackForm(),
                 'D',new UnificationEntry(OrePrefix.plate, Materials.Aluminium)
         );
         ModHandler.addShapedRecipe("grass_killer", MyMetaItems.GRASS_KILLER.getStackForm(),
