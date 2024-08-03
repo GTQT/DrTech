@@ -19,6 +19,12 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Loader;
 
+import static gregicality.multiblocks.api.unification.GCYMMaterials.MolybdenumDisilicide;
+import static gregtech.api.GTValues.EV;
+import static gregtech.api.GTValues.IV;
+import static gregtech.api.unification.material.Materials.Platinum;
+import static gregtech.api.unification.material.Materials.Ultimet;
+import static gregtech.api.unification.ore.OrePrefix.*;
 import static gregtech.loaders.recipe.CraftingComponent.*;
 
 public class CraftingReceipe {
@@ -33,7 +39,7 @@ public class CraftingReceipe {
         ModHandler.addShapedRecipe("yot_tank", MetaTileEntities.YOUT_TANK.getStackForm(),
                 "WAW", "EFE", "MBM",
                 'W', new UnificationEntry(OrePrefix.screw,Materials.TungstenSteel),
-                'E', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.EV),
+                'E', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
                 'F', new ItemStack(BlocksInit.COMMON_CASING,1,9),
                 'M', MetaItems.FIELD_GENERATOR_LV,
                 'A', new UnificationEntry(OrePrefix.plate,Materials.Polytetrafluoroethylene),
@@ -42,7 +48,7 @@ public class CraftingReceipe {
         ModHandler.addShapedRecipe("tfft_tank", MetaTileEntities.TFFT.getStackForm(),
                 "WAW", "EFE", "MBM",
                 'W', new UnificationEntry(OrePrefix.screw,Materials.TungstenSteel),
-                'E', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.EV),
+                'E', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
                 'F', new ItemStack(BlocksInit.COMMON_CASING,1,10),
                 'M', MetaItems.FIELD_GENERATOR_LV,
                 'A', new UnificationEntry(OrePrefix.plate,Materials.Polytetrafluoroethylene),
@@ -51,7 +57,7 @@ public class CraftingReceipe {
         ModHandler.addShapedRecipe("mob_killer", MetaTileEntities.MOB_KILLER.getStackForm(),
                 "WAW", "AFA", "SSS",
                 'W',  MetaItems.ROBOT_ARM_HV,
-                'A', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.HV),
+                'A', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
                 'F', new ItemStack(MetaBlocks.MACHINE,1,988),
                 'S', Items.DIAMOND_SWORD
         );
@@ -65,7 +71,7 @@ public class CraftingReceipe {
                 'W', new UnificationEntry(OrePrefix.plateDouble,Materials.Copper),
                 'D', new UnificationEntry(OrePrefix.plateDouble,Materials.Silver),
                 'S', new ItemStack(MetaBlocks.MACHINE,1,986),
-                'A', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.LV)
+                'A', new UnificationEntry(circuit, MarkerMaterials.Tier.LV)
         );
         ModHandler.addShapedRecipe("connector_1", new ItemStack(BlocksInit.BLOCK_CONNECTOR1),
                 "WAW", "WSW", "WAW",
@@ -92,7 +98,7 @@ public class CraftingReceipe {
         );
         ModHandler.addShapedRecipe(true, "electric_implosion_compressor", MetaTileEntities.LARGE_LARGE.getStackForm(),
                 new Object[]{"PCP", "FSF", "PCP", 'C',
-                        new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.IV),
+                        new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
                         'S', gregtech.common.metatileentities.MetaTileEntities.IMPLOSION_COMPRESSOR.getStackForm(),
                         'P', MetaItems.ELECTRIC_PISTON_EV.getStackForm(),
                         'F', MetaItems.FIELD_GENERATOR_EV.getStackForm()});
@@ -114,7 +120,7 @@ public class CraftingReceipe {
         }
         ModHandler.addShapedRecipe(true, "electric_plasma_gun",MyMetaItems.ELECTRIC_PLASMA_GUN.getStackForm(),
                 "JTG", "LSB", "DSB",
-                        'D', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.IV),
+                        'D', new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
                         'S', MetaItems.ENERGIUM_CRYSTAL,
                         'B', new UnificationEntry(OrePrefix.plate,Materials.Titanium),
                         'L', MetaItems.FIELD_GENERATOR_HV,
@@ -124,7 +130,7 @@ public class CraftingReceipe {
         );
         ModHandler.addShapedRecipe(true, "tactical_laser_submachine_gun",MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getStackForm(),
                 "JTG", "LSB", "DSB",
-                        'D', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.IV),
+                        'D', new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
                         'S', MetaItems.ENERGIUM_CRYSTAL,
                         'B', new UnificationEntry(OrePrefix.plate,Materials.Iridium),
                         'L', MetaItems.FIELD_GENERATOR_HV,
@@ -134,7 +140,7 @@ public class CraftingReceipe {
                 );
         ModHandler.addShapedRecipe(true, "advanced_tachino_disruptor",MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getStackForm(),
                 "JBG", "DSB", "DSB",
-                        'D', new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.LuV),
+                        'D', new UnificationEntry(circuit, MarkerMaterials.Tier.LuV),
                         'S', MetaItems.LAPOTRON_CRYSTAL,
                         'B', new UnificationEntry(OrePrefix.plate,Materials.Iridium),
                         'J',MetaItems.NANO_SABER,
@@ -170,7 +176,7 @@ public class CraftingReceipe {
         ModHandler.addShapedRecipe(true,"large_alloy_smelter", MetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm(),
                 "ADA", "WSW", "WWW",
                 'W',  new ItemStack(MetaBlocks.METAL_CASING,1,2),
-                'A',   new UnificationEntry(OrePrefix.circuit, MarkerMaterials.Tier.MV),
+                'A',   new UnificationEntry(circuit, MarkerMaterials.Tier.MV),
                 'S', GTQTMetaTileEntities.ALLOY_KILN.getStackForm(),
                 'D',new UnificationEntry(OrePrefix.plate, Materials.Aluminium)
         );
@@ -179,5 +185,13 @@ public class CraftingReceipe {
                 'W', Blocks.GRASS,
                 'S', Items.IRON_INGOT
         );
+        ModHandler.addShapedRecipe(true, "large_extruder", MetaTileEntities.LARGE_EXTRUDER.getStackForm(),
+                "LCL", "PSP", "OWO",
+                'L', new UnificationEntry(pipeLargeItem, Ultimet),
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'S', gregtech.common.metatileentities.MetaTileEntities.EXTRUDER[EV].getStackForm(),
+                'P', MetaItems.ELECTRIC_PISTON_EV.getStackForm(),
+                'O', new UnificationEntry(spring, MolybdenumDisilicide),
+                'W', new UnificationEntry(cableGtSingle, Platinum));
     }
 }
