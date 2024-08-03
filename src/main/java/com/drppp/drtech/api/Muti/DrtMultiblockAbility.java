@@ -16,7 +16,5 @@ import java.util.List;
 import java.util.Map;
 
 public class DrtMultiblockAbility {
-    public static MultiblockAbility<IAssembly> EXPORT_ASSEMBLY; //= new MultiblockAbility<>("export_assembly");
-    public static  MultiblockAbility<IAssembly> IMPORT_ASSEMBLY; //= new MultiblockAbility<>("import_assembly");
 
 }

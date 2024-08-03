@@ -578,5 +578,47 @@ public class NuclearRecipe {
                 .EUt(48)
                 .duration(500)
                 .buildAndRegister();
+
+        //升级配件
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.circuit,MarkerMaterials.Tier.HV)
+                .input(OrePrefix.plate, Materials.Tin,4)
+                .input(MetaItems.CONVEYOR_MODULE_HV,2)
+                .circuitMeta(1)
+                .output(MetaItemsReactor.UPGRADE_IO)
+                .EUt(480)
+                .duration(200)
+                .buildAndRegister();
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.circuit,MarkerMaterials.Tier.HV)
+                .input(OrePrefix.plate, Materials.Tin,4)
+                .input(MetaItems.COVER_MACHINE_CONTROLLER)
+                .circuitMeta(1)
+                .output(MetaItemsReactor.UPGRADE_STOP)
+                .EUt(480)
+                .duration(200)
+                .buildAndRegister();
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.circuit,MarkerMaterials.Tier.HV)
+                .input(OrePrefix.plate, Materials.TungstenCarbide,4)
+                .input(MetaItems.COVER_ACTIVITY_DETECTOR)
+                .input(OrePrefix.dust,Materials.Graphite,64)
+                .input(OrePrefix.dust,Materials.Graphite,64)
+                .input(OrePrefix.dust,Materials.Graphite,64)
+                .circuitMeta(1)
+                .output(MetaItemsReactor.UPGRADE_CATCH)
+                .EUt(1920)
+                .duration(200)
+                .buildAndRegister();
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.circuit,MarkerMaterials.Tier.HV)
+                .input(OrePrefix.plate, Materials.TungstenCarbide,4)
+                .input(MetaItems.COVER_ACTIVITY_DETECTOR)
+                .input(MetaItemsReactor.THICK_NEUTRON_REFLECTOR)
+                .circuitMeta(1)
+                .output(MetaItemsReactor.UPGRADE_REFLECT)
+                .EUt(480)
+                .duration(200)
+                .buildAndRegister();
     }
 }

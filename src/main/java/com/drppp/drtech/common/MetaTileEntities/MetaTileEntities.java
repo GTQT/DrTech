@@ -3,7 +3,6 @@ package com.drppp.drtech.common.MetaTileEntities;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityInputAssembly;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
 import com.drppp.drtech.loaders.DrtechReceipes;
@@ -19,13 +18,8 @@ import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
-import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.util.GTUtility;
-
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityItemBus;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
-import keqing.gtqtcore.api.GTQTValue;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +35,6 @@ public class MetaTileEntities {
     public static MetaTileEntityElectricImplosionCompressor LARGE_LARGE;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
-    public static MetaTileEntityInputAssembly[] ITEM_IMPORT_BUS = new MetaTileEntityInputAssembly[GTValues.UHV + 1];
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
     public static MetaTileEntityLargeElementDuplicator LARGE_ELEMENT_DUPLICATOR;
     public static MetaTileEntityLargeMolecularRecombination LARGE_MOLECULAR_RECOMBINATION;
@@ -62,7 +55,7 @@ public class MetaTileEntities {
     public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static SimpleMachineMetaTileEntity[] DUPLICATOR = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
     public static SimpleMachineMetaTileEntity[] UU_PRODUCTER = new SimpleMachineMetaTileEntity[GTValues.V.length - 1];
-
+    public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -125,7 +118,7 @@ public class MetaTileEntities {
         WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(getID(), new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
         YOT_HARCH = registerMetaTileEntity(getID(),new MetaTileEntityYotHatch(getmyId("yot_hatch")));
         YOUT_TANK = registerMetaTileEntity(getID(),new MetaTileEntityYotTank(getmyId("yot_tank")));
-
+        LARGE_EXTRUDER = registerMetaTileEntity(getID(),new MetaTileentityLargeExtruder(getmyId("large_extruder")));
 
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {

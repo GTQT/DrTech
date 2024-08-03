@@ -102,6 +102,10 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
             super(tileEntity, hasPerfectOC);
         }
         @Override
+        public void setMaxProgress(int maxProgress) {
+            this.maxProgressTime = (int)(maxProgress * 0.5);
+        }
+        @Override
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
