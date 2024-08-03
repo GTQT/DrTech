@@ -32,4 +32,9 @@ public class DrtConfig {
     @Config.Comment("开启拆解机")
     @Config.RequiresMcRestart
     public static boolean EnableDisassembly=false;
+    @Config.LangKey("nuclear_explosion_range")
+    @Config.Comment("核电爆炸范围")
+    @Config.RequiresMcRestart
+    public static float EXPLOSION_RANGE=10;
+
 }

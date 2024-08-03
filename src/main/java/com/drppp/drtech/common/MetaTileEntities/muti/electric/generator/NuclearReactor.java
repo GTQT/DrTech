@@ -3,6 +3,7 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.generator;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing1;
 import com.drppp.drtech.Client.Textures;
@@ -178,39 +179,10 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
 
     @Override
     protected void updateFormedValid() {
-        if(!isActive)
-            setActive(true);
-        if(tick++>10 )
+        if(!getWorld().isRemote)
         {
-            tick=0;
-            this.outputEnergy=0;
-            this.realout=0;
-            this.emitHeat=0;
-            ioUpgrade=false;
-            stopUpgrade=false;
-            reflectUpgrade=false;
-            reflectAmount=0;
-            catchUpgrade=false;
-            catchAmount=0;
-            //查找升级物品栏
-            for (int i = 0; i < upgradeInventory.getSlots(); i++) {
-                ItemStack up = upgradeInventory.getStackInSlot(i);
-                if(up.getItem()== MetaItemsReactor.UPGRADE_IO.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_IO.getMetaValue())
-                {
-                    ioUpgrade=true;
-                }else if(up.getItem()== MetaItemsReactor.UPGRADE_STOP.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_STOP.getMetaValue())
-                {
-                    stopUpgrade=true;
-                }else if(up.getItem()== MetaItemsReactor.UPGRADE_CATCH.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_CATCH.getMetaValue())
-                {
-                    catchUpgrade=true;
-                    catchAmount++;
-                }else if(up.getItem()== MetaItemsReactor.UPGRADE_REFLECT.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_REFLECT.getMetaValue())
-                {
-                    reflectUpgrade=true;
-                    reflectAmount++;
-                }
-            }
+            if(!isActive)
+                setActive(true);
             //IO升级
             if(ioUpgrade)
             {
@@ -246,10 +218,42 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                     }
                 }
             }
-            //查找反应仓
-            for (int i = 0; i < inventory.getSlots(); i++) {
-                ItemStack stack = inventory.getStackInSlot(i);
-                //燃料棒
+            if(tick++>10 )
+            {
+                tick=0;
+                this.outputEnergy=0;
+                this.realout=0;
+                this.emitHeat=0;
+                ioUpgrade=false;
+                stopUpgrade=false;
+                reflectUpgrade=false;
+                reflectAmount=0;
+                catchUpgrade=false;
+                catchAmount=0;
+                //查找升级物品栏
+                for (int i = 0; i < upgradeInventory.getSlots(); i++) {
+                    ItemStack up = upgradeInventory.getStackInSlot(i);
+                    if(up.getItem()== MetaItemsReactor.UPGRADE_IO.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_IO.getMetaValue())
+                    {
+                        ioUpgrade=true;
+                    }else if(up.getItem()== MetaItemsReactor.UPGRADE_STOP.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_STOP.getMetaValue())
+                    {
+                        stopUpgrade=true;
+                    }else if(up.getItem()== MetaItemsReactor.UPGRADE_CATCH.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_CATCH.getMetaValue())
+                    {
+                        catchUpgrade=true;
+                        catchAmount++;
+                    }else if(up.getItem()== MetaItemsReactor.UPGRADE_REFLECT.getMetaItem() && up.getMetadata()==MetaItemsReactor.UPGRADE_REFLECT.getMetaValue())
+                    {
+                        reflectUpgrade=true;
+                        reflectAmount++;
+                    }
+                }
+
+                //查找反应仓
+                for (int i = 0; i < inventory.getSlots(); i++) {
+                    ItemStack stack = inventory.getStackInSlot(i);
+                    //燃料棒
                     if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null) && this.isWorkingEnabled())
                     {
                         //检测热量 判断是否需要停机
@@ -308,35 +312,37 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                         }
                     }
                     //热量过线 爆炸  暂时没有添加配置文件 控制范围
-                if(this.heat>=getMaxHeat())
-                {
-                    setWorkingEnabled(false);
-                    for (int j = 0; j < inventory.getSlots(); j++) {
-                        inventory.extractItem(j,1,false);
+                    if(this.heat>=getMaxHeat())
+                    {
+                        setWorkingEnabled(false);
+                        for (int j = 0; j < inventory.getSlots(); j++) {
+                            inventory.extractItem(j,1,false);
+                        }
+                        for (int j = 0; j < upgradeInventory.getSlots(); j++) {
+                            upgradeInventory.extractItem(j,1,false);
+                        }
+                        this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), DrtConfig.EXPLOSION_RANGE, true);
                     }
-                    for (int j = 0; j < upgradeInventory.getSlots(); j++) {
-                        upgradeInventory.extractItem(j,1,false);
-                    }
-                    this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), 10.0F, true);
                 }
             }
-        }
-        realout = this.outputEnergy;
-        if(catchUpgrade)
-            realout = (int)(this.outputEnergy*(1+0.1*catchAmount));
-        //判断动力舱能量是否停机
-        if(stopUpgrade)
-        {
-            if(this.energyContainer.getEnergyStored()+realout>=this.energyContainer.getEnergyCapacity())
+            realout = this.outputEnergy;
+            if(catchUpgrade)
+                realout = (int)(this.outputEnergy*(1+0.1*catchAmount));
+            //判断动力舱能量是否停机
+            if(stopUpgrade)
             {
-                this.setWorkingEnabled(false);
-            }else
-            {
-                if(this.heat<8900)
-                    this.setWorkingEnabled(true);
+                if(this.energyContainer.getEnergyStored()+realout>=this.energyContainer.getEnergyCapacity())
+                {
+                    this.setWorkingEnabled(false);
+                }else
+                {
+                    if(this.heat<8900)
+                        this.setWorkingEnabled(true);
+                }
             }
+            this.energyContainer.addEnergy(realout);
         }
-        this.energyContainer.addEnergy(realout);
+
     }
     private void HeatExchangerOperation(int i, IHeatExchanger data)
     {

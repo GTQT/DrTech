@@ -11,6 +11,8 @@ import com.drppp.drtech.intergations.HarvestcraftLinkage;
 import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.blocks.BlockAlvearyType;
 import gregicality.multiblocks.api.unification.GCYMMaterials;
+import gregtech.api.GTValues;
+import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.unification.material.MarkerMaterials;
@@ -402,6 +404,17 @@ public class MachineReceipe {
                         .duration(1200)
                         .EUt(VA[IV]))
                 .duration(800).EUt(VA[LuV]).buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(gregtech.common.metatileentities.MetaTileEntities.HULL[LV])
+                .input(MetaItems.EMITTER_LV,4)
+                .input(MetaBlocks.OPTICAL_PIPES[0])
+                .fluidInputs(TinAlloy.getFluid(1440))
+                .circuitMeta(24)
+                .output(MetaTileEntities.PASSTHROUGH_COMPUTER)
+                .cleanroom(CleanroomType.CLEANROOM)
+                .EUt(120)
+                .duration(300)
+                .buildAndRegister();
     }
 
 }
