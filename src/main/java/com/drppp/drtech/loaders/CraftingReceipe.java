@@ -194,5 +194,8 @@ public class CraftingReceipe {
                 'P', MetaItems.ELECTRIC_PISTON_EV.getStackForm(),
                 'O', new UnificationEntry(spring, MolybdenumDisilicide),
                 'W', new UnificationEntry(cableGtSingle, Platinum));
+        ModHandler.addShapedRecipe(true, "storage_pail", new ItemStack(ItemsInit.ITEM_BLOCK_STORAGE_PAIL),
+                "XXX", "XCX", "XXX",
+                'X', Blocks.CHEST,'C',MetaItems.ELECTRIC_PISTON_LV);
     }
 }
