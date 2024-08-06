@@ -177,6 +177,7 @@ drtech.machine.large_alloy_smelter.name=大型合金窑
 drtech.machine.matrix_solver.name=不定元矩阵运算器
 drtech.machine.large_extruder.name=大型压模机
 drtech.machine.passthrough_computationhatch.name=算力通行仓
+drtech.machine.industrial_apiary.name=工业蜂箱
 #Materials
 gregtech.material.bedrock=基岩
 

@@ -25,10 +25,10 @@ import java.util.Arrays;
 public class CombRecipes {
 
     public static void initDRTCombs() {
-        addCentrifugeToMaterial(DrtCombType.BORAX, new Material[] { Materials.Borax }, new int[] { 30 * 100 },
+        addCentrifugeToMaterial(DrtCombType.BORAX, new Material[] { Materials.Borax,Materials.Salt,Materials.RockSalt }, new int[] { 30 * 100,10 * 100,10 * 100 },
                 new int[] { 9 }, Voltage.ULV, ItemStack.EMPTY, 30 * 100);
         addProcessGT(
-                DrtCombType.BORAX, new Material[] { Materials.Borax,Materials.Salt }, Voltage.LV);
+                DrtCombType.BORAX, new Material[] { Materials.Borax,Materials.Salt,Materials.RockSalt }, Voltage.LV);
     }
 
     private static void addChemicalProcess(DrtCombType comb, Material inMaterial, Material outMaterial, Voltage volt) {
@@ -38,7 +38,7 @@ public class CombRecipes {
             return;
 
         RecipeBuilder<?> builder = RecipeMaps.CHEMICAL_RECIPES.recipeBuilder()
-                .inputs(GTUtility.copy(9, ForestryUtil.getCombStack(comb)))
+                .inputs(GTUtility.copy(1, ForestryUtil.getCombStack(comb)))
                 .input(OrePrefix.crushed, inMaterial)
                 .fluidInputs(volt.getFluid())
                 .output(OrePrefix.crushedPurified, outMaterial, 4)
@@ -70,7 +70,7 @@ public class CombRecipes {
         if (OreDictUnifier.get(OrePrefix.crushedPurified, material, 4).isEmpty()) return;
 
         RecipeBuilder<?> builder = RecipeMaps.AUTOCLAVE_RECIPES.recipeBuilder()
-                .inputs(GTUtility.copy(9, ForestryUtil.getCombStack(comb)))
+                .inputs(GTUtility.copy(1, ForestryUtil.getCombStack(comb)))
                 .circuitMeta(circuitNumber)
                 .fluidInputs(
                         Materials.Mutagen.getFluid((int) Math.max(1, material.getMass() + volt.getMutagenAmount())))
