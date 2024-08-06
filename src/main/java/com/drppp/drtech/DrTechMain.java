@@ -27,6 +27,9 @@ import com.drppp.drtech.common.command.CommandHordeStatus;
 import com.drppp.drtech.common.command.CommandHordeStop;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.enent.PollutionEffectHandler;
+import com.drppp.drtech.intergations.Forestry.CombRecipes;
+import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
+import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
@@ -39,6 +42,8 @@ import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
+import gregtech.integration.forestry.bees.GTAlleleBeeSpecies;
+import gregtech.integration.forestry.bees.GTBeeDefinition;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
@@ -157,6 +162,8 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(new NuclearItemsRender());
         StructUtil.init();
 
+        DRTAlleleBeeSpecies.setupAlleles();
+        CombRecipes.initDRTCombs();
     }
     @SideOnly(Side.CLIENT)
     @EventHandler
@@ -166,20 +173,16 @@ public class DrTechMain {
         SyncInit.init();
         if(Loader.isModLoaded("forestry"))
         {
-            Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack, tintIndex) -> {
-                if (stack.getItem() instanceof forestry.core.items.IColoredItem coloredItem) {
-                    return coloredItem.getColorFromItemstack(stack, tintIndex);
-                }
-                return 0xFFFFFF;
-            }, ITEM_COMBS);
+            ItemCombs.ClientInit();
         }
-
     }
     @EventHandler
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
     public void postInit(FMLPostInitializationEvent event) {
         if(DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
+        DrtBeeDefinition.initBees();
+
     }
 
     @EventHandler

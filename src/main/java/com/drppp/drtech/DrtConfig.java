@@ -3,28 +3,28 @@ package com.drppp.drtech;
 import net.minecraftforge.common.config.Config;
 @Config(modid = DrTechMain.MODID)
 public class DrtConfig {
-    @Config.LangKey("逃生舱迫降")
-    @Config.Comment("Player Logged In Event")
+    @Config.LangKey("Player Logged In Event")
+    @Config.Comment("逃生舱迫降")
     @Config.RequiresMcRestart
     public static boolean onPlayerLoggedInEvent=true;
 
-    @Config.LangKey("怪物袭击")
-    @Config.Comment("Mob Horde Event")
+    @Config.LangKey("Mob Horde Event")
+    @Config.Comment("怪物袭击")
     @Config.RequiresMcRestart
     public static boolean MobHordeEvent=false;
 
-    @Config.LangKey("僵尸袭击")
-    @Config.Comment("Zombie Horde Event")
+    @Config.LangKey("Zombie Horde Event")
+    @Config.Comment("僵尸袭击")
     @Config.RequiresMcRestart
     public static boolean ZombieHordeEvent=false;
 
-    @Config.LangKey("骷髅袭击")
-    @Config.Comment("Skeleton Horde Event")
+    @Config.LangKey("Skeleton Horde Event")
+    @Config.Comment("骷髅袭击")
     @Config.RequiresMcRestart
     public static boolean SkeletonMobHordeEvent=false;
 
-    @Config.LangKey("爬行者袭击")
-    @Config.Comment("Creeper Horde Event")
+    @Config.LangKey("Creeper Horde Event")
+    @Config.Comment("爬行者袭击")
     @Config.RequiresMcRestart
     public static boolean CreeperMobHordeEvent=false;
 
@@ -35,6 +35,6 @@ public class DrtConfig {
     @Config.LangKey("nuclear_explosion_range")
     @Config.Comment("核电爆炸范围")
     @Config.RequiresMcRestart
-    public static float EXPLOSION_RANGE=10;
+    public static float NuclearExplosionRange=10;
 
 }

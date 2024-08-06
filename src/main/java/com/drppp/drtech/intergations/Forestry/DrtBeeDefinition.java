@@ -1,5 +1,7 @@
 package com.drppp.drtech.intergations.Forestry;
 
+import com.drppp.drtech.Tags;
+import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import forestry.api.apiculture.*;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
@@ -10,11 +12,8 @@ import forestry.apiculture.genetics.IBeeDefinition;
 import forestry.apiculture.items.EnumHoneyComb;
 import forestry.core.genetics.alleles.AlleleHelper;
 import forestry.core.genetics.alleles.EnumAllele;
-import gregtech.api.GTValues;
 import gregtech.integration.forestry.ForestryModule;
-import gregtech.integration.forestry.bees.GTAlleleBeeSpecies;
 import gregtech.integration.forestry.bees.GTBeeDefinition;
-import gregtech.integration.forestry.bees.GTBranchDefinition;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,7 @@ import static forestry.api.apiculture.EnumBeeChromosome.*;
 public enum DrtBeeDefinition implements IBeeDefinition {
 
     // Organic
-    BORAX(GTBranchDefinition.GT_METAL, "borax", true, 0xC8C8DA, 0x0000FF,
+    BORAX(DRTBranchDefinition.DRT_METAL, "borax", true, 0xC8C8DA, 0x0000FF,
             beeSpecies -> {
                 beeSpecies.addProduct(getForestryComb(EnumHoneyComb.HONEY), 0.30f);
                 beeSpecies.addProduct(getDrtComb(DrtCombType.BORAX), 0.1f);
@@ -42,37 +41,35 @@ public enum DrtBeeDefinition implements IBeeDefinition {
                 AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
                 AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.GOURD);
             },
-            dis -> {
-                IBeeMutationBuilder mutation = dis.registerMutation(GTBeeDefinition.SALTY, GTBeeDefinition.LITHIUM,
-                        10);
-            });
+            dis -> dis.registerMutation(GTBeeDefinition.SALTY, GTBeeDefinition.LITHIUM, 10)
+            );
 
-    private final GTBranchDefinition branch;
-    private final GTAlleleBeeSpecies species;
-    private final Consumer<GTAlleleBeeSpecies> speciesProperties;
+    private final DRTBranchDefinition branch;
+    private final DRTAlleleBeeSpecies species;
+    private final Consumer<DRTAlleleBeeSpecies> speciesProperties;
     private final Consumer<IAllele[]> alleles;
     private final Consumer<DrtBeeDefinition> mutations;
     private IAllele[] template;
     private IBeeGenome genome;
     private final Supplier<Boolean> generationCondition;
 
-    DrtBeeDefinition(GTBranchDefinition branch,
+    DrtBeeDefinition(DRTBranchDefinition branch,
                     String binomial,
                     boolean dominant,
                     int primary,
                     int secondary,
-                    Consumer<GTAlleleBeeSpecies> speciesProperties,
+                    Consumer<DRTAlleleBeeSpecies> speciesProperties,
                     Consumer<IAllele[]> alleles,
                     Consumer<DrtBeeDefinition> mutations) {
         this(branch, binomial, dominant, primary, secondary, speciesProperties, alleles, mutations, () -> true);
     }
 
-    DrtBeeDefinition(GTBranchDefinition branch,
+    DrtBeeDefinition(DRTBranchDefinition branch,
                     String binomial,
                     boolean dominant,
                     int primary,
                     int secondary,
-                    Consumer<GTAlleleBeeSpecies> speciesProperties,
+                    Consumer<DRTAlleleBeeSpecies> speciesProperties,
                     Consumer<IAllele[]> alleles,
                     Consumer<DrtBeeDefinition> mutations,
                     Supplier<Boolean> generationCondition) {
@@ -87,7 +84,7 @@ public enum DrtBeeDefinition implements IBeeDefinition {
         String name = "for.bees.species." + lowercaseName;
 
         this.branch = branch;
-        this.species = new GTAlleleBeeSpecies(GTValues.MODID, uid, name, "GregTech", description, dominant,
+        this.species = new DRTAlleleBeeSpecies(Tags.MODID, uid, name, "DrTech", description, dominant,
                 branch.getBranch(), binomial, primary, secondary);
         this.generationCondition = generationCondition;
     }
@@ -106,10 +103,10 @@ public enum DrtBeeDefinition implements IBeeDefinition {
     }
 
     private static ItemStack getDrtComb(DrtCombType type) {
-        return new ItemStack(ForestryModule.COMBS, 1, type.ordinal());
+        return new ItemStack(ItemCombs.ITEM_COMBS, 1, type.ordinal());
     }
 
-    private void setSpeciesProperties(GTAlleleBeeSpecies beeSpecies) {
+    private void setSpeciesProperties(DRTAlleleBeeSpecies beeSpecies) {
         this.speciesProperties.accept(beeSpecies);
     }
 

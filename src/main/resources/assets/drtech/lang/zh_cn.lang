@@ -177,6 +177,7 @@ drtech.machine.large_alloy_smelter.name=大型合金窑
 drtech.machine.matrix_solver.name=不定元矩阵运算器
 drtech.machine.large_extruder.name=大型压模机
 drtech.machine.passthrough_computationhatch.name=算力通行仓
+drtech.machine.industrial_apiary.name=工业蜂箱
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -288,6 +289,8 @@ drtech.machine.large_extruder.tooltip.2=§6尽情的压模吧
 drtech.machine.large_extruder.tooltip.3=§6并行UV以下电压等级*4,以上电压等级*8
 drtech.machine.passthrough_computationhatch.tooltip.1=§d超净间的算力传递方式
 drtech.machine.passthrough_computationhatch.tooltip.2=§d正向接收反向输送
+drtech.machine.nuclear.tooltip.1=§dIC2核电复刻
+drtech.machine.nuclear.tooltip.2=§d可安装升级配件，体验全新功能
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
@@ -754,6 +757,7 @@ drtech.machine.wireless_energy_hatch.output_1048576a.max.name=1048576安无线�
 #comb
 item.drt.comb.borax.name=硼砂蜂窝
 item.drt.comb.ether.name=以太蜂窝
+for.bees.species.borax=硼砂
 
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡

@@ -17,11 +17,11 @@ import software.bernie.example.registry.ItemRegistry;
 
 public class GeoItemsInit {
     private static IForgeRegistry<Item> itemRegistry;
-    public static GeoItem GEO_ITEM_1;
+    //public static GeoItem GEO_ITEM_1;
     public static void init(RegistryEvent.Register<Item> event)
     {
         itemRegistry = event.getRegistry();
-        GEO_ITEM_1 = registerItem(new GeoItem(),"test_item");
+        //GEO_ITEM_1 = registerItem(new GeoItem(),"test_item");
     }
     public static <T extends Item> T registerItem(T item, String name) {
         registerItem(item, new ResourceLocation(Tags.MODID, name));
@@ -34,10 +34,9 @@ public class GeoItemsInit {
     }
     @SideOnly(Side.CLIENT)
     public static void onModelRegistry() {
-        ModelLoader.setCustomModelResourceLocation(GEO_ITEM_1, 0,
-                new ModelResourceLocation(Tags.MODID + ":windrotor", "inventory"));
+        //ModelLoader.setCustomModelResourceLocation(GEO_ITEM_1, 0, new ModelResourceLocation(Tags.MODID + ":windrotor", "inventory"));
 
 
-        GEO_ITEM_1.setTileEntityItemStackRenderer(new GeoItemRender());
+        //GEO_ITEM_1.setTileEntityItemStackRenderer(new GeoItemRender());
     }
 }
