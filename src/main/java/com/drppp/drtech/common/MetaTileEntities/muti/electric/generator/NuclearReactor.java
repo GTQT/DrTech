@@ -33,6 +33,7 @@ import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -51,6 +52,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BooleanSupplier;
@@ -321,7 +323,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                         for (int j = 0; j < upgradeInventory.getSlots(); j++) {
                             upgradeInventory.extractItem(j,1,false);
                         }
-                        this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), DrtConfig.EXPLOSION_RANGE, true);
+                        this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), DrtConfig.NuclearExplosionRange, true);
                     }
                 }
             }
@@ -784,7 +786,11 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.NUCLEAR_PART_CASING;
     }
-
+    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
+        super.addInformation(stack, world, tooltip, advanced);
+        tooltip.add(I18n.format("drtech.machine.nuclear.tooltip.1", new Object[0]));
+        tooltip.add(I18n.format("drtech.machine.nuclear.tooltip.2", new Object[0]));
+    }
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
         ModularUI.Builder builder;

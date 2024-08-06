@@ -292,7 +292,10 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     public boolean isWorkingEnabled() {
         return this.isWorkingEnabled;
     }
-
+    @Override
+    public boolean isActive() {
+        return this.isActive;
+    }
     @Override
     public void setWorkingEnabled(boolean b) {
         this.isWorkingEnabled = b;
