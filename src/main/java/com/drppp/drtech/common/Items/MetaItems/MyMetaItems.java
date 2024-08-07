@@ -31,6 +31,38 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem WIRELESS_NETWORK_CONTROL_PANEL ;
     public static MetaItem<?>.MetaValueItem HAND_PUMP ;
     public static MetaItem<?>.MetaValueItem GRASS_KILLER ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_NULL ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED1 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED2 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED3 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED4 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED5 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED6 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED7 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED8 ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED8P ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_PRODUCTION ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_PLAIN ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_LIGHT ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_FLOWERING ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_WINTER_EMULATION ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_DRYER ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_AUTOMATION ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_HUMIDIFIER ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_HELL_EMULATION ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_POLLEN_SCRUBBER ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_DESERT_EMULATION ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_COOLER ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_LIFESPAN ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SEAL ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_GENETIC_STABILIZER ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_JUNGLE_EMULATION ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_TERRITORY ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_OCEAN_EMULATION ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_OPEN_SKY ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_HEATER ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_SIEVE ;
+    public static MetaItem<?>.MetaValueItem UPGRADE_T ;
 
     public static void MetaItemsInit()
     {

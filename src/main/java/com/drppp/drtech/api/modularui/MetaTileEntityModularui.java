@@ -11,7 +11,10 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.UUID;
+
 public class MetaTileEntityModularui extends TieredMetaTileEntity implements IGuiHolder {
+    public UUID MachineOwner = null;
     public MetaTileEntityModularui(ResourceLocation metaTileEntityId, int tier) {
         super(metaTileEntityId, tier);
     }

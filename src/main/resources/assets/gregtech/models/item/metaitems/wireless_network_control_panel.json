@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "drtech:items/metaitems/wireless_network_control_panel"
+      "layer0": "drtech:items/metaitems/wireless_network_control_panel"
   }
 }

@@ -7,20 +7,24 @@ import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.drppp.drtech.loaders.DrtechReceipes.LOG_CREATE;
 import static gregtech.api.GregTechAPI.materialManager;
+import static net.bdew.gendustry.api.GendustryAPI.Items;
 
 public class DrtechUtils {
     public static  List<Material> listMater = new ArrayList<>();
@@ -241,5 +245,82 @@ public class DrtechUtils {
         if (compound.hasKey("IntCount")) stack.setCount(compound.getInteger("IntCount"));
 
         return stack;
+    }
+
+    public abstract class ItemIdManager {
+        public  static ItemId create(NBTTagCompound tag) {
+            return new ItemId(
+                    Item.getItemById(tag.getShort("item")),
+                    tag.getShort("meta"),
+                    tag.hasKey("tag", Constants.NBT.TAG_COMPOUND) ? tag.getCompoundTag("tag") : null);
+        }
+
+        /**
+         * This method copies NBT, as it is mutable.
+         */
+        public static ItemId create(ItemStack itemStack) {
+            NBTTagCompound nbt = itemStack.getTagCompound();
+            if (nbt != null) {
+                nbt = (NBTTagCompound) nbt.copy();
+            }
+
+            return new ItemId(itemStack.getItem(), itemStack.getMetadata(), nbt);
+        }
+
+        /**
+         * This method copies NBT, as it is mutable.
+         */
+        public static ItemId create(Item item, int metaData, @Nullable NBTTagCompound nbt) {
+            if (nbt != null) {
+                nbt = (NBTTagCompound) nbt.copy();
+            }
+            return new ItemId(item, metaData, nbt);
+        }
+
+        /**
+         * This method stores NBT as null.
+         */
+        public static ItemId createWithoutNBT(ItemStack itemStack) {
+            return new ItemId(itemStack.getItem(), itemStack.getMetadata(), null);
+        }
+
+        /**
+         * This method does not copy NBT in order to save time. Make sure not to mutate it!
+         */
+        public static ItemId createNoCopy(ItemStack itemStack) {
+            return new ItemId(
+                    itemStack.getItem(),
+                    itemStack.getMetadata(),
+                    itemStack.getTagCompound());
+        }
+
+        /**
+         * This method does not copy NBT in order to save time. Make sure not to mutate it!
+         */
+        public ItemId createNoCopy(Item item, int metaData, @Nullable NBTTagCompound nbt) {
+            return new ItemId(item, metaData, nbt);
+        }
+
+        protected abstract Item item();
+
+        protected abstract int metaData();
+
+        @Nullable
+        protected abstract NBTTagCompound nbt();
+
+        public NBTTagCompound writeToNBT() {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setShort("item", (short) Item.getIdFromItem(item()));
+            tag.setShort("meta", (short) metaData());
+            if (nbt() != null) tag.setTag("tag", nbt());
+            return tag;
+        }
+
+        @Nonnull
+        public ItemStack getItemStack() {
+            ItemStack itemStack = new ItemStack(item(), 1, metaData());
+            itemStack.setTagCompound(nbt());
+            return itemStack;
+        }
     }
 }
