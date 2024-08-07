@@ -131,7 +131,38 @@ public  class MetaItems1 extends StandardMetaItem {
                 .addComponents(new KillGrassBehavior())
                 .setCreativeTabs(DrTechMain.Mytab)
                 .setMaxStackSize(1);
-
+        MyMetaItems.UPGRADE_NULL = this.addItem(28,"upgrade_null").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED1 = this.addItem(29,"upgrade_speed1").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED2 = this.addItem(30,"upgrade_speed2").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED3 = this.addItem(31,"upgrade_speed3").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED4 = this.addItem(32,"upgrade_speed4").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED5 = this.addItem(33,"upgrade_speed5").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED6  = this.addItem(34,"upgrade_speed6").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED7  = this.addItem(35,"upgrade_speed7").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED8  = this.addItem(36,"upgrade_speed8").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SPEED8P  = this.addItem(37,"upgrade_speed8p").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_PRODUCTION  = this.addItem(38,"upgrade_production").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_PLAIN  = this.addItem(39,"upgrade_plain").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_LIGHT  = this.addItem(40,"upgrade_light").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_FLOWERING  = this.addItem(41,"upgrade_flowering").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_WINTER_EMULATION  = this.addItem(42,"upgrade_winter_emulation").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_DRYER  = this.addItem(43,"upgrade_dryer").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_AUTOMATION  = this.addItem(44,"upgrade_automation").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_HUMIDIFIER  = this.addItem(45,"upgrade_humidifier").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_HELL_EMULATION  = this.addItem(46,"upgrade_hell_emulation").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_POLLEN_SCRUBBER  = this.addItem(47,"upgrade_pollen_scrubber").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_DESERT_EMULATION  = this.addItem(48,"upgrade_desert_emulation").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_COOLER  = this.addItem(49,"upgrade_cooler").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_LIFESPAN  = this.addItem(50,"upgrade_lifespan").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SEAL  = this.addItem(51,"upgrade_seal").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_GENETIC_STABILIZER  = this.addItem(52,"upgrade_genetic_stabilizer").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_JUNGLE_EMULATION  = this.addItem(53,"upgrade_jungle_emulation").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_TERRITORY  = this.addItem(54,"upgrade_territory").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_OCEAN_EMULATION  = this.addItem(55,"upgrade_ocean_emulation").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_OPEN_SKY  = this.addItem(56,"upgrade_open_sky").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_HEATER  = this.addItem(57,"upgrade_heater").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_SIEVE  = this.addItem(58,"upgrade_sieve").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
+        MyMetaItems.UPGRADE_T  = this.addItem(59,"upgrade_t").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
     }
 
     @Override
