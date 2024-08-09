@@ -14,7 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import java.util.UUID;
 
 public class MetaTileEntityModularui extends TieredMetaTileEntity implements IGuiHolder {
-    public UUID MachineOwner = null;
     public MetaTileEntityModularui(ResourceLocation metaTileEntityId, int tier) {
         super(metaTileEntityId, tier);
     }
@@ -26,7 +25,7 @@ public class MetaTileEntityModularui extends TieredMetaTileEntity implements IGu
 
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
-        return new MetaTileEntityModularui(this.metaTileEntityId,getTier());
+        return null;
     }
 
     @Override
