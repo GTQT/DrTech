@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.drppp.drtech.Client.ModularUiTextures;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
+import com.drppp.drtech.api.ItemHandler.OnlyBeesStackhandler;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.Utils.GT_ApiaryUpgrade;
 import com.drppp.drtech.api.Utils.ItemId;
@@ -26,12 +27,15 @@ import com.drppp.drtech.api.modularui.MetaTileEntityModularui;
 import com.drppp.drtech.api.modularui.DrtMetaTileEntityGuiFactory;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
+import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.items.ItemBeeGE;
+import forestry.apiculture.items.ItemRegistryApiculture;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IDataStickIntractable;
 import gregtech.api.capability.IWorkable;
+import gregtech.api.capability.impl.EnergyContainerHandler;
 import gregtech.api.cover.Cover;
 import gregtech.api.cover.CoverRayTracer;
 import gregtech.api.gui.ModularUI;
@@ -47,19 +51,19 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import forestry.api.apiculture.BeeManager;
@@ -110,8 +114,9 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     public boolean isWorkingEnabled=true;
     public int mProgresstime=0;
     public int mMaxProgresstime=100;
+    public int progressPer=0;
     public int mEUt=0;
-    ItemStackHandler inventoryBees = new ItemStackHandler(2);
+    ItemStackHandler inventoryBees = new OnlyBeesStackhandler(2);
     ItemStackHandler inventoryUpgrade = new ItemStackHandler(4);
     ItemStackHandler inventoryOutput = new InOutItemStackHandler(12,false);
     ItemStack[] mOutputItems = new ItemStack[12];
@@ -121,8 +126,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     private static final int drone = 1;
     private static final int upgradeSlot = 0;
     private static final int upgradeSlotCount = 4;
-    private static Field AlleleBeeEffectThrottledField;
-
     final IBeeRoot beeRoot = (IBeeRoot) AlleleManager.alleleRegistry.getSpeciesRoot("rootBees");
 
     public int mSpeed = 0;
@@ -133,14 +136,13 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     private IBee usedQueenBee = null;
     private IEffectData[] effectData = new IEffectData[2];
     public MetaTileEntityIndustrialApiary(ResourceLocation metaTileEntityId, ICubeRenderer renderer) {
-        super(metaTileEntityId, GTValues.UV);
+        super(metaTileEntityId, GTValues.UHV);
         this.renderer = renderer;
     }
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityIndustrialApiary(this.metaTileEntityId,renderer);
     }
-
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
         return null;
@@ -173,11 +175,11 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                .size(20)
                .pos(70,5)
                .texture(GuiTextures.PROGRESS_ARROW, 20)
-               .value(new DoubleSyncValue(() -> this.getProgress() / 100.0, val -> this.mProgresstime = (int) (val * 100))));
+               .value(new DoubleSyncValue(() -> this.progressPer / 100.0, val -> this.progressPer = (int) (val * 100))));
        panel.child(new Icon(ModularUiTextures.INFORMATION).asWidget()
-               .addTooltipLine("能量需求:"+i)
-               .addTooltipLine("温度:")
-               .addTooltipLine("湿度:")
+               .addTooltipLine("能量需求:"+mEUt)
+               .addTooltipLine("温度:"+getTemperature())
+               .addTooltipLine("湿度:"+getHumidity())
                .pos(70,62)
        );
        panel.child(new ToggleButton().pos(13,18)
@@ -185,14 +187,15 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                .selectedBackground(ModularUiTextures.CHECK_MARK)
                        .disableHoverBackground()
                .value(new BooleanSyncValue(()->isWorkingEnabled,isWorkingEnabled->setWorkingEnabled(!this.isWorkingEnabled)))
-               .addTooltipLine("取消处理")
-               .addTooltipLine("同时会关闭机器")
-               .addTooltipLine("可以重新开启")
+
        );
-        panel.child(new ToggleButton().pos(13,38)
-                        .overlay(GuiTextures.SHIFT_FORWARD)
-                .value(new BooleanSyncValue(()->isWorkingEnabled,isWorkingEnabled->setWorkingEnabled(!this.isWorkingEnabled)))
-        );
+//        panel.child(new ToggleButton().pos(13,38)
+//                        .overlay(GuiTextures.SHIFT_FORWARD)
+//                .value(new BooleanSyncValue(()->isWorkingEnabled,isWorkingEnabled->cancelProcess()))
+//                .addTooltipLine("取消处理")
+//                .addTooltipLine("同时会关闭机器")
+//                .addTooltipLine("可以重新开启")
+//        );
       //  panel.child(new CycleButtonWidget());
         panel.bindPlayerInventory();
         return panel;
@@ -246,13 +249,13 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
 
     }
     protected void renderOverlays(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
-        this.renderer.renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), isActive(), isWorkingEnabled());
+        this.renderer.renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), isActive(), isWorking());
     }
 
     @Override
     public void update() {
         if (getWorld().isRemote) {
-            if (isActive()) {
+            if (isWorking()) {
                 if (usedQueen != null) {
                     if (this.getOffsetTimer() % 2 == 0) {
                         // FX on client, effect on server
@@ -263,8 +266,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             }
         }
         if (!getWorld().isRemote) {
-            this.energyContainer.addEnergy(mEUt);
-            if (!isActive()) {
+            if (!isWorking()) {
                 if (this.energyContainer.getEnergyStored()>mEUt) {
                     final boolean check = checkRecipe();
                     if (check ) {
@@ -304,23 +306,33 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                     if (usedQueenBee != null) doAcceleratedEffects();
                     updateModifiers();
                     for (int i = 0; i < mOutputItems.length; i++)
-                        if (mOutputItems[i] != null) for (int j = 0; j < mOutputItems.length; j++) {
-                            if (j == 0 && isAutomated) {
-                                if (beeRoot.isMember(mOutputItems[i], EnumBeeType.QUEEN)
-                                        || beeRoot.isMember(mOutputItems[i], EnumBeeType.PRINCESS)) {
-                                    if (GTTransferUtils.insertItem(inventoryBees, mOutputItems[i].copy(),false) != ItemStack.EMPTY) break;
+                    {
+                        if (mOutputItems[i] != null && !mOutputItems[i].isEmpty()) for (int j = 0; j < mOutputItems.length; j++) {
+                            if (j == 0 && isAutomated)
+                            {
+                                if (beeRoot.isMember(mOutputItems[i], EnumBeeType.QUEEN) || beeRoot.isMember(mOutputItems[i], EnumBeeType.PRINCESS))
+                                {
+                                   inventoryBees.insertItem(queen,mOutputItems[i].copy(),false) ;
+                                    mOutputItems[i]=null;
                                 } else if (beeRoot.isMember(mOutputItems[i], EnumBeeType.DRONE))
-                                    if (GTTransferUtils.insertItem(inventoryBees, mOutputItems[i].copy(),false) != ItemStack.EMPTY) break;
-                            } else if (mAutoQueen && i == 0
-                                    && j == 0
-                                    && beeRoot.isMember(mOutputItems[0], EnumBeeType.QUEEN)
-                                    && GTTransferUtils.insertItem(inventoryOutput, mOutputItems[i].copy(),false) != ItemStack.EMPTY) break;
-                            if (GTTransferUtils.insertItem(inventoryOutput, mOutputItems[i].copy(),true) != ItemStack.EMPTY)
+                                {
+                                     if(inventoryBees.insertItem(drone,mOutputItems[i].copy(),true) == ItemStack.EMPTY)
+                                     {
+                                         inventoryBees.insertItem(drone,mOutputItems[i].copy(),false);
+                                         mOutputItems[i]=null;
+                                     }
+                                }
+                            } else if (mAutoQueen && i == 0 && j == 0 && beeRoot.isMember(mOutputItems[0], EnumBeeType.QUEEN))
+                            {
+                                inventoryBees.insertItem(queen,mOutputItems[i].copy(),false);
+                                mOutputItems[0]=null;
                                 break;
+                            }
                         }
+                    }
                     for (int j = 0; j < mOutputItems.length; j++) {
-                        if(mOutputItems!=null && mOutputItems[j]!=null)
-                        GTTransferUtils.insertItem(inventoryOutput,mOutputItems[j].copy(),false);
+                        if(mOutputItems!=null && mOutputItems[j]!=null && !mOutputItems[j].isEmpty())
+                            GTTransferUtils.insertItem(inventoryOutput,mOutputItems[j].copy(),false);
                     }
                     Arrays.fill(mOutputItems, null);
                     mEUt = 0;
@@ -331,10 +343,12 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                         setWorkingEnabled(true);
                 }
             }
+            progressPer = (int)(((float)mProgresstime / (float)mMaxProgresstime) * 100);
         }
     }
     private float getFinalChance(float baseChance, float speed, float prodMod, float modifier) {
-        return baseChance * speed * prodMod * modifier;
+        double finalchance = (1+modifier/6)*(Math.pow(baseChance,0.5))*2f*(1+speed)+Math.pow(prodMod,Math.pow(baseChance,0.333f))-3;
+        return (float) finalchance;
     }
 
     boolean retrievingPollenInThisOperation = false;
@@ -508,7 +522,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                 else if (useddivider > 2) this.mEUt += (32 * (useddivider << (this.mSpeed - 2)));
             } else {
                 // Breeding time
-
                 retrievingPollenInThisOperation = true; // Don't pollinate when breeding
 
                 this.mMaxProgresstime = 100;
@@ -525,10 +538,10 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                 princess.mate(drone);
                 final NBTTagCompound nbttagcompound = new NBTTagCompound();
                 princess.writeToNBT(nbttagcompound);
-                this.mOutputItems[0] = new ItemBeeGE(EnumBeeType.QUEEN).getItemStack();
+                ItemRegistryApiculture apicultureItems = ModuleApiculture.getItems();
+                this.mOutputItems[0] = apicultureItems.beeQueenGE.getItemStack();
                 this.mOutputItems[0].setTagCompound(nbttagcompound);
-                beeRoot.getBreedingTracker(getWorld(), getOwner())
-                        .registerQueen(princess);
+                beeRoot.getBreedingTracker(getWorld(), getOwner()).registerQueen(princess);
 
                 setQueen(ItemStack.EMPTY);
                 getDrone().setCount(getDrone().getCount()-1);
@@ -541,7 +554,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         return false;
     }
     public void cancelProcess() {
-        if (this.isActive()
+        if (this.isWorking()
                 && !this.getWorld().isRemote
                 && usedQueen != null
                 && beeRoot.isMember(usedQueen, EnumBeeType.QUEEN)) {
@@ -549,8 +562,11 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             mEUt = 0;
             mProgresstime = 0;
             mMaxProgresstime = 0;
-            isActive=false;
-            setQueen(usedQueen);
+            setActive(false);
+            if(inventoryBees.getStackInSlot(queen).isEmpty())
+                setQueen(usedQueen);
+            else
+                GTTransferUtils.insertItem(inventoryOutput,usedQueen,false);
             setWorkingEnabled(false);
         }
     }
@@ -565,6 +581,21 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         data.setTag("invUpgrade",inventoryUpgrade.serializeNBT());
         data.setTag("invOutputs",inventoryOutput.serializeNBT());
         data.setInteger("mEut",mEUt);
+        data.setInteger("mSpeed",mSpeed);
+        NBTTagCompound tag = new NBTTagCompound();
+        usedQueen.writeToNBT(tag);
+        data.setTag("usedQueen",tag);
+        data.setBoolean("autoQueen",mAutoQueen);
+        NBTTagList nbtTagList = new NBTTagList();
+        for (int i = 0; i < mOutputItems.length; i++) {
+            if (mOutputItems[i]!=null && !mOutputItems[i].isEmpty()) {
+                NBTTagCompound itemTag = new NBTTagCompound();
+                itemTag.setInteger("Slot", i);
+                mOutputItems[i].writeToNBT(itemTag);
+                nbtTagList.appendTag(itemTag);
+            }
+        }
+        data.setTag("mOutputItems", nbtTagList);
         return data;
     }
 
@@ -579,6 +610,21 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         inventoryUpgrade.deserializeNBT(data.getCompoundTag("invUpgrade"));
         inventoryOutput.deserializeNBT(data.getCompoundTag("invOutputs"));
         mEUt = data.getInteger("mEut");
+        mSpeed = data.getInteger("mSpeed");
+        usedQueen = new ItemStack(data.getCompoundTag("usedQueen"));
+        if (usedQueenBee == null) usedQueenBee = beeRoot.getMember(usedQueen);
+        mAutoQueen = data.getBoolean("autoQueen");
+        for (int i = 0; i < 12; i++) {
+            mOutputItems[i] = ItemStack.EMPTY;
+        }
+        NBTTagList nbtTagList = data.getTagList("mOutputItems", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < nbtTagList.tagCount(); i++) {
+            NBTTagCompound itemTag = nbtTagList.getCompoundTagAt(i);
+            int slot = itemTag.getInteger("Slot");
+            if (slot >= 0 && slot < 12) {
+                mOutputItems[slot] = new ItemStack(itemTag);
+            }
+        }
     }
     @Override
     public void writeInitialSyncData(PacketBuffer buf) {
@@ -615,17 +661,27 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         return this.isActive;
     }
 
+    public boolean isWorking() {
+        return this.isActive &&  this.isWorkingEnabled;
+    }
     @Override
     public void setWorkingEnabled(boolean b) {
         this.isWorkingEnabled = b;
+        markDirty();
+        World world = getWorld();
+        if (world != null && !world.isRemote) {
+            writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(isWorkingEnabled));
+        }
+    }
+    public void setActive(boolean b) {
         this.isActive=b;
         markDirty();
         World world = getWorld();
         if (world != null && !world.isRemote) {
             writeCustomData(GregtechDataCodes.WORKABLE_ACTIVE, buf -> buf.writeBoolean(isActive));
-            writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(isWorkingEnabled));
         }
     }
+
     @Override
     public int getProgress() {
         return this.mProgresstime;
@@ -802,6 +858,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         if (!effect.isCombinable()) {
             return;
         }
+        effectData[0] = effect.validateStorage(effectData[0]);
         effect.doEffect(genome, effectData[0], this);
         // 获取非活跃等位基因的效果
         final IAlleleBeeEffect secondary = (IAlleleBeeEffect) genome.getInactiveAllele(EnumBeeChromosome.EFFECT);
@@ -809,6 +866,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         if (!secondary.isCombinable()) {
             return;
         }
+        effectData[1] = effect.validateStorage(effectData[1]);
         secondary.doEffect(genome, effectData[1], this);
     }
     private void doAcceleratedEffects() {
@@ -820,7 +878,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             if (!effect.isCombinable()) {
                 return;
             }
-
             final IAlleleBeeEffect secondary = (IAlleleBeeEffect) genome.getInactiveAllele(EnumBeeChromosome.EFFECT);
             effectData[1] = secondary.doEffect(genome, effectData[1],this);
         } catch (Exception ex) {
@@ -855,7 +912,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
 
     @Override
     public boolean canBlockSeeTheSky() {
-        return getWorld().canSeeSky(getPos());
+        return getWorld().getBlockState(getPos().offset(getFrontFacing())).getBlock()== Blocks.AIR;
     }
 
     @Override
@@ -886,7 +943,9 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
 
     @Override
     public void setQueen(ItemStack itemStack) {
-        if(inventoryBees.insertItem(queen, itemStack,true) != ItemStack.EMPTY)
+        if(itemStack==ItemStack.EMPTY)
+            inventoryBees.extractItem(queen,1,false);
+        if(inventoryBees.insertItem(queen, itemStack,true) == ItemStack.EMPTY)
         {
             inventoryBees.insertItem(queen, itemStack,false);
         }
@@ -894,7 +953,9 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
 
     @Override
     public void setDrone(ItemStack itemStack) {
-        if(inventoryBees.insertItem(drone, itemStack,true) != ItemStack.EMPTY)
+        if(itemStack==ItemStack.EMPTY)
+            inventoryBees.extractItem(drone,1,false);
+        if(inventoryBees.insertItem(drone, itemStack,true) == ItemStack.EMPTY)
         {
             inventoryBees.insertItem(drone, itemStack,false);
         }
