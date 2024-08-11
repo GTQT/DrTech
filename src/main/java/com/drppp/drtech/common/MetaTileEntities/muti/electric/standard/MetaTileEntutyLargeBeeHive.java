@@ -359,8 +359,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                     ItemStack is = inventory.getStackInSlot(i);
                     EnumBeeType beeType = beeRoot.getType(is);
                     if (beeType == EnumBeeType.QUEEN) {
-                        IBee bee = beeRoot.getMember(is);
-                        BeeSimulator bs = new BeeSimulator(is.copy(), this.getWorld(), bee.getGenome().getSpeed());
+                        BeeSimulator bs = new BeeSimulator(is.copy(), this.getWorld(), (float)getVoltageTierExact());
                         for (var drop : bs.drops) {
                             listdrops.add(drop.get((int) drop.getAmount()));
                         }
@@ -395,7 +394,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                     if(beeType == EnumBeeType.QUEEN)
                     {
                         IBee bee = beeRoot.getMember(is);
-                        BeeSimulator bs = new BeeSimulator(is.copy() , this.getWorld(), bee.getGenome().getSpeed());
+                        BeeSimulator bs = new BeeSimulator(is.copy() , this.getWorld(),(float)getVoltageTierExact());
                         List<ItemStack> list = new ArrayList<>();
                         list.add(bs.createIgnobleCopy());
                         if(GTTransferUtils.addItemsToItemHandler(this.itemExportInventory,true,list))
@@ -408,7 +407,9 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         }
     }
 
-
+    public double getVoltageTierExact() {
+        return Math.log((double) this.energyContainer.getEnergyCapacity() / 8d) / 1.3862943611199 + 1e-8d;
+    }
 
     private static class BeeSimulator {
 
@@ -482,36 +483,26 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                 id = this.stack.copy();
                 evaluate();
             }
+              public void evaluate() {
 
-            public void updateTVar(float t) {
-                if (this.t != t) {
-                    this.t = t;
-                    evaluate();
-                }
-            }
-
-            public void evaluate() {
-
-                this.amount = getFinalChance();
+                this.amount = getFinalChance()*t;
             }
             public double getFinalChance()
             {
-                double d = chance* MAX_PRODUCTION_MODIFIER_FROM_UPGRADES * beeSpeed;
+                double d = getFinalChance(chance,beeSpeed,17.19926784f,MAX_PRODUCTION_MODIFIER_FROM_UPGRADES);
                 return d;
             }
+            private float getFinalChance(float baseChance, float speed, float prodMod, float modifier) {
+                double finalchance = (1+modifier/6)*(Math.pow(baseChance,0.5))*2f*(1+speed)+Math.pow(prodMod,Math.pow(baseChance,0.333f))-3;
+                return (float) finalchance;
+            }
             public double getAmount() {
-                if(chance>=0.4)
-                    return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES*0.333;
-                else if(chance>=0.2)
-                    return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES*0.8;
-                else if(chance<0.01)
-                    return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES*10;
-                return amount * MAX_PRODUCTION_MODIFIER_FROM_UPGRADES ;
+                return amount ;
             }
 
             public ItemStack get(int amount) {
                 ItemStack r = stack.copy();
-                amount = Math.max(amount,3);
+                amount = Math.max(amount,5);
                 r.setCount(amount);
                 return r;
             }
