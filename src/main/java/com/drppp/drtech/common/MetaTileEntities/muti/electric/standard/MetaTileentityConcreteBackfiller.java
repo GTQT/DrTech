@@ -15,9 +15,11 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
+import gregtech.common.blocks.StoneVariantBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -94,7 +96,7 @@ public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithCont
         return blockState.getBlock() == Blocks.AIR;
     }
     public void setBlockToDirt(World world, BlockPos pos) {
-        world.setBlockState(pos, Blocks.DIRT.getDefaultState());
+        world.setBlockState(pos, MetaBlocks.STONE_BLOCKS.get(StoneVariantBlock.StoneVariant.SMOOTH).getState(StoneVariantBlock.StoneType.CONCRETE_LIGHT));
     }
     private boolean canwork()
     {
