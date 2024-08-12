@@ -60,6 +60,8 @@ public class MetaTileEntities {
     public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
     public static MetaTileeneityPassthroughHatchComputationHatch PASSTHROUGH_COMPUTER;
     public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
+    public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
+    public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -125,6 +127,8 @@ public class MetaTileEntities {
         LARGE_EXTRUDER = registerMetaTileEntity(getID(),new MetaTileentityLargeExtruder(getmyId("large_extruder")));
         PASSTHROUGH_COMPUTER = registerMetaTileEntity(getID(),new MetaTileeneityPassthroughHatchComputationHatch(getmyId("passthrough_computationhatch")));
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialApiary(getmyId("industrial_apiary"),Textures.INDUSTRIAL_APIARY));
+        CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(),new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller1"),1));
+        CONCRETE_BACK_FILLER2 = registerMetaTileEntity(getID(),new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller2"),2));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();
