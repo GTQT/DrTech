@@ -1,5 +1,6 @@
 package com.drppp.drtech.intergations.Forestry;
 
+import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.recipes.RecipeBuilder;
@@ -12,6 +13,8 @@ import gregtech.api.unification.material.properties.OreProperty;
 import gregtech.api.unification.material.properties.PropertyKey;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.util.GTUtility;
+import gregtech.common.items.MetaItems;
+import gregtech.integration.forestry.bees.GTDropItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import com.google.common.collect.ImmutableMap;
@@ -27,8 +30,13 @@ public class CombRecipes {
     public static void initDRTCombs() {
         addCentrifugeToMaterial(DrtCombType.BORAX, new Material[] { Materials.Borax,Materials.Salt,Materials.RockSalt }, new int[] { 30 * 100,10 * 100,10 * 100 },
                 new int[] { 9 }, Voltage.ULV, ItemStack.EMPTY, 30 * 100);
-        addProcessGT(
-                DrtCombType.BORAX, new Material[] { Materials.Borax,Materials.Salt,Materials.RockSalt }, Voltage.LV);
+        addProcessGT(DrtCombType.BORAX, new Material[] { Materials.Borax }, Voltage.LV);
+        addProcessGT(DrtCombType.BRIGHT, new Material[] { Materials.NetherStar }, Voltage.EV);
+        addCentrifugeToMaterial(DrtCombType.WITHER, new Material[] { Materials.Coal }, new int[] { 60 * 100 },
+                new int[] { 9 }, Voltage.MV, MyMetaItems.SKULL_DUST.getStackForm(), 15 * 100);
+        addCentrifugeToMaterial(DrtCombType.MUTAGENIC_AGENT, new Material[] {  }, new int[] {  },
+                new int[] { 9 }, Voltage.HV, new ItemStack(GTDropItem.getByNameOrId("gregtech:gt.honey_drop"),1,3), 100 * 100);
+        addProcessGT(DrtCombType.MUTAGENIC_AGENT, new Material[] { Materials.Uranium238,Materials.Uranium235,Materials.Plutonium239 }, Voltage.EV);
     }
 
     private static void addChemicalProcess(DrtCombType comb, Material inMaterial, Material outMaterial, Voltage volt) {
@@ -38,7 +46,7 @@ public class CombRecipes {
             return;
 
         RecipeBuilder<?> builder = RecipeMaps.CHEMICAL_RECIPES.recipeBuilder()
-                .inputs(GTUtility.copy(1, ForestryUtil.getCombStack(comb)))
+                .inputs(GTUtility.copy(4, ForestryUtil.getCombStack(comb)))
                 .input(OrePrefix.crushed, inMaterial)
                 .fluidInputs(volt.getFluid())
                 .output(OrePrefix.crushedPurified, outMaterial, 4)
@@ -70,14 +78,13 @@ public class CombRecipes {
         if (OreDictUnifier.get(OrePrefix.crushedPurified, material, 4).isEmpty()) return;
 
         RecipeBuilder<?> builder = RecipeMaps.AUTOCLAVE_RECIPES.recipeBuilder()
-                .inputs(GTUtility.copy(1, ForestryUtil.getCombStack(comb)))
+                .inputs(GTUtility.copy(4, ForestryUtil.getCombStack(comb)))
                 .circuitMeta(circuitNumber)
                 .fluidInputs(
                         Materials.Mutagen.getFluid((int) Math.max(1, material.getMass() + volt.getMutagenAmount())))
                 .output(OrePrefix.crushedPurified, material, 4)
                 .duration((int) (material.getMass() * 128))
                 .EUt(volt.getAutoclaveEnergy());
-
         if (volt.compareTo(Voltage.HV) > 0) {
             builder.cleanroom(CleanroomType.CLEANROOM);
         }
