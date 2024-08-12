@@ -815,7 +815,13 @@ drtech.machine.wireless_energy_hatch.output_1048576a.max.name=1048576安无线�
 #comb
 item.drt.comb.borax.name=硼砂蜂窝
 item.drt.comb.ether.name=以太蜂窝
+item.drt.comb.bright.name=璀璨蜂窝
+item.drt.comb.wither.name=凋零蜂窝
+item.drt.comb.mutagenic_agent.name=诱变蜂窝
 for.bees.species.borax=硼砂
+for.bees.species.wither=凋零
+for.bees.species.bright=璀璨
+for.bees.species.mutagenic_agent=诱变
 
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡

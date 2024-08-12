@@ -3,9 +3,12 @@ package com.drppp.drtech.intergations.Forestry;
 
 public enum DrtCombType {
 
-    // Organic
+    // 内容颜色 边框颜色
     BORAX("borax", 0x178c29, 0xbab8fe),
-    ETHER("ether", 0x117c29, 0xba18f8);
+    ETHER("ether", 0x117c29, 0xba18f8),
+    BRIGHT("bright", 0x7A007A, 0xFFFFFF),
+    WITHER("wither", 0x040102, 0x144F5B),
+    MUTAGENIC_AGENT("mutagenic_agent", 0xa39f00, 0x1fff5b);
 
     public static final DrtCombType[] VALUES = values();
 

@@ -8,13 +8,16 @@ import forestry.api.core.EnumTemperature;
 import forestry.api.genetics.IAllele;
 import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.genetics.Bee;
+import forestry.apiculture.genetics.BeeDefinition;
 import forestry.apiculture.genetics.IBeeDefinition;
 import forestry.apiculture.items.EnumHoneyComb;
 import forestry.core.genetics.alleles.AlleleHelper;
 import forestry.core.genetics.alleles.EnumAllele;
+import gregtech.api.unification.ore.OrePrefix;
 import gregtech.integration.forestry.ForestryModule;
 import gregtech.integration.forestry.bees.GTBeeDefinition;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.BiomeDictionary;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,8 +45,61 @@ public enum DrtBeeDefinition implements IBeeDefinition {
                 AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.GOURD);
             },
             dis -> dis.registerMutation(GTBeeDefinition.SALTY, GTBeeDefinition.LITHIUM, 10)
-            );
-
+            ),
+    WITHER(DRTBranchDefinition.DRT_METAL, "wither", true, 0x040102, 0x144F5B,
+          beeSpecies -> {
+        beeSpecies.addProduct(getForestryComb(EnumHoneyComb.SIMMERING), 0.50f);
+        beeSpecies.addProduct(getDrtComb(DrtCombType.WITHER), 0.30f);
+        beeSpecies.setHumidity(EnumHumidity.ARID);
+        beeSpecies.setTemperature(EnumTemperature.HELLISH);
+    },
+    template -> {
+        AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+        AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+        AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.NETHER);
+    },
+    dis -> {
+        IBeeMutationBuilder mutation= dis.registerMutation(BeeDefinition.DEMONIC, GTBeeDefinition.ASH, 10);
+        mutation.restrictBiomeType(BiomeDictionary.Type.NETHER);
+    }
+    ),
+    BRIGHT(DRTBranchDefinition.DRT_RAREMETAL, "bright", true, 0x7A007A, 0xFFFFFF,
+            beeSpecies -> {
+                beeSpecies.addProduct(getForestryComb(EnumHoneyComb.SIMMERING), 0.50f);
+                beeSpecies.addProduct(getDrtComb(DrtCombType.BRIGHT), 0.30f);
+                beeSpecies.addProduct(getDrtComb(DrtCombType.WITHER), 0.10f);
+                beeSpecies.setHumidity(EnumHumidity.ARID);
+                beeSpecies.setTemperature(EnumTemperature.HELLISH);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.NETHER);
+            },
+            dis -> {
+                IBeeMutationBuilder mutation = dis.registerMutation(DrtBeeDefinition.WITHER, GTBeeDefinition.ASH, 5);
+                mutation.restrictTemperature(EnumTemperature.HOT);
+                mutation.requireResource("blockTricalciumPhosphate");
+            }
+    ),
+    MUTAGENIC_AGENT(DRTBranchDefinition.DRT_RAREMETAL, "mutagenic_agent", true, 0xa39f00, 0x1fff5b,
+            beeSpecies -> {
+                beeSpecies.addProduct(getForestryComb(EnumHoneyComb.HONEY), 0.30f);
+                beeSpecies.addProduct(getDrtComb(DrtCombType.MUTAGENIC_AGENT), 0.15f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.HOT);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.END);
+            },
+            dis -> {
+                dis.registerMutation(GTBeeDefinition.PLUTONIUM, GTBeeDefinition.URANIUM, 5);
+            }
+    );
     private final DRTBranchDefinition branch;
     private final DRTAlleleBeeSpecies species;
     private final Consumer<DRTAlleleBeeSpecies> speciesProperties;
