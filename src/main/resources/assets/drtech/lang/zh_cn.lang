@@ -90,14 +90,14 @@ metaitem.upgrade_reflect.name=反射效率升级
 metaitem.wireless_network_control_panel.name=无线网络控制面板
 metaitem.grass_killer.name=杂草终结者
 metaitem.upgrade_null.name=升级框架
-metaitem.upgrade_speed1.name=速度升级(1x)
-metaitem.upgrade_speed2.name=速度升级(2x)
-metaitem.upgrade_speed3.name=速度升级(4x)
-metaitem.upgrade_speed4.name=速度升级(8x)
-metaitem.upgrade_speed5.name=速度升级(16x)
-metaitem.upgrade_speed6.name=速度升级(32x)
-metaitem.upgrade_speed7.name=速度升级(64x)
-metaitem.upgrade_speed8.name=速度升级(128x)
+metaitem.upgrade_speed1.name=速度升级(2x)
+metaitem.upgrade_speed2.name=速度升级(4x)
+metaitem.upgrade_speed3.name=速度升级(8x)
+metaitem.upgrade_speed4.name=速度升级(16x)
+metaitem.upgrade_speed5.name=速度升级(32x)
+metaitem.upgrade_speed6.name=速度升级(64x)
+metaitem.upgrade_speed7.name=速度升级(128x)
+metaitem.upgrade_speed8.name=速度升级(256x)
 metaitem.upgrade_speed8p.name=速度产量升级(256x)
 metaitem.upgrade_production.name=产量升级
 metaitem.upgrade_plain.name=平原环境升级
@@ -121,6 +121,7 @@ metaitem.upgrade_open_sky.name=露天升级
 metaitem.upgrade_heater.name=加热器升级
 metaitem.upgrade_sieve.name=筛滤升级
 metaitem.upgrade_t.name=夜间升级
+metaitem.tool_box.name=工具盒(未完成)
 
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
@@ -211,6 +212,8 @@ drtech.machine.matrix_solver.name=不定元矩阵运算器
 drtech.machine.large_extruder.name=大型压模机
 drtech.machine.passthrough_computationhatch.name=算力通行仓
 drtech.machine.industrial_apiary.name=工业蜂箱
+drtech.machine.concrete_backfiller1.name=混凝土回填机
+drtech.machine.concrete_backfiller2.name=进阶混凝土回填机
 #Materials
 gregtech.material.bedrock=基岩
 
@@ -257,7 +260,8 @@ drtech.universal.tooltip.energy_storage_capacity=§c流体缓存：§r%s L
 drtech.multiblock.yot_tank.fluid_type=流体类型:%s
 gregtech.machine.yot_tank.tooltip1=§9超超超超级量子缸！
 gregtech.machine.yot_tank.tooltip2=§9存储任意搭配,运行不耗电!
-
+drtech.multiblock.lbh.changep=切换工作类型
+drtech.multiblock.lbh.changew=切换工作方式
 drtech.machine.mobskiller.tip.1=§3根据电路板和生物群系产出掉落物(地狱 沼泽 末地)!输入总线放一把剑！
 drtech.machine.mobskiller.tip.2=§3按照电路1-14分别是:僵尸、骷髅、爬行者、女巫、烈焰人、猪人、凋零骷髅、恶魂、末影人、史莱姆、牛、鸡、羊、猪
 metaitem.pipe_1.tooltip.1=管道长度:1
@@ -324,6 +328,27 @@ drtech.machine.passthrough_computationhatch.tooltip.1=§d超净间的算力传�
 drtech.machine.passthrough_computationhatch.tooltip.2=§d正向接收反向输送
 drtech.machine.nuclear.tooltip.1=§dIC2核电复刻
 drtech.machine.nuclear.tooltip.2=§d可安装升级配件，体验全新功能
+metaitem.upgrade.info=工业蜂箱的%s升级
+metaitem.upgrade.maxnum=最大安装数量:%s
+metaitem.upgrade.speed=×解锁%s倍加速
+metaitem.upgrade.energy=×能耗%s
+metaitem.upgrade.product=×解锁8×产量升级
+metaitem.upgrade.production.function=提升25%产量
+metaitem.upgrade.biomes=×生物群系覆盖:%S
+metaitem.upgrade.light=×内部照明
+metaitem.upgrade.flowering=×开花授粉+20%
+metaitem.upgrade.dry=×湿度-12.5%
+metaitem.upgrade.humidifier=×湿度+12.5%
+metaitem.upgrade.pollen_scrubber=×开花授粉-100%
+metaitem.upgrade.cooler=×温度-12.5%
+metaitem.upgrade.heater=×温度+12.5%
+metaitem.upgrade.lifespan=×寿命-33.3%
+metaitem.upgrade.seal=×防雨
+metaitem.upgrade.genetic_stabilizer=×基因衰退-100%
+metaitem.upgrade.territory=×活动范围+50%
+metaitem.upgrade.sieve=×花粉收集
+metaitem.upgrade.tool_box.1=能放工具的工具盒
+metaitem.upgrade.tool_box.2=能维护维护仓
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
@@ -810,4 +835,8 @@ drtech.command.horde.stop.has_active_no_invasion=没有正在进行中的入侵�
 drtech.command.horde.stop.stopped=%s入侵已结束。
 drtech.command.horde.status.usage=/mobHorde status <player>
 drtech.command.horde.status.has_active_invasion=Player %s has an active %s invasion for %d ticks. It will time out in %s ticks.
-drtech.command.horde.status.no_active_invasion=Player %s has no active invasion.
+
+
+
+
+drtech.command.horde.status.no_active_invasion=Player %s has no active invasion.entity.UTi_Golem.name=Uranium-Titanium Alloy Golemdrtech.command.horde.status.no_active_invasion=Player %s has no active invasion.entity.UTi_Golem.name=Uranium-Titanium Alloy Golemdrtech.command.horde.status.no_active_invasion=Player %s has no active invasion.

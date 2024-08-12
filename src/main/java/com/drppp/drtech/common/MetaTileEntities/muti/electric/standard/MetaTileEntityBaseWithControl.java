@@ -38,8 +38,8 @@ import java.util.List;
 public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase implements IControllable, IDataInfoProvider, IWorkable {
     private boolean isActive = false;
     private boolean isWorkingEnabled = true;
-    private int process;
-    private int maxProcess;
+    public int process;
+    public int maxProcess;
     protected IItemHandlerModifiable inputInventory;
     protected IItemHandlerModifiable outputInventory;
     protected IMultipleTankHandler inputFluidInventory;

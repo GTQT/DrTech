@@ -71,9 +71,7 @@ public class MetaTileeneityPassthroughHatchComputationHatch extends MetaTileEnti
     }
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
-        if (side == getFrontFacing() && capability == GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER) {
-            return GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER.cast(this);
-        }else if (side == getFrontFacing().getOpposite() && capability == GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER) {
+     if (side == getFrontFacing().getOpposite() && capability == GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER) {
             return GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER.cast(this);
         }
         return super.getCapability(capability, side);
@@ -83,8 +81,11 @@ public class MetaTileeneityPassthroughHatchComputationHatch extends MetaTileEnti
         if (tileEntity == null) return null;
 
         if (tileEntity instanceof TileEntityOpticalPipe) {
-            return tileEntity.getCapability(GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER,
-                    getFrontFacing().getOpposite());
+            if(tileEntity.hasCapability(GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER, getFrontFacing().getOpposite()))
+            {
+                return tileEntity.getCapability(GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER, getFrontFacing().getOpposite());
+            }
+            else return null;
         }
         return null;
     }
