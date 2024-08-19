@@ -2,19 +2,18 @@ package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
+import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
-import com.drppp.drtech.api.Utils.GT_ApiaryUpgrade;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.Client.render.ConnectorTesr;
-import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.common.CommonProxy;
@@ -36,20 +35,15 @@ import com.drppp.drtech.loaders.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.Sync.SyncInit;
-import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
-import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
-import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import gregtech.integration.forestry.bees.GTAlleleBeeSpecies;
-import gregtech.integration.forestry.bees.GTBeeDefinition;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -70,7 +64,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.geckolib3.GeckoLib;
 
-import static com.drppp.drtech.common.Items.MetaItems.ItemCombs.ITEM_COMBS;
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]")
@@ -92,9 +85,9 @@ public class DrTechMain {
     public static CommonProxy proxy;
     public static ClientProxy cproxy;
     @EventHandler
-    // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
     public void preInit(FMLPreInitializationEvent event) {
         // register to the event bus so that we can listen to events
+        OBJLoader.INSTANCE.addDomain(Tags.MODID);
         MinecraftForge.EVENT_BUS.register(this);
         Mytab = new MyCreativeTabs("mytab");
         MyMetaItems.MetaItemsInit();
@@ -106,29 +99,31 @@ public class DrTechMain {
         }
         GeckoLib.initialize();
         Textures.init();
-    }
-    @EventHandler
-    @SideOnly(Side.CLIENT)
-    // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
-    public void ClientpreInit(FMLPreInitializationEvent event) {
-        TexturesInit();
-        drtMetaEntities.initRenderers();
-        ModelLoaderRegistry.registerLoader(OBJLoader.INSTANCE);
-        OBJLoader.INSTANCE.addDomain(Tags.MODID);
-    }
-    @Mod.EventHandler
-    public void onPreInit( FMLPreInitializationEvent event) {
         drtMetaEntities.init();
         SusySounds.registerSounds();
         TileEntityUIFactory.INSTANCE.init();
         DrtDimType.init();
         WorldRegisterHandler.init();
     }
+    @EventHandler
+    @SideOnly(Side.CLIENT)
+    // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
+    public void ClientpreInit(FMLPreInitializationEvent event) {
+        OBJLoader.INSTANCE.addDomain(Tags.MODID);
+        TexturesInit();
+        drtMetaEntities.initRenderers();
+
+    }
+
     @SideOnly(Side.CLIENT)
     public void TexturesInit()
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new ConnectorTesr());
+        try {
+            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         TextureUtils.addIconRegister(Textures::register);
         LaserPipeRenderer.INSTANCE.preInit();
     }
