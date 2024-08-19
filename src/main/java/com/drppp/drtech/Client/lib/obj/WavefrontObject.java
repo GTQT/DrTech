@@ -332,7 +332,6 @@ public class WavefrontObject implements IModelCustom {
             throw new ModelFormatException("Error parsing entry ('" + line + "', line " + lineCount + ") in file '" + this.fileName + "' - Incorrect format");
         }
     }
-
     private Face parseFace(String line, int lineCount) throws ModelFormatException {
         Face face = null;
         if (isValidFaceLine(line)) {
@@ -340,20 +339,20 @@ public class WavefrontObject implements IModelCustom {
             String trimmedLine = line.substring(line.indexOf(" ") + 1);
             String[] tokens = trimmedLine.split(" ");
             String[] subTokens = null;
-            if (tokens.length == 3) {
+
+            // 支持三角形面和四边形面
+            if (tokens.length == 3 || tokens.length == 4) {
                 if (this.currentGroupObject.glDrawingMode == -1) {
-                    this.currentGroupObject.glDrawingMode = 4;
-                } else if (this.currentGroupObject.glDrawingMode != 4) {
-                    throw new ModelFormatException("Error parsing entry ('" + line + "', line " + lineCount + ") in file '" + this.fileName + "' - Invalid number of points for face (expected 4, found " + tokens.length + ")");
+                    this.currentGroupObject.glDrawingMode = (tokens.length == 3) ? 4 : 7; // GL_TRIANGLES 或 GL_QUADS
+                } else if (this.currentGroupObject.glDrawingMode != 4 && this.currentGroupObject.glDrawingMode != 7) {
+                    throw new ModelFormatException("Error parsing entry ('" + line + "', line " + lineCount + ") in file '" + this.fileName + "' - Invalid number of points for face (expected 3 or 4, found " + tokens.length + ")");
                 }
-            } else if (tokens.length == 4) {
-                if (this.currentGroupObject.glDrawingMode == -1) {
-                    this.currentGroupObject.glDrawingMode = 7;
-                } else if (this.currentGroupObject.glDrawingMode != 7) {
-                    throw new ModelFormatException("Error parsing entry ('" + line + "', line " + lineCount + ") in file '" + this.fileName + "' - Invalid number of points for face (expected 3, found " + tokens.length + ")");
-                }
+            } else {
+                // 如果既不是三角形面也不是四边形面，抛出异常
+                throw new ModelFormatException("Error parsing entry ('" + line + "', line " + lineCount + ") in file '" + this.fileName + "' - Invalid number of points for face (expected 3 or 4, found " + tokens.length + ")");
             }
 
+            // 解析 V/Vt/Vn
             int i;
             if (isValidFace_V_VT_VN_Line(line)) {
                 face.vertices = new Vertex[tokens.length];
