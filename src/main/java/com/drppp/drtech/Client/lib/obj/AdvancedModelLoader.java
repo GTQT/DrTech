@@ -44,7 +44,23 @@ public class AdvancedModelLoader {
             }
         }
     }
-
+    public static IModelCustom loadModelWithMtl(ResourceLocation resource) throws IllegalArgumentException, WavefrontObject.ModelFormatException {
+        String name = resource.getPath();
+        int i = name.lastIndexOf(46);
+        if (i == -1) {
+            FMLLog.severe("The resource name %s is not valid", new Object[]{resource});
+            throw new IllegalArgumentException("The resource name is not valid");
+        } else {
+            String suffix = name.substring(i + 1);
+            IModelCustomLoader loader = (IModelCustomLoader)instances.get(suffix);
+            if (loader == null) {
+                FMLLog.severe("The resource name %s is not supported", new Object[]{resource});
+                throw new IllegalArgumentException("The resource name is not supported");
+            } else {
+                return loader.loadInstance(resource,true);
+            }
+        }
+    }
     public static Collection<String> getSupportedSuffixes() {
         return instances.keySet();
     }

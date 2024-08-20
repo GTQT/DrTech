@@ -15,7 +15,10 @@ public class ObjModelLoader implements IModelCustomLoader {
         return types;
     }
 
-    public IModelCustom loadInstance(ResourceLocation resource) throws thaumcraft.client.lib.obj.WavefrontObject.ModelFormatException {
+    public IModelCustom loadInstance(ResourceLocation resource) throws WavefrontObject.ModelFormatException {
         return new WavefrontObject(resource);
+    }
+    public IModelCustom loadInstance(ResourceLocation resource,boolean hasmtl) throws WavefrontObject.ModelFormatException {
+        return new WavefrontObject(resource,hasmtl);
     }
 }

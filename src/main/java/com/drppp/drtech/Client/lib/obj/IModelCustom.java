@@ -10,6 +10,9 @@ public interface IModelCustom {
     void renderAll();
 
     @SideOnly(Side.CLIENT)
+    void renderAllWithMtl();
+
+    @SideOnly(Side.CLIENT)
     void renderOnly(String... var1);
 
     @SideOnly(Side.CLIENT)

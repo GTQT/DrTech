@@ -124,4 +124,31 @@ class MaterialLibrary extends Dictionary<String, Material> {
         this.currentMaterial = new Material(materialName);
         this.materialLibrary.put(this.currentMaterial.Name, this.currentMaterial);
     }
+    // 新添加的方法
+    public String getTexture(String materialName, String textureType) {
+        Material material = this.get(materialName);
+        if (material != null) {
+            switch (textureType.toLowerCase()) {
+                case "ambient":
+                    return material.AmbientTextureMap;
+                case "diffuse":
+                    return material.DiffuseTextureMap;
+                case "specular":
+                    return material.SpecularTextureMap;
+                case "specularhighlight":
+                    return material.SpecularHighlightTextureMap;
+                case "alpha":
+                    return material.AlphaTextureMap;
+                case "bump":
+                    return material.BumpMap;
+                case "displacement":
+                    return material.DisplacementMap;
+                case "decal":
+                    return material.StencilDecalMap;
+                default:
+                    return null;
+            }
+        }
+        return null;
+    }
 }
