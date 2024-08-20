@@ -10,13 +10,18 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.vecmath.Vector3f;
 
 public class WavefrontObject implements IModelCustom {
     private static Pattern vertexPattern = Pattern.compile("(v( (\\-){0,1}\\d+\\.\\d+){3,4} *\\n)|(v( (\\-){0,1}\\d+\\.\\d+){3,4} *$)");
@@ -39,9 +44,11 @@ public class WavefrontObject implements IModelCustom {
     public ArrayList<Vertex> vertexNormals = new ArrayList();
     public ArrayList<TextureCoordinate> textureCoordinates = new ArrayList();
     public ArrayList<GroupObject> groupObjects = new ArrayList();
+    public ArrayList<String> usemtls = new ArrayList<>();
     private GroupObject currentGroupObject;
     private String fileName;
-
+    private MaterialLibrary materialLibrary;
+    private boolean HasMtlFile = false;
     public WavefrontObject(ResourceLocation resource) throws ModelFormatException {
         this.fileName = resource.toString();
 
@@ -58,7 +65,21 @@ public class WavefrontObject implements IModelCustom {
         this.fileName = filename;
         this.loadObjModel(inputStream);
     }
-
+    public WavefrontObject(ResourceLocation resource,boolean hasmtl) throws ModelFormatException {
+        HasMtlFile = hasmtl;
+        this.fileName = resource.toString();
+        try {
+            IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resource);
+            this.loadObjModel(res.getInputStream());
+            // 加载材质文件（假设材质文件与OBJ文件同名）
+            ResourceLocation mtlResource = new ResourceLocation(resource.getNamespace(), resource.getPath().replace(".obj", ".mtl"));
+            this.materialLibrary = new MaterialLibrary();
+            this.materialLibrary.loadFromStream(mtlResource);
+        } catch (IOException var3) {
+            IOException e = var3;
+            throw new WavefrontObject.ModelFormatException("IO Exception reading model format", e);
+        }
+    }
     private void loadObjModel(InputStream inputStream) throws ModelFormatException {
         BufferedReader reader = null;
         String currentLine = null;
@@ -100,9 +121,15 @@ public class WavefrontObject implements IModelCustom {
                         GroupObject group = this.parseGroupObject(currentLine, lineCount);
                         if (group != null && this.currentGroupObject != null) {
                             this.groupObjects.add(this.currentGroupObject);
+
                         }
 
                         this.currentGroupObject = group;
+                    }else if(currentLine.startsWith("usemtl"))
+                    {
+                        if(currentGroupObject!=null)
+                            currentGroupObject.materialName=currentLine.substring(6).trim();
+                        this.usemtls.add(currentLine.substring(6).trim());
                     }
                 }
             }
@@ -148,7 +175,25 @@ public class WavefrontObject implements IModelCustom {
         }
 
     }
+    @SideOnly(Side.CLIENT)
+    public void renderAllWithMtl() {
+        Tessellator tessellator = Tessellator.getInstance();
+//        if (this.currentGroupObject != null) {
+//            tessellator.getBuffer().begin(this.currentGroupObject.glDrawingMode, DefaultVertexFormats.POSITION_TEX_NORMAL);
+//        } else {
+//            tessellator.getBuffer().begin(4, DefaultVertexFormats.POSITION_TEX_NORMAL);
+//        }
 
+        this.tessellateAllWithMtl(tessellator);
+        //tessellator.draw();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void tessellateAllWithMtl(Tessellator tessellator) {
+        for (GroupObject groupObject : this.groupObjects) {
+            groupObject.render(tessellator, this.materialLibrary);  // 传递材质库
+        }
+    }
     @SideOnly(Side.CLIENT)
     public void renderOnly(String... groupNames) {
         Iterator var2 = this.groupObjects.iterator();
@@ -526,7 +571,8 @@ public class WavefrontObject implements IModelCustom {
         public String name;
         public ArrayList<Face> faces;
         public int glDrawingMode;
-
+        public Material material;
+        public String materialName;
         public GroupObject() {
             this("");
         }
@@ -564,6 +610,35 @@ public class WavefrontObject implements IModelCustom {
             }
 
         }
+        @SideOnly(Side.CLIENT)
+        public void render(Tessellator tessellator, MaterialLibrary materialLibrary) {
+            if (this.faces.size() > 0) {
+                boolean hasTexture = false;
+                this.material = materialLibrary.get(materialName);
+                // 检查材质和材质库
+                if (this.material != null && materialLibrary != null) {
+                    String texturePath = materialLibrary.getTexture(this.material.Name, "diffuse");
+                    if (texturePath != null && !texturePath.isEmpty()) {
+                        ResourceLocation textureLocation = new ResourceLocation(texturePath);
+                        Minecraft.getMinecraft().getTextureManager().bindTexture(textureLocation);
+                        hasTexture = true;
+                    }
+                }
+                // 如果没有纹理，使用颜色
+                if (this.material != null && materialLibrary != null && !hasTexture) {
+                    Vector3f diffuseColor = this.material.DiffuseColor != null ? this.material.DiffuseColor : new Vector3f(1.0f, 1.0f, 1.0f); // 默认白色
+                    GlStateManager.color(diffuseColor.x, diffuseColor.y, diffuseColor.z);
+                } else {
+                    // 如果有绑定了纹理，则重置颜色，以防止颜色影响纹理
+                    GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+                }
+
+                tessellator.getBuffer().begin(this.glDrawingMode, DefaultVertexFormats.POSITION_TEX_NORMAL);
+                this.render(tessellator);
+                tessellator.draw();
+            }
+        }
+
     }
 
     public class Face {
@@ -571,7 +646,7 @@ public class WavefrontObject implements IModelCustom {
         public Vertex[] vertexNormals;
         public Vertex faceNormal;
         public TextureCoordinate[] textureCoordinates;
-
+        public Material material;
         public Face() {
         }
 
@@ -585,7 +660,6 @@ public class WavefrontObject implements IModelCustom {
             if (this.faceNormal == null) {
                 this.faceNormal = this.calculateFaceNormal();
             }
-
             float averageU = 0.0F;
             float averageV = 0.0F;
             if (this.textureCoordinates != null && this.textureCoordinates.length > 0) {
@@ -610,15 +684,22 @@ public class WavefrontObject implements IModelCustom {
                         offsetV = -offsetV;
                     }
 
-                    tessellator.getBuffer().pos((double)this.vertices[i].x, (double)this.vertices[i].y, (double)this.vertices[i].z).tex((double)(this.textureCoordinates[i].u + offsetU), (double)(this.textureCoordinates[i].v + offsetV)).normal(this.faceNormal.x, this.faceNormal.y, this.faceNormal.z).endVertex();
+                    tessellator.getBuffer().pos((double)this.vertices[i].x, (double)this.vertices[i].y, (double)this.vertices[i].z)
+                            .tex((double)(this.textureCoordinates[i].u + offsetU), (double)(this.textureCoordinates[i].v + offsetV))
+                            .normal(this.faceNormal.x, this.faceNormal.y, this.faceNormal.z).endVertex();
                 } else {
-                    tessellator.getBuffer().pos((double)this.vertices[i].x, (double)this.vertices[i].y, (double)this.vertices[i].z).normal(this.faceNormal.x, this.faceNormal.y, this.faceNormal.z).endVertex();
+                    tessellator.getBuffer().pos((double)this.vertices[i].x, (double)this.vertices[i].y, (double)this.vertices[i].z)
+                            .normal(this.faceNormal.x, this.faceNormal.y, this.faceNormal.z).endVertex();
                 }
             }
 
         }
 
         public Vertex calculateFaceNormal() {
+            if (this.vertices == null || this.vertices.length < 3) {
+                // Vertices array is invalid for calculating face normal
+                return new Vertex(0.0f, 0.0f, 0.0f);
+            }
             Vec3d v1 = new Vec3d((double)(this.vertices[1].x - this.vertices[0].x), (double)(this.vertices[1].y - this.vertices[0].y), (double)(this.vertices[1].z - this.vertices[0].z));
             Vec3d v2 = new Vec3d((double)(this.vertices[2].x - this.vertices[0].x), (double)(this.vertices[2].y - this.vertices[0].y), (double)(this.vertices[2].z - this.vertices[0].z));
             Vec3d normalVector = null;

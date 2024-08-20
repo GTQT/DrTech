@@ -7,4 +7,5 @@ public interface IModelCustomLoader {
     String[] getSuffixes();
 
     IModelCustom loadInstance(ResourceLocation var1) throws WavefrontObject.ModelFormatException;
+    IModelCustom loadInstance(ResourceLocation var1,boolean var2) throws WavefrontObject.ModelFormatException;
 }
