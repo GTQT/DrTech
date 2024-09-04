@@ -1,5 +1,6 @@
 package com.drppp.drtech.Client;
 
+import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.resources.AdoptableTextureArea;
 import gregtech.api.gui.resources.TextureArea;
 import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
@@ -44,7 +45,8 @@ public class Textures {
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_65536x;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_262144x;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_1048576x;
-
+    public static final TextureArea BEE_DRONE_LOGO = TextureArea.fullImage("textures/gui/bee_drone.png");
+    public static final TextureArea BEE_QUEEN_LOGO = TextureArea.fullImage("textures/gui/bee_queen.png");
     public static void init()
     {
         MULTIPART_WIRELESS_ENERGY = new SimpleOverlayRenderer("wireless_hatch/overlay_front");

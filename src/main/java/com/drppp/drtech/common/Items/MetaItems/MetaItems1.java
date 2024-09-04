@@ -347,7 +347,7 @@ public  class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.maxnum","1"));
                     lines.add(I18n.format("metaitem.upgrade.energy","+5%"));
                 }));
-        MyMetaItems.TOOL_BOX = this.addItem(60,"tool_box").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1).addComponents(new ToolBoxBehavior())
+        MyMetaItems.TOOL_BOX = this.addItem(60,"tool_box").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
                 .addComponents(
                         new TooltipBehavior((lines) -> {
                             lines.add(I18n.format("metaitem.upgrade.tool_box.1", new Object[0]));

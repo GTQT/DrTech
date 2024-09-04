@@ -34,6 +34,8 @@ public class OnlyUpgradeStackhandler extends ItemStackHandler {
             int max  =GT_ApiaryUpgrade.getUpgrade(stack).getMaxNumber();
             if(hasSpeedItem(stack))
                 return false;
+            if(hasSpeedProItem(stack))
+                return false;
             if(stack.getCount()>max)
                 return false;
         }
@@ -61,6 +63,23 @@ public class OnlyUpgradeStackhandler extends ItemStackHandler {
         {
             for (int i = 0; i < getSlots(); i++) {
                 if(getStackInSlot(i).getMetadata()>=29 && getStackInSlot(i).getMetadata()<=37 && getStackInSlot(i).getItem()!= Items.AIR)
+                    return true;
+            }
+        }
+        return false;
+    }
+    private boolean hasSpeedProItem(ItemStack is)
+    {
+        if( is.getMetadata()==37)
+        {
+            for (int i = 0; i < getSlots(); i++) {
+                if(getStackInSlot(i).getMetadata()==38 && getStackInSlot(i).getItem()!= Items.AIR)
+                    return true;
+            }
+        }else if( is.getMetadata()==38)
+        {
+            for (int i = 0; i < getSlots(); i++) {
+                if(getStackInSlot(i).getMetadata()==37 && getStackInSlot(i).getItem()!= Items.AIR)
                     return true;
             }
         }

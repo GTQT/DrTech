@@ -10,13 +10,16 @@ import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.value.sync.*;
 import com.cleanroommc.modularui.widgets.*;
+import com.cleanroommc.modularui.widgets.ProgressWidget;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.drppp.drtech.Client.ModularUiTextures;
+import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
 import com.drppp.drtech.api.ItemHandler.OnlyBeesStackhandler;
 import com.drppp.drtech.api.ItemHandler.OnlyUpgradeStackhandler;
@@ -39,9 +42,13 @@ import gregtech.api.capability.impl.EnergyContainerHandler;
 import gregtech.api.cover.Cover;
 import gregtech.api.cover.CoverRayTracer;
 import gregtech.api.gui.ModularUI;
+import gregtech.api.gui.resources.TextureArea;
+import gregtech.api.gui.widgets.*;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntityHolder;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
+import gregtech.api.metatileentity.multiblock.MultiblockDisplayText;
+import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.common.items.MetaItems;
@@ -61,6 +68,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
@@ -128,6 +137,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     private static final int drone = 1;
     private static final int upgradeSlot = 0;
     private static final int upgradeSlotCount = 4;
+    private  List<ITextComponent> textList = new ArrayList<>();
     final IBeeRoot beeRoot = (IBeeRoot) AlleleManager.alleleRegistry.getSpeciesRoot("rootBees");
 
     public int mSpeed = 0;
@@ -148,8 +158,35 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     }
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
-        return null;
+        ModularUI.Builder builder;
+        builder = ModularUI.builder(Textures.BACKGROUND, 176, 166);
+        builder.slot(inventoryBees,0,36,21,true,true,Textures.BEE_QUEEN_LOGO);
+        builder.slot(inventoryBees,1,36,41,true,true,Textures.BEE_DRONE_LOGO);
+        for (int j = 0; j < inventoryUpgrade.getSlots(); j++) {
+            builder.slot(inventoryUpgrade,j,61+j%2*18, 23+j/2*18,true,true, gregtech.api.gui.GuiTextures.SLOT);
+        }
+        for (int j = 0; j < inventoryOutput.getSlots(); j++) {
+            builder.slot(inventoryOutput,j,107+j%3*18,8+ j/3*18,true,false, gregtech.api.gui.GuiTextures.SLOT);
+        }
+        builder.widget(new gregtech.api.gui.widgets.ProgressWidget(this::getProgressPercent, 70, 5, 20, 20, gregtech.api.gui.GuiTextures.PROGRESS_BAR_ARROW, gregtech.api.gui.widgets.ProgressWidget.MoveType.HORIZONTAL));
+        ImageWidget logo = new ImageWidget(70,62, 17, 17, gregtech.api.gui.GuiTextures.GREGTECH_LOGO).setIgnoreColor(true);
+        builder.widget(logo);
+        builder.widget(new ToggleButtonWidget(13,18, 18, 18,
+                gregtech.api.gui.GuiTextures.BUTTON_FLUID_OUTPUT, this::isWorkingEnabled,this::setWorkingEnabled)
+                .setTooltipText("drtech.gui.industrial_apiary.tooltip.1")
+                .shouldUseBaseBackground());
+        builder.widget(new ToggleButtonWidget(13,38, 18, 18,
+                gregtech.api.gui.GuiTextures.BUTTON_FLUID_OUTPUT, this::isActive,this::cancelProcess)
+                .setTooltipText("drtech.gui.industrial_apiary.tooltip.2")
+                .shouldUseBaseBackground());
+        builder.bindPlayerInventory(entityPlayer.inventory,86);
+        return builder.build(this.getHolder(),entityPlayer);
     }
+//    protected void addErrorText(List<ITextComponent> textList) {
+//        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.1",this.mEUt));
+//        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.2",getTemperature()));
+//        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.3",getHumidity()));
+//    }
     //modularui的ui创建
     @Override
     public ModularPanel buildUI(GuiData guiData, GuiSyncManager guiSyncManager) {
@@ -260,49 +297,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         this.error = error;
         markDirty();
         writeCustomData(4803,buf->buf.writeString(error));
-    }
-
-    @Override
-    public boolean onRightClick(EntityPlayer playerIn, EnumHand hand, EnumFacing facing, CuboidRayTraceResult hitResult) {
-        ItemStack heldStack = playerIn.getHeldItem(hand);
-        if (this instanceof IDataStickIntractable) {
-            IDataStickIntractable dsi = (IDataStickIntractable)this;
-            if (MetaItems.TOOL_DATA_STICK.isItemEqual(heldStack) && dsi.onDataStickRightClick(playerIn, heldStack)) {
-                return true;
-            }
-        }
-        //在这里写打开UI事件
-        if (!playerIn.isSneaking() && this.openGUIOnRightClick()) {
-            if (this.getWorld() != null && !this.getWorld().isRemote) {
-                DrtMetaTileEntityGuiFactory.open(playerIn,this);
-                if(uid==null)
-                    setUUID(playerIn);
-            }
-
-            return true;
-        } else if (heldStack.getItem() == Items.NAME_TAG && playerIn.isSneaking() && heldStack.getTagCompound() != null && heldStack.getTagCompound().hasKey("display")) {
-            MetaTileEntityHolder mteHolder = (MetaTileEntityHolder)this.getHolder();
-            mteHolder.setCustomName(heldStack.getTagCompound().getCompoundTag("display").getString("Name"));
-            if (!playerIn.isCreative()) {
-                heldStack.shrink(1);
-            }
-
-            return true;
-        } else {
-            EnumFacing hitFacing = hitResult.sideHit;
-            Cover cover = hitFacing == null ? null : this.getCoverAtSide(hitFacing);
-            if (cover != null && cover.onRightClick(playerIn, hand, hitResult) == EnumActionResult.SUCCESS) {
-                return true;
-            } else {
-                EnumFacing gridSideHit = CoverRayTracer.determineGridSideHit(hitResult);
-                cover = gridSideHit == null ? null : this.getCoverAtSide(gridSideHit);
-                if (cover != null && playerIn.isSneaking() && playerIn.getHeldItemMainhand().isEmpty()) {
-                    return cover.onScrewdriverClick(playerIn, hand, hitResult) == EnumActionResult.SUCCESS;
-                } else {
-                    return false;
-                }
-            }
-        }
     }
 
     @Override
@@ -809,7 +803,9 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     public int getMaxProgress() {
         return mMaxProgresstime;
     }
-
+    public double getProgressPercent() {
+        return this.getMaxProgress() == 0 ? 0.0 : (double)this.getProgress() / ((double)this.getMaxProgress() * 1.0);
+    }
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
         if (capability == GregtechTileCapabilities.CAPABILITY_WORKABLE)
