@@ -47,7 +47,7 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
                 .where('A', states(getCasingState()).setMinGlobalLimited(20)
                         .or(autoAbilities(true, true, true, true, false, false, false)))
                 .where('B', heatingCoils())
-                .where(' ', air())
+                .where(' ', any())
                 .build();
     }
     protected IBlockState getCasingState() {

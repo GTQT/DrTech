@@ -2,10 +2,14 @@ package com.drppp.drtech.Client.render;
 
 
 
+import com.drppp.drtech.Client.lib.obj.AdvancedModelLoader;
+import com.drppp.drtech.Client.lib.obj.IModelCustom;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -19,12 +23,13 @@ public class EOH_TESR extends TileEntitySpecialRenderer<TileEntityHomoEye> {
         GlStateManager.pushMatrix();
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
-        //FMLClientHandler.instance().getClient().getTextureManager().bindTexture(MAGIC_CIRCLE);
+       // FMLClientHandler.instance().getClient().getTextureManager().bindTexture(MAGIC_CIRCLE);
         GlStateManager.translate(x, y, z);
         GlStateManager.translate(0.5, 0.5, 0.5);
         float angle = (System.currentTimeMillis() % 3600) / 10.0f;
-        GlStateManager.rotate(angle, 1F, 0F, 0F);
-       // starModel1.renderAll();
+      //  GlStateManager.rotate(angle, 0F, 0F, 1F);
+        GlStateManager.scale(0.1,0.1,0.1);
+        //Dna_Model.renderAllWithMtl();
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
         GlStateManager.popAttrib();

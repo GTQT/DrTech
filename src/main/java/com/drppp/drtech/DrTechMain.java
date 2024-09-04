@@ -87,7 +87,6 @@ public class DrTechMain {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         // register to the event bus so that we can listen to events
-        OBJLoader.INSTANCE.addDomain(Tags.MODID);
         MinecraftForge.EVENT_BUS.register(this);
         Mytab = new MyCreativeTabs("mytab");
         MyMetaItems.MetaItemsInit();

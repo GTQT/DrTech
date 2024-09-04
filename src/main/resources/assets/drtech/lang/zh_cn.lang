@@ -349,6 +349,10 @@ metaitem.upgrade.territory=×活动范围+50%
 metaitem.upgrade.sieve=×花粉收集
 metaitem.upgrade.tool_box.1=能放工具的工具盒
 metaitem.upgrade.tool_box.2=能维护维护仓
+drtech.gui.industrial_apiary.tooltip.1.disabled=暂停机器
+drtech.gui.industrial_apiary.tooltip.1.enabled=执行机器
+drtech.gui.industrial_apiary.tooltip.2.disabled=取消处理
+drtech.gui.industrial_apiary.tooltip.2.enabled=启用处理
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
