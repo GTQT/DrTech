@@ -101,7 +101,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     private static final int drone = 1;
     private static final int upgradeSlot = 0;
     private static final int upgradeSlotCount = 4;
-    private  List<ITextComponent> textList = new ArrayList<>();
     final IBeeRoot beeRoot = (IBeeRoot) AlleleManager.alleleRegistry.getSpeciesRoot("rootBees");
 
     public int mSpeed = 0;
@@ -111,7 +110,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     private ItemStack usedQueen = null;
     private IBee usedQueenBee = null;
     private IEffectData[] effectData = new IEffectData[2];
-    public String error="";
     public MetaTileEntityIndustrialApiary(ResourceLocation metaTileEntityId, ICubeRenderer renderer) {
         super(metaTileEntityId, GTValues.UHV);
         this.renderer = renderer;
@@ -162,25 +160,18 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.1",this.mEUt));
         textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.2",getTemperature()));
         textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.3",getHumidity()));
-        if(error.length()==0)
+        if(!hasErrors())
         {
             textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.5"));
         }
         else
         {
-            textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.4",getError()));
+            textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.4"));
+            mErrorStates.forEach(info->{
+                textList.add(new TextComponentTranslation(info.getUnlocalizedDescription()));
+            });
         }
     }
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-        markDirty();
-        writeCustomData(4803,buf->buf.writeString(error));
-    }
-
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
@@ -200,7 +191,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             usedQueen=ItemStack.EMPTY;
         buf.writeItemStack(usedQueen);
         buf.writeInt(mEUt);
-        buf.writeString(error);
         writeData(buf);
     }
 
@@ -215,7 +205,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             throw new RuntimeException(e);
         }
         mEUt = buf.readInt();
-        error = buf.readString(30000);
         readData(buf);
     }
     @Override
@@ -264,10 +253,11 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         }else if(dataId==4802)
         {
             readData(buf);
-        }else if(dataId==4803)
-        {
-            this.error = buf.readString(32700);
         }
+//        else if(dataId==4803)
+//        {
+//            this.error = buf.readString(32700);
+//        }
     }
     @Override
     public void update() {
@@ -626,7 +616,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             }
         }
         data.setTag("mOutputItems", nbtTagList);
-        data.setString("errors",this.error);
         return data;
     }
 
@@ -659,7 +648,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                 mOutputItems[slot] = new ItemStack(itemTag);
             }
         }
-        this.error = data.getString("errors");
     }
 
     @Override
@@ -765,11 +753,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         if (b) mErrorStates.add(iErrorState);
         else mErrorStates.remove(iErrorState);
         writeCustomData(4802,buf->writeData(buf));
-        this.error="";
-        mErrorStates.forEach(info->{
-            this.error += I18n.format(info.getUnlocalizedDescription())+"\n";
-        });
-        writeCustomData(4803,buf->buf.writeString(error));
         return b;
     }
     @Override
@@ -784,11 +767,6 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     public void clearErrors() {
         mErrorStates.clear();
         writeCustomData(4802,buf->writeData(buf));
-        this.error="";
-        mErrorStates.forEach(info->{
-            this.error += I18n.format(info.getUnlocalizedDescription())+"\n";
-        });
-        writeCustomData(4803,buf->buf.writeString(error));
     }
 
     @Override

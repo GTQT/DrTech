@@ -13,9 +13,12 @@ import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.apiimpl.styles.TextStyle;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.items.ItemStackHandler;
@@ -99,10 +102,15 @@ public class TopCommonProvider implements IProbeInfoProvider {
             iProbeInfo.text("耗电:"+machine.mEUt);
             iProbeInfo.text("温度:"+machine.getTemperature());
             iProbeInfo.text("湿度:"+machine.getHumidity());
-            if(machine.getError().length()==0)
+            if(!machine.hasErrors())
                 iProbeInfo.text("没有任何错误,老铁!");
             else
-                iProbeInfo.text("错误列表:"+machine.getError().replace('\n',' '));
+            {
+                iProbeInfo.text("错误列表:");
+                machine.mErrorStates.forEach(info->{
+                    iProbeInfo.text("{*"+info.getUnlocalizedDescription()+"*}");
+                });
+            }
         }
     }
 }
