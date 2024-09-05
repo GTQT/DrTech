@@ -6,6 +6,7 @@ import com.drppp.drtech.Tile.TileEntitySapBag;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntutyLargeBeeHive;
 import com.drppp.drtech.Tags;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.TextFormattingUtil;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -92,6 +93,16 @@ public class TopCommonProvider implements IProbeInfoProvider {
                 iProbeInfo.text("贮存物品:"+ s.getDisplayName() +"*"+s.getCount());
             }
 
+        }else if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityIndustrialApiary)
+        {
+            var machine = (MetaTileEntityIndustrialApiary)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
+            iProbeInfo.text("耗电:"+machine.mEUt);
+            iProbeInfo.text("温度:"+machine.getTemperature());
+            iProbeInfo.text("湿度:"+machine.getHumidity());
+            if(machine.getError().length()==0)
+                iProbeInfo.text("没有任何错误,老铁!");
+            else
+                iProbeInfo.text("错误列表:"+machine.getError().replace('\n',' '));
         }
     }
 }

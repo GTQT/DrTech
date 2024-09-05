@@ -47,6 +47,8 @@ public class Textures {
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_1048576x;
     public static final TextureArea BEE_DRONE_LOGO = TextureArea.fullImage("textures/gui/bee_drone.png");
     public static final TextureArea BEE_QUEEN_LOGO = TextureArea.fullImage("textures/gui/bee_queen.png");
+    public static final TextureArea CROSS = TextureArea.fullImage("textures/gui/cross.png");
+    public static final TextureArea CHECK_MARK = TextureArea.fullImage("textures/gui/checkmark.png");
     public static void init()
     {
         MULTIPART_WIRELESS_ENERGY = new SimpleOverlayRenderer("wireless_hatch/overlay_front");
