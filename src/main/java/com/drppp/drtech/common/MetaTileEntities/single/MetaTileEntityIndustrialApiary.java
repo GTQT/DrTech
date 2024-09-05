@@ -1,24 +1,8 @@
 package com.drppp.drtech.common.MetaTileEntities.single;
 
-import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.drawable.Icon;
-import com.cleanroommc.modularui.factory.GuiData;
-import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
-import com.cleanroommc.modularui.value.sync.*;
-import com.cleanroommc.modularui.widgets.*;
-import com.cleanroommc.modularui.widgets.ProgressWidget;
-import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-import com.cleanroommc.modularui.widgets.slot.SlotGroup;
-import com.drppp.drtech.Client.ModularUiTextures;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
 import com.drppp.drtech.api.ItemHandler.OnlyBeesStackhandler;
@@ -27,7 +11,6 @@ import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.Utils.GT_ApiaryUpgrade;
 import com.drppp.drtech.api.Utils.ItemId;
 import com.drppp.drtech.api.modularui.MetaTileEntityModularui;
-import com.drppp.drtech.api.modularui.DrtMetaTileEntityGuiFactory;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 import forestry.apiculture.ModuleApiculture;
@@ -36,31 +19,20 @@ import forestry.apiculture.items.ItemRegistryApiculture;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
-import gregtech.api.capability.IDataStickIntractable;
 import gregtech.api.capability.IWorkable;
-import gregtech.api.capability.impl.EnergyContainerHandler;
-import gregtech.api.cover.Cover;
-import gregtech.api.cover.CoverRayTracer;
+import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
-import gregtech.api.gui.resources.TextureArea;
 import gregtech.api.gui.widgets.*;
 import gregtech.api.metatileentity.MetaTileEntity;
-import gregtech.api.metatileentity.MetaTileEntityHolder;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
-import gregtech.api.metatileentity.multiblock.MultiblockDisplayText;
-import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
-import gregtech.common.items.MetaItems;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPane;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -103,19 +75,11 @@ import forestry.api.core.IErrorState;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IEffectData;
 import forestry.api.genetics.IIndividual;
-import forestry.apiculture.genetics.Bee;
-import forestry.apiculture.genetics.alleles.AlleleEffectThrottled;
 import forestry.core.errors.EnumErrorCode;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.*;
-
-import static forestry.api.apiculture.BeeManager.beeRoot;
-
 
 public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui implements IWorkable ,
         IBeeHousing, IBeeHousingInventory, IErrorLogic, IBeeModifier, IBeeListener {
@@ -171,124 +135,42 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         builder.widget(new gregtech.api.gui.widgets.ProgressWidget(this::getProgressPercent, 70, 5, 20, 20, gregtech.api.gui.GuiTextures.PROGRESS_BAR_ARROW, gregtech.api.gui.widgets.ProgressWidget.MoveType.HORIZONTAL));
         ImageWidget logo = new ImageWidget(70,62, 17, 17, gregtech.api.gui.GuiTextures.GREGTECH_LOGO).setIgnoreColor(true);
         builder.widget(logo);
-        builder.widget(new ToggleButtonWidget(13,18, 18, 18,
-                gregtech.api.gui.GuiTextures.BUTTON_FLUID_OUTPUT, this::isWorkingEnabled,this::setWorkingEnabled)
+        AdvancedTextWidget textWidget = new AdvancedTextWidget(8,62,this::addErrorText,0x52135);
+        builder.widget(textWidget);
+        var btn = new ToggleButtonWidget(13,18, 18, 18,
+                Textures.CROSS, this::isWorkingEnabled,this::setWorkingEnabled)
                 .setTooltipText("drtech.gui.industrial_apiary.tooltip.1")
-                .shouldUseBaseBackground());
+                .shouldUseBaseBackground();
+        if(isWorking())
+        {
+            btn.setButtonTexture(Textures.CHECK_MARK);
+            btn.updateScreenOnFrame();
+        }
+        else {
+            btn.setButtonTexture(Textures.CROSS);
+            btn.updateScreenOnFrame();
+        }
+        builder.widget(btn);
         builder.widget(new ToggleButtonWidget(13,38, 18, 18,
-                gregtech.api.gui.GuiTextures.BUTTON_FLUID_OUTPUT, this::isActive,this::cancelProcess)
+                GuiTextures.ARROW_DOUBLE, this::isActive,this::cancelProcess)
                 .setTooltipText("drtech.gui.industrial_apiary.tooltip.2")
                 .shouldUseBaseBackground());
         builder.bindPlayerInventory(entityPlayer.inventory,86);
         return builder.build(this.getHolder(),entityPlayer);
     }
-//    protected void addErrorText(List<ITextComponent> textList) {
-//        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.1",this.mEUt));
-//        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.2",getTemperature()));
-//        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.3",getHumidity()));
-//    }
-    //modularui的ui创建
-    @Override
-    public ModularPanel buildUI(GuiData guiData, GuiSyncManager guiSyncManager) {
-        ModularPanel panel = ModularPanel.defaultPanel("industrial_apiary_gui");
-        var iswork = new BooleanSyncValue(this::isWorkingEnabled,this::setWorkingEnabled);
-        iswork.updateCacheFromSource(true);
-        var isactive = new BooleanSyncValue(this::isActive,this::cancelProcess);
-        isactive.updateCacheFromSource(true);
-        var eut = new IntSyncValue(()->mEUt,this::setmEut);
-        eut.updateCacheFromSource(true);
-        var s = new StringSyncValue(this::getError,this::setError);
-        s.updateCacheFromSource(true);
-        panel.child(new ItemSlot()
-                .slot(inventoryBees,0)
-                .pos(36,21)
-                .background(ModularUiTextures.BEE_QUEEN_ICON)
-        );
-        panel.child(new ItemSlot()
-                .slot(inventoryBees,1)
-                .pos(36,41)
-                .background(ModularUiTextures.BEE_DRONE_ICON)
-        );
-        var groupUpgrade = new SlotGroupWidget();
-        for (int j = 0; j < inventoryUpgrade.getSlots(); j++) {
-            groupUpgrade.child(
-                    new ItemSlot()
-                            .slot(inventoryUpgrade,j)
-                            .pos( j%2*18, j/2*18)
-                            .addTooltipLine("升级槽")
-            );
+    protected void addErrorText(List<ITextComponent> textList) {
+        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.1",this.mEUt));
+        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.2",getTemperature()));
+        textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.3",getHumidity()));
+        if(error.length()==0)
+        {
+            textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.5"));
         }
-        panel.child(groupUpgrade.pos(61,23).size(36,36));
-        var groupOutput = new SlotGroupWidget();
-        for (int j = 0; j < inventoryOutput.getSlots(); j++) {
-            groupOutput.child(new ItemSlot().slot(inventoryOutput,j).pos( j%3*18, j/3*18));
+        else
+        {
+            textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.4",getError()));
         }
-        panel.child(groupOutput.pos(107,8).size(54,72));
-       panel.child(new ProgressWidget()
-               .size(20)
-               .pos(70,5)
-               .texture(GuiTextures.PROGRESS_ARROW, 20)
-               .value(new DoubleSyncValue(() -> this.progressPer / 100.0, val -> this.progressPer = (int) (val * 100))));
-       panel.child(new Icon(ModularUiTextures.INFORMATION).asWidget()
-                       .tooltip(tooltip -> {
-                           tooltip.addLine(IKey.dynamic(() -> "消耗Eut: " + this.mEUt));
-                           tooltip.addLine("温度: "+getTemperature());
-                           tooltip.addLine("湿度: "+getHumidity());
-                           tooltip.addLine(IKey.dynamic(()->{
-                               if(error.length()==0)
-                               {
-                                   return "老铁,没有任何问题!";
-                               }
-                               else
-                               {
-                                   return error;
-                               }
-                           }));
-
-                       })
-               .pos(70,62)
-       );
-       panel.child(new ToggleButton()
-               .pos(13,18)
-               .size(18,18)
-               .background(ModularUiTextures.CROSS)
-               .hoverBackground(ModularUiTextures.CROSS)
-               .selectedBackground(ModularUiTextures.CHECK_MARK)
-               .selectedHoverBackground(ModularUiTextures.CHECK_MARK)
-               .value(iswork)
-               .tooltip(tooltip -> {
-                   tooltip.showUpTimer(5);
-                   tooltip.addLine("暂停/开始");
-               })
-       );
-        panel.child(new ToggleButton()
-                .pos(13,38)
-                .size(18,18)
-                        .overlay(GuiTextures.SHIFT_FORWARD)
-                .tooltip(tooltip -> {
-                    tooltip.showUpTimer(5);
-                    tooltip.addLine("启用/取消处理");
-                    tooltip.addLine("同时会关闭机器");
-                    tooltip.addLine("可以重新开启");
-                        }
-                )
-                .value(isactive)
-        );
-        panel .child(
-                IKey.dynamic(()->{
-                    if(isActive())
-                        return "启用";
-                    else
-                        return "禁用";
-                        }).color(0xf973c9)
-                .asWidget()
-                        .pos(13,58)
-        );
-        panel.child(IKey.str("工业蜂箱").asWidget().pos(5,5));
-        panel.bindPlayerInventory();
-        return panel;
     }
-
     public String getError() {
         return error;
     }
