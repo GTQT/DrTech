@@ -4,6 +4,7 @@ import appeng.api.AEApi;
 import appeng.api.config.AccessRestriction;
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.events.MENetworkCellArrayUpdate;
 import appeng.api.networking.events.MENetworkStorageEvent;
@@ -43,6 +44,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.IFluidTank;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,8 +56,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart implements IMultiblockAbilityPart<IAEFluidStack> , IGridProxyable, IActionHost, ICellContainer,
-        IMEInventory<IAEFluidStack>, IMEInventoryHandler<IAEFluidStack> {
+public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart implements IMultiblockAbilityPart<IAEFluidStack> , IGridHost, IFluidHandler,IMEInventoryHandler<IAEFluidStack> {
     private MetaTileEntityYotTank yotTank;
     private  IAEFluidStack iaeFluidContainer;
     private final MEInventoryHandler<IAEFluidStack> meInventoryHandler;
@@ -65,7 +69,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         iaeFluidContainer =null;
         this.meInventoryHandler = new MEInventoryHandler<>(this, FLUID_NET);
     }
-
+    IFluidTank tank;
     @Override
     public boolean isWorkingEnabled() {
         return true;
@@ -104,7 +108,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     public void setYotTank(MetaTileEntityYotTank yotTank) {
         this.yotTank = yotTank;
-
+        this.tank = new FluidTank(yotTank.getFluid().getFluid(),(int)yotTank.getFluidBank().getStored().longValue(),Integer.MAX_VALUE);
     }
 
     @Override
@@ -136,6 +140,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
             }
             if (!getWorld().isRemote && this.isWorkingEnabled() && this.shouldSyncME()&&updateMEStatus()) {
                 try {
+                    
                     this.getProxy().getGrid().postEvent(new MENetworkCellArrayUpdate());
                 } catch (GridAccessException e) {
                     throw new RuntimeException(e);
@@ -149,11 +154,6 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         if(this.yotTank.getFluid()==null) return false;
         return true;
     }
-    @Override
-    public DimensionalCoord getLocation() {
-        return new DimensionalCoord(this.getWorld(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
-    }
-
     @Nullable
     @Override
     public IGridNode getGridNode(@NotNull AEPartLocation aePartLocation) {
@@ -164,26 +164,6 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     @Override
     public void securityBreak() {
 
-    }
-
-    @Override
-    public void blinkCell(int i) {
-
-    }
-
-    @NotNull
-    @Override
-    public IGridNode getActionableNode() {
-        AENetworkProxy gp = getProxy();
-        return gp != null ? gp.getNode() : null;
-    }
-
-    @Override
-    public List<IMEInventoryHandler> getCellArray(IStorageChannel<?> iStorageChannel) {
-        if (iStorageChannel == FLUID_NET) {
-            return Collections.singletonList(this.meInventoryHandler);
-        }
-        return Collections.EMPTY_LIST;
     }
 
     @Override
@@ -208,7 +188,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     @Override
     public int getSlot() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -336,12 +316,28 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         return this.FLUID_NET;
     }
 
+
     @Override
-    public void saveChanges(@Nullable ICellInventory<?> iCellInventory) {
-        if(this instanceof ISaveProvider)
-        {
-            ((ISaveProvider)this).saveChanges(iCellInventory);
-        }
+    public IFluidTankProperties[] getTankProperties() {
+        return new IFluidTankProperties[0];
     }
 
+    @Override
+    public int fill(FluidStack resource, boolean doFill) {
+        return (int) fill(null, AEFluidStack.fromFluidStack(resource), doFill);
+    }
+
+    @Nullable
+    @Override
+    public FluidStack drain(FluidStack resource, boolean doDrain) {
+        IAEFluidStack drained = drain(null, AEFluidStack.fromFluidStack(resource), doDrain);
+        return drained != null ? drained.getFluidStack() : null;
+    }
+
+    @Nullable
+    @Override
+    public FluidStack drain(int maxDrain, boolean doDrain) {
+        FluidStack resource = new FluidStack(yotTank.getFluid(), maxDrain);
+        return drain(resource, doDrain);
+    }
 }

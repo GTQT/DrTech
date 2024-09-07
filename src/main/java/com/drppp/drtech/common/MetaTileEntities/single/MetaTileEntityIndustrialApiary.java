@@ -133,8 +133,10 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         builder.widget(new gregtech.api.gui.widgets.ProgressWidget(this::getProgressPercent, 70, 5, 20, 20, gregtech.api.gui.GuiTextures.PROGRESS_BAR_ARROW, gregtech.api.gui.widgets.ProgressWidget.MoveType.HORIZONTAL));
         ImageWidget logo = new ImageWidget(70,62, 17, 17, gregtech.api.gui.GuiTextures.GREGTECH_LOGO).setIgnoreColor(true);
         builder.widget(logo);
-        AdvancedTextWidget textWidget = new AdvancedTextWidget(8,62,this::addErrorText,0x52135);
-        builder.widget(textWidget);
+        var scroll = new ScrollableListWidget(8,62,60,22);
+        AdvancedTextWidget textWidget = new AdvancedTextWidget(0,0,this::addErrorText,0x52135);
+        scroll.addWidget(textWidget);
+        builder.widget(scroll);
         var btn = new ToggleButtonWidget(13,18, 18, 18,
                 Textures.CROSS, this::isWorkingEnabled,this::setWorkingEnabled)
                 .setTooltipText("drtech.gui.industrial_apiary.tooltip.1")
