@@ -31,6 +31,7 @@ import com.drppp.drtech.api.capability.DrtechCapabilities;
 import com.drppp.drtech.api.capability.IAEFluidContainer;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechDataCodes;
+import gregtech.api.capability.impl.NotifiableFluidTank;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -56,18 +57,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart implements IMultiblockAbilityPart<IAEFluidStack> , IGridHost, IFluidHandler,IMEInventoryHandler<IAEFluidStack> {
+public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart implements IMultiblockAbilityPart<IFluidTank> ,IMEInventory<IAEFluidStack>,ICellProvider {
     private MetaTileEntityYotTank yotTank;
-    private  IAEFluidStack iaeFluidContainer;
-    private final MEInventoryHandler<IAEFluidStack> meInventoryHandler;
-    protected static final IStorageChannel<IAEFluidStack> FLUID_NET = AEApi.instance().storage()
-            .getStorageChannel(IFluidStorageChannel.class);
-    private int priority=10;
+    private boolean online;
+    private final HatchFluidTank fluidTank = new HatchFluidTank(Integer.MAX_VALUE,this);
+    protected static final IStorageChannel<IAEFluidStack> FLUID_NET = AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class);
+    private final MEInventoryHandler<IAEFluidStack> meInventoryHandler=new MEInventoryHandler<>(this, FLUID_NET);
     public MetaTileEntityYotHatch(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId, GTValues.UV, false,IFluidStorageChannel.class);
+        super(metaTileEntityId, GTValues.LV, false,IFluidStorageChannel.class);
         this.setWorkingEnabled(true);
-        iaeFluidContainer =null;
-        this.meInventoryHandler = new MEInventoryHandler<>(this, FLUID_NET);
+
     }
     IFluidTank tank;
     @Override
@@ -112,14 +111,15 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     }
 
     @Override
-    public MultiblockAbility<IAEFluidStack> getAbility() {
+    public MultiblockAbility<IFluidTank> getAbility() {
         return DrtechCapabilities.YOT_HATCH;
     }
 
     @Override
-    public void registerAbilities(List<IAEFluidStack> list) {
-        list.add(iaeFluidContainer);
+    public void registerAbilities(List<IFluidTank> list) {
+        list.add(this.fluidTank);
     }
+
 
     @Override
     public void update() {
@@ -127,92 +127,59 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
        if(this.yotTank==null)
            return;
 
-        if (!this.getWorld().isRemote) {
-
-            if(this.iaeFluidContainer==null && this.yotTank!=null && this.yotTank.getFluid()!=null)
-            {
-                int ready;
-                if ( yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-                    ready = Integer.MAX_VALUE;
-                } else ready = yotTank.getFluidBank().getStored().intValue();
-                this.iaeFluidContainer = WrappedFluidStack.fromFluidStack(new FluidStack(yotTank.getFluid(),ready));
-
-            }
-            if (!getWorld().isRemote && this.isWorkingEnabled() && this.shouldSyncME()&&updateMEStatus()) {
+//        if (!this.getWorld().isRemote) {
+//            if (!getWorld().isRemote && this.isWorkingEnabled() && this.shouldSyncME()&&updateMEStatus()) {
+//                try {
+//                    this.getProxy().getGrid().postEvent(new MENetworkCellArrayUpdate());
+//                } catch (GridAccessException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        }
+        if (!getWorld().isRemote && this.isWorkingEnabled() && this.shouldSyncME()) {
+            if(updateMEStatus()) {
                 try {
-                    
-                    this.getProxy().getGrid().postEvent(new MENetworkCellArrayUpdate());
+                    IStorageGrid gridCache = this.getProxy().getGrid().getCache(IStorageGrid.class);
+                    if (!online) {
+                        gridCache.registerCellProvider(this);
+                        online = true;
+                    }
                 } catch (GridAccessException e) {
                     throw new RuntimeException(e);
                 }
             }
+            else {
+                disconnectNetwork();
+            }
         }
-
     }
+    private void disconnectNetwork()
+    {
+        if(online) {
+            try {
+                IStorageGrid gridCache = this.getProxy().getGrid().getCache(IStorageGrid.class);
+                gridCache.unregisterCellProvider(this);
+            } catch (GridAccessException e) {
+                throw new RuntimeException(e);
+            }
+            online=false;
+        }
+    }
+
     private boolean isChanged() {
         if (this.yotTank == null) return false;
         if(this.yotTank.getFluid()==null) return false;
         return true;
     }
-    @Nullable
-    @Override
-    public IGridNode getGridNode(@NotNull AEPartLocation aePartLocation) {
-        AENetworkProxy gp = getProxy();
-        return gp != null ? gp.getNode() : null;
-    }
 
-    @Override
-    public void securityBreak() {
-
-    }
-
-    @Override
-    public AccessRestriction getAccess() {
-        return AccessRestriction.READ_WRITE;
-    }
-
-    @Override
-    public boolean isPrioritized(IAEFluidStack iaeFluidStack) {
-        return true;
-    }
-
-    @Override
-    public boolean canAccept(IAEFluidStack iaeFluidStack) {
-        return true;
-    }
-
-    @Override
-    public int getPriority() {
-        return this.priority;
-    }
-
-    @Override
-    public int getSlot() {
-        return 1;
-    }
-
-    @Override
-    public boolean validForPass(int i) {
-        return true;
-    }
-
-    @Override
-    public IAEFluidStack injectItems(IAEFluidStack iaeFluidStack, Actionable actionable, IActionSource iActionSource) {
-        long amt = fill(null, iaeFluidStack, false);
-        if (amt == iaeFluidStack.getStackSize()) {
-            if (actionable.equals(Actionable.MODULATE)) fill(null, iaeFluidStack, true);
-            return null;
-        }
-        return iaeFluidStack;
-    }
 
     public int fill(GuiProgressBar.Direction from, FluidStack resource, boolean doFill) {
-        if (yotTank == null  || !yotTank.isActive()) return 0;
+        if (yotTank == null  ) return 0;
         if (yotTank.getFluid() != null && !yotTank.getFluid().getLocalizedName().equals("")
-                && !yotTank.getFluid().equals(resource.getFluid().getName()))
+                && !yotTank.getFluid().isFluidEqual(resource))
             return 0;
         if (yotTank.getFluid() == null || yotTank.getFluid().getLocalizedName().equals("")
-                || yotTank.getFluid().equals(resource.getFluid().getName())) {
+                || yotTank.getFluid().isFluidEqual(resource)) {
             yotTank.setFluid(new FluidStack(resource.getFluid(),0));
             if (yotTank.getFluidBank().getCapacity().subtract(yotTank.getFluidBank().getStored()).compareTo(BigInteger.valueOf(resource.amount)) >= 0) {
                 if (doFill) yotTank.getFluidBank().fill(resource.amount);
@@ -250,20 +217,12 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         }
         return 0;
     }
-    @Override
-    public IAEFluidStack extractItems(IAEFluidStack iaeFluidStack, Actionable actionable, IActionSource iActionSource) {
-        IAEFluidStack ready = drain(null, iaeFluidStack, false);
-        if (ready != null) {
-            if (actionable.equals(Actionable.MODULATE)) drain(null, ready, true);
-            return ready;
-        } else return null;
-    }
 
     public FluidStack drain(GuiProgressBar.Direction from, FluidStack resource, boolean doDrain) {
         if (yotTank == null || !yotTank.isActive())
             return null;
         if (yotTank.getFluid() != null && !yotTank.getFluid().getLocalizedName().equals("")
-                && !yotTank.getFluid().equals(resource.getFluid().getName()))
+                && !yotTank.getFluid().isFluidEqual(resource))
             return null;
         int ready;
         if (yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
@@ -294,50 +253,103 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         copy.setStackSize(ready);
         return copy;
     }
+    private void postDifference(Iterable<IAEFluidStack> a) {
+        try{
+            IStorageGrid gridCache = this.getProxy().getGrid().getCache(IStorageGrid.class);
+            gridCache.postAlterationOfStoredItems(FLUID_NET,a,getActionSource());
+        }catch (GridAccessException e)
+        {
+        }
+    }
+
+
+    @Override
+    public IAEFluidStack injectItems(IAEFluidStack input, Actionable type, IActionSource src) {
+        FluidStack fluidStack = input.getFluidStack();
+
+        // Insert
+        int wasFillled = this.fluidTank.fill(fluidStack, type != Actionable.SIMULATE);
+        this.fill(null,fluidStack,type != Actionable.SIMULATE);
+        int remaining = fluidStack.amount - wasFillled;
+        if (fluidStack.amount == remaining) {
+            // The stack was unmodified, target tank is full
+
+            return input;
+        }
+
+        if (type == Actionable.MODULATE) {
+            IAEFluidStack added = input.copy().setStackSize(input.getStackSize() - remaining);
+            //this.cache.currentlyCached.add(added);
+            this.postDifference(Collections.singletonList(added));
+            try {
+                this.getProxy().getTick().alertDevice(this.getProxy().getNode());
+            } catch (GridAccessException ex) {
+                // meh
+            }
+        }
+
+        fluidStack.amount = remaining;
+
+        return AEFluidStack.fromFluidStack(fluidStack);
+    }
+
+    @Override
+    public IAEFluidStack extractItems(IAEFluidStack request, Actionable mode, IActionSource src) {
+        FluidStack requestedFluidStack = request.getFluidStack();
+        final boolean doDrain = (mode == Actionable.MODULATE);
+
+        // Drain the fluid from the tank
+        FluidStack gathered = this.fluidTank.drain(requestedFluidStack, doDrain);
+        if (gathered == null) {
+            // If nothing was pulled from the tank, return null
+
+            return null;
+        }
+        this.drain(null,requestedFluidStack,doDrain);
+        IAEFluidStack gatheredAEFluidstack = AEFluidStack.fromFluidStack(gathered);
+        if (mode == Actionable.MODULATE) {
+            this.postDifference(Collections.singletonList(gatheredAEFluidstack.copy().setStackSize(-gatheredAEFluidstack.getStackSize())));
+            try {
+                this.getProxy().getTick().alertDevice(this.getProxy().getNode());
+            } catch (GridAccessException ex) {
+                // meh
+            }
+        }
+        return gatheredAEFluidstack;
+    }
 
     @Override
     public IItemList<IAEFluidStack> getAvailableItems(IItemList<IAEFluidStack> iItemList) {
-        if (yotTank == null || !yotTank.isActive())
-            return iItemList;
-        if (yotTank.getFluid() == null || yotTank.getFluid().getLocalizedName().equals("")
-                || yotTank.getFluidBank().getStored().compareTo(BigInteger.ZERO) <= 0)
-            return iItemList;
-        int ready;
-        if (yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-            ready = Integer.MAX_VALUE;
-        } else ready = yotTank.getFluidBank().getStored().intValue();
-        //iItemList.add(StackUtils.createAEFluidStack(FluidRegistry.getFluid(yotTank.getFluid()), ready));
-        iItemList.add( AEFluidStack.fromFluidStack(new FluidStack(yotTank.getFluid(),ready)));
+        new Exception("Getting available items").printStackTrace();
+        this.fluidTank.setFluid(new FluidStack(this.yotTank.getFluid().getFluid(),this.yotTank.getFluidBank().getStored().intValue()));
+        iItemList.add(AEFluidStack.fromFluidStack(this.fluidTank.getFluid()));
         return iItemList;
     }
 
     @Override
     public IStorageChannel<IAEFluidStack> getChannel() {
-        return this.FLUID_NET;
-    }
-
-
-    @Override
-    public IFluidTankProperties[] getTankProperties() {
-        return new IFluidTankProperties[0];
+        return FLUID_NET;
     }
 
     @Override
-    public int fill(FluidStack resource, boolean doFill) {
-        return (int) fill(null, AEFluidStack.fromFluidStack(resource), doFill);
+    public List<IMEInventoryHandler> getCellArray(IStorageChannel<?> iStorageChannel) {
+        if (iStorageChannel == FLUID_NET) {
+            return Collections.singletonList(this.meInventoryHandler);
+        }
+        return Collections.EMPTY_LIST;
     }
 
-    @Nullable
     @Override
-    public FluidStack drain(FluidStack resource, boolean doDrain) {
-        IAEFluidStack drained = drain(null, AEFluidStack.fromFluidStack(resource), doDrain);
-        return drained != null ? drained.getFluidStack() : null;
+    public int getPriority() {
+        return 0;
     }
+    private static class HatchFluidTank extends NotifiableFluidTank {
+        public HatchFluidTank(int capacity, MetaTileEntityAEHostablePart entityToNotify) {
+            super(capacity, entityToNotify, false);
+        }
 
-    @Nullable
-    @Override
-    public FluidStack drain(int maxDrain, boolean doDrain) {
-        FluidStack resource = new FluidStack(yotTank.getFluid(), maxDrain);
-        return drain(resource, doDrain);
+        public boolean canFillFluidType(FluidStack fluid) {
+            return true;
+        }
     }
 }
