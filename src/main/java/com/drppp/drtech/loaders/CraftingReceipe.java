@@ -26,6 +26,7 @@ import static gregtech.api.unification.material.Materials.Platinum;
 import static gregtech.api.unification.material.Materials.Ultimet;
 import static gregtech.api.unification.ore.OrePrefix.*;
 import static gregtech.common.metatileentities.MetaTileEntities.ELECTRIC_BLAST_FURNACE;
+import static gregtech.common.metatileentities.MetaTileEntities.FISHER;
 import static gregtech.loaders.recipe.CraftingComponent.*;
 
 public class CraftingReceipe {
@@ -181,6 +182,16 @@ public class CraftingReceipe {
                 'S', ELECTRIC_BLAST_FURNACE.getStackForm(),
                 'D',new UnificationEntry(OrePrefix.plate, Materials.Aluminium)
         );
+
+
+        ModHandler.addShapedRecipe(true,"large_alloy_smelter", MetaTileEntities.DRONE_PAD.getStackForm(),
+                "ADA", "WSW", "WWW",
+                'W',  new ItemStack(MetaBlocks.METAL_CASING,1,3),
+                'A',   new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
+                'S', FISHER[3].getStackForm(),
+                'D',new UnificationEntry(OrePrefix.plate, Materials.StainlessSteel)
+        );
+
         ModHandler.addShapedRecipe("grass_killer", MyMetaItems.GRASS_KILLER.getStackForm(),
                 "WSW", "SSS", "WSW",
                 'W', Blocks.GRASS,

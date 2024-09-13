@@ -138,6 +138,7 @@ public class MeTaTileEntityWindDrivenGenerator extends MetaTileEntityBaseWithCon
 
         rotor = (EntityWindRotor) createEntityFromNBT(nbttagcompound,this.getWorld());
         rotor.setPosition(pos.x,pos.y,pos.z);
+
         switch (this.getFrontFacing()) {
             case EAST :
                 rotor.rotationYaw=90;

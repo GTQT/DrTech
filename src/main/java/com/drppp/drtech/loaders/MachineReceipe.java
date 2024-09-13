@@ -258,12 +258,6 @@ public class MachineReceipe {
         {
             ForestryLinkage.MachineRecipeInit();
         }
-        DRRP_GROUND_PUMP.recipeBuilder()
-                .fluidInputs(new FluidStack(FluidRegistry.WATER, 1000))
-                .fluidOutputs(new FluidStack(Steam.getFluid(), 1000))
-                .EUt(512)
-                .duration(20)
-                .buildAndRegister();
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.plate, Polyethylene)
                 .input(dust, Silver)
