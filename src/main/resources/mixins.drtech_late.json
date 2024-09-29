@@ -6,7 +6,9 @@
   "minVersion": "0.8.3",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinCombRecipes"
+    "MixinCombRecipes",
+    "forestry.MixinModuleCore",
+    "forestry.MixinModuleMachine"
   ],
   "server": [],
   "client":[]
