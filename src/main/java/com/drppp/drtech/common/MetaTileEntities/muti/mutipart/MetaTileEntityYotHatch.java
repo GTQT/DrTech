@@ -19,6 +19,7 @@ import appeng.api.util.AEPartLocation;
 import appeng.api.util.DimensionalCoord;
 import appeng.client.gui.widgets.GuiProgressBar;
 import appeng.fluids.util.AEFluidStack;
+import appeng.fluids.util.FluidList;
 import appeng.me.GridAccessException;
 import appeng.me.helpers.AENetworkProxy;
 import appeng.me.helpers.IGridProxyable;
@@ -42,6 +43,8 @@ import gregtech.client.renderer.texture.Textures;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.MetaTileEntityAEHostablePart;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.stack.WrappedFluidStack;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
@@ -52,6 +55,7 @@ import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +64,7 @@ import java.util.List;
 public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart implements IMultiblockAbilityPart<IFluidTank> ,IMEInventory<IAEFluidStack>,ICellProvider {
     private MetaTileEntityYotTank yotTank;
     private boolean online;
+    private int Priority=0;
     private final HatchFluidTank fluidTank = new HatchFluidTank(Integer.MAX_VALUE,this);
     protected static final IStorageChannel<IAEFluidStack> FLUID_NET = AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class);
     private final MEInventoryHandler<IAEFluidStack> meInventoryHandler=new MEInventoryHandler<>(this, FLUID_NET);
@@ -68,7 +73,6 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         this.setWorkingEnabled(true);
 
     }
-    IFluidTank tank;
     @Override
     public boolean isWorkingEnabled() {
         return true;
@@ -78,7 +82,6 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     public void setWorkingEnabled(boolean workingEnabled) {
         World world = this.getWorld();
         if (world != null && !world.isRemote) {
-
             writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(workingEnabled));
         }
     }
@@ -107,7 +110,6 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     public void setYotTank(MetaTileEntityYotTank yotTank) {
         this.yotTank = yotTank;
-        this.tank = new FluidTank(yotTank.getFluid().getFluid(),(int)yotTank.getFluidBank().getStored().longValue(),Integer.MAX_VALUE);
     }
 
     @Override
@@ -126,16 +128,6 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         super.update();
        if(this.yotTank==null)
            return;
-
-//        if (!this.getWorld().isRemote) {
-//            if (!getWorld().isRemote && this.isWorkingEnabled() && this.shouldSyncME()&&updateMEStatus()) {
-//                try {
-//                    this.getProxy().getGrid().postEvent(new MENetworkCellArrayUpdate());
-//                } catch (GridAccessException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        }
         if (!getWorld().isRemote && this.isWorkingEnabled() && this.shouldSyncME()) {
             if(updateMEStatus()) {
                 try {
@@ -143,7 +135,12 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
                     if (!online) {
                         gridCache.registerCellProvider(this);
                         online = true;
+                        this.writeCustomData(32768, (buf) -> {
+                            buf.writeBoolean(online);
+                        });
+                        this.getProxy().getGrid().postEvent(new MENetworkStorageEvent(gridCache.getInventory(FLUID_NET), FLUID_NET));
                     }
+                    this.getProxy().getGrid().postEvent(new MENetworkCellArrayUpdate());
                 } catch (GridAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -156,22 +153,49 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     private void disconnectNetwork()
     {
         if(online) {
+            online=false;
+            this.writeCustomData(32768, (buf) -> {
+                buf.writeBoolean(online);
+            });
             try {
+                FluidStack existingFluid = this.fluidTank.getFluid();
+                if (existingFluid != null) {
+                    IAEFluidStack drainedFluidStack = AEFluidStack.fromFluidStack(existingFluid);
+                    drainedFluidStack.setStackSize(-drainedFluidStack.getStackSize());
+                    this.postDifference(Collections.singletonList(drainedFluidStack));
+                    this.fluidTank.setFluid(null); // 清除 fluidTank 中的流体
+                }
+                this.getProxy().getTick().alertDevice(this.getProxy().getNode());
                 IStorageGrid gridCache = this.getProxy().getGrid().getCache(IStorageGrid.class);
                 gridCache.unregisterCellProvider(this);
-            } catch (GridAccessException e) {
-                throw new RuntimeException(e);
+            } catch (GridAccessException ex) {
+                // meh
             }
-            online=false;
+
         }
     }
 
-    private boolean isChanged() {
-        if (this.yotTank == null) return false;
-        if(this.yotTank.getFluid()==null) return false;
-        return true;
+    public void writeInitialSyncData(PacketBuffer buf) {
+        super.writeInitialSyncData(buf);
+        buf.writeBoolean(this.online);
     }
 
+    public void receiveInitialSyncData(PacketBuffer buf) {
+        super.receiveInitialSyncData(buf);
+        this.online = buf.readBoolean();
+    }
+
+    public void receiveCustomData(int dataId, PacketBuffer buf) {
+        super.receiveCustomData(dataId, buf);
+        if (dataId == 32768) {
+            boolean isOnline = buf.readBoolean();
+            if (this.online != isOnline) {
+                this.online = isOnline;
+                this.scheduleRenderUpdate();
+            }
+        }
+
+    }
 
     public int fill(GuiProgressBar.Direction from, FluidStack resource, boolean doFill) {
         if (yotTank == null  ) return 0;
@@ -302,7 +326,6 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         FluidStack gathered = this.fluidTank.drain(requestedFluidStack, doDrain);
         if (gathered == null) {
             // If nothing was pulled from the tank, return null
-
             return null;
         }
         this.drain(null,requestedFluidStack,doDrain);
@@ -321,8 +344,19 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
     @Override
     public IItemList<IAEFluidStack> getAvailableItems(IItemList<IAEFluidStack> iItemList) {
         new Exception("Getting available items").printStackTrace();
-        this.fluidTank.setFluid(new FluidStack(this.yotTank.getFluid().getFluid(),this.yotTank.getFluidBank().getStored().intValue()));
-        iItemList.add(AEFluidStack.fromFluidStack(this.fluidTank.getFluid()));
+        if(online && this.yotTank!=null &&this.yotTank.isStructureFormed())
+        {
+            if(this.yotTank.getFluid()!=null)
+            {
+                if(this.yotTank.getFluidBank().getStored().longValue()<Integer.MAX_VALUE)
+                    this.fluidTank.setFluid(new FluidStack(this.yotTank.getFluid().getFluid(),this.yotTank.getFluidBank().getStored().intValue()));
+                else
+                    this.fluidTank.setFluid(new FluidStack(this.yotTank.getFluid().getFluid(),Integer.MAX_VALUE));
+            }
+            else
+                this.fluidTank.setFluid(null);
+            iItemList.add(AEFluidStack.fromFluidStack(this.fluidTank.getFluid()));
+        }
         return iItemList;
     }
 
@@ -341,8 +375,9 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     @Override
     public int getPriority() {
-        return 0;
+        return Priority;
     }
+
     private static class HatchFluidTank extends NotifiableFluidTank {
         public HatchFluidTank(int capacity, MetaTileEntityAEHostablePart entityToNotify) {
             super(capacity, entityToNotify, false);
@@ -351,5 +386,18 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
         public boolean canFillFluidType(FluidStack fluid) {
             return true;
         }
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound data) {
+        super.readFromNBT(data);
+        this.Priority = data.getInteger("Priority");
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound data) {
+        super.writeToNBT(data);
+        data.setInteger("Priority",Priority);
+        return data;
     }
 }

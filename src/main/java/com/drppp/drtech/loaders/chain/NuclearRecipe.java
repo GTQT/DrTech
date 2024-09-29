@@ -579,6 +579,71 @@ public class NuclearRecipe {
                 .duration(500)
                 .buildAndRegister();
 
+        //富集硅岩mox燃料棒
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.dust,Materials.NaquadahEnriched,12)
+                .input(OrePrefix.dust,Materials.Plutonium239,12)
+                .input(MyMetaItems.NULL_FUEL_ROD)
+                .fluidInputs(Oxygen.getFluid(FluidStorageKeys.LIQUID, 4000))
+                .circuitMeta(1)
+                .output(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)
+                .EUt(64)
+                .duration(100)
+                .buildAndRegister();
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)
+                .input(OrePrefix.stick,Materials.Steel,2)
+                .circuitMeta(2)
+                .output(MetaItemsReactor.Nq_MOX_FUEL_ROD_2X)
+                .EUt(64)
+                .duration(100)
+                .buildAndRegister();
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)
+                .input(OrePrefix.stick,Materials.Steel,4)
+                .circuitMeta(4)
+                .output(MetaItemsReactor.Nq_MOX_FUEL_ROD_4X)
+                .EUt(64)
+                .duration(100)
+                .buildAndRegister();
+
+        RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_2X)
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_2X)
+                .input(OrePrefix.stick,Materials.Steel,4)
+                .circuitMeta(4)
+                .output(MetaItemsReactor.Nq_MOX_FUEL_ROD_4X)
+                .EUt(64)
+                .duration(100)
+                .buildAndRegister();
+        RecipeMaps.THERMAL_CENTRIFUGE_RECIPES.recipeBuilder()
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X_EX)
+                .output(OrePrefix.dust,Materials.Plutonium239,3)
+                .output(OrePrefix.dustTiny,Materials.Naquadria,1)
+                .output(OrePrefix.dust,Materials.Iron,1)
+                .EUt(48)
+                .duration(500)
+                .buildAndRegister();
+        RecipeMaps.THERMAL_CENTRIFUGE_RECIPES.recipeBuilder()
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_2X_EX)
+                .output(OrePrefix.dust,Materials.Plutonium239,6)
+                .output(OrePrefix.dust,Materials.Iron,3)
+                .output(OrePrefix.dustTiny,Materials.Naquadria,2)
+                .EUt(48)
+                .duration(500)
+                .buildAndRegister();
+        RecipeMaps.THERMAL_CENTRIFUGE_RECIPES.recipeBuilder()
+                .input(MetaItemsReactor.Nq_MOX_FUEL_ROD_4X_EX)
+                .output(OrePrefix.dust,Materials.Plutonium239,12)
+                .output(OrePrefix.dust,Materials.Iron,6)
+                .output(OrePrefix.dustTiny,Materials.Naquadria,4)
+                .EUt(48)
+                .duration(500)
+                .buildAndRegister();
         //升级配件
         RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.circuit,MarkerMaterials.Tier.HV)
@@ -620,5 +685,7 @@ public class NuclearRecipe {
                 .EUt(480)
                 .duration(200)
                 .buildAndRegister();
+
+
     }
 }

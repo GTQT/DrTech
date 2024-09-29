@@ -47,6 +47,12 @@ public class MetaItemsReactor {
     public static MetaItem<?>.MetaValueItem UPGRADE_CATCH;
     public static MetaItem<?>.MetaValueItem UPGRADE_STOP;
     public static MetaItem<?>.MetaValueItem UPGRADE_REFLECT;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_1X ;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_2X ;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_4X ;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_1X_EX ;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_2X_EX ;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_4X_EX ;
     public static void FuelRodInit()
     {
         MetaItemsReactorReg metaItemFuelRod = new MetaItemsReactorReg();
