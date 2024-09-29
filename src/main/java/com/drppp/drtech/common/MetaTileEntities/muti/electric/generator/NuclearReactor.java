@@ -200,10 +200,47 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                         {
                             inventory.extractItem(i,1,false);
                             GTTransferUtils.addItemsToItemHandler(outputInventory,false,outlist);
+                            for (int ii = 0; ii < inputInventory.getSlots(); ii++) {
+                                ItemStack son = inputInventory.getStackInSlot(ii).copy();
+                                if(son!=null && son.getItem()!= Items.AIR &&   son.getCount()>0 && son.getCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null)!=null)
+                                {
+                                    inputInventory.extractItem(ii,1,false);
+                                    inventory.insertItem(i,son,false);
+                                    break;
+                                }
+                            }
+
                         }
 
+                    }else if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
+                    {
+                        var ca = stack.getCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null);
+                        if(ca.getDurability()<=0)
+                        {
+                            ItemStack outstack = ca.outItem().copy();
+                            List<ItemStack> outlist = new ArrayList<>();
+                            outlist.add(outstack);
+                            inventory.extractItem(i,1,false);
+                            if(ioUpgrade &&this.outputInventory!=null && this.outputInventory.getSlots()>0 && GTTransferUtils.addItemsToItemHandler(outputInventory,true,outlist))
+                            {
+                                GTTransferUtils.addItemsToItemHandler(outputInventory,false,outlist);
+                                for (int ii = 0; ii < inputInventory.getSlots(); ii++) {
+                                    ItemStack son = inputInventory.getStackInSlot(ii).copy();
+                                    if(son!=null && son.getItem()!= Items.AIR &&   son.getCount()>0 && son.getCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null)!=null)
+                                    {
+                                        inputInventory.extractItem(ii,1,false);
+                                        inventory.insertItem(i,son,false);
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                inventory.insertItem(i, outstack,false);
+                            }
+                        }
                     }
-                    if(stack==null ||stack.getItem()== Items.AIR ||  stack.getCount()==0 )
+                    else if(stack==null ||stack.getItem()== Items.AIR ||  stack.getCount()==0 )
                     {
                         if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
                         {
@@ -273,21 +310,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                                 if(new Random().nextInt(10-reflectAmount)!=1)
                                     ca.setDurability(ca.getDurability()-1);
                             }else ca.setDurability(ca.getDurability()-1);
-                            if(ca.getDurability()<=0)
-                            {
-                                ItemStack outstack = ca.outItem().copy();
-                                List<ItemStack> outlist = new ArrayList<>();
-                                outlist.add(outstack);
-                                inventory.extractItem(i,1,false);
-                                if(ioUpgrade &&this.outputInventory!=null && this.outputInventory.getSlots()>0 && GTTransferUtils.addItemsToItemHandler(outputInventory,true,outlist))
-                                {
-                                    GTTransferUtils.addItemsToItemHandler(outputInventory,false,outlist);
-                                }
-                                else
-                                {
-                                    inventory.insertItem(i, outstack,false);
-                                }
-                            }
+
                             FuelRodOperation(i,ca);
                         }
                         //散热片

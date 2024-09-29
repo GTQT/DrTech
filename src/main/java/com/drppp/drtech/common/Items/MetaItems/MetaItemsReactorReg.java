@@ -164,6 +164,32 @@ public class MetaItemsReactorReg extends StandardMetaItem {
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.nuclear.upgrade.reflect", new Object[0]));
                 }));
+
+        //富集硅岩-钚 MOX燃料棒
+        MetaItemsReactor.Nq_MOX_FUEL_ROD_1X_EX = this.addItem(45,"nq_mox_fuel_rod_1x_ex")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .addComponents(fuelColor)
+                .setMaxStackSize(64);
+        MetaItemsReactor.Nq_MOX_FUEL_ROD_2X_EX = this.addItem(46,"nq_mox_fuel_rod_2x_ex")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .addComponents(fuelColor)
+                .setMaxStackSize(64);
+        MetaItemsReactor.Nq_MOX_FUEL_ROD_4X_EX = this.addItem(47,"nq_mox_fuel_rod_4x_ex")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .addComponents(fuelColor)
+                .setMaxStackSize(64);
+        MetaItemsReactor.Nq_MOX_FUEL_ROD_1X = this.addItem(48,"nq_mox_fuel_rod_1x")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(64)
+                .addComponents(new FuelRodBehavior(150,2,1,true,4,1000000, MetaItemsReactor.Nq_MOX_FUEL_ROD_1X_EX.getStackForm(),150));
+        MetaItemsReactor.Nq_MOX_FUEL_ROD_2X = this.addItem(49,"nq_mox_fuel_rod_2x")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(64)
+                .addComponents(new FuelRodBehavior(600,4,2,true,4,1000000, MetaItemsReactor.Nq_MOX_FUEL_ROD_2X_EX.getStackForm(),150));
+        MetaItemsReactor.Nq_MOX_FUEL_ROD_4X = this.addItem(50,"nq_mox_fuel_rod_4x")
+                .setCreativeTabs(DrTechMain.Mytab)
+                .setMaxStackSize(64)
+                .addComponents(new FuelRodBehavior(1800,8,4,true,4,1000000, MetaItemsReactor.Nq_MOX_FUEL_ROD_4X_EX.getStackForm(),150));
     }
 
 
