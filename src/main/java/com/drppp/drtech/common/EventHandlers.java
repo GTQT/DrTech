@@ -14,9 +14,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import thebetweenlands.common.config.BetweenlandsConfig;
+import thebetweenlands.common.world.teleporter.TeleporterHandler;
 
+import static com.drppp.drtech.DrtConfig.onPlayerLoggedAtTheBetweenLand;
 import static com.drppp.drtech.DrtConfig.onPlayerLoggedInEvent;
 
 @Mod.EventBusSubscriber(modid = Tags.MODID)
@@ -25,17 +26,21 @@ public class EventHandlers {
 
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if(!onPlayerLoggedInEvent)return;
+        if (!onPlayerLoggedInEvent) return;
+
         NBTTagCompound playerData = event.player.getEntityData();
         NBTTagCompound data = playerData.hasKey(EntityPlayer.PERSISTED_NBT_TAG) ? playerData.getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG) : new NBTTagCompound();
 
-        if(!event.player.getEntityWorld().isRemote && !data.getBoolean(FIRST_SPAWN)) {
+        if (!event.player.getEntityWorld().isRemote && !data.getBoolean(FIRST_SPAWN)) {
 
             data.setBoolean(FIRST_SPAWN, true);
             playerData.setTag(EntityPlayer.PERSISTED_NBT_TAG, data);
 
+            if (onPlayerLoggedAtTheBetweenLand) {
+                WorldServer blWorld = event.player.world.getMinecraftServer().getWorld(BetweenlandsConfig.WORLD_AND_DIMENSION.dimensionId);
+                TeleporterHandler.transferToDim(event.player, blWorld, BetweenlandsConfig.WORLD_AND_DIMENSION.startInPortal, true);
+            }
             EntityDropPod dropPod = new EntityDropPod(event.player.getEntityWorld(), event.player.posX, event.player.posY + 256, event.player.posZ);
-
             GTTeleporter teleporter = new GTTeleporter((WorldServer) event.player.world, event.player.posX, event.player.posY + 256, event.player.posZ);
             TeleportHandler.teleport(event.player, event.player.dimension, teleporter, event.player.posX, event.player.posY + 256, event.player.posZ);
 
@@ -43,6 +48,7 @@ public class EventHandlers {
             event.player.startRiding(dropPod);
         }
     }
+
     @SubscribeEvent
     public static void on(TickEvent.WorldTickEvent event) {
 
@@ -68,5 +74,5 @@ public class EventHandlers {
         }
     }
 
-   
+
 }

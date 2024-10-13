@@ -8,6 +8,11 @@ public class DrtConfig {
     @Config.RequiresMcRestart
     public static boolean onPlayerLoggedInEvent=true;
 
+    @Config.LangKey("Player Logged At TheBetweenLand")
+    @Config.Comment("交错出生；注意，默认交错出生的开关在这里调整而不是在交错的配置文件调整")
+    @Config.RequiresMcRestart
+    public static boolean onPlayerLoggedAtTheBetweenLand=false;
+
     @Config.LangKey("Mob Horde Event")
     @Config.Comment("怪物袭击")
     @Config.RequiresMcRestart

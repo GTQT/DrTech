@@ -84,3 +84,5 @@ logs/
 gradle/wrapper/gradle-wrapper.properties
 dependencies.gradle
 libs/torcherino-7.6.jar
+libs/TheBetweenlands-3.9.6-universal.jar
+libs/TheBetweenlands-3.9.6-core.jar
