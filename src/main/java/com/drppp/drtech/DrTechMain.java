@@ -1,5 +1,4 @@
 package com.drppp.drtech;
-import thebetweenlands.common.TheBetweenlands;
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.render.EOH_TESR;
@@ -63,13 +62,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.geckolib3.GeckoLib;
-import thebetweenlands.common.config.BetweenlandsConfig;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
