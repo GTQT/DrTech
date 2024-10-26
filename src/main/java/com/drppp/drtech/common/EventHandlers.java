@@ -5,17 +5,22 @@ import com.drppp.drtech.common.Entity.EntityDropPod;
 import com.drppp.drtech.common.enent.MobHordeWorldData;
 import gregtech.api.util.GTTeleporter;
 import gregtech.api.util.TeleportHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import thebetweenlands.common.config.BetweenlandsConfig;
-import thebetweenlands.common.world.teleporter.TeleporterHandler;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import static com.drppp.drtech.DrtConfig.onPlayerLoggedAtTheBetweenLand;
 import static com.drppp.drtech.DrtConfig.onPlayerLoggedInEvent;
@@ -35,10 +40,26 @@ public class EventHandlers {
 
             data.setBoolean(FIRST_SPAWN, true);
             playerData.setTag(EntityPlayer.PERSISTED_NBT_TAG, data);
+            if (onPlayerLoggedAtTheBetweenLand && Loader.isModLoaded("thebetweenlands")) {
+                try {
+                        Class<?> betweenlandsConfigClass = Class.forName("thebetweenlands.common.config.BetweenlandsConfig");
+                        Field worldAndDimensionField = betweenlandsConfigClass.getField("WORLD_AND_DIMENSION");
+                        Object worldAndDimension = worldAndDimensionField.get(null);
+                        Field dimensionIdField = worldAndDimension.getClass().getField("dimensionId");
+                        int dimensionId = dimensionIdField.getInt(worldAndDimension);
+                        Field startInPortalField = worldAndDimension.getClass().getField("startInPortal");
+                        boolean startInPortal = startInPortalField.getBoolean(worldAndDimension);
+                        MinecraftServer server = event.player.world.getMinecraftServer();
+                        if (server != null) {
+                            WorldServer blWorld = server.getWorld(dimensionId);
+                            Class<?> teleporterHandlerClass = Class.forName("thebetweenlands.common.world.teleporter.TeleporterHandler");
+                            Method transferToDimMethod = teleporterHandlerClass.getMethod("transferToDim", Entity.class, World.class, boolean.class, boolean.class);
+                            transferToDimMethod.invoke(null, event.player, blWorld, startInPortal, true);
+                        }
 
-            if (onPlayerLoggedAtTheBetweenLand) {
-                WorldServer blWorld = event.player.world.getMinecraftServer().getWorld(BetweenlandsConfig.WORLD_AND_DIMENSION.dimensionId);
-                TeleporterHandler.transferToDim(event.player, blWorld, BetweenlandsConfig.WORLD_AND_DIMENSION.startInPortal, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             EntityDropPod dropPod = new EntityDropPod(event.player.getEntityWorld(), event.player.posX, event.player.posY + 256, event.player.posZ);
             GTTeleporter teleporter = new GTTeleporter((WorldServer) event.player.world, event.player.posX, event.player.posY + 256, event.player.posZ);
