@@ -103,6 +103,8 @@ public class MetaTileEntityLogFactory extends RecipeMapMultiblockController {
                    MyitemOutputs.add(new ItemStack(item.getItem(),num%64,item.getMetadata()));
                }
                GTTransferUtils.addItemsToItemHandler(this.getOutputInventory(), false, MyitemOutputs);
+
+               
            }
         }
     private int getCoe() {
