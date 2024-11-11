@@ -64,9 +64,40 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
                 }, 0xFAF9F6)
                 .widget(new ClickButtonWidget(10, 68, 77, 20, "保存到NBT", clickData -> exportLog(playerInventoryHolder)))
                 .widget(new ClickButtonWidget(90, 68, 77, 20, "蓝图绘制", clickData -> blueprintdraw(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(100, 98, 77, 20, "获取物品", clickData -> getItem(playerInventoryHolder)))
                 .build(playerInventoryHolder, entityPlayer);
     }
 
+    private void getItem(PlayerInventoryHolder playerInventoryHolder)
+    {
+       var world =  playerInventoryHolder.player.world;
+        var list = getPos(playerInventoryHolder.getCurrentItem());
+        var pos1 = list[0];
+        var pos2 = list[1];
+        NBTTagCompound nbt = new NBTTagCompound();
+        int minX = Math.min(pos1.getX(), pos2.getX());
+        int minY = Math.min(pos1.getY(), pos2.getY());
+        int minZ = Math.min(pos1.getZ(), pos2.getZ());
+        int maxX = Math.max(pos1.getX(), pos2.getX());
+        int maxY = Math.max(pos1.getY(), pos2.getY());
+        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    BlockPos currentPos = new BlockPos(x, y, z);
+                    TileEntity tileEntity = world.getTileEntity(currentPos);
+                    IBlockState state = world.getBlockState(currentPos);
+                        NBTTagCompound blockNBT = new NBTTagCompound();
+                        var block =  state.getBlock().getRegistryName().toString();
+                        var meta = state.getBlock().getMetaFromState(state);
+                        ItemStack iss = new ItemStack(ItemBlock.getItemFromBlock(state.getBlock()),1, meta);
+                    System.out.println(iss.toString());
+
+                }
+            }
+        }
+
+    }
     private void exportLog(PlayerInventoryHolder playerInventoryHolder) {
         if (getPos(playerInventoryHolder.getCurrentItem()) != null && !playerInventoryHolder.player.world.isRemote ) {
             var list = getPos(playerInventoryHolder.getCurrentItem());
