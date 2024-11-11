@@ -36,7 +36,9 @@ metaitem.hand_pump.name=手泵
 item.drtech.red_stone_seed.name=红石种子
 item.drtech.lapis_seed.name=染料种子
 item.drtech.flu_seed.name=萤石种子
-
+item.gt.tool.once_wrench.name=一次性扳手
+item.gt.tool.once_hammer.name=一次性锤子
+item.gt.tool.once_wire_cutter.name=一次性剪线钳
 
 #FUEL_ROD
 metaitem.u_fuel_rod_1x.name=燃料棒(铀)

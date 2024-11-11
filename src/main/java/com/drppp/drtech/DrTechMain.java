@@ -20,6 +20,7 @@ import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.command.CommandHordeBase;
 import com.drppp.drtech.common.command.CommandHordeStart;
 import com.drppp.drtech.common.command.CommandHordeStatus;
@@ -102,6 +103,7 @@ public class DrTechMain {
         TileEntityUIFactory.INSTANCE.init();
         DrtDimType.init();
         WorldRegisterHandler.init();
+        DrtToolItems.init();
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
