@@ -38,6 +38,14 @@ public class CraftingReceipe {
                 'E', new UnificationEntry(OrePrefix.plate, Materials.Iridium),
                 'F', new ItemStack(BlocksInit.COMMON_CASING,1,8),
                 'M', MetaItems.CONVEYOR_MODULE_IV);
+
+        ModHandler.addShapedRecipe("drone_pad", MetaTileEntities.DRONE_PAD.getStackForm(),
+                "WMW", "EFE", "WMW",
+                'W', MetaItems.ELECTRIC_PISTON_EV,
+                'E', new UnificationEntry(OrePrefix.plate, Materials.TungstenSteel),
+                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[4],
+                'M', new UnificationEntry(circuit,MarkerMaterials.Tier.EV));
+
         ModHandler.addShapedRecipe("yot_tank", MetaTileEntities.YOUT_TANK.getStackForm(),
                 "WAW", "EFE", "MBM",
                 'W', new UnificationEntry(OrePrefix.screw,Materials.TungstenSteel),
@@ -149,20 +157,6 @@ public class CraftingReceipe {
                         'G',MetaItems.EMITTER_IV
                 );
         ModHandler.addShapelessRecipe("peaceful_table", new ItemStack(ItemsInit.ITEM_BLOCK_PEACEFUL_TABLE),Blocks.CRAFTING_TABLE,Items.IRON_SWORD);
-        gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(true, MetaTileEntities.UU_PRODUCTER,
-                "WSW", "XCX", "WSW",
-                'W',CIRCUIT,
-                'C', CASING,
-                'S', FIELD_GENERATOR,
-                'X',CABLE_QUAD);
-        gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(true, MetaTileEntities.DUPLICATOR,
-                "WSW", "XCX", "WDW",
-                'W', EMITTER,
-                'C', CASING,
-                'D',CABLE_QUAD,
-                'S', FIELD_GENERATOR,
-                'X',CIRCUIT);
-
 
         ModHandler.addShapedRecipe("sap_bag", new ItemStack(BlocksInit.BLOCK_SAP_BAG),
                 "WWW", "SCS", "SSS",
