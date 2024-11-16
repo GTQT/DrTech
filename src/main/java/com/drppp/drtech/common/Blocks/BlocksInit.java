@@ -7,6 +7,7 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.Utils.Datas;
+import com.drppp.drtech.common.CustomCrops.CustomeCropsInit;
 import gregtech.common.pipelike.laser.LaserPipeType;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -35,7 +36,7 @@ public class BlocksInit {
     public static final BlockYotTankPart YOT_TANK = new BlockYotTankPart();
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
-
+    public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
     public  static void init(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
@@ -61,11 +62,13 @@ public class BlocksInit {
         event.getRegistry().register(COMMON_CASING1);
         event.getRegistry().register(YOT_TANK);
         event.getRegistry().register(TFFT_TANK);
-
+        event.getRegistry().register(BLOCK_ADVANCED_CAULDRON);
+        GameRegistry.registerTileEntity(TileEntityAdvancedCauldron.class, new ResourceLocation(Tags.MODID, "advanced_cauldron"));
         MY_LASER_PIPE.setRegistryName("my_laser_pipe_normal");
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
         MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
         event.getRegistry().register(MY_LASER_PIPE);
+        CustomeCropsInit.init(event);
         Datas.init();
     }
 

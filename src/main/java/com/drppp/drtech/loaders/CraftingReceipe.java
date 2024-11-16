@@ -43,7 +43,7 @@ public class CraftingReceipe {
                 "WMW", "EFE", "WMW",
                 'W', MetaItems.ELECTRIC_PISTON_EV,
                 'E', new UnificationEntry(OrePrefix.plate, Materials.TungstenSteel),
-                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[4],
+                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[4].getStackForm(),
                 'M', new UnificationEntry(circuit,MarkerMaterials.Tier.EV));
 
         ModHandler.addShapedRecipe("yot_tank", MetaTileEntities.YOUT_TANK.getStackForm(),
@@ -202,5 +202,6 @@ public class CraftingReceipe {
         ModHandler.addShapedRecipe(true, "storage_pail", new ItemStack(ItemsInit.ITEM_BLOCK_STORAGE_PAIL),
                 "XXX", "XCX", "XXX",
                 'X', Blocks.CHEST,'C',MetaItems.ELECTRIC_PISTON_LV);
+        ModHandler.addShapelessRecipe("advanced_cauldron",new ItemStack(ItemsInit.ITEM_BLOCK_ADVANCED_CAULDRON),Items.CAULDRON);
     }
 }

@@ -4,6 +4,7 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.common.Items.Behavior.BluePrintBehavior;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
@@ -14,6 +15,7 @@ import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.*;
+import gregtech.api.metatileentity.IFastRenderMetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.TieredMetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -22,6 +24,13 @@ import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.common.metatileentities.storage.MetaTileEntityQuantumChest;
 import gregtech.common.metatileentities.storage.MetaTileEntityQuantumTank;
+import keqing.gtqtcore.client.utils.RenderBufferHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -29,6 +38,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -42,13 +52,14 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 
-public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity implements IWorkable {
+public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity implements IWorkable, IFastRenderMetaTileEntity {
     protected final ICubeRenderer renderer;
     boolean isActive=true;
     boolean isWorkingEnabled=true;
@@ -58,6 +69,7 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     boolean autooutput=true;
     private int range=0;
     private int lx=0,ly=0,lz=0;
+    boolean showRange = false;
     public MetaTileEntityUniversalCollector(ResourceLocation metaTileEntityId, int tier, ICubeRenderer renderer) {
         super(metaTileEntityId, tier);
         this.renderer = renderer;
@@ -117,6 +129,7 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
                 }));
         builder.widget(new ClickButtonWidget(165,87,30,20,"弹出",this::setAuto));
         builder.widget(new AdvancedTextWidget(172,107,this::addDisplayText,0x161655));
+        builder.widget(new ClickButtonWidget(165,117,28,18,"范围显示",this::setShowRange));
         builder.bindPlayerInventory(entityPlayer.inventory, 117+18);
         return builder.build(this.getHolder(), entityPlayer);
     }
@@ -129,6 +142,11 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     public void setAuto(Widget.ClickData clickData)
     {
         this.autooutput = !this.autooutput;
+    }
+    public void setShowRange(Widget.ClickData clickData)
+    {
+        this.showRange = !this.showRange;
+        writeCustomData(8888,packetBuffer -> packetBuffer.writeBoolean(this.showRange));
     }
     protected void addDisplayText(List<ITextComponent> textList) {
         if(this.autooutput)
@@ -252,6 +270,9 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
         } else if (dataId == GregtechDataCodes.WORKING_ENABLED) {
             isWorkingEnabled = buf.readBoolean();
             scheduleRenderUpdate();
+        }else if(dataId==8888)
+        {
+            this.showRange = buf.readBoolean();
         }
     }
     @Override
@@ -315,4 +336,59 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
         tooltip.add("耗电:"+(GTValues.V[getTier()]/4));
     }
 
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void renderMetaTileEntity(double x, double y, double z, float partialTicks) {
+        if (showRange) {
+            var pos = getPos();
+            BlockPos[] poses = new BlockPos[2];
+            poses[0] = getPos().add(-range, -range, -range);
+            poses[1] = getPos().add(range, range, range);
+            double doubleX =  (pos.getX() - x) * 1;
+            double doubleY =  (pos.getY() - y) * 1;
+            double doubleZ =  (pos.getZ() - z) * 1;
+            if (range <= 0) return; // 确保范围有效
+
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+            GlStateManager.disableDepth();
+            GlStateManager.disableTexture2D();
+            GlStateManager.enableBlend();
+            GlStateManager.disableCull();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+
+            // 渲染立方体面
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            RenderBufferHelper.renderCubeFace(buffer,
+                    poses[0].getX(), poses[0].getY(), poses[0].getZ(),
+                    poses[1].getX() + 1, poses[1].getY() + 1, poses[1].getZ() + 1,
+                    0.2f, 1f, 0.2f, 0.25f, true);
+            tessellator.draw();
+
+            // 渲染立方体边框
+            buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+            GlStateManager.glLineWidth(3);
+            RenderBufferHelper.renderCubeFrame(buffer,
+                    poses[0].getX(), poses[0].getY(), poses[0].getZ(),
+                    poses[1].getX() + 1, poses[1].getY() + 1, poses[1].getZ() + 1,
+                    0.0f, 1f, 0f, 0.5f);
+            tessellator.draw();
+
+            // 恢复状态
+            GlStateManager.enableCull();
+            GlStateManager.disableBlend();
+            GlStateManager.enableTexture2D();
+            GlStateManager.enableDepth();
+            GlStateManager.popMatrix();
+        }
+
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(getPos().add(-range,-range,-range),getPos().add(range,range,range));
+    }
 }

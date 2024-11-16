@@ -1,5 +1,6 @@
 package com.drppp.drtech.loaders;
 
+import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.intergations.Forestry.ForestryLinkage;
@@ -409,6 +410,31 @@ public class MachineReceipe {
                 .EUt(120)
                 .duration(300)
                 .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(plate,Tin)
+                .input(stick,Tin)
+                .outputs(DrtToolItems.ONCE_HARD_HAMMER.get(Iron))
+                .circuitMeta(23)
+                .EUt(10)
+                .duration(20)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(plate,Tin)
+                .input(stick,Tin)
+                .outputs(DrtToolItems.ONCE_WRENCH.get(Iron))
+                .circuitMeta(21)
+                .EUt(10)
+                .duration(20)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(plate,Tin)
+                .input(stick,Tin)
+                .outputs(DrtToolItems.ONCE_WIRE_CUTTER.get(Iron))
+                .circuitMeta(22)
+                .EUt(10)
+                .duration(20)
+                .buildAndRegister();
+
     }
 
 }
