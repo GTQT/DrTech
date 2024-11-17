@@ -203,5 +203,12 @@ public class CraftingReceipe {
                 "XXX", "XCX", "XXX",
                 'X', Blocks.CHEST,'C',MetaItems.ELECTRIC_PISTON_LV);
         ModHandler.addShapelessRecipe("advanced_cauldron",new ItemStack(ItemsInit.ITEM_BLOCK_ADVANCED_CAULDRON),Items.CAULDRON);
+
+        ModHandler.addShapedRecipe("type_filter", MetaTileEntities.TYPE_FILTER.getStackForm(),
+                "WBW", "WFW", "WWW",
+                'B',ToolItems.WRENCH,
+                'W', Blocks.IRON_BARS,
+                'F', new ItemStack(BlocksInit.COMMON_CASING,1,1)
+        );
     }
 }

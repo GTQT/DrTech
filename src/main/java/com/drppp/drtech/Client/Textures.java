@@ -33,7 +33,7 @@ public class Textures {
     public static SimpleOverlayRenderer WIRELESS_HATCH_HATCH;
     public static OrientedOverlayRenderer DISASSEMBLY;
     public static OrientedOverlayRenderer INDUSTRIAL_APIARY;
-
+    public static  OrientedOverlayRenderer FILTER_OVERLAY;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_4x;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_16x;
@@ -68,6 +68,7 @@ public class Textures {
         DUPLICATOR = new OrientedOverlayRenderer("machines/duplicator");
         DISASSEMBLY = new OrientedOverlayRenderer("machines/disassembly");
         INDUSTRIAL_APIARY = new OrientedOverlayRenderer("machines/industrial_apiary");
+        FILTER_OVERLAY = new OrientedOverlayRenderer("machines/type_filter");
         MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
         ASEPTIC_MACHINE_CASING = new SimpleOverlayRenderer("casings/aseptic_machine_casing");
         ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
