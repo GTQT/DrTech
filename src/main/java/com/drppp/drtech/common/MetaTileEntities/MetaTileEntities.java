@@ -6,6 +6,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileeneityPassthroughHatchComputationHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLaserPipeBending;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityTypeFilter;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
 import com.drppp.drtech.loaders.DrtechReceipes;
@@ -64,6 +65,7 @@ public class MetaTileEntities {
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
     public static MetaTileEntityTypeFilter TYPE_FILTER;
+    public static MetaTileEntityLaserPipeBending LASER_BENDING;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -86,6 +88,11 @@ public class MetaTileEntities {
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_262144A = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
+    public static MetaTileEntityLaserPipeBending[] LASER_BENDING_256 = new MetaTileEntityLaserPipeBending[10]; // IV+
+    public static MetaTileEntityLaserPipeBending[] LASER_BENDING_1024 = new MetaTileEntityLaserPipeBending[10]; // IV+
+    public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
+    public static MetaTileEntityLaserPipeBending[] LASER_BENDING_16384 = new MetaTileEntityLaserPipeBending[10]; // IV+
+    public static MetaTileEntityLaserPipeBending[] LASER_BENDING_65536 = new MetaTileEntityLaserPipeBending[10]; // IV+
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
         if (id > 1000)
@@ -178,6 +185,14 @@ public class MetaTileEntities {
             WIRELESS_OUTPUT_ENERGY_HATCH_65536A[i]   = registerPartMetaTileEntity( 285 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_65536a."   + tier), i, 65536,   true));
             WIRELESS_OUTPUT_ENERGY_HATCH_262144A[i]  = registerPartMetaTileEntity( 300 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_262144a."  + tier), i, 262144,  true));
             WIRELESS_OUTPUT_ENERGY_HATCH_1048576A[i] = registerPartMetaTileEntity( 315 + i, new MetaTileEntityWirelessEnergyHatch(getmyId("wireless_energy_hatch.output_1048576a." + tier), i, 1048576, true));
+        }
+        //17630开始 激光折弯
+        for (int i = 0; i < 10; i++) {
+            LASER_BENDING_256[i] = registerMetaTileEntity(17630+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_256."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,256));
+            LASER_BENDING_1024[i] = registerMetaTileEntity(17640+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_1024."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,1024));
+            LASER_BENDING_4096[i]= registerMetaTileEntity(17650+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_4096."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,4096));
+            LASER_BENDING_16384[i]= registerMetaTileEntity(17660+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_16384."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,16384));
+            LASER_BENDING_65536[i]= registerMetaTileEntity(17670+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_65536."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,65536));
         }
     }
 
