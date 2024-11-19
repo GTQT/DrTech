@@ -45,6 +45,7 @@ public class ItemsInit {
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
     public static final Item ITEM_BLOCK_CROP_GANZHE = new ItemBlock(CustomeCropsInit.CROP_GAN_ZHE).setRegistryName(Tags.MODID,CustomeCropsInit.CROP_GAN_ZHE.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID,BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
+    public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID,BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
     public static void init(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
@@ -62,6 +63,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_SAP_BAG);
         event.getRegistry().register(ITEM_BLOCK_CROP_GANZHE);
         event.getRegistry().register(ITEM_BLOCK_ADVANCED_CAULDRON);
+        event.getRegistry().register(ITEM_BLOCK_TIME_TABLE);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));

@@ -1,9 +1,11 @@
 package com.drppp.drtech;
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
+import com.drppp.drtech.Tile.TileEntityTimeTable;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
@@ -119,6 +121,7 @@ public class DrTechMain {
     public void TexturesInit()
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
         try {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
         } catch (Exception e) {
