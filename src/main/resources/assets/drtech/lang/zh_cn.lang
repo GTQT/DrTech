@@ -225,6 +225,7 @@ drtech.machine.industrial_apiary.name=工业蜂箱
 drtech.machine.concrete_backfiller1.name=混凝土回填机
 drtech.machine.concrete_backfiller2.name=进阶混凝土回填机
 drtech.machine.type_filter.name=类型过滤器
+drtech.machine.industrial_coke_oven.name=工业焦炉
 
 #Materials
 gregtech.material.bedrock=基岩

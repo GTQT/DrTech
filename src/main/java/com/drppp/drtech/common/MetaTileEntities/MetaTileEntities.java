@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.MetaTileEntities;
 
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
@@ -65,7 +66,7 @@ public class MetaTileEntities {
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
     public static MetaTileEntityTypeFilter TYPE_FILTER;
-    public static MetaTileEntityLaserPipeBending LASER_BENDING;
+    public static MetaTileEntityIndustrialCokeOven INDUSTRIAL_COKE_OVEN;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -139,6 +140,7 @@ public class MetaTileEntities {
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(),new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller1"),1));
         CONCRETE_BACK_FILLER2 = registerMetaTileEntity(getID(),new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller2"),2));
         TYPE_FILTER = registerMetaTileEntity(getID(),new MetaTileEntityTypeFilter(getmyId("type_filter")));
+        INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCokeOven(getmyId("industrial_coke_oven")));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();

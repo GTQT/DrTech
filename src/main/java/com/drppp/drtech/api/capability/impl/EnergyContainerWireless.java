@@ -24,9 +24,9 @@ public class EnergyContainerWireless extends EnergyContainerHandler {
     
     @Override
     public void update() {
-        //super.update();
+        super.update();
         if(!this.metaTileEntity.getWorld().isRemote){
-            if(this.metaTileEntity.getOffsetTimer() % 5 == 0 && this.ownerUuid!=null){
+            if(this.ownerUuid!=null){
                 WirelessNetworkManager.strongCheckOrAddUser(this.ownerUuid);
                 //是动力舱 给网络增加能量
                 if(this.getInputVoltage()==0)
