@@ -25,6 +25,7 @@ import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
+import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -444,7 +445,22 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(200)
                 .buildAndRegister();
-
+        ASSEMBLY_LINE_RECIPES.recipeBuilder()
+                .input(GTQTMetaTileEntities.LIGHTNING_ROD[2],4)
+                .input(circuit, MarkerMaterials.Tier.UV, 4)
+                .input(plate, Iridium,16)
+                .input(plate, Iridium,16)
+                .input(cableGtDouble, Gold,64)
+                .input(cableGtDouble, Gold,64)
+                .fluidInputs(SolderingAlloy.getFluid(1440))
+                .outputs(MetaTileEntities.LARGE_LIGHTING_ROD.getStackForm())
+                .scannerResearch(b -> b
+                        .researchStack(GTQTMetaTileEntities.LIGHTNING_ROD[2].getStackForm())
+                        .duration(1200)
+                        .EUt(VA[ZPM]))
+                .EUt(GTValues.VA[ZPM])
+                .duration(600)
+                .buildAndRegister();
     }
 
 }

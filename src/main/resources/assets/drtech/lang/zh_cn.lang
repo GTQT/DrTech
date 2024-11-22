@@ -226,6 +226,7 @@ drtech.machine.concrete_backfiller1.name=混凝土回填机
 drtech.machine.concrete_backfiller2.name=进阶混凝土回填机
 drtech.machine.type_filter.name=类型过滤器
 drtech.machine.industrial_coke_oven.name=工业焦炉
+drtech.machine.large_lighting_rod.name=大型避雷针
 
 #Materials
 gregtech.material.bedrock=基岩
