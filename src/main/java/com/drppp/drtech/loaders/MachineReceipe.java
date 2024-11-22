@@ -434,6 +434,16 @@ public class MachineReceipe {
                 .EUt(10)
                 .duration(20)
                 .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(gregtech.common.metatileentities.MetaTileEntities.COKE_OVEN,16)
+                .input(plate,Steel,32)
+                .input(stick,Steel,16)
+                .fluidInputs(Tin.getFluid(1440))
+                .outputs(MetaTileEntities.INDUSTRIAL_COKE_OVEN.getStackForm())
+                .circuitMeta(1)
+                .EUt(16)
+                .duration(200)
+                .buildAndRegister();
 
     }
 
