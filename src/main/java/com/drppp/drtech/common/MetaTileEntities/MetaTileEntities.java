@@ -1,8 +1,11 @@
 package com.drppp.drtech.common.MetaTileEntities;
 
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
+import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityBatteryEnergyHatch;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileeneityPassthroughHatchComputationHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
@@ -65,7 +68,8 @@ public class MetaTileEntities {
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
     public static MetaTileEntityTypeFilter TYPE_FILTER;
-    public static MetaTileEntityLaserPipeBending LASER_BENDING;
+    public static MetaTileEntityIndustrialCokeOven INDUSTRIAL_COKE_OVEN;
+    public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -93,6 +97,7 @@ public class MetaTileEntities {
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_16384 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_65536 = new MetaTileEntityLaserPipeBending[10]; // IV+
+    public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH = new MetaTileEntityBatteryEnergyHatch[15];
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
         if (id > 1000)
@@ -139,6 +144,8 @@ public class MetaTileEntities {
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(),new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller1"),1));
         CONCRETE_BACK_FILLER2 = registerMetaTileEntity(getID(),new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller2"),2));
         TYPE_FILTER = registerMetaTileEntity(getID(),new MetaTileEntityTypeFilter(getmyId("type_filter")));
+        INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCokeOven(getmyId("industrial_coke_oven")));
+        LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(),new MetaTileEntityLargeLightningRod(getmyId("large_lighting_rod")));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();
@@ -193,6 +200,10 @@ public class MetaTileEntities {
             LASER_BENDING_4096[i]= registerMetaTileEntity(17650+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_4096."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,4096));
             LASER_BENDING_16384[i]= registerMetaTileEntity(17660+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_16384."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,16384));
             LASER_BENDING_65536[i]= registerMetaTileEntity(17670+i,new MetaTileEntityLaserPipeBending(getmyId("laser_bending_65536."+GTValues.VN[GTValues.IV+i]),GTValues.IV+i,65536));
+        }
+        for (int i = 0; i < 15; i++) {
+            String tier = VN[i].toLowerCase();
+            BATTERY_INPUT_ENERGY_HATCH[i]          = registerMetaTileEntity( 17680+i,       new MetaTileEntityBatteryEnergyHatch(getmyId("battery_energy_hatch.input."          + tier), i, 2,       false));
         }
     }
 

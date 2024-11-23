@@ -5,6 +5,7 @@ import gregtech.api.gui.resources.AdoptableTextureArea;
 import gregtech.api.gui.resources.TextureArea;
 import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
+import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
@@ -28,6 +29,7 @@ public class Textures {
     public static  OrientedOverlayRenderer LARGE_UU_PRODUCTER;
     public static  OrientedOverlayRenderer ELECTRIC_IMPLOSION_OVERLAY;
     public static  OrientedOverlayRenderer TFFT_OVERLAY;
+    public static OrientedOverlayRenderer LIGHTING_ROD_OVERLAY;
     public static  TextureArea BACKGROUND;
     public static  TextureArea PAIL_BACKGROUND;
     public static SimpleOverlayRenderer WIRELESS_HATCH_HATCH;
@@ -77,6 +79,7 @@ public class Textures {
         LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
         ELECTRIC_IMPLOSION_OVERLAY = new OrientedOverlayRenderer("multiblock/electric_implosion");
         TFFT_OVERLAY = new OrientedOverlayRenderer("multiblock/tfft_tank");
+        LIGHTING_ROD_OVERLAY = new OrientedOverlayRenderer("multiblock/lighting_rod");
         SALT_INHIBITION_CASING = new SimpleOverlayRenderer("casings/salt_inhibition_casing");
         NUCLEAR_PART_CASING = new SimpleOverlayRenderer("casings/nuclear_part_casing");
         BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);

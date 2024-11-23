@@ -1,4 +1,6 @@
 itemGroup.mytab=DR科技
+key.categories.drtech=Dr科技
+key.ctrl=飞行戒指加速
 #recipemap
 recipemap.eimplosion_compressor.name=电力聚爆压缩机
 recipemap.uu_producter.name=UU物质生产
@@ -130,6 +132,7 @@ metaitem.upgrade_heater.name=加热器升级
 metaitem.upgrade_sieve.name=筛滤升级
 metaitem.upgrade_t.name=夜间升级
 metaitem.tool_box.name=工具盒(未完成)
+metaitem.cover.energy_link_panel.name=能源连接面板
 
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
@@ -154,6 +157,7 @@ tile.drtech.storage_compress.name=存储桶
 tile.drtech.waste_dirt.name=废土泥土
 tile.drtech.SapBag.name=树脂收集器
 tile.advanced_cauldron.name=进阶炼药锅
+tile.drtech.Time_Table.name=时间之瓶挂机桌
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
@@ -224,6 +228,8 @@ drtech.machine.industrial_apiary.name=工业蜂箱
 drtech.machine.concrete_backfiller1.name=混凝土回填机
 drtech.machine.concrete_backfiller2.name=进阶混凝土回填机
 drtech.machine.type_filter.name=类型过滤器
+drtech.machine.industrial_coke_oven.name=工业焦炉
+drtech.machine.large_lighting_rod.name=大型避雷针
 
 #Materials
 gregtech.material.bedrock=基岩
@@ -887,6 +893,22 @@ drtech.machine.laser_bending_65536.uiv.name=65536A激光折弯器（§4UIV§r）
 drtech.machine.laser_bending_65536.uxv.name=65536A激光折弯器（§4UXV§r）
 drtech.machine.laser_bending_65536.opv.name=65536A激光折弯器（§4OPV§r）
 drtech.machine.laser_bending_65536.max.name=65536A激光折弯器（§4MAX§r）
+
+drtech.machine.battery_energy_hatch.input.ulv.name=缓存能源仓（ulv）
+drtech.machine.battery_energy_hatch.input.lv.name=缓存能源仓（§7LV§r）
+drtech.machine.battery_energy_hatch.input.mv.name=缓存能源仓（§bMV§r）
+drtech.machine.battery_energy_hatch.input.hv.name=缓存能源仓（§6HV§r）
+drtech.machine.battery_energy_hatch.input.ev.name=缓存能源仓（§5EV§r）
+drtech.machine.battery_energy_hatch.input.iv.name=缓存能源仓（§1IV§r）
+drtech.machine.battery_energy_hatch.input.luv.name=缓存能源仓（§dLuV§r）
+drtech.machine.battery_energy_hatch.input.zpm.name=缓存能源仓（§cZPM§r）
+drtech.machine.battery_energy_hatch.input.uv.name=缓存能源仓（§3UV§r）
+drtech.machine.battery_energy_hatch.input.uhv.name=缓存能源仓（§4UHV§r）
+drtech.machine.battery_energy_hatch.input.uev.name=缓存能源仓（§4UEV§r）
+drtech.machine.battery_energy_hatch.input.uiv.name=缓存能源仓（§4UIV§r）
+drtech.machine.battery_energy_hatch.input.uxv.name=缓存能源仓（§eUXV§r）
+drtech.machine.battery_energy_hatch.input.opv.name=缓存能源仓（§9OpV§r）
+drtech.machine.battery_energy_hatch.input.max.name=缓存能源仓（§c§lMAX§r）
 #comb
 item.drt.comb.borax.name=硼砂蜂窝
 item.drt.comb.ether.name=以太蜂窝

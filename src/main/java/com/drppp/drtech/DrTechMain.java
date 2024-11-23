@@ -1,9 +1,11 @@
 package com.drppp.drtech;
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
+import com.drppp.drtech.Tile.TileEntityTimeTable;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
@@ -25,6 +27,7 @@ import com.drppp.drtech.common.command.CommandHordeBase;
 import com.drppp.drtech.common.command.CommandHordeStart;
 import com.drppp.drtech.common.command.CommandHordeStatus;
 import com.drppp.drtech.common.command.CommandHordeStop;
+import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.enent.PollutionEffectHandler;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
@@ -39,6 +42,8 @@ import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
+import gregtech.api.GregTechAPI;
+import gregtech.api.cover.CoverDefinition;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -119,6 +124,7 @@ public class DrTechMain {
     public void TexturesInit()
     {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
         try {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
         } catch (Exception e) {
@@ -200,6 +206,9 @@ public class DrTechMain {
         hordeCommand.addSubcommand(new CommandHordeStop());
         hordeCommand.addSubcommand(new CommandHordeStatus());
     }
-
+    @SubscribeEvent
+    public static void registerCoverBehavior(GregTechAPI.RegisterEvent<CoverDefinition> event) {
+        DrtCoverReg.init();
+    }
 
 }

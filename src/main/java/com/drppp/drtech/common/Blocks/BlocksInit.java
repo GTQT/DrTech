@@ -37,6 +37,7 @@ public class BlocksInit {
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
+    public static final BlockTimeTable BLOCK_TIME_TABLE = new BlockTimeTable();
     public  static void init(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
@@ -64,6 +65,8 @@ public class BlocksInit {
         event.getRegistry().register(TFFT_TANK);
         event.getRegistry().register(BLOCK_ADVANCED_CAULDRON);
         GameRegistry.registerTileEntity(TileEntityAdvancedCauldron.class, new ResourceLocation(Tags.MODID, "advanced_cauldron"));
+        event.getRegistry().register(BLOCK_TIME_TABLE);
+        GameRegistry.registerTileEntity(TileEntityTimeTable.class, new ResourceLocation(Tags.MODID, "time_table"));
         MY_LASER_PIPE.setRegistryName("my_laser_pipe_normal");
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
         MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
