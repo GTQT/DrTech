@@ -1,4 +1,6 @@
 itemGroup.mytab=DR科技
+key.categories.drtech=Dr科技
+key.ctrl=飞行戒指加速
 #recipemap
 recipemap.eimplosion_compressor.name=电力聚爆压缩机
 recipemap.uu_producter.name=UU物质生产
