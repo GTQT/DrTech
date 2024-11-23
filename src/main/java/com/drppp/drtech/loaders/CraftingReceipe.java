@@ -13,6 +13,7 @@ import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import gregtech.common.items.ToolItems;
+import gregtech.common.metatileentities.electric.MetaTileEntityBatteryBuffer;
 import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -210,5 +211,9 @@ public class CraftingReceipe {
                 'W', Blocks.IRON_BARS,
                 'F', new ItemStack(BlocksInit.COMMON_CASING,1,1)
         );
+        for (int i = 0; i < 10; i++) {
+            ModHandler.addShapelessRecipe("huancun_energy_hatch"+i,MetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[i].getStackForm(), gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH[i].getStackForm(), gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
+
+        }
     }
 }

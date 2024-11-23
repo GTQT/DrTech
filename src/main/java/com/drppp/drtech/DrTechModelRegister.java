@@ -54,6 +54,7 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_WASTE_DIRT), 0, new ModelResourceLocation(BlocksInit.BLOCK_WASTE_DIRT.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_SAP_BAG), 0, new ModelResourceLocation(BlocksInit.BLOCK_SAP_BAG.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON), 0, new ModelResourceLocation(BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_TIME_TABLE), 0, new ModelResourceLocation(BlocksInit.BLOCK_TIME_TABLE.getRegistryName(), "inventory"));
 
         ItemsInit.registerItemModels();
         GeoItemsInit.onModelRegistry();

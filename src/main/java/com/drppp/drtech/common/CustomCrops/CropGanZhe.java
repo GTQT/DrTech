@@ -27,9 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public class CropGanZhe extends Block {
 
     public static final PropertyInteger GANZHE_AGE = PropertyInteger.create("age",0,4);
-//    public static final PropertyInteger GROW_SPEED = PropertyInteger.create("grow_speed",1,128);
-//    public static final PropertyInteger GAIN_RATE = PropertyInteger.create("gain_rate",1,128);
-//    public static final PropertyInteger RESISTANCE = PropertyInteger.create("resistance",1,128);
+
     public static  final AxisAlignedBB[] COMMON_AABB = new AxisAlignedBB[]
             {
                     new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D),
