@@ -130,6 +130,7 @@ metaitem.upgrade_heater.name=加热器升级
 metaitem.upgrade_sieve.name=筛滤升级
 metaitem.upgrade_t.name=夜间升级
 metaitem.tool_box.name=工具盒(未完成)
+metaitem.cover.energy_link_panel.name=能源连接面板
 
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
@@ -890,6 +891,22 @@ drtech.machine.laser_bending_65536.uiv.name=65536A激光折弯器（§4UIV§r）
 drtech.machine.laser_bending_65536.uxv.name=65536A激光折弯器（§4UXV§r）
 drtech.machine.laser_bending_65536.opv.name=65536A激光折弯器（§4OPV§r）
 drtech.machine.laser_bending_65536.max.name=65536A激光折弯器（§4MAX§r）
+
+drtech.machine.battery_energy_hatch.input.ulv.name=缓存能源仓（ulv）
+drtech.machine.battery_energy_hatch.input.lv.name=缓存能源仓（§7LV§r）
+drtech.machine.battery_energy_hatch.input.mv.name=缓存能源仓（§bMV§r）
+drtech.machine.battery_energy_hatch.input.hv.name=缓存能源仓（§6HV§r）
+drtech.machine.battery_energy_hatch.input.ev.name=缓存能源仓（§5EV§r）
+drtech.machine.battery_energy_hatch.input.iv.name=缓存能源仓（§1IV§r）
+drtech.machine.battery_energy_hatch.input.luv.name=缓存能源仓（§dLuV§r）
+drtech.machine.battery_energy_hatch.input.zpm.name=缓存能源仓（§cZPM§r）
+drtech.machine.battery_energy_hatch.input.uv.name=缓存能源仓（§3UV§r）
+drtech.machine.battery_energy_hatch.input.uhv.name=缓存能源仓（§4UHV§r）
+drtech.machine.battery_energy_hatch.input.uev.name=缓存能源仓（§4UEV§r）
+drtech.machine.battery_energy_hatch.input.uiv.name=缓存能源仓（§4UIV§r）
+drtech.machine.battery_energy_hatch.input.uxv.name=缓存能源仓（§eUXV§r）
+drtech.machine.battery_energy_hatch.input.opv.name=缓存能源仓（§9OpV§r）
+drtech.machine.battery_energy_hatch.input.max.name=缓存能源仓（§c§lMAX§r）
 #comb
 item.drt.comb.borax.name=硼砂蜂窝
 item.drt.comb.ether.name=以太蜂窝

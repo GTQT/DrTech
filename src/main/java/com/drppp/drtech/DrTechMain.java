@@ -27,6 +27,7 @@ import com.drppp.drtech.common.command.CommandHordeBase;
 import com.drppp.drtech.common.command.CommandHordeStart;
 import com.drppp.drtech.common.command.CommandHordeStatus;
 import com.drppp.drtech.common.command.CommandHordeStop;
+import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.enent.PollutionEffectHandler;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
@@ -41,6 +42,8 @@ import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
+import gregtech.api.GregTechAPI;
+import gregtech.api.cover.CoverDefinition;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -203,6 +206,9 @@ public class DrTechMain {
         hordeCommand.addSubcommand(new CommandHordeStop());
         hordeCommand.addSubcommand(new CommandHordeStatus());
     }
-
+    @SubscribeEvent
+    public static void registerCoverBehavior(GregTechAPI.RegisterEvent<CoverDefinition> event) {
+        DrtCoverReg.init();
+    }
 
 }

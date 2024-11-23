@@ -64,6 +64,7 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem UPGRADE_SIEVE ;
     public static MetaItem<?>.MetaValueItem UPGRADE_T ;
     public static MetaItem<?>.MetaValueItem TOOL_BOX ;
+    public static MetaItem<?>.MetaValueItem ENERGY_LINK_PANEL ;
 
     public static void MetaItemsInit()
     {
