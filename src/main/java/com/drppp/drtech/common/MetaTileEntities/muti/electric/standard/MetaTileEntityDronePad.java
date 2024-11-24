@@ -140,7 +140,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     public void spawnDroneEntity(boolean descending) {
 
         NBTTagCompound nbttagcompound = new NBTTagCompound();
-        nbttagcompound.setString("id", "susy:drone");
+        nbttagcompound.setString("id", "drtech:drone");
         Vec3d pos = this.getDroneSpawnPosition(descending);
 
         EntityDrone drone = ((EntityDrone) AnvilChunkLoader.readWorldEntityPos(nbttagcompound, this.getWorld(), pos.x, pos.y, pos.z, true));
