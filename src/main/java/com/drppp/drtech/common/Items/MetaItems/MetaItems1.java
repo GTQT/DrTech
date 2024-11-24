@@ -354,7 +354,6 @@ public  class MetaItems1 extends StandardMetaItem {
                             lines.add(I18n.format("metaitem.upgrade.tool_box.1", new Object[0]));
                             lines.add(I18n.format("metaitem.upgrade.tool_box.2", new Object[0]));
                         }));
-        MyMetaItems.ENERGY_LINK_PANEL = this.addItem(61,"cover.energy_link_panel").setCreativeTabs(DrTechMain.Mytab);
     }
 
     @Override

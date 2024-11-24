@@ -26,7 +26,7 @@ public final class DrtechReceipes {
 
 
     public static final RecipeMap<DronePadRecipeBuilder> DRONE_PAD = new RecipeMap<>("drone_pad", 3, 9, 3, 3, new DronePadRecipeBuilder(), false);
-
+    public static final RecipeMap<SimpleRecipeBuilder> COMBS_PRODUCT ;
 
     private DrtechReceipes() {
     }
@@ -48,7 +48,7 @@ public final class DrtechReceipes {
         MOLECULAR_RECOMBINATION = new RecipeMap<>("molecular_recombination",1,1,1,1,(new SimpleRecipeBuilder()),false);
         MOB_KILLER = new RecipeMap<>("mob_killer",2,6,0,1,(new SimpleRecipeBuilder()),false);
         SOLAR_TOWER = new RecipeMap<>("solar_tower",0,0,1,1,(new SimpleRecipeBuilder()),false);
-
+        COMBS_PRODUCT = new RecipeMap<>("combs_product",3,9,2,3,(new SimpleRecipeBuilder()),false);
 
     }
 }

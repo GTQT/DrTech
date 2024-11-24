@@ -1,6 +1,7 @@
 package com.drppp.drtech.intergations.Forestry;
 
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.recipes.RecipeBuilder;
@@ -14,6 +15,7 @@ import gregtech.api.unification.material.properties.PropertyKey;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
+import gregtech.integration.forestry.bees.GTCombType;
 import gregtech.integration.forestry.bees.GTDropItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
@@ -37,8 +39,132 @@ public class CombRecipes {
         addCentrifugeToMaterial(DrtCombType.MUTAGENIC_AGENT, new Material[] {  }, new int[] {  },
                 new int[] { 9 }, Voltage.HV, new ItemStack(GTDropItem.getByNameOrId("gregtech:gt.honey_drop"),1,3), 100 * 100);
         addProcessGT(DrtCombType.MUTAGENIC_AGENT, new Material[] { Materials.Uranium238,Materials.Uranium235,Materials.Plutonium239 }, Voltage.EV);
-    }
 
+        addCombProductProcess(GTCombType.COAL, new Material[] { Materials.Coal }, Voltage.LV);
+        addCombProductProcess(GTCombType.COKE, new Material[] { Materials.Coke }, Voltage.LV);
+        addCombProductProcess(GTCombType.OIL, new Material[] { Materials.Oilsands }, Voltage.LV);
+        addCombProductProcess(GTCombType.APATITE, new Material[] { Materials.Apatite, Materials.TricalciumPhosphate }, Voltage.LV);
+        addCombProductProcess(GTCombType.REDALLOY, new Material[] { Materials.RedAlloy, Materials.Redstone, Materials.Copper },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.STAINLESSSTEEL, new Material[] { Materials.StainlessSteel, Materials.Iron,
+                Materials.Chrome, Materials.Manganese, Materials.Nickel }, Voltage.HV);
+        addCombProductProcess(GTCombType.STONE, new Material[] { Materials.Soapstone, Materials.Talc, Materials.Apatite,
+                Materials.Phosphate, Materials.TricalciumPhosphate }, Voltage.LV);
+        addCombProductProcess(GTCombType.CERTUS,
+                new Material[] { Materials.CertusQuartz, Materials.Quartzite, Materials.Barite }, Voltage.LV);
+        addCombProductProcess(GTCombType.REDSTONE, new Material[] { Materials.Redstone, Materials.Cinnabar }, Voltage.LV);
+        addCombProductProcess(GTCombType.LAPIS,
+                new Material[] { Materials.Lapis, Materials.Sodalite, Materials.Lazurite, Materials.Calcite },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.RUBY, new Material[] { Materials.Ruby, Materials.Redstone }, Voltage.LV);
+        addCombProductProcess(GTCombType.SAPPHIRE,
+                new Material[] { Materials.Sapphire, Materials.GreenSapphire, Materials.Almandine, Materials.Pyrope },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.DIAMOND, new Material[] { Materials.Diamond, Materials.Graphite }, Voltage.LV);
+        addCombProductProcess(GTCombType.OLIVINE, new Material[] { Materials.Olivine, Materials.Bentonite, Materials.Magnesite,
+                Materials.GlauconiteSand }, Voltage.LV);
+        addCombProductProcess(GTCombType.EMERALD, new Material[] { Materials.Emerald, Materials.Beryllium, Materials.Thorium },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.PYROPE,
+                new Material[] { Materials.Pyrope, Materials.Aluminium, Materials.Magnesium, Materials.Silicon },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.GROSSULAR,
+                new Material[] { Materials.Grossular, Materials.Aluminium, Materials.Silicon }, Voltage.LV);
+        addCombProductProcess(GTCombType.COPPER, new Material[] { Materials.Copper, Materials.Tetrahedrite,
+                Materials.Chalcopyrite, Materials.Malachite, Materials.Pyrite, Materials.Stibnite }, Voltage.LV);
+        addCombProductProcess(GTCombType.TIN, new Material[] { Materials.Tin, Materials.Cassiterite, Materials.CassiteriteSand },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.LEAD, new Material[] { Materials.Lead, Materials.Galena }, Voltage.LV);
+        addCombProductProcess(GTCombType.NICKEL, new Material[] { Materials.Nickel, Materials.Garnierite, Materials.Pentlandite,
+                Materials.Cobaltite, Materials.Wulfenite, Materials.Powellite }, Voltage.LV);
+        addCombProductProcess(GTCombType.ZINC, new Material[] { Materials.Sphalerite, Materials.Sulfur }, Voltage.LV);
+        addCombProductProcess(GTCombType.SILVER, new Material[] { Materials.Silver, Materials.Galena }, Voltage.LV);
+        addCombProductProcess(GTCombType.GOLD, new Material[] { Materials.Gold, Materials.Magnetite }, Voltage.LV);
+        addCombProductProcess(GTCombType.SULFUR, new Material[] { Materials.Sulfur, Materials.Pyrite, Materials.Sphalerite },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.GALLIUM, new Material[] { Materials.Gallium, Materials.Niobium }, Voltage.LV);
+        addCombProductProcess(GTCombType.ARSENIC, new Material[] { Materials.Realgar, Materials.Cassiterite, Materials.Zeolite },
+                Voltage.LV);
+        addCombProductProcess(
+                GTCombType.IRON, new Material[] { Materials.Iron, Materials.Magnetite, Materials.BrownLimonite,
+                        Materials.YellowLimonite, Materials.VanadiumMagnetite, Materials.BandedIron, Materials.Pyrite },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.BAUXITE, new Material[] { Materials.Bauxite, Materials.Aluminium }, Voltage.LV);
+        addCombProductProcess(GTCombType.ALUMINIUM, new Material[] { Materials.Aluminium, Materials.Bauxite }, Voltage.LV);
+        addCombProductProcess(GTCombType.MANGANESE, new Material[] { Materials.Manganese, Materials.Grossular,
+                Materials.Spessartine, Materials.Pyrolusite, Materials.Tantalite }, Voltage.LV);
+        addCombProductProcess(GTCombType.TITANIUM,
+                new Material[] { Materials.Titanium, Materials.Ilmenite, Materials.Bauxite, Materials.Rutile },
+                Voltage.EV);
+        addCombProductProcess(GTCombType.MAGNESIUM, new Material[] { Materials.Magnesium, Materials.Magnesite }, Voltage.LV);
+        addCombProductProcess(GTCombType.CHROME, new Material[] { Materials.Chrome, Materials.Ruby, Materials.Chromite,
+                Materials.Redstone, Materials.Neodymium, Materials.Bastnasite }, Voltage.HV);
+        addCombProductProcess(GTCombType.TUNGSTEN,
+                new Material[] { Materials.Tungsten, Materials.Tungstate, Materials.Scheelite, Materials.Lithium },
+                Voltage.IV);
+        addCombProductProcess(GTCombType.PLATINUM,
+                new Material[] { Materials.Platinum, Materials.Cooperite, Materials.Palladium }, Voltage.HV);
+        addCombProductProcess(GTCombType.MOLYBDENUM, new Material[] { Materials.Molybdenum, Materials.Molybdenite,
+                Materials.Powellite, Materials.Wulfenite }, Voltage.LV);
+        addCombProductProcess(GTCombType.LITHIUM,
+                new Material[] { Materials.Lithium, Materials.Lepidolite, Materials.Spodumene }, Voltage.MV);
+        addCombProductProcess(GTCombType.SALT, new Material[] { Materials.Salt, Materials.RockSalt, Materials.Saltpeter },
+                Voltage.MV);
+        addCombProductProcess(GTCombType.ELECTROTINE,
+                new Material[] { Materials.Electrotine, Materials.Electrum, Materials.Redstone }, Voltage.MV);
+        addCombProductProcess(GTCombType.ALMANDINE,
+                new Material[] { Materials.Almandine, Materials.Pyrope, Materials.Sapphire, Materials.GreenSapphire },
+                Voltage.LV);
+        addCombProductProcess(GTCombType.URANIUM, new Material[] { Materials.Uranium238, Materials.Pitchblende,
+                Materials.Uraninite, Materials.Uranium235 }, Voltage.EV);
+        addCombProductProcess(GTCombType.PLUTONIUM, new Material[] { Materials.Plutonium239, Materials.Uranium235 }, Voltage.EV);
+        addCombProductProcess(GTCombType.NAQUADAH,
+                new Material[] { Materials.Naquadah, Materials.NaquadahEnriched, Materials.Naquadria }, Voltage.IV);
+        addCombProductProcess(GTCombType.NAQUADRIA,
+                new Material[] { Materials.Naquadria, Materials.NaquadahEnriched, Materials.Naquadah }, Voltage.LUV);
+        addCombProductProcess(GTCombType.THORIUM, new Material[] { Materials.Thorium, Materials.Uranium238, Materials.Coal },
+                Voltage.EV);
+        addCombProductProcess(GTCombType.LUTETIUM, new Material[] { Materials.Lutetium, Materials.Thorium }, Voltage.IV);
+        addCombProductProcess(GTCombType.AMERICIUM, new Material[] { Materials.Americium, Materials.Lutetium }, Voltage.LUV);
+        addCombProductProcess(GTCombType.TRINIUM, new Material[] { Materials.Trinium, Materials.Naquadah, Materials.Naquadria },
+                Voltage.ZPM);
+    }
+    private static void addCombProductProcess(DrtCombType comb, Material[] material, Voltage volt)
+    {
+        Material rongye = volt.ordinal()<4?Materials.HydrofluoricAcid:Materials.PhthalicAcid;
+        RecipeBuilder<?> builder = DrtechReceipes.COMBS_PRODUCT.recipeBuilder()
+                .duration(200*(volt.ordinal()+1))
+                .EUt(volt.getAutoclaveEnergy());
+        for (var item:material)
+        {
+            if (OreDictUnifier.get(OrePrefix.crushedPurified, item, 4).isEmpty()) continue;
+            builder.output(OrePrefix.crushedPurified, item, 4);
+        }
+        if(builder.getOutputs().size()>0)
+        {
+            builder.inputs(GTUtility.copy(4 * builder.getOutputs().size(), ForestryUtil.getCombStack(comb)))
+                    .fluidInputs(rongye.getFluid(576 * builder.getOutputs().size()))
+                    .buildAndRegister();
+        }
+    }
+    private static void addCombProductProcess(GTCombType comb, Material[] material, Voltage volt)
+    {
+        Material rongye = volt.ordinal()<4?Materials.HydrofluoricAcid:Materials.PhthalicAcid;
+        RecipeBuilder<?> builder = DrtechReceipes.COMBS_PRODUCT.recipeBuilder()
+                .duration(200*(volt.ordinal()+1))
+                .EUt(volt.getAutoclaveEnergy());
+        for (var item:material)
+        {
+            if (OreDictUnifier.get(OrePrefix.crushedPurified, item, 4).isEmpty()) continue;
+            builder.output(OrePrefix.crushedPurified, item, 4);
+        }
+        if(builder.getOutputs().size()>0)
+        {
+            builder.inputs(GTUtility.copy(4 * builder.getOutputs().size(), gregtech.integration.forestry.ForestryUtil.getCombStack(comb)))
+                    .fluidInputs(rongye.getFluid(576 * builder.getOutputs().size()))
+                    .buildAndRegister();
+        }
+    }
     private static void addChemicalProcess(DrtCombType comb, Material inMaterial, Material outMaterial, Voltage volt) {
         if (OreDictUnifier.get(OrePrefix.crushedPurified, outMaterial, 4).isEmpty() ||
                 OreDictUnifier.get(OrePrefix.crushed, inMaterial).isEmpty() ||
@@ -100,39 +226,15 @@ public class CombRecipes {
                 .buildAndRegister();
     }
 
-    /**
-     * this only adds Chemical and AutoClave process.
-     * If you need Centrifuge recipe. use addCentrifugeToMaterial or addCentrifugeToItemStack
-     *
-     * @param volt     This determines the required Tier of process for these recipes. This decides the required aEU/t,
-     *                 progress time, required additional Mutagen, requirement of cleanRoom, needed fluid stack for
-     *                 Chemical.
-     * @param material result of Material that should be generated by this process.
-     **/
     private static void addProcessGT(DrtCombType comb, Material[] material, Voltage volt) {
+        addCombProductProcess(comb,material,volt);
         for (int i = 0; i < material.length; i++) {
             addChemicalProcess(comb, material[i], material[i], volt);
             addAutoclaveProcess(comb, material[i], volt, i + 1);
+
         }
     }
 
-    /**
-     * this method only adds Centrifuge based on Material. If volt is lower than MV than it will also add forestry
-     * centrifuge recipe.
-     *
-     * @param comb      BeeComb
-     * @param material  resulting Material of processing. must be less than or equal to 9.
-     * @param chance    chance to get result, 10000 == 100%
-     * @param volt      required Voltage Tier for this recipe, this also affect the duration, amount of Mutagen, and
-     *                  needed liquid type and amount for chemical reactor
-     * @param stackSize This parameter can be null, in that case stack size will be just 1. This handle the stackSize of
-     *                  the resulting Item, and Also the Type of Item. if this value is multiple of 9, than related
-     *                  Material output will be dust, if this value is multiple of 4 than output will be Small dust,
-     *                  else the output will be Tiny dust
-     * @param beeWax    if this is null, then the comb will product default Bee wax. But if material is more than 5,
-     *                  beeWax will be ignored in Gregtech Centrifuge.
-     * @param waxChance have same format like "chance"
-     **/
     private static void addCentrifugeToMaterial(DrtCombType comb, Material[] material, int[] chance, int[] stackSize,
                                                 Voltage volt, ItemStack beeWax, int waxChance) {
         addCentrifugeToMaterial(comb, material, chance, stackSize, volt, volt.getCentrifugeTime(), beeWax, waxChance);

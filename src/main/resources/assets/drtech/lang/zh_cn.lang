@@ -12,6 +12,7 @@ recipemap.deep_ground_pump.name=热能抽取
 recipemap.solar_tower.name=太阳之力
 recipemap.disassembler.name=拆解机
 recipemap.drone_pad.name=无人机狩猎
+recipemap.combs_product.name=蜂窝处理
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
@@ -230,6 +231,7 @@ drtech.machine.concrete_backfiller2.name=进阶混凝土回填机
 drtech.machine.type_filter.name=类型过滤器
 drtech.machine.industrial_coke_oven.name=工业焦炉
 drtech.machine.large_lighting_rod.name=大型避雷针
+drtech.machine.comb_process.name=蜂窝处理器
 
 #Materials
 gregtech.material.bedrock=基岩

@@ -447,18 +447,39 @@ public class MachineReceipe {
                 .buildAndRegister();
         ASSEMBLY_LINE_RECIPES.recipeBuilder()
                 .input(GTQTMetaTileEntities.LIGHTNING_ROD[2],4)
-                .input(circuit, MarkerMaterials.Tier.UV, 4)
-                .input(plate, Iridium,16)
-                .input(plate, Iridium,16)
+                .input(circuit, MarkerMaterials.Tier.UHV, 16)
+                .input(plate, Iridium,48)
+                .input(plate, Iridium,48)
                 .input(cableGtDouble, Gold,64)
                 .input(cableGtDouble, Gold,64)
+                .input(MetaItems.ULTIMATE_BATTERY)
                 .fluidInputs(SolderingAlloy.getFluid(1440))
+                .fluidInputs(UUMatter.getFluid(1440))
                 .outputs(MetaTileEntities.LARGE_LIGHTING_ROD.getStackForm())
                 .scannerResearch(b -> b
                         .researchStack(GTQTMetaTileEntities.LIGHTNING_ROD[2].getStackForm())
                         .duration(1200)
                         .EUt(VA[ZPM]))
                 .EUt(GTValues.VA[ZPM])
+                .duration(600)
+                .buildAndRegister();
+
+        ASSEMBLY_LINE_RECIPES.recipeBuilder()
+                .input(MetaTileEntities.INDUSTRIAL_APIARY,4)
+                .input(circuit, MarkerMaterials.Tier.LuV, 16)
+                .input(MetaItems.ROBOT_ARM_LuV,64)
+                .input(cableGtDouble, Osmium,64)
+                .input(cableGtDouble, Osmium,64)
+                .input(plate, Iridium,48)
+                .input(plate, Iridium,48)
+                .fluidInputs(SolderingAlloy.getFluid(1440))
+                .fluidInputs(UUMatter.getFluid(144))
+                .outputs(MetaTileEntities.COMB_PROVESS.getStackForm())
+                .scannerResearch(b -> b
+                        .researchStack(MetaTileEntities.INDUSTRIAL_APIARY.getStackForm())
+                        .duration(1200)
+                        .EUt(VA[LuV]))
+                .EUt(GTValues.VA[LuV])
                 .duration(600)
                 .buildAndRegister();
     }
