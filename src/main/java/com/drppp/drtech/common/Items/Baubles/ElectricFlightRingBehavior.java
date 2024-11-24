@@ -70,7 +70,8 @@ public class ElectricFlightRingBehavior extends BaubleBehavior {
                 }
                 else
                 {
-                    disableFlyingAbility(player);
+                    if(!player.capabilities.isCreativeMode)
+                        disableFlyingAbility(player);
                 }
 
 

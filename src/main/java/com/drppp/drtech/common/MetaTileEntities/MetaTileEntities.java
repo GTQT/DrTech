@@ -70,6 +70,7 @@ public class MetaTileEntities {
     public static MetaTileEntityTypeFilter TYPE_FILTER;
     public static MetaTileEntityIndustrialCokeOven INDUSTRIAL_COKE_OVEN;
     public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
+    public static MetaTileEntityCombProcess COMB_PROVESS;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -146,6 +147,7 @@ public class MetaTileEntities {
         TYPE_FILTER = registerMetaTileEntity(getID(),new MetaTileEntityTypeFilter(getmyId("type_filter")));
         INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCokeOven(getmyId("industrial_coke_oven")));
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(),new MetaTileEntityLargeLightningRod(getmyId("large_lighting_rod")));
+        COMB_PROVESS = registerMetaTileEntity(getID(),new MetaTileEntityCombProcess(getmyId("comb_process")));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();

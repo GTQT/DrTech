@@ -3,7 +3,6 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.render.EOH_TESR;
-import com.drppp.drtech.Client.render.Items.NuclearItemsRender;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.Tile.TileEntityTimeTable;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
@@ -161,7 +160,6 @@ public class DrTechMain {
         TopInit.init();
         MinecraftForge.EVENT_BUS.register(new GlobalEnergyWorldSavedData());
         MinecraftForge.EVENT_BUS.register(new PollutionEffectHandler());
-        MinecraftForge.EVENT_BUS.register(new NuclearItemsRender());
         StructUtil.init();
 
         DRTAlleleBeeSpecies.setupAlleles();
