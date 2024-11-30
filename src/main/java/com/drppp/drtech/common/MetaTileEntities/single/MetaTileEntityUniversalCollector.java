@@ -282,13 +282,7 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.inventory);
         }else if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
         {
-            for (int i = 0; i < fluidTankList.getTanks(); i++)
-            {
-                if(fluidTankList.getTankAt(i).getFluidAmount()>0)
-                {
-                    return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.fluidTankList.getTankAt(i));
-                }
-            }
+            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.fluidTankList);
         }else if (capability == GregtechTileCapabilities.CAPABILITY_WORKABLE)
         {
             return GregtechTileCapabilities.CAPABILITY_WORKABLE.cast(this);

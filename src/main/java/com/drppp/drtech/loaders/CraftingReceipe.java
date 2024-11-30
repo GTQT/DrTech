@@ -209,7 +209,7 @@ public class CraftingReceipe {
                 "WBW", "WFW", "WWW",
                 'B',ToolItems.WRENCH,
                 'W', Blocks.IRON_BARS,
-                'F', new ItemStack(BlocksInit.COMMON_CASING,1,1)
+                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[0].getStackForm()
         );
         for (int i = 0; i < 10; i++) {
             ModHandler.addShapelessRecipe("huancun_energy_hatch"+i,MetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[i].getStackForm(), gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH[i].getStackForm(), gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
