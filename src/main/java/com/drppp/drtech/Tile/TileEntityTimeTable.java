@@ -26,8 +26,8 @@ public class TileEntityTimeTable extends TileEntity implements ITickable {
                 if (is.hasTagCompound()) {
                     NBTTagCompound compound = is.getTagCompound();
                     time = compound.getInteger("storedTime");
-                    time +=19;
-                    if(time <=604800)
+                    time +=20;
+                    if(time <=6048000)
                         compound.setInteger("storedTime", time);
                 } else {
                     NBTTagCompound compound = new NBTTagCompound();

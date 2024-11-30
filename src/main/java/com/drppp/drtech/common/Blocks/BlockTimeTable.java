@@ -6,6 +6,7 @@ import com.drppp.drtech.Tile.TileEntitySapBag;
 import com.drppp.drtech.Tile.TileEntityTimeTable;
 import keqing.gtqtcore.common.items.GTQTMetaItems;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
@@ -25,6 +26,9 @@ import javax.annotation.Nonnull;
 public class BlockTimeTable extends Block {
     public BlockTimeTable() {
         super(Material.ROCK);
+        this.setHardness(1);
+        this.setResistance(10F);
+        this.setSoundType(SoundType.METAL);
         this.setCreativeTab(DrTechMain.Mytab);
         this.setRegistryName(Tags.MODID,"time_table");
         this.setTranslationKey(Tags.MODID+".Time_Table");
