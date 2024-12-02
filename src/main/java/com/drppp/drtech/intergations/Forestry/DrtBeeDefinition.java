@@ -99,7 +99,236 @@ public enum DrtBeeDefinition implements IBeeDefinition {
             dis -> {
                 dis.registerMutation(GTBeeDefinition.PLUTONIUM, GTBeeDefinition.URANIUM, 5);
             }
+    ), PRIMITIVE_STRAIN_A(DRTBranchDefinition.DRT_NOBLEGAS, "primitive_strain_a", false, 0xB106B1, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.PRIMITIVE_STRAIN_A), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    PRIMITIVE_STRAIN_B(DRTBranchDefinition.DRT_NOBLEGAS, "primitive_strain_b", false, 0x9B2B2B, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.PRIMITIVE_STRAIN_B), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    PRIMITIVE_STRAIN_C(DRTBranchDefinition.DRT_NOBLEGAS, "primitive_strain_c", false, 0x85294C, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.PRIMITIVE_STRAIN_C), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    PRIMITIVE_STRAIN_D(DRTBranchDefinition.DRT_NOBLEGAS, "primitive_strain_d", false, 0x89B289, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.PRIMITIVE_STRAIN_D), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    PRIMITIVE_STRAIN_E(DRTBranchDefinition.DRT_NOBLEGAS, "primitive_strain_e", false, 0x8F8A54, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.PRIMITIVE_STRAIN_E), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    COMMON_MINE_STRAIN(DRTBranchDefinition.DRT_NOBLEGAS, "common_mine_strain", false, 0x04B5BD, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.COMMON_MINE_STRAIN), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    DIRECTED_PLATINUM_STRAIN(DRTBranchDefinition.DRT_NOBLEGAS, "directed_platinum_strain", false, 0x43BE7A, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.DIRECTED_PLATINUM_STRAIN), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    UNIVERSAL_DEMON_STRAIN(DRTBranchDefinition.DRT_NOBLEGAS, "universal_demon_strain", false, 0x546D20, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.UNIVERSAL_DEMON_STRAIN), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    UNIVERSAL_BYPRODUCT_STRAINS(DRTBranchDefinition.DRT_NOBLEGAS, "universal_byproduct_strains", false, 0x5AB007, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.UNIVERSAL_BYPRODUCT_STRAINS), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    INDUSTRIAL_SYNTHETIC_STRAINS(DRTBranchDefinition.DRT_NOBLEGAS, "industrial_synthetic_strains", false, 0x7A4127, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.INDUSTRIAL_SYNTHETIC_STRAINS), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    INDUSTRIAL_REDUCTION_CULTURE(DRTBranchDefinition.DRT_NOBLEGAS, "industrial_reduction_culture", false, 0x742A9A, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.INDUSTRIAL_REDUCTION_CULTURE), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    INDUSTRIAL_OXIDIZING_BACTERIA(DRTBranchDefinition.DRT_NOBLEGAS, "industrial_oxidizing_bacteria", false, 0x6E8E6E, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.INDUSTRIAL_OXIDIZING_BACTERIA), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    INDUSTRIAL_CATALYTIC_STRAINS(DRTBranchDefinition.DRT_NOBLEGAS, "industrial_catalytic_strains", false, 0x6B6060, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.INDUSTRIAL_CATALYTIC_STRAINS), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
+    ),
+
+    DIRECTED_LANTHANIDE_STRAINS(DRTBranchDefinition.DRT_NOBLEGAS, "directed_lanthanide_strains", false, 0x41BA77, 0xffffff,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.DIRECTED_LANTHANIDE_STRAINS), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.WARM);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.MUSHROOMS);
+            },
+            dis -> {
+
+            }
     );
+    ;
     private final DRTBranchDefinition branch;
     private final DRTAlleleBeeSpecies species;
     private final Consumer<DRTAlleleBeeSpecies> speciesProperties;

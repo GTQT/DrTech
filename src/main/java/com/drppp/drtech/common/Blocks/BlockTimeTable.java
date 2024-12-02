@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
 
 public class BlockTimeTable extends Block {
     public BlockTimeTable() {
-        super(Material.ROCK);
+        super(Material.IRON);
         this.setHardness(1);
         this.setResistance(10F);
         this.setSoundType(SoundType.METAL);

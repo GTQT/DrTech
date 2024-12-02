@@ -77,7 +77,9 @@ public class BlockStoragePail extends Block {
             return;
         final TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (tileEntity instanceof TileEntityStoragePail) {
+
             final TileEntityStoragePail spail = (TileEntityStoragePail) tileEntity;
+
             worldIn.updateComparatorOutputLevel(pos, this);
             final ItemStack droppedStack = new ItemStack(this, 1, 0);
             final NBTTagCompound nbtTagCompound = new NBTTagCompound();

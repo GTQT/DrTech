@@ -17,6 +17,7 @@ import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
 import gregtech.integration.forestry.bees.GTCombType;
 import gregtech.integration.forestry.bees.GTDropItem;
+import keqing.gtqtcore.api.unification.GTQTMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import com.google.common.collect.ImmutableMap;
@@ -128,6 +129,20 @@ public class CombRecipes {
         addCombProductProcess(GTCombType.AMERICIUM, new Material[] { Materials.Americium, Materials.Lutetium }, Voltage.LUV);
         addCombProductProcess(GTCombType.TRINIUM, new Material[] { Materials.Trinium, Materials.Naquadah, Materials.Naquadria },
                 Voltage.ZPM);
+        addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_A, GTQTMaterials.Enzymesa.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_B, GTQTMaterials.Enzymesb.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_C, GTQTMaterials.Enzymesc.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_D, GTQTMaterials.Enzymesd.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_E, GTQTMaterials.Enzymese.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.COMMON_MINE_STRAIN, GTQTMaterials.Enzymesaa.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.DIRECTED_PLATINUM_STRAIN, GTQTMaterials.Enzymesab.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.UNIVERSAL_DEMON_STRAIN, GTQTMaterials.Enzymesac.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.UNIVERSAL_BYPRODUCT_STRAINS, GTQTMaterials.Enzymesad.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.INDUSTRIAL_SYNTHETIC_STRAINS, GTQTMaterials.Enzymesba.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.INDUSTRIAL_REDUCTION_CULTURE, GTQTMaterials.Enzymesbb.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.INDUSTRIAL_OXIDIZING_BACTERIA, GTQTMaterials.Enzymesbc.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.INDUSTRIAL_CATALYTIC_STRAINS, GTQTMaterials.Enzymesbd.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.DIRECTED_LANTHANIDE_STRAINS, GTQTMaterials.Enzymesea.getFluid(500),Voltage.EV,60);
     }
     private static void addCombProductProcess(DrtCombType comb, Material[] material, Voltage volt)
     {

@@ -384,12 +384,12 @@ public class MachineReceipe {
                 .duration(200)
                 .buildAndRegister();
         ASSEMBLY_LINE_RECIPES.recipeBuilder()
-                .inputs(MetaBlocks.MACHINE_CASING.getItemVariant(BlockMachineCasing.MachineCasingType.IV))
-                .input(circuit, MarkerMaterials.Tier.EV, 16)
-                .input(circuit, MarkerMaterials.Tier.IV, 4)
+                .inputs(MetaBlocks.MACHINE_CASING.getItemVariant(BlockMachineCasing.MachineCasingType.ZPM))
+                .input(circuit, MarkerMaterials.Tier.ZPM, 64)
+                .input(circuit, MarkerMaterials.Tier.IV, 32)
                 .inputs(MetaBlocks.METAL_CASING.getItemVariant(BlockMetalCasing.MetalCasingType.BRONZE_BRICKS,32))
-                .input(MetaItems.ELECTRIC_PUMP_EV)
-                .input(MetaItems.CONVEYOR_MODULE_EV)
+                .input(MetaItems.ROBOT_ARM_ZPM,32)
+                .input(MetaItems.CONVEYOR_MODULE_ZPM)
                 .input(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN),16)
                 .input(ModuleApiculture.getBlocks().apiary,16)
                 .fluidInputs(SolderingAlloy.getFluid(1152))
@@ -399,7 +399,7 @@ public class MachineReceipe {
                         .researchStack(new ItemStack(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN)))
                         .duration(1200)
                         .EUt(VA[IV]))
-                .duration(800).EUt(VA[LuV]).buildAndRegister();
+                .duration(800).EUt(VA[ZPM]).buildAndRegister();
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(gregtech.common.metatileentities.MetaTileEntities.HULL[LV])
                 .input(MetaItems.EMITTER_LV,4)

@@ -9,7 +9,7 @@ import net.minecraft.util.ITickable;
 public class TileEntityWithUI extends TileEntity implements ITickable, IUIHolder {
     @Override
     public boolean isValid() {
-        return true;
+        return !super.isInvalid();
     }
 
     @Override
