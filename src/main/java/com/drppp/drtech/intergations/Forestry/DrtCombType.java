@@ -22,7 +22,12 @@ public enum DrtCombType {
     INDUSTRIAL_REDUCTION_CULTURE("industrial_reduction_culture", 0x742A9A, 0xffffff),
     INDUSTRIAL_OXIDIZING_BACTERIA("industrial_oxidizing_bacteria", 0x6E8E6E, 0xffffff),
     INDUSTRIAL_CATALYTIC_STRAINS("industrial_catalytic_strains", 0x6B6060, 0xffffff),
-    DIRECTED_LANTHANIDE_STRAINS("directed_lanthanide_strains", 0x41BA77, 0xffffff);
+    DIRECTED_LANTHANIDE_STRAINS("directed_lanthanide_strains", 0x41BA77, 0xffffff),
+    FUEL("fuel", 0xDBA800, 0x9C6F40),
+    HIGH_CETANE_DIESEL("high_cetane_diesel", 0xB5C806, 0x9C6F40),
+    GASOLINE("gasoline", 0xBE4E07,0xBD7F06) ,
+    ETHYLENE("ethylene", 0x9AA4A5, 0x9AA4A5),
+    TETRAFLUOROETHYLENE("tetrafluoroethylene", 0x585858, 0x585858);
 
     public static final DrtCombType[] VALUES = values();
 

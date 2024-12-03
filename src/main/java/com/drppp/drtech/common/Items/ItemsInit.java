@@ -74,6 +74,7 @@ public class ItemsInit {
         if(Loader.isModLoaded("forestry"))
         {
             event.getRegistry().register(ItemCombs.ITEM_COMBS);
+            event.getRegistry().register(ItemCombs.ITEM_DROPS);
         }
     }
     @SideOnly(Side.CLIENT)
@@ -96,6 +97,7 @@ public class ItemsInit {
         if(Loader.isModLoaded("forestry"))
         {
             ((com.drppp.drtech.intergations.Forestry.DrtCombItem) ItemCombs.ITEM_COMBS).registerModel(ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);
+            ((com.drppp.drtech.intergations.Forestry.DrtDropItem) ItemCombs.ITEM_DROPS).registerModel(ItemCombs.ITEM_DROPS, forestry.api.core.ForestryAPI.modelManager);
         }
 
     }

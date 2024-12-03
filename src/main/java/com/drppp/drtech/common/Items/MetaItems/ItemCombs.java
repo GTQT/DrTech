@@ -7,9 +7,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemCombs {
     public static  Item ITEM_COMBS;
+    public static  Item ITEM_DROPS;
     public static void init()
     {
         ITEM_COMBS =  new com.drppp.drtech.intergations.Forestry.DrtCombItem();
+        ITEM_DROPS =  new com.drppp.drtech.intergations.Forestry.DrtDropItem();
     }
     @SideOnly(Side.CLIENT)
     public static void ClientInit()
@@ -19,6 +21,6 @@ public class ItemCombs {
                 return coloredItem.getColorFromItemstack(stack, tintIndex);
             }
             return 0xFFFFFF;
-        }, ITEM_COMBS);
+        }, ITEM_COMBS,ITEM_DROPS);
     }
 }

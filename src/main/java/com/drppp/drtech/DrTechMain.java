@@ -96,10 +96,6 @@ public class DrTechMain {
         MyMetaItems.MetaItemsInit();
         FuelRodInit();
         DrtechCapInit.init();
-        if(Loader.isModLoaded("forestry"))
-        {
-             ItemCombs.init();
-        }
         GeckoLib.initialize();
         Textures.init();
         drtMetaEntities.init();
@@ -108,6 +104,10 @@ public class DrTechMain {
         DrtDimType.init();
         WorldRegisterHandler.init();
         DrtToolItems.init();
+        if(Loader.isModLoaded("forestry"))
+        {
+            ItemCombs.init();
+        }
     }
     @EventHandler
     @SideOnly(Side.CLIENT)

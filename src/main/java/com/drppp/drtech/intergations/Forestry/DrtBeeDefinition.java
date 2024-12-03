@@ -14,10 +14,12 @@ import forestry.apiculture.items.EnumHoneyComb;
 import forestry.core.genetics.alleles.AlleleHelper;
 import forestry.core.genetics.alleles.EnumAllele;
 import gregtech.api.unification.ore.OrePrefix;
+import gregtech.api.util.Mods;
 import gregtech.integration.forestry.ForestryModule;
 import gregtech.integration.forestry.bees.GTBeeDefinition;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.fml.common.Optional;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +29,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static forestry.api.apiculture.EnumBeeChromosome.*;
+import static gregtech.api.util.Mods.ExtraBees;
 
 
 public enum DrtBeeDefinition implements IBeeDefinition {
@@ -327,8 +330,86 @@ public enum DrtBeeDefinition implements IBeeDefinition {
             dis -> {
 
             }
+    ),
+    FUEL(DRTBranchDefinition.DRT_ORGANIC, "fuel", true,  0x9C6F40,0xDBA800,
+            beeSpecies -> {
+                beeSpecies.addProduct(getExtraBeesComb(3), 0.35f);
+                beeSpecies.addSpecialty(getDrtComb(DrtCombType.FUEL), 0.25f);
+                beeSpecies.setHumidity(EnumHumidity.NORMAL);
+                beeSpecies.setTemperature(EnumTemperature.NORMAL);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.NONE);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.VANILLA);
+            },
+            dis -> {
+                dis.registerMutation(ForestryUtil.getSpecies(ExtraBees,"distilled"),GTBeeDefinition.OIL,8);
+            }
+    ),
+    HIGH_CETANE_DIESEL(DRTBranchDefinition.DRT_ORGANIC, "high_cetane_diesel", false,  0x9C6F40,0xB5C806,
+            beeSpecies -> {
+                beeSpecies.addProduct(getExtraBeesComb(3), 0.35f);
+                beeSpecies.addSpecialty(getDrtComb(DrtCombType.HIGH_CETANE_DIESEL), 0.15f);
+                beeSpecies.setHumidity(EnumHumidity.NORMAL);
+                beeSpecies.setTemperature(EnumTemperature.NORMAL);
+                beeSpecies.setHasEffect();
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.NONE);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.VANILLA);
+            },
+            dis -> {
+                dis.registerMutation(DrtBeeDefinition.FUEL,GTBeeDefinition.OIL,3);
+            }
+    ),
+    GASOLINE(DRTBranchDefinition.DRT_ORGANIC, "gasoline", true,  0xBE4E07,0xBD7F06,
+            beeSpecies -> {
+                beeSpecies.addProduct(getExtraBeesComb(3), 0.35f);
+                beeSpecies.addSpecialty(getDrtComb(DrtCombType.GASOLINE), 0.25f);
+                beeSpecies.setHumidity(EnumHumidity.NORMAL);
+                beeSpecies.setTemperature(EnumTemperature.NORMAL);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.NONE);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.VANILLA);
+            },
+            dis -> {
+                dis.registerMutation(ForestryUtil.getSpecies(ExtraBees,"distilled"),GTBeeDefinition.OIL,8);
+            }
+    ),ETHYLENE(DRTBranchDefinition.DRT_NOBLEGAS, "ethylene", true,  0x9AA4A5, 0x9AA4A5,
+            beeSpecies -> {
+                beeSpecies.addProduct(getDrtComb(DrtCombType.ETHYLENE), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.NORMAL);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.NONE);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.VANILLA);
+            },
+            dis -> {
+                dis.registerMutation(GTBeeDefinition.HYDROGEN,GTBeeDefinition.OIL,12);
+            }
+    ),TETRAFLUOROETHYLENE(DRTBranchDefinition.DRT_NOBLEGAS, "tetrafluoroethylene", true,  0x585858, 0x585858,
+            beeSpecies -> {
+                beeSpecies.addSpecialty(getDrtComb(DrtCombType.TETRAFLUOROETHYLENE), 0.15f);
+                beeSpecies.addProduct(getDrtComb(DrtCombType.ETHYLENE), 0.35f);
+                beeSpecies.setHumidity(EnumHumidity.DAMP);
+                beeSpecies.setTemperature(EnumTemperature.NORMAL);
+            },
+            template -> {
+                AlleleHelper.getInstance().set(template, FLOWERING, EnumAllele.Flowering.AVERAGE);
+                AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.NONE);
+                AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.VANILLA);
+            },
+            dis -> {
+                dis.registerMutation(DrtBeeDefinition.ETHYLENE,GTBeeDefinition.FLUORINE,12);
+            }
     );
-    ;
+    //边框    内部
     private final DRTBranchDefinition branch;
     private final DRTAlleleBeeSpecies species;
     private final Consumer<DRTAlleleBeeSpecies> speciesProperties;
@@ -381,6 +462,10 @@ public enum DrtBeeDefinition implements IBeeDefinition {
         for (DrtBeeDefinition bee : values()) {
             bee.registerMutations();
         }
+    }
+    @Optional.Method(modid = Mods.Names.EXTRA_BEES)
+    private static ItemStack getExtraBeesComb(int meta) {
+        return ExtraBees.getItem("honey_comb", meta);
     }
 
     private static ItemStack getForestryComb(EnumHoneyComb type) {
