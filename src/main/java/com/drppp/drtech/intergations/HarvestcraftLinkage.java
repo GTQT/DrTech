@@ -7,6 +7,7 @@ import forestry.api.farming.IFarmable;
 import forestry.api.recipes.RecipeManagers;
 import forestry.core.utils.Log;
 import forestry.farming.logic.farmables.FarmableAgingCrop;
+import gregtech.common.items.MetaItems;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static gregtech.api.recipes.RecipeMaps.COMPRESSOR_RECIPES;
 import static gregtech.api.recipes.RecipeMaps.EXTRACTOR_RECIPES;
 
 public class HarvestcraftLinkage {
@@ -50,6 +52,14 @@ public class HarvestcraftLinkage {
                         .EUt(2)
                         .duration(32)
                         .buildAndRegister();
+                var item = mustardFruit.copy();
+                item.setCount(4);
+                COMPRESSOR_RECIPES.recipeBuilder()
+                        .inputs(item)
+                        .output(MetaItems.PLANT_BALL)
+                        .EUt(2)
+                        .duration(300)
+                        .buildAndRegister();
             }
         }
         UnmodifiableIterator var42;
@@ -66,6 +76,14 @@ public class HarvestcraftLinkage {
                         .EUt(2)
                         .duration(32)
                         .buildAndRegister();
+                var item = hcBeeswaxItem.copy();
+                item.setCount(4);
+                COMPRESSOR_RECIPES.recipeBuilder()
+                        .inputs(item)
+                        .output(MetaItems.PLANT_BALL)
+                        .EUt(2)
+                        .duration(300)
+                        .buildAndRegister();
             }
         }
         var42 = nuts.iterator();
@@ -78,6 +96,14 @@ public class HarvestcraftLinkage {
                         .fluidOutputs(new FluidStack(seedOil, 15*seedamount))
                         .EUt(2)
                         .duration(32)
+                        .buildAndRegister();
+                var item = hcBeeswaxItem.copy();
+                item.setCount(4);
+                COMPRESSOR_RECIPES.recipeBuilder()
+                        .inputs(item)
+                        .output(MetaItems.PLANT_BALL)
+                        .EUt(2)
+                        .duration(300)
                         .buildAndRegister();
             }
         }
