@@ -144,6 +144,13 @@ public class CombRecipes {
         addExtractorProcess(DrtCombType.INDUSTRIAL_OXIDIZING_BACTERIA, GTQTMaterials.Enzymesbc.getFluid(500),Voltage.EV,60);
         addExtractorProcess(DrtCombType.INDUSTRIAL_CATALYTIC_STRAINS, GTQTMaterials.Enzymesbd.getFluid(500),Voltage.EV,60);
         addExtractorProcess(DrtCombType.DIRECTED_LANTHANIDE_STRAINS, GTQTMaterials.Enzymesea.getFluid(500),Voltage.EV,60);
+        addExtractorProcess(DrtCombType.FUEL, Materials.Diesel.getFluid(500),Voltage.ULV,32);
+        addExtractorProcess(DrtCombType.HIGH_CETANE_DIESEL, Materials.CetaneBoostedDiesel.getFluid(500),Voltage.ULV,32);
+        addExtractorProcess(DrtCombType.GASOLINE, Materials.Gasoline.getFluid(500),Voltage.ULV,32);
+        addCentrifugeToItemStack(DrtCombType.ETHYLENE,new ItemStack[]{ForestryUtil.getDropStack(DrtDropType.ETHYLENE)},new int[]{7000},Voltage.LV);
+        addCentrifugeToItemStack(DrtCombType.TETRAFLUOROETHYLENE,new ItemStack[]{ForestryUtil.getDropStack(DrtDropType.TETRAFLUOROETHYLENE),ForestryUtil.getDropStack(DrtDropType.ETHYLENE)},new int[]{3000,7000},Voltage.HV);
+        addExtractorProcess(ForestryUtil.getDropStack(DrtDropType.ETHYLENE),Materials.Ethylene.getFluid(500),Voltage.LV,20);
+        addExtractorProcess(ForestryUtil.getDropStack(DrtDropType.TETRAFLUOROETHYLENE),Materials.Tetrafluoroethylene.getFluid(500),Voltage.HV,20);
     }
     private static void addCombProductProcess(DrtCombType comb, Material[] material, Voltage volt)
     {
@@ -241,7 +248,14 @@ public class CombRecipes {
                 .EUt(volt.getCentrifugeEnergy() / 2)
                 .buildAndRegister();
     }
-
+    private static void addExtractorProcess(ItemStack comb, FluidStack fluidStack, Voltage volt, int duration) {
+        RecipeMaps.EXTRACTOR_RECIPES.recipeBuilder()
+                .inputs(comb)
+                .fluidOutputs(fluidStack)
+                .duration(duration)
+                .EUt(volt.getCentrifugeEnergy() / 2)
+                .buildAndRegister();
+    }
     private static void addProcessGT(DrtCombType comb, Material[] material, Voltage volt) {
         addCombProductProcess(comb,material,volt);
         for (int i = 0; i < material.length; i++) {

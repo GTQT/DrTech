@@ -931,6 +931,11 @@ item.drt.comb.industrial_reduction_culture.name=α-工业还原菌种蜂窝
 item.drt.comb.industrial_oxidizing_bacteria.name=α-工业氧化菌种蜂窝
 item.drt.comb.industrial_catalytic_strains.name=α-工业催化菌种蜂窝
 item.drt.comb.directed_lanthanide_strains.name=β-定向镧系菌种蜂窝
+item.drt.comb.fuel.name=燃油蜂窝
+item.drt.comb.high_cetane_diesel.name=高十六燃油蜂窝
+item.drt.comb.gasoline.name=汽油蜂窝
+item.drt.comb.ethylene.name=乙烯蜂窝
+item.drt.comb.tetrafluoroethylene.name=四氟乙烯蜂窝
 
 
 for.bees.species.borax=硼砂
@@ -951,7 +956,14 @@ for.bees.species.industrial_reduction_culture=α-工业还原菌种
 for.bees.species.industrial_oxidizing_bacteria=α-工业氧化菌种
 for.bees.species.industrial_catalytic_strains=α-工业催化菌种
 for.bees.species.directed_lanthanide_strains=β-定向镧系菌种
+for.bees.species.fuel=燃油
+for.bees.species.high_cetane_diesel=高十六燃油
+for.bees.species.gasoline=汽油
+for.bees.species.ethylene=乙烯
+for.bees.species.tetrafluoroethylene=四氟乙烯
 
+item.drt.honey_drop.ethylene.name=乙烯液滴
+item.drt.honey_drop.tetrafluoroethylene.name=四氟乙烯液滴
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡
 
