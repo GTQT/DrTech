@@ -129,6 +129,7 @@ public class CombRecipes {
         addCombProductProcess(GTCombType.AMERICIUM, new Material[] { Materials.Americium, Materials.Lutetium }, Voltage.LUV);
         addCombProductProcess(GTCombType.TRINIUM, new Material[] { Materials.Trinium, Materials.Naquadah, Materials.Naquadria },
                 Voltage.ZPM);
+        addCombProductProcess(GTCombType.INDIUM, new Material[] { Materials.Aluminium, Materials.Indium }, Voltage.ZPM);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_A, GTQTMaterials.Enzymesa.getFluid(500),Voltage.EV,60);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_B, GTQTMaterials.Enzymesb.getFluid(500),Voltage.EV,60);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_C, GTQTMaterials.Enzymesc.getFluid(500),Voltage.EV,60);
@@ -175,7 +176,7 @@ public class CombRecipes {
         }
         if(builder.getOutputs().size()>0)
         {
-            builder.inputs(GTUtility.copy(4 * builder.getOutputs().size(), gregtech.integration.forestry.ForestryUtil.getCombStack(comb)))
+            builder.inputs(GTUtility.copy(2 * builder.getOutputs().size(), gregtech.integration.forestry.ForestryUtil.getCombStack(comb)))
                     .fluidInputs(rongye.getFluid(576 * builder.getOutputs().size()))
                     .buildAndRegister();
         }
