@@ -464,23 +464,23 @@ public class MachineReceipe {
                 .duration(600)
                 .buildAndRegister();
 
-        ASSEMBLY_LINE_RECIPES.recipeBuilder()
+        ASSEMBLER_RECIPES.recipeBuilder()
                 .input(MetaTileEntities.INDUSTRIAL_APIARY,4)
-                .input(circuit, MarkerMaterials.Tier.LuV, 16)
-                .input(MetaItems.ROBOT_ARM_LuV,64)
-                .input(cableGtDouble, Osmium,64)
-                .input(cableGtDouble, Osmium,64)
-                .input(plate, Iridium,48)
-                .input(plate, Iridium,48)
+                .input(circuit, MarkerMaterials.Tier.HV, 16)
+                .input(MetaItems.ROBOT_ARM_HV,16)
+                .input(plate,StainlessSteel,64)
                 .fluidInputs(SolderingAlloy.getFluid(1440))
-                .fluidInputs(UUMatter.getFluid(144))
                 .outputs(MetaTileEntities.COMB_PROVESS.getStackForm())
-                .scannerResearch(b -> b
-                        .researchStack(MetaTileEntities.INDUSTRIAL_APIARY.getStackForm())
-                        .duration(1200)
-                        .EUt(VA[LuV]))
-                .EUt(GTValues.VA[LuV])
+                .EUt(GTValues.VA[HV])
                 .duration(600)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.plate, Polyethylene)
+                .input(cableGtSingle,Copper,4)
+                .output(MyMetaItems.UPGRADE_NULL)
+                .circuitMeta(9)
+                .EUt(16)
+                .duration(100)
                 .buildAndRegister();
     }
 

@@ -5,6 +5,8 @@ import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
+import forestry.apiculture.ModuleApiculture;
+import forestry.apiculture.blocks.BlockAlvearyType;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Materials;
@@ -17,22 +19,27 @@ import gregtech.common.metatileentities.electric.MetaTileEntityBatteryBuffer;
 import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import static gregicality.multiblocks.api.unification.GCYMMaterials.MolybdenumDisilicide;
 import static gregtech.api.GTValues.EV;
 import static gregtech.api.GTValues.IV;
-import static gregtech.api.unification.material.Materials.Platinum;
-import static gregtech.api.unification.material.Materials.Ultimet;
+import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.ore.OrePrefix.*;
-import static gregtech.common.metatileentities.MetaTileEntities.ELECTRIC_BLAST_FURNACE;
-import static gregtech.common.metatileentities.MetaTileEntities.FISHER;
+import static gregtech.common.metatileentities.MetaTileEntities.*;
 import static gregtech.loaders.recipe.CraftingComponent.*;
+import static gregtech.loaders.recipe.CraftingComponent.HULL;
+import static gregtech.loaders.recipe.CraftingComponent.PUMP;
 
 public class CraftingReceipe {
     public static void load()
     {
+        GameRegistry.addSmelting(new ItemStack(Items.ROTTEN_FLESH), new ItemStack(Items.LEATHER), 0.1F);
         ModHandler.addShapedRecipe("log_factory", MetaTileEntities.LOG_FACTORY.getStackForm(),
                 "WMW", "EFE", "WMW",
                 'W', MetaItems.FIELD_GENERATOR_IV,
@@ -214,6 +221,280 @@ public class CraftingReceipe {
         for (int i = 0; i < 10; i++) {
             ModHandler.addShapelessRecipe("huancun_energy_hatch"+i,MetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[i].getStackForm(), gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH[i].getStackForm(), gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
 
+        }
+        ModHandler.addShapedRecipe("industrial_apiary", MetaTileEntities.INDUSTRIAL_APIARY.getStackForm(),
+                "KBK",
+                        "JSJ",
+                        "RRR",
+                'S', getItemStack("forestry:sturdy_machine",0),
+                'J', MetaItems.ROBOT_ARM_HV,
+                'K', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN),
+                'R', getItemStack("extrabees:alveary",3),
+                'B', getItemStack("forestry:chipsets",1)
+        );
+        ItemStack[] upgrade = {
+                MyMetaItems.UPGRADE_SPEED1.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED2.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED3.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED4.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED5.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED6.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED7.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED8.getStackForm(),
+                MyMetaItems.UPGRADE_SPEED8P.getStackForm(),
+                MyMetaItems.UPGRADE_PRODUCTION.getStackForm(),
+        };
+        for (int i = 0; i < 8; i++) {
+            ModHandler.addShapedRecipe("upgrade_speed"+i, upgrade[i].copy(),
+                    "ACA",
+                            "CSC",
+                            "BCB",
+                    'S', WORLD_ACCELERATOR[i].getStackForm(),
+                    'C', MyMetaItems.UPGRADE_NULL,
+                    'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                    'B',  new UnificationEntry(gearSmall, Materials.Steel)
+            );
+        }
+        ModHandler.addShapedRecipe("upgrade_speed_ppp", upgrade[8].copy(),
+                "AAA",
+                "ASA",
+                "AAA",
+                'S',  upgrade[7],
+                'A', MyMetaItems.UPGRADE_PRODUCTION
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_production", MyMetaItems.UPGRADE_PRODUCTION.getStackForm(),
+                "ACA",
+                "DSD",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', Items.SUGAR,
+                'D', getItemStack("forestry:royal_jelly",0),
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_pingyuan", MyMetaItems.UPGRADE_PLAIN.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', getItemStack("gendustry:env_processor",0),
+                'D', Blocks.GRASS,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_shamo", MyMetaItems.UPGRADE_DESERT_EMULATION.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', getItemStack("gendustry:env_processor",0),
+                'D', Blocks.SAND,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_yanhan", MyMetaItems.UPGRADE_WINTER_EMULATION.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', getItemStack("gendustry:env_processor",0),
+                'D', Blocks.SNOW,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_haiyang", MyMetaItems.UPGRADE_OCEAN_EMULATION.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', getItemStack("gendustry:env_processor",0),
+                'D', Items.WATER_BUCKET,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_diyu", MyMetaItems.UPGRADE_HELL_EMULATION.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', getItemStack("gendustry:env_processor",0),
+                'D', Blocks.NETHER_BRICK,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_conglin", MyMetaItems.UPGRADE_JUNGLE_EMULATION.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', getItemStack("gendustry:env_processor",0),
+                'D', new ItemStack(Items.DYE,1,3),
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_light", MyMetaItems.UPGRADE_LIGHT.getStackForm(),
+                "ACA",
+                "CSC",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', Blocks.GLASS,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_shoufende", MyMetaItems.UPGRADE_FLOWERING.getStackForm(),
+                "ACA",
+                "CSC",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', Blocks.RED_FLOWER,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_ganzao", MyMetaItems.UPGRADE_DRYER.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', Items.LAVA_BUCKET,
+                'D', Blocks.SAND,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_jaishi", MyMetaItems.UPGRADE_HUMIDIFIER.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', Items.WATER_BUCKET,
+                'D', Blocks.CACTUS,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_auto", MyMetaItems.UPGRADE_AUTOMATION.getStackForm(),
+                "ACA",
+                "CSC",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', MetaItems.ROBOT_ARM_LV,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_huafen", MyMetaItems.UPGRADE_POLLEN_SCRUBBER.getStackForm(),
+                "ADA",
+                "CSC",
+                "BDB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', new UnificationEntry(rotor, Materials.StainlessSteel),
+                'D', MetaItems.ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_jiangwen", MyMetaItems.UPGRADE_COOLER.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', Blocks.ICE,
+                'D', Blocks.SNOW,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_shengwen", MyMetaItems.UPGRADE_HEATER.getStackForm(),
+                "ACA",
+                "DSD",
+                "BEB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("gendustry:climate_module",0),
+                'E', Blocks.NETHERRACK,
+                'D', Items.LAVA_BUCKET,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_lifespan", MyMetaItems.UPGRADE_LIFESPAN.getStackForm(),
+                "ADA",
+                "CSC",
+                "BDB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', Blocks.CACTUS,
+                'D', Items.FERMENTED_SPIDER_EYE,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_jiyiwending", MyMetaItems.UPGRADE_GENETIC_STABILIZER.getStackForm(),
+                "ADA",
+                "CSC",
+                "BDB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'D', getItemStack("gendustry:genetics_processor",0),
+                'C', new UnificationEntry(plate, RedAlloy),
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_fanwei", MyMetaItems.UPGRADE_TERRITORY.getStackForm(),
+                "ADA",
+                "CSC",
+                "BDB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'D', new UnificationEntry(plate, Iron),
+                'C', new UnificationEntry(plate, EnderPearl),
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_sky", MyMetaItems.UPGRADE_OPEN_SKY.getStackForm(),
+                "ADA",
+                "CSC",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'D', Blocks.REDSTONE_LAMP,
+                'C', Blocks.GLASS_PANE,
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_lvwang", MyMetaItems.UPGRADE_SIEVE.getStackForm(),
+                "ACA",
+                "CSC",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', getItemStack("forestry:crafting_material",3),
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_dark", MyMetaItems.UPGRADE_T.getStackForm(),
+                "ACA",
+                "CSC",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', new UnificationEntry(plate, Steel),
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("upgrade_speed_qimi", MyMetaItems.UPGRADE_SEAL.getStackForm(),
+                "ACA",
+                "CSC",
+                "BCB",
+                'S', MyMetaItems.UPGRADE_NULL,
+                'C', new UnificationEntry(plate, Rubber),
+                'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
+                'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+    }
+    public static ItemStack getItemStack(String itemstr, int meta)
+    {
+        String[] str = itemstr.split(":");
+        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(str[0], str[1]));
+        if (item != null) {
+            return new ItemStack(item, 1,meta);
+        } else {
+            return ItemStack.EMPTY;
         }
     }
 }
