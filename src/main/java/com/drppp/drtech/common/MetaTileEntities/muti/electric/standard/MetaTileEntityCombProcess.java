@@ -56,10 +56,10 @@ public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
                 .aisle("AAAAA", " CCC ", " BBB ", " CCC ", "AAAAA")
                 .aisle("AASAA", "B   B", "B   B", "B   B", "AAAAA")
                 .where('S', selfPredicate())
-                .where('C',states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.TUNGSTENSTEEL_PIPE)))
+                .where('C',states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.TITANIUM_PIPE)))
                 .where('A', states(getCasingState()).setMinGlobalLimited(20)
-                        .or(autoAbilities(true, true, true, true, false, false, false)))
-                .where('B', frames(Materials.TungstenSteel))
+                        .or(autoAbilities(true, true, true, true, true, false, false)))
+                .where('B', frames(Materials.StainlessSteel))
                 .where('M', abilities(MultiblockAbility.MUFFLER_HATCH))
                 .where(' ', any())
                 .build();
@@ -67,12 +67,12 @@ public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
 
 
     private static IBlockState getCasingState() {
-        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TUNGSTENSTEEL_ROBUST);
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN);
     }
 
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
-        return Textures.ROBUST_TUNGSTENSTEEL_CASING;
+        return Textures.CLEAN_STAINLESS_STEEL_CASING;
     }
 
     @Override

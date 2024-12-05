@@ -31,6 +31,7 @@ import static gregtech.api.unification.material.Materials.Ash;
 import static gregtech.api.unification.ore.OrePrefix.dustTiny;
 
 public class DisassemblyHandler {
+    public  static  List<ItemStack> black_list = new ArrayList<>();
     private static final Map<String, Tuple<ItemStack, Integer>> circuitToUse = createCircuitMap(Arrays.asList(
             GTQTMetaItems.GENERAL_CIRCUIT_LV.getStackForm(),
             GTQTMetaItems.GENERAL_CIRCUIT_MV.getStackForm(),
@@ -91,11 +92,21 @@ public class DisassemblyHandler {
             {
                 return;
             }
+            boolean cando =true;
             List<ItemStack> outputItems = recipe.getOutputs();
+            for (int i = 0; i < outputItems.size(); i++) {
+                for (int j = 0; j < black_list.size(); j++) {
+                    if(black_list.get(j).getItem()==outputItems.get(i).getItem() && black_list.get(j).getMetadata()==outputItems.get(i).getMetadata())
+                    {
+                        cando=false;
+                        break;
+                    }
+                }
+            }
             List<ItemStack[]> inItems = new ArrayList<>();
             long voltage = recipe.getEUt();
             int duration = recipe.getDuration();
-            if(outputItems.size()>0 && recipe.getInputs().size()>0)
+            if(outputItems.size()>0 && recipe.getInputs().size()>0 && cando)
             {
                 recipe.getInputs().forEach(x->inItems.add(x.getInputStacks().clone()));
                 for (var s:inItems)
