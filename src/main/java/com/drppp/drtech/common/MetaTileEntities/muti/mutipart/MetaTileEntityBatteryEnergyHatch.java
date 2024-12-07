@@ -140,19 +140,29 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
     }
 
     @Override
+    public void onRemoval() {
+        super.onRemoval();
+        if(!getWorld().isRemote )
+        {
+            if(itemInventory.getSlots()>0)
+            {
+                for (int i = 0; i < itemInventory.getSlots(); i++) {
+                    var pos = getPos();
+                    if(!itemInventory.getStackInSlot(i).isEmpty())
+                    {
+                        getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,itemInventory.getStackInSlot(i)));
+                        itemInventory.extractItem(i,1,false);
+                    }
+
+                }
+            }
+        }
+    }
+
+    @Override
     public void removeFromMultiBlock(MultiblockControllerBase controllerBase) {
         super.removeFromMultiBlock(controllerBase);
-       if(!getWorld().isRemote)
-       {
-           if(itemInventory.getSlots()>0)
-           {
-               for (int i = 0; i < itemInventory.getSlots(); i++) {
-                   var pos = getPos();
-                   if(!itemInventory.getStackInSlot(i).isEmpty())
-                        getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,itemInventory.getStackInSlot(i)));
-               }
-           }
-       }
+
     }
 
     public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, boolean advanced) {

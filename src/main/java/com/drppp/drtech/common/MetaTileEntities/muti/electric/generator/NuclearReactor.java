@@ -34,6 +34,7 @@ import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -916,5 +917,28 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     @Override
     public @NotNull List<ITextComponent> getDataInfo() {
         return new LinkedList<>();
+    }
+
+    @Override
+    public void onRemoval() {
+        super.onRemoval();
+        for (int i = 0; i < inventory.getSlots(); i++) {
+            var pos = getPos();
+            if(!inventory.getStackInSlot(i).isEmpty())
+            {
+                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,inventory.getStackInSlot(i)));
+                inventory.extractItem(i,1,false);
+            }
+
+        }
+        for (int i = 0; i < upgradeInventory.getSlots(); i++) {
+            var pos = getPos();
+            if(!upgradeInventory.getStackInSlot(i).isEmpty())
+            {
+                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,upgradeInventory.getStackInSlot(i)));
+                upgradeInventory.extractItem(i,1,false);
+            }
+
+        }
     }
 }

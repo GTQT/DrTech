@@ -94,7 +94,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     ItemStackHandler inventoryBees = new OnlyBeesStackhandler(2);
     ItemStackHandler inventoryUpgrade = new OnlyUpgradeStackhandler(4);
     ItemStackHandler inventoryOutput = new InOutItemStackHandler(12,false);
-    ItemStack[] mOutputItems = new ItemStack[12];
+    public  ItemStack[] mOutputItems = new ItemStack[12];
     public static final int beeCycleLength = 550;
     public static final int baseEUtUsage = 37;
     private static final int queen = 0;
