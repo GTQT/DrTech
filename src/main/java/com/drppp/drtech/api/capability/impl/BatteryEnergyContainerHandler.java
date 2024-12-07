@@ -276,7 +276,7 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
                 if (canAccept >= voltage) {
                     long amperesAccepted = Math.min(canAccept / voltage, Math.min(amperage, this.getInputAmperage() - this.amps));
                     if (amperesAccepted > 0L) {
-                        this.changeEnergy(this.getEnergyStored() + voltage * amperesAccepted);
+                        this.changeEnergy(voltage * amperesAccepted);
                         this.amps += amperesAccepted;
                         return amperesAccepted;
                     }
@@ -317,7 +317,7 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
         if(this.batteries.size()==0)
             return  energyToAdd;
         int count = this.batteries.size();
-        long average_energy = leftenergy/count;
+        long average_energy = leftenergy/count + leftenergy%count;
         for (int i = 0; i < count; i++) {
             var battery = batteries.get(i);
             //充电
@@ -328,7 +328,7 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
             //耗电
             else {
                 long charged = battery.discharge(Math.abs(average_energy),GTUtility.getTierByVoltage(maxInputVoltage),false,false,false);
-                leftenergy += (charged+energyToAdd);
+                leftenergy += charged;
             }
         }
         return leftenergy;
