@@ -85,15 +85,4 @@ public class BlockTimeTable extends Block {
         return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
 
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-        super.breakBlock(worldIn, pos, state);
-        if(!worldIn.isRemote)
-        {
-            TileEntityTimeTable tt = (TileEntityTimeTable) worldIn.getTileEntity(pos);
-            if(!tt.inventory.getStackInSlot(0).isEmpty())
-                worldIn.spawnEntity(new EntityItem(worldIn,pos.getX()+0.5,pos.getY()+1,pos.getZ()+0.5,tt.inventory.getStackInSlot(0)));
-        }
-    }
 }

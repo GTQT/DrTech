@@ -1021,12 +1021,14 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
 
     @Override
     public boolean isSelfLighted() {
+        if(selfUnlightedMod)
+            return false;
         return selfLightedMod;
     }
 
     @Override
     public boolean isSunlightSimulated() {
-        return selfUnlightedMod;
+        return sunlightSimulatedMod;
     }
 
     @Override
@@ -1036,6 +1038,8 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
 
     @Override
     public Biome getBiome() {
+        if(biomeOverride!=null)
+            return biomeOverride;
         return getWorld().getBiome(this.getPos());
     }
 
