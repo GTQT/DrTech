@@ -7,7 +7,6 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.Utils.Datas;
-import com.drppp.drtech.common.CustomCrops.CustomeCropsInit;
 import gregtech.common.pipelike.laser.LaserPipeType;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -71,7 +70,6 @@ public class BlocksInit {
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
         MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
         event.getRegistry().register(MY_LASER_PIPE);
-        CustomeCropsInit.init(event);
         Datas.init();
     }
 

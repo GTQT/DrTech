@@ -99,9 +99,19 @@ public class TopCommonProvider implements IProbeInfoProvider {
         }else if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityIndustrialApiary)
         {
             var machine = (MetaTileEntityIndustrialApiary)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
-            iProbeInfo.text("耗电:"+machine.mEUt);
+            iProbeInfo.text("耗电:"+machine.mEUt+"Eu/t");
             iProbeInfo.text("温度:"+machine.getTemperature());
             iProbeInfo.text("湿度:"+machine.getHumidity());
+            var list = machine.mOutputItems;
+            if(machine.isWorking())
+                for (int i = 0; i < list.length; i++) {
+                    if(!list[i].isEmpty())
+                    {
+                        String item = list[i].getDisplayName();
+                        int num = list[i].getCount();
+                        iProbeInfo.text("产出物品:"+item +"*"+num);
+                    }
+                }
             if(!machine.hasErrors())
                 iProbeInfo.text("没有任何错误,老铁!");
             else

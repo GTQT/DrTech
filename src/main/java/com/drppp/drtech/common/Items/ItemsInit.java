@@ -2,7 +2,6 @@ package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
-import com.drppp.drtech.common.CustomCrops.CustomeCropsInit;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemRedStoneCropSeed;
@@ -43,7 +42,6 @@ public class ItemsInit {
     public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
-    public static final Item ITEM_BLOCK_CROP_GANZHE = new ItemBlock(CustomeCropsInit.CROP_GAN_ZHE).setRegistryName(Tags.MODID,CustomeCropsInit.CROP_GAN_ZHE.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID,BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID,BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
     public static void init(RegistryEvent.Register<Item> event)
@@ -61,7 +59,6 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_STORAGE_PAIL);
         event.getRegistry().register(ITEM_BLOCK_WASTE_DIRT);
         event.getRegistry().register(ITEM_BLOCK_SAP_BAG);
-        event.getRegistry().register(ITEM_BLOCK_CROP_GANZHE);
         event.getRegistry().register(ITEM_BLOCK_ADVANCED_CAULDRON);
         event.getRegistry().register(ITEM_BLOCK_TIME_TABLE);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING,  VariantItemBlock::new));

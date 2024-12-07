@@ -56,7 +56,7 @@ public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
                 .aisle("AAAAA", " CCC ", " BBB ", " CCC ", "AAAAA")
                 .aisle("AASAA", "B   B", "B   B", "B   B", "AAAAA")
                 .where('S', selfPredicate())
-                .where('C',states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.TITANIUM_PIPE)))
+                .where('C',states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.PTFE_INERT_CASING)))
                 .where('A', states(getCasingState()).setMinGlobalLimited(20)
                         .or(autoAbilities(true, true, true, true, true, false, false)))
                 .where('B', frames(Materials.StainlessSteel))

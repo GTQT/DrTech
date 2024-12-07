@@ -327,8 +327,8 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
             }
             //耗电
             else {
-                long charged = battery.charge(Math.abs(average_energy),GTUtility.getTierByVoltage(maxInputVoltage),false,false);
-                leftenergy += charged;
+                long charged = battery.discharge(Math.abs(average_energy),GTUtility.getTierByVoltage(maxInputVoltage),false,false,false);
+                leftenergy += (charged+energyToAdd);
             }
         }
         return leftenergy;
