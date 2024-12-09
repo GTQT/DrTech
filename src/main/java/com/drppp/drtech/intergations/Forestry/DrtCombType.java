@@ -27,7 +27,8 @@ public enum DrtCombType {
     HIGH_CETANE_DIESEL("high_cetane_diesel", 0xB5C806, 0x9C6F40),
     GASOLINE("gasoline", 0xBE4E07,0xBD7F06) ,
     ETHYLENE("ethylene", 0x9AA4A5, 0x9AA4A5),
-    TETRAFLUOROETHYLENE("tetrafluoroethylene", 0x585858, 0x585858);
+    TETRAFLUOROETHYLENE("tetrafluoroethylene", 0x585858, 0x585858),
+    CRYOLITE("cryolite", 0x6ac6d4, 0xaedfe8);
 
     public static final DrtCombType[] VALUES = values();
 

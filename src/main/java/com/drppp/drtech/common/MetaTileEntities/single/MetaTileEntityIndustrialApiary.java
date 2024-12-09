@@ -4,6 +4,7 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
 import com.drppp.drtech.api.ItemHandler.OnlyBeesStackhandler;
 import com.drppp.drtech.api.ItemHandler.OnlyUpgradeStackhandler;
@@ -264,7 +265,8 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     @Override
     public void update() {
         super.update();
-        if (getWorld().isRemote) {
+        if (getWorld().isRemote && DrtConfig.EnableIndustrialApiaryTx)
+        {
             if (isWorking()) {
                 if (usedQueen != null && !usedQueen.isEmpty()) {
                     if (this.getOffsetTimer() % 2 == 0) {

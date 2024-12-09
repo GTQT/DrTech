@@ -89,16 +89,6 @@ public class MetaTileeneityPassthroughHatchComputationHatch extends MetaTileEnti
         }
         return null;
     }
-    private IOpticalComputationProvider getOpticalNetProviderOpposite() {
-        TileEntity tileEntity = getNeighbor(getFrontFacing().getOpposite());
-        if (tileEntity == null) return null;
-
-        if (tileEntity instanceof TileEntityOpticalPipe) {
-            return tileEntity.getCapability(GregtechTileCapabilities.CABABILITY_COMPUTATION_PROVIDER,
-                    getFrontFacing());
-        }
-        return null;
-    }
     public void addInformation(ItemStack stack, World player, List<String> tooltip, boolean advanced) {
         tooltip.add(I18n.format( "drtech.machine.passthrough_computationhatch.tooltip.1"));
         tooltip.add(I18n.format( "drtech.machine.passthrough_computationhatch.tooltip.2"));
@@ -110,18 +100,17 @@ public class MetaTileeneityPassthroughHatchComputationHatch extends MetaTileEnti
 
     @Override
     public int requestCWUt(int cwut, boolean simulate, @NotNull Collection<IOpticalComputationProvider> seen) {
-        seen.add(this);
         IOpticalComputationProvider providerin = getOpticalNetProvider();
         if(providerin!=null)
         {
-           return providerin.getMaxCWUt();
+           return providerin.requestCWUt(cwut,simulate);
         }
         return 0;
+
     }
 
     @Override
     public int getMaxCWUt(@NotNull Collection<IOpticalComputationProvider> seen) {
-        seen.add(this);
         IOpticalComputationProvider providerin = getOpticalNetProvider();
         if(providerin!=null)
         {
@@ -132,24 +121,9 @@ public class MetaTileeneityPassthroughHatchComputationHatch extends MetaTileEnti
 
     @Override
     public boolean canBridge(@NotNull Collection<IOpticalComputationProvider> seen) {
-        seen.add(this);
-        var controller = getController();
-        // return true here so that unlinked hatches don't cause problems in multis like the Network Switch
-        if (controller == null || !controller.isStructureFormed()) return true;
-        if (isTransmitter()) {
-            // Ask the Multiblock controller, which *should* be an IOpticalComputationProvider
-            if (controller instanceof IOpticalComputationProvider provider) {
-                return provider.canBridge(seen);
-            } else {
-                GTLog.logger.error("Computation Transmission Hatch could not test bridge status of its controller!");
-                return false;
-            }
-        } else {
-            // Ask the attached Transmitter hatch, if it exists
-            IOpticalComputationProvider provider = getOpticalNetProvider();
-            if (provider == null) return true; // nothing found, so don't report a problem, just pass quietly
-            return provider.canBridge(seen);
-        }
+        IOpticalComputationProvider provider = getOpticalNetProvider();
+        if (provider == null) return true; // nothing found, so don't report a problem, just pass quietly
+        return provider.canBridge(seen);
     }
 
 }

@@ -936,6 +936,7 @@ item.drt.comb.high_cetane_diesel.name=高十六燃油蜂窝
 item.drt.comb.gasoline.name=汽油蜂窝
 item.drt.comb.ethylene.name=乙烯蜂窝
 item.drt.comb.tetrafluoroethylene.name=四氟乙烯蜂窝
+item.drt.comb.cryolite.name=冰晶石蜂窝
 
 
 for.bees.species.borax=硼砂
@@ -961,6 +962,7 @@ for.bees.species.high_cetane_diesel=高十六燃油
 for.bees.species.gasoline=汽油
 for.bees.species.ethylene=乙烯
 for.bees.species.tetrafluoroethylene=四氟乙烯
+for.bees.species.cryolite=冰晶石
 
 item.drt.honey_drop.ethylene.name=乙烯液滴
 item.drt.honey_drop.tetrafluoroethylene.name=四氟乙烯液滴

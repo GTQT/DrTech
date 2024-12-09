@@ -13,10 +13,15 @@ import forestry.apiculture.genetics.IBeeDefinition;
 import forestry.apiculture.items.EnumHoneyComb;
 import forestry.core.genetics.alleles.AlleleHelper;
 import forestry.core.genetics.alleles.EnumAllele;
+import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.util.Mods;
 import gregtech.integration.forestry.ForestryModule;
 import gregtech.integration.forestry.bees.GTBeeDefinition;
+import gregtech.integration.forestry.bees.GTBranchDefinition;
+import gregtech.integration.forestry.bees.GTCombType;
+import gregtech.integration.forestry.mutation.MaterialMutationCondition;
+import keqing.gtqtcore.api.unification.GTQTMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.common.Optional;
@@ -29,6 +34,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static forestry.api.apiculture.EnumBeeChromosome.*;
+import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.util.Mods.ExtraBees;
 
 
@@ -47,7 +53,10 @@ public enum DrtBeeDefinition implements IBeeDefinition {
                 AlleleHelper.getInstance().set(template, HUMIDITY_TOLERANCE, EnumAllele.Tolerance.BOTH_1);
                 AlleleHelper.getInstance().set(template, FLOWER_PROVIDER, EnumAllele.Flowers.GOURD);
             },
-            dis -> dis.registerMutation(GTBeeDefinition.SALTY, GTBeeDefinition.LITHIUM, 10)
+            dis -> {
+                IBeeMutationBuilder mutation =  dis.registerMutation(GTBeeDefinition.SALTY, GTBeeDefinition.LITHIUM, 10);
+                mutation.addMutationCondition(new MaterialMutationCondition(Borax));
+            }
             ),
     WITHER(DRTBranchDefinition.DRT_METAL, "wither", true, 0x040102, 0x144F5B,
           beeSpecies -> {
@@ -408,7 +417,19 @@ public enum DrtBeeDefinition implements IBeeDefinition {
             dis -> {
                 dis.registerMutation(DrtBeeDefinition.ETHYLENE,GTBeeDefinition.FLUORINE,12);
             }
-    );
+    ) ,
+    CRYOLITE(DRTBranchDefinition.DRT_GEM, "cryolite", false, 0x6ac6d4, 0xaedfe8,
+              beeSpecies -> {
+        beeSpecies.addProduct(getGTComb(GTCombType.STONE), 0.30f);
+        beeSpecies.addProduct(getDrtComb(DrtCombType.CRYOLITE), 0.25f);
+        beeSpecies.setHumidity(EnumHumidity.DAMP);
+        beeSpecies.setTemperature(EnumTemperature.HOT);
+    },
+    template -> AlleleHelper.getInstance().set(template, SPEED, EnumAllele.Speed.SLOWER),
+    dis -> {
+        IBeeMutationBuilder mutation = dis.registerMutation(GTBeeDefinition.ALUMINIUM, GTBeeDefinition.SALTY, 10);
+        //mutation.addMutationCondition(new MaterialMutationCondition( GTQTMaterials.Cryolite));
+    });
     //边框    内部
     private final DRTBranchDefinition branch;
     private final DRTAlleleBeeSpecies species;
@@ -475,7 +496,9 @@ public enum DrtBeeDefinition implements IBeeDefinition {
     private static ItemStack getDrtComb(DrtCombType type) {
         return new ItemStack(ItemCombs.ITEM_COMBS, 1, type.ordinal());
     }
-
+    private static ItemStack getGTComb(GTCombType type) {
+        return new ItemStack(ForestryModule.COMBS, 1, type.ordinal());
+    }
     private void setSpeciesProperties(DRTAlleleBeeSpecies beeSpecies) {
         this.speciesProperties.accept(beeSpecies);
     }
