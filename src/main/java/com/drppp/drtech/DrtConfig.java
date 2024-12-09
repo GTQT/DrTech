@@ -42,4 +42,8 @@ public class DrtConfig {
     @Config.RequiresMcRestart
     public static float NuclearExplosionRange=10;
 
+    @Config.LangKey("enable_mutiblocks_process_utput")
+    @Config.Comment("开启多方块产物GUI显示")
+    @Config.RequiresMcRestart
+    public static boolean EnableMutiProcessOutput=true;
 }
