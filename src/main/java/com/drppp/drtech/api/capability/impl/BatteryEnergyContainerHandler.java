@@ -202,7 +202,6 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
                 batteries.clear();
                 this.batterymaxCapacity=0;
                 this.batteryEnergyStored=0;
-                syncBattriesInfo();
                 for (int i = 0; i < this.metaTileEntity.getItemInventory().getSlots(); i++)
                 {
                     ItemStack itemStack = this.metaTileEntity.getItemInventory().getStackInSlot(i);
@@ -225,6 +224,7 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
                     this.batterymaxCapacity = 0;
                     syncBattriesInfo();
                 }
+                syncBattriesInfo();
             }
             if (this.getEnergyStored() >= this.getOutputVoltage() && this.getOutputVoltage() > 0L && this.getOutputAmperage() > 0L) {
                 long outputVoltage = this.getOutputVoltage();
@@ -255,7 +255,7 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
                 }
 
                 if (amperesUsed > 0L) {
-                    this.changeEnergy(this.getEnergyStored() - amperesUsed * outputVoltage);
+                    this.changeEnergy( - amperesUsed * outputVoltage);
                 }
             }
 
@@ -322,12 +322,12 @@ public class BatteryEnergyContainerHandler extends MTETrait implements IEnergyCo
             var battery = batteries.get(i);
             //充电
             if(average_energy>0){
-                long charged = battery.charge(average_energy,GTUtility.getTierByVoltage(maxInputVoltage),false,false);
+                long charged = battery.charge(average_energy,GTUtility.getTierByVoltage(maxInputVoltage),true,false);
                 leftenergy -= charged;
             }
             //耗电
             else {
-                long charged = battery.discharge(Math.abs(average_energy),GTUtility.getTierByVoltage(maxInputVoltage),false,false,false);
+                long charged = battery.discharge(Math.abs(average_energy),GTUtility.getTierByVoltage(maxInputVoltage),true,false,false);
                 leftenergy += charged;
             }
         }

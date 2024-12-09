@@ -130,6 +130,9 @@ public class CombRecipes {
         addCombProductProcess(GTCombType.TRINIUM, new Material[] { Materials.Trinium, Materials.Naquadah, Materials.Naquadria },
                 Voltage.ZPM);
         addCombProductProcess(GTCombType.INDIUM, new Material[] { Materials.Aluminium, Materials.Indium }, Voltage.ZPM);
+        addCentrifugeToItemStack(GTCombType.INDIUM,new ItemStack[]{ OreDictUnifier.get(OrePrefix.dust,Materials.Aluminium),
+                OreDictUnifier.get(OrePrefix.dust,Materials.Indium) },new int[]{4000,500},Voltage.ZPM);
+        addCombProductProcess(DrtCombType.CRYOLITE, new Material[] { GTQTMaterials.Cryolite }, Voltage.MV);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_A, GTQTMaterials.Enzymesa.getFluid(500),Voltage.EV,60);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_B, GTQTMaterials.Enzymesb.getFluid(500),Voltage.EV,60);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_C, GTQTMaterials.Enzymesc.getFluid(500),Voltage.EV,60);
@@ -184,7 +187,7 @@ public class CombRecipes {
         if(builder.getOutputs().size()>0)
         {
             builder.inputs(GTUtility.copy(2 * builder.getOutputs().size(), gregtech.integration.forestry.ForestryUtil.getCombStack(comb)))
-                    .fluidInputs(rongye.getFluid(576 * builder.getOutputs().size()))
+                    .fluidInputs(rongye.getFluid(288 * builder.getOutputs().size()))
                     .buildAndRegister();
         }
     }
@@ -341,7 +344,47 @@ public class CombRecipes {
         // Finalize GregTech Map
         builder.buildAndRegister();
     }
+    private static void addCentrifugeToItemStack(GTCombType comb, ItemStack[] item, int[] chance, Voltage volt) {
+        addCentrifugeToItemStack(comb, item, chance, volt, volt.getCentrifugeTime());
+    }
 
+    private static void addCentrifugeToItemStack(GTCombType comb, ItemStack[] item, int[] chance, Voltage volt,
+                                                 int duration) {
+        ItemStack combStack = gregtech.integration.forestry.ForestryUtil.getCombStack(comb);
+
+        // Start of the Forestry Map
+        ImmutableMap.Builder<ItemStack, Float> product = new ImmutableMap.Builder<>();
+        // Start of the GregTech Map
+        RecipeBuilder<?> builder = RecipeMaps.CENTRIFUGE_RECIPES.recipeBuilder()
+                .inputs(combStack)
+                .duration(duration)
+                .EUt(volt.getCentrifugeEnergy());
+
+        int numGTOutputs = 0;
+        for (int i = 0; i < item.length; i++) {
+            if (item[i] == null || item[i] == ItemStack.EMPTY) continue;
+            // Add to Forestry Map
+            product.put(item[i], chance[i] / 10000.0f);
+            // Add to GregTech Map
+            if (numGTOutputs < RecipeMaps.CENTRIFUGE_RECIPES.getMaxOutputs()) {
+                if (chance[i] >= 10000) {
+                    builder.outputs(item[i]);
+                } else {
+                    builder.chancedOutput(item[i], chance[i], 0);
+                }
+                numGTOutputs++;
+            }
+        }
+
+        // Finalize Forestry Map
+        if (volt.compareTo(Voltage.MV) < 0) {
+            if (ModuleFactory.machineEnabled(MachineUIDs.CENTRIFUGE)) {
+                RecipeManagers.centrifugeManager.addRecipe(duration, combStack, product.build());
+            }
+        }
+        // Finalize GregTech Map
+        builder.buildAndRegister();
+    }
     private enum Voltage {
 
         ULV,

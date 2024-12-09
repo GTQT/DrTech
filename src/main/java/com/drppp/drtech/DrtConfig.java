@@ -42,8 +42,8 @@ public class DrtConfig {
     @Config.RequiresMcRestart
     public static float NuclearExplosionRange=10;
 
-    @Config.LangKey("enable_mutiblocks_process_utput")
-    @Config.Comment("开启多方块产物GUI显示")
+    @Config.LangKey("enable_industrial_Apiary_Tx")
+    @Config.Comment("开始工业蜂箱粒子特效")
     @Config.RequiresMcRestart
-    public static boolean EnableMutiProcessOutput=true;
+    public static boolean EnableIndustrialApiaryTx=true;
 }
