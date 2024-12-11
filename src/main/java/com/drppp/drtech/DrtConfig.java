@@ -1,7 +1,7 @@
 package com.drppp.drtech;
 
 import net.minecraftforge.common.config.Config;
-@Config(modid = DrTechMain.MODID)
+@Config(modid = Tags.MODID)
 public class DrtConfig {
     @Config.LangKey("Player Logged In Event")
     @Config.Comment("逃生舱迫降")

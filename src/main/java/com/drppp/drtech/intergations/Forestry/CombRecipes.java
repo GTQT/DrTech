@@ -187,7 +187,7 @@ public class CombRecipes {
         if(builder.getOutputs().size()>0)
         {
             builder.inputs(GTUtility.copy(2 * builder.getOutputs().size(), gregtech.integration.forestry.ForestryUtil.getCombStack(comb)))
-                    .fluidInputs(rongye.getFluid(288 * builder.getOutputs().size()))
+                    .fluidInputs(rongye.getFluid(576 * builder.getOutputs().size()))
                     .buildAndRegister();
         }
     }

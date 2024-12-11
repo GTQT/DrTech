@@ -62,39 +62,15 @@ public final class DrTechModelRegister {
     @SideOnly(Side.CLIENT)
     public static void EntityRenderReg()
     {
-        RenderingRegistry.registerEntityRenderingHandler(EntityParticleGroup.class, new IRenderFactory<EntityParticleGroup>() {
-            public Render<EntityParticleGroup> createRenderFor(RenderManager manager) {
-                return (Render<EntityParticleGroup>) new ParticleRenderer(manager);
-            }
-        });
-        RenderingRegistry.registerEntityRenderingHandler(EntityHyperGunBullet.class, new IRenderFactory<EntityHyperGunBullet>() {
-            public Render<EntityHyperGunBullet> createRenderFor(RenderManager manager) {
-                return (Render<EntityHyperGunBullet>) new BulletRenderer(manager,
-                        new ResourceLocation(Tags.MODID, "textures/entity/hyper_bullet.png"));
-            }
-        });
-        RenderingRegistry.registerEntityRenderingHandler(EntityPlasmaBullet.class, new IRenderFactory<EntityPlasmaBullet>() {
-            public Render<EntityPlasmaBullet> createRenderFor(RenderManager manager) {
-                return (Render<EntityPlasmaBullet>) new PlasmaBulletRenderer(manager);
-            }
-        });
-        RenderingRegistry.registerEntityRenderingHandler(EntityGunBullet.class, new IRenderFactory<EntityGunBullet>() {
-            public Render<EntityGunBullet> createRenderFor(RenderManager manager) {
-                return (Render<EntityGunBullet>) new BulletRenderer(manager,
-                        new ResourceLocation(Tags.MODID, "textures/entity/bullet.png"));
-            }
-        });
-        RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBullet.class, new IRenderFactory<EntityTachyonBullet>() {
-            public Render<EntityTachyonBullet> createRenderFor(RenderManager manager) {
-                return (Render<EntityTachyonBullet>) new TachyonRenderer(manager,
-                        new ResourceLocation(Tags.MODID, "textures/entity/tachyon.png"));
-            }
-        });
-        RenderingRegistry.registerEntityRenderingHandler(EntityParticleSpray.class, new IRenderFactory<EntityParticleSpray>() {
-            public Render<EntityParticleSpray> createRenderFor(RenderManager manager) {
-                return (Render<EntityParticleSpray>) new InstantParticleRender(manager);
-            }
-        });
+        RenderingRegistry.registerEntityRenderingHandler(EntityParticleGroup.class, manager -> new ParticleRenderer(manager));
+        RenderingRegistry.registerEntityRenderingHandler(EntityHyperGunBullet.class, manager -> (Render<EntityHyperGunBullet>) new BulletRenderer(manager,
+                new ResourceLocation(Tags.MODID, "textures/entity/hyper_bullet.png")));
+        RenderingRegistry.registerEntityRenderingHandler(EntityPlasmaBullet.class, manager -> new PlasmaBulletRenderer(manager));
+        RenderingRegistry.registerEntityRenderingHandler(EntityGunBullet.class, manager -> (Render<EntityGunBullet>) new BulletRenderer(manager,
+                new ResourceLocation(Tags.MODID, "textures/entity/bullet.png")));
+        RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBullet.class, manager -> (Render<EntityTachyonBullet>) new TachyonRenderer(manager,
+                new ResourceLocation(Tags.MODID, "textures/entity/tachyon.png")));
+        RenderingRegistry.registerEntityRenderingHandler(EntityParticleSpray.class, manager -> new InstantParticleRender(manager));
 
     }
 }

@@ -47,6 +47,7 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.client.model.b3d.B3DLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -72,25 +73,15 @@ import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodIn
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
         dependencies = "required:genetics@[2.5.1.203,);")
 public class DrTechMain {
-
-
     public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
     public static CreativeTabs Mytab;
-
-    @Mod.Instance(DrTechMain.MODID)
+    @Mod.Instance(Tags.MODID)
     public static DrTechMain instance;
-
-
-    public static final String MODID = "drtech";
-    public static final String NAME = "drtech";
-    public static final String VERSION = "1.0";
-    @SidedProxy(modId = MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
-
+    @SidedProxy(modId = Tags.MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
     public static CommonProxy proxy;
     public static ClientProxy cproxy;
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        // register to the event bus so that we can listen to events
         MinecraftForge.EVENT_BUS.register(this);
         Mytab = new MyCreativeTabs("mytab");
         MyMetaItems.MetaItemsInit();
@@ -111,12 +102,11 @@ public class DrTechMain {
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
-    // preInit "Run before anything else. Read your config, create blocks, items, etc. (Remove if not needed)
     public void ClientpreInit(FMLPreInitializationEvent event) {
-        OBJLoader.INSTANCE.addDomain(Tags.MODID);
         TexturesInit();
         drtMetaEntities.initRenderers();
-
+        OBJLoader.INSTANCE.addDomain("drtech");
+        B3DLoader.INSTANCE.addDomain("drtech");
     }
 
     @SideOnly(Side.CLIENT)
@@ -133,25 +123,20 @@ public class DrTechMain {
         LaserPipeRenderer.INSTANCE.preInit();
     }
     @SubscribeEvent
-    // Register recipes here (Remove if not needed)
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         OrePrefixRecipes.init();
     }
-
     @SubscribeEvent
-    // Register items here (Remove if not needed)
     public void registerItems(RegistryEvent.Register<Item> event) {
         ItemsInit.init(event);
         GeoItemsInit.init(event);
     }
     @SubscribeEvent
-    // Register blocks here (Remove if not needed)
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         BlocksInit.init(event);
         CropsInit.init(event);
     }
     @EventHandler
-    // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
     public void init(FMLInitializationEvent event) {
         MetaTileEntities.Init();
         CraftingReceipe.load();
@@ -161,14 +146,12 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(new GlobalEnergyWorldSavedData());
         MinecraftForge.EVENT_BUS.register(new PollutionEffectHandler());
         StructUtil.init();
-
         DRTAlleleBeeSpecies.setupAlleles();
         CombRecipes.initDRTCombs();
     }
 
     @SideOnly(Side.CLIENT)
     @EventHandler
-    // load "Do your mod setup. Build whatever data structures you care about." (Remove if not needed)
     public void Clientinit(FMLInitializationEvent event) {
         DrtechEventHandler.Keybinds.registerKeybinds();
         SyncInit.init();
@@ -178,7 +161,6 @@ public class DrTechMain {
         }
     }
     @EventHandler
-    // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
     public void postInit(FMLPostInitializationEvent event) {
         if(DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
@@ -187,7 +169,6 @@ public class DrTechMain {
     }
 
     @EventHandler
-    // register server commands in this event handler (Remove if not needed)
     public void serverStarting(FMLServerStartingEvent event) {
     }
     @Mod.EventHandler
@@ -199,7 +180,6 @@ public class DrTechMain {
     public void onServerStarting( FMLServerStartingEvent event) {
         CommandHordeBase hordeCommand = new CommandHordeBase();
         event.registerServerCommand(hordeCommand);
-
         hordeCommand.addSubcommand(new CommandHordeStart());
         hordeCommand.addSubcommand(new CommandHordeStop());
         hordeCommand.addSubcommand(new CommandHordeStatus());

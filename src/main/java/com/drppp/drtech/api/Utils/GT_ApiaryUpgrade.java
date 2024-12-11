@@ -108,7 +108,7 @@ public enum  GT_ApiaryUpgrade {
         mods.energy *= 1.05f;
     }),
     unlight(UNIQUE_INDEX.LIGHT_UPGRADE, 59, 1, (mods, n) -> {
-        mods.isSelfUnlighted = false;
+        mods.isSelfUnlighted = true;
         mods.energy *= 1.05f;
     });
 
