@@ -31,6 +31,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
@@ -367,6 +368,38 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     private float getFinalChance(float baseChance, float speed, float prodMod, float modifier) {
         double finalchance = (1+modifier/6)*(Math.pow(baseChance,0.5))*2f*(1+speed)+Math.pow(prodMod,Math.pow(baseChance,0.333f))-3;
         return (float) finalchance;
+    }
+
+    @Override
+    public void onRemoval() {
+        super.onRemoval();
+        for (int i = 0; i < inventoryBees.getSlots(); i++) {
+            var pos = getPos();
+            if(!inventoryBees.getStackInSlot(i).isEmpty())
+            {
+                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,inventoryBees.getStackInSlot(i)));
+                inventoryBees.extractItem(i,1,false);
+            }
+
+        }
+        for (int i = 0; i < inventoryUpgrade.getSlots(); i++) {
+            var pos = getPos();
+            if(!inventoryUpgrade.getStackInSlot(i).isEmpty())
+            {
+                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,inventoryUpgrade.getStackInSlot(i)));
+                inventoryUpgrade.extractItem(i,1,false);
+            }
+
+        }
+        for (int i = 0; i < inventoryOutput.getSlots(); i++) {
+            var pos = getPos();
+            if(!inventoryOutput.getStackInSlot(i).isEmpty())
+            {
+                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,inventoryOutput.getStackInSlot(i)));
+                inventoryOutput.extractItem(i,1,false);
+            }
+
+        }
     }
 
     boolean retrievingPollenInThisOperation = false;
@@ -796,6 +829,10 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         final IBee bee = beeRoot.getMember(queen);
         for (IErrorState err : bee.getCanWork(this)) setCondition(true, err);
         setCondition(!checkFlower(bee), EnumErrorCode.NO_FLOWER);
+        if(contains(EnumErrorCode.NOT_NIGHT) && isselfUnlightedMod())
+        {
+            setCondition(false,EnumErrorCode.NOT_NIGHT);
+        }
         return !hasErrors();
     }
 
@@ -810,6 +847,10 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             final IBee bee = beeRoot.getMember(getQueen());
             for (IErrorState err : bee.getCanWork(this)) setCondition(true, err);
             setCondition(!checkFlower(bee), EnumErrorCode.NO_FLOWER);
+            if(contains(EnumErrorCode.NOT_NIGHT) && isselfUnlightedMod())
+            {
+                setCondition(false,EnumErrorCode.NOT_NIGHT);
+            }
             return !hasErrors();
         } else {
             setCondition(true, EnumErrorCode.NO_QUEEN);
@@ -905,11 +946,15 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
 
     @Override
     public int getBlockLightValue() {
+        if(selfUnlightedMod)
+            return 0;
         return getLightValue();
     }
 
     @Override
     public int getActualLightValue() {
+        if(selfUnlightedMod)
+            return 0;
         return getWorld().getLightFromNeighbors(getPos().up());
     }
 
@@ -1027,7 +1072,9 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             return false;
         return selfLightedMod;
     }
-
+    public boolean isselfUnlightedMod() {
+        return  selfUnlightedMod;
+    }
     @Override
     public boolean isSunlightSimulated() {
         return sunlightSimulatedMod;
