@@ -78,33 +78,33 @@ public abstract class MinxinRecipeMapMultiblockController extends MultiblockWith
         }
         this.inputFluidInventory = new FluidTankList(true, tanks);
     }
-//    @Overwrite
-//    public TraceabilityPredicate autoAbilities(boolean checkEnergyIn, boolean checkMaintenance, boolean checkItemIn, boolean checkItemOut, boolean checkFluidIn, boolean checkFluidOut, boolean checkMuffler) {
-//        TraceabilityPredicate predicate = super.autoAbilities(checkMaintenance, checkMuffler);
-//        if (checkEnergyIn) {
-//            predicate = predicate.or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2).setPreviewCount(1));
-//        }
-//
-//        if (checkItemIn && this.recipeMap.getMaxInputs() > 0) {
-//            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_ITEMS).setPreviewCount(1));
-//            predicate = predicate.or(abilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID).setPreviewCount(1));
-//        }
-//
-//        if (checkItemOut && this.recipeMap.getMaxOutputs() > 0) {
-//            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_ITEMS).setPreviewCount(1));
-//            predicate = predicate.or(abilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID).setPreviewCount(1));
-//        }
-//
-//        if (checkFluidIn && this.recipeMap.getMaxFluidInputs() > 0) {
-//            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_FLUIDS).setPreviewCount(1));
-//            predicate = predicate.or(abilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID).setPreviewCount(1));
-//        }
-//
-//        if (checkFluidOut && this.recipeMap.getMaxFluidOutputs() > 0) {
-//            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_FLUIDS).setPreviewCount(1));
-//            predicate = predicate.or(abilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID).setPreviewCount(1));
-//        }
-//
-//        return predicate;
-//    }
+    @Overwrite
+    public TraceabilityPredicate autoAbilities(boolean checkEnergyIn, boolean checkMaintenance, boolean checkItemIn, boolean checkItemOut, boolean checkFluidIn, boolean checkFluidOut, boolean checkMuffler) {
+        TraceabilityPredicate predicate = super.autoAbilities(checkMaintenance, checkMuffler);
+        if (checkEnergyIn) {
+            predicate = predicate.or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2).setPreviewCount(1));
+        }
+
+        if (checkItemIn && this.recipeMap.getMaxInputs() > 0) {
+            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_ITEMS).setPreviewCount(1));
+            predicate = predicate.or(abilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID).setPreviewCount(1));
+        }
+
+        if (checkItemOut && this.recipeMap.getMaxOutputs() > 0) {
+            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_ITEMS).setPreviewCount(1));
+            predicate = predicate.or(abilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID).setPreviewCount(1));
+        }
+
+        if (checkFluidIn && this.recipeMap.getMaxFluidInputs() > 0) {
+            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_FLUIDS).setPreviewCount(1));
+            predicate = predicate.or(abilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID).setPreviewCount(1));
+        }
+
+        if (checkFluidOut && this.recipeMap.getMaxFluidOutputs() > 0) {
+            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_FLUIDS).setPreviewCount(1));
+            predicate = predicate.or(abilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID).setPreviewCount(1));
+        }
+
+        return predicate;
+    }
 }
