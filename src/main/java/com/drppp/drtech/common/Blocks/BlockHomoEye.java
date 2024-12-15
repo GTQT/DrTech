@@ -51,7 +51,7 @@ public class BlockHomoEye extends Block {
 
     @Nullable
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return Block.NULL_AABB;
+        return new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 10.0D, 1.0D);
     }
     @Nonnull
     @Deprecated

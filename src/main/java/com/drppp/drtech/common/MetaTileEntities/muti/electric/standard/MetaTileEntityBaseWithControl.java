@@ -3,6 +3,7 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.google.common.collect.Lists;
 import gregtech.api.capability.*;
@@ -27,12 +28,14 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase implements IControllable, IDataInfoProvider, IWorkable {
@@ -143,19 +146,48 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         this.resetTileAbilities();
     }
     protected void initializeAbilities() {
-        this.inputInventory = new ItemHandlerList(this.getAbilities(MultiblockAbility.IMPORT_ITEMS));
-        this.inputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), this.getAbilities(MultiblockAbility.IMPORT_FLUIDS));
-        this.outputInventory = new ItemHandlerList(this.getAbilities(MultiblockAbility.EXPORT_ITEMS));
-        this.outputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), this.getAbilities(MultiblockAbility.EXPORT_FLUIDS));
+        var im_item = this.getAbilities(MultiblockAbility.IMPORT_ITEMS);
+        var im_itemCC = this.getAbilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID);
+        List<IItemHandlerModifiable> itemlist = new ArrayList<>();
+        itemlist.addAll(im_item);
+        itemlist.addAll(im_itemCC);
+        this.inputInventory = new ItemHandlerList(itemlist);
+        var im_fluid = this.getAbilities(MultiblockAbility.IMPORT_FLUIDS);
+        List<IFluidTank> tanks = new ArrayList<>();
+        tanks.addAll(im_fluid);
+        if(!im_itemCC.isEmpty())
+        {
+            for (int i = 0; i < im_itemCC.size(); i++) {
+                tanks.addAll(im_itemCC.get(i).getFluidTanks());
+            }
+        }
+        this.inputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), tanks);
+
+        var ex_item = this.getAbilities(MultiblockAbility.EXPORT_ITEMS);
+        var ex_itemCC = this.getAbilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID);
+        List<IItemHandlerModifiable> ex_itemlist = new ArrayList<>();
+        ex_itemlist.addAll(ex_item);
+        ex_itemlist.addAll(ex_itemCC);
+        this.outputInventory = new ItemHandlerList(ex_itemlist);
+        var ex_fluid = this.getAbilities(MultiblockAbility.EXPORT_FLUIDS);
+        List<IFluidTank> extanks = new ArrayList<>();
+        extanks.addAll(ex_fluid);
+        if(!ex_itemCC.isEmpty())
+        {
+            for (int i = 0; i < ex_itemCC.size(); i++) {
+                extanks.addAll(ex_itemCC.get(i).getFluidTanks());
+            }
+        }
+        this.outputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), extanks);
         this.energyContainer = new EnergyContainerList(this.getAbilities(MultiblockAbility.INPUT_ENERGY));
         this.outEnergyContainer = new EnergyContainerList(this.getAbilities(MultiblockAbility.OUTPUT_ENERGY));
     }
 
     private void resetTileAbilities() {
         this.inputInventory = new GTItemStackHandler(this, 0);
-        this.inputFluidInventory = new FluidTankList(true, new IFluidTank[0]);
+        this.inputFluidInventory = new FluidTankList(true);
         this.outputInventory = new GTItemStackHandler(this, 0);
-        this.outputFluidInventory = new FluidTankList(true, new IFluidTank[0]);
+        this.outputFluidInventory = new FluidTankList(true);
         this.energyContainer = new EnergyContainerList(Lists.newArrayList());
         this.outEnergyContainer = new EnergyContainerList(Lists.newArrayList());
     }

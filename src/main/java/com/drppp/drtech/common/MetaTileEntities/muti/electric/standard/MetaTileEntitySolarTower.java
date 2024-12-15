@@ -68,6 +68,7 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setExactLimit(1))
+
                 )
                 .where('Y', states( BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING)))
                 .where('G', states( BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING)))

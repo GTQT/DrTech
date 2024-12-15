@@ -1,20 +1,11 @@
 package com.drppp.drtech.api.Muti;
 
-import com.drppp.drtech.api.capability.IAssembly;
-import gregtech.api.capability.*;
-import gregtech.api.metatileentity.MetaTileEntity;
-import gregtech.api.metatileentity.multiblock.IPassthroughHatch;
+import com.drppp.drtech.api.capability.IItemAndFluidHandler;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class DrtMultiblockAbility {
+    public static final MultiblockAbility<IItemAndFluidHandler> EXPORT_ITEM_FLUID = new MultiblockAbility("export_item_fluid");
+    public static final MultiblockAbility<IItemAndFluidHandler> IMPORT_ITEM_FLUID = new MultiblockAbility("import_item_fluid");
+
 
 }
