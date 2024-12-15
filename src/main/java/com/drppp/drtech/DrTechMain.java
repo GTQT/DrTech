@@ -47,8 +47,6 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.client.model.b3d.B3DLoader;
-import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -105,8 +103,7 @@ public class DrTechMain {
     public void ClientpreInit(FMLPreInitializationEvent event) {
         TexturesInit();
         drtMetaEntities.initRenderers();
-        OBJLoader.INSTANCE.addDomain("drtech");
-        B3DLoader.INSTANCE.addDomain("drtech");
+
     }
 
     @SideOnly(Side.CLIENT)
@@ -165,7 +162,6 @@ public class DrTechMain {
         if(DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
-
     }
 
     @EventHandler

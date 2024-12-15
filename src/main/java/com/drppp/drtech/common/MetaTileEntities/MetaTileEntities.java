@@ -5,9 +5,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCok
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityBatteryEnergyHatch;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityWirelessEnergyHatch;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileeneityPassthroughHatchComputationHatch;
+import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.*;
 import com.drppp.drtech.common.MetaTileEntities.single.*;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
@@ -15,13 +13,13 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearR
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityEnergyTransTower;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
+import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.util.GTUtility;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
 import net.minecraft.util.ResourceLocation;
@@ -96,6 +94,8 @@ public class MetaTileEntities {
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_16384 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_65536 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH = new MetaTileEntityBatteryEnergyHatch[15];
+    public static final MetaTileentityItemAndFluidHatch[] ITEM_FLUID_IMPORT_HATCH = new MetaTileentityItemAndFluidHatch[15];
+    public static final MetaTileentityItemAndFluidHatch[] ITEM_FLUID_EXPORT_HATCH = new MetaTileentityItemAndFluidHatch[15];
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
         if (id > 1000)
@@ -203,6 +203,16 @@ public class MetaTileEntities {
         for (int i = 0; i < 15; i++) {
             String tier = VN[i].toLowerCase();
             BATTERY_INPUT_ENERGY_HATCH[i]          = registerMetaTileEntity( 17680+i,       new MetaTileEntityBatteryEnergyHatch(getmyId("battery_energy_hatch.input."          + tier), i, 2,       false));
+        }
+        for (int i = 0; i < 15; i++)
+        {
+            String tier = VN[i].toLowerCase();
+            ITEM_FLUID_IMPORT_HATCH[i] = registerMetaTileEntity(17695+i,new MetaTileentityItemAndFluidHatch(getmyId("item_and_fluid_import_hatch_"+tier),i,false));
+            MultiblockAbility.REGISTRY.get(MultiblockAbility.IMPORT_ITEMS).add(ITEM_FLUID_IMPORT_HATCH[i]);
+            MultiblockAbility.REGISTRY.get(MultiblockAbility.IMPORT_FLUIDS).add(ITEM_FLUID_IMPORT_HATCH[i]);
+            ITEM_FLUID_EXPORT_HATCH[i] = registerMetaTileEntity(17710+i,new MetaTileentityItemAndFluidHatch(getmyId("item_and_fluid_export_hatch_"+tier),i,true));
+            MultiblockAbility.REGISTRY.get(MultiblockAbility.EXPORT_ITEMS).add(ITEM_FLUID_EXPORT_HATCH[i]);
+            MultiblockAbility.REGISTRY.get(MultiblockAbility.EXPORT_FLUIDS).add(ITEM_FLUID_EXPORT_HATCH[i]);
         }
     }
 

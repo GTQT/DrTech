@@ -16,14 +16,12 @@ import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.b3d.B3DLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -35,6 +33,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public final class DrTechModelRegister {
     @SubscribeEvent
     public static void onModelReg(ModelRegistryEvent event) {
+        OBJLoader.INSTANCE.addDomain("drtech");
+        B3DLoader.INSTANCE.addDomain("drtech");
         onModelRegistration();
         EntityRenderReg();
     }
