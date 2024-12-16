@@ -76,7 +76,7 @@ public abstract class MinxinRecipeMapMultiblockController extends MultiblockWith
                 extanks.addAll(ex_itemCC.get(i).getFluidTanks());
             }
         }
-        this.inputFluidInventory = new FluidTankList(true, tanks);
+        this.outputFluidInventory = new FluidTankList(true, extanks);
     }
     @Overwrite
     public TraceabilityPredicate autoAbilities(boolean checkEnergyIn, boolean checkMaintenance, boolean checkItemIn, boolean checkItemOut, boolean checkFluidIn, boolean checkFluidOut, boolean checkMuffler) {
