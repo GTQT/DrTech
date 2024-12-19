@@ -31,15 +31,28 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
 
     public static final BluePrintBehavior INSTANCE = new BluePrintBehavior();
+
+    BlockPos startPos;
+
+    private boolean oppositeX=false;
+    private boolean oppositeY=false;
+    private boolean oppositeZ=false;
+
+    private boolean rotateX = false;
+    private boolean rotateY = false;
+    private boolean rotateZ = false;
+
 
     protected BluePrintBehavior() {/**/}
 
@@ -110,7 +123,7 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
 
     @Override
     public ModularUI createUI(PlayerInventoryHolder playerInventoryHolder, EntityPlayer entityPlayer) {
-        return ModularUI.builder(GuiTextures.BACKGROUND, 176, 120)
+        return ModularUI.builder(GuiTextures.BACKGROUND, 260, 160)
                 .image(10, 8, 156, 50, GuiTextures.DISPLAY)
                 .dynamicLabel(15, 13, () -> {
                     int x = 0;
@@ -124,10 +137,32 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
                     }
                     return I18n.format("metaitem.debug.structure_writer.structural_scale", x, y, z);
                 }, 0xFAF9F6)
+                .dynamicLabel(15, 23, () -> I18n.format("旋转状态： X:%s  Y:%s  Z:%s", rotateX, rotateY, rotateZ), 0xFAF9F6)
+                .dynamicLabel(15, 33, () -> I18n.format("镜像状态： X:%s  Y:%s  Z:%s", oppositeX, oppositeY, oppositeZ), 0xFAF9F6)
                 .widget(new ClickButtonWidget(10, 68, 77, 20, "保存到NBT", clickData -> exportLog(playerInventoryHolder)))
                 .widget(new ClickButtonWidget(90, 68, 77, 20, "蓝图绘制", clickData -> blueprintdraw(playerInventoryHolder)))
-                .widget(new ClickButtonWidget(100, 98, 77, 20, "获取物品", clickData -> getItem(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(10, 93, 77, 20, "获取物品", clickData -> getItem(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(90, 93, 77, 20, "放置预览", clickData -> Preparedraw(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(175, 10, 77, 20, "X轴旋转", clickData -> toggleRotateX(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(175, 35, 77, 20, "Y轴旋转", clickData -> toggleRotateY(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(175, 60, 77, 20, "Z轴旋转", clickData -> toggleRotateZ(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(175, 85, 77, 20, "X轴镜像", clickData -> toggleMirrorX(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(175, 110, 77, 20, "Y轴镜像", clickData -> toggleMirrorY(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(175, 135, 77, 20, "Z轴镜像", clickData -> toggleMirrorZ(playerInventoryHolder)))
+                .widget(new ClickButtonWidget(175, 135, 77, 20, "重置状态", clickData -> clear(playerInventoryHolder)))
                 .build(playerInventoryHolder, entityPlayer);
+    }
+
+    private void clear(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        player.sendStatusMessage(new TextComponentTranslation("已还原所有状态"), true);
+        oppositeX=false;
+        oppositeY=false;
+        oppositeZ=false;
+
+        rotateX = false;
+        rotateY = false;
+        rotateZ = false;
     }
 
     private void getItem(PlayerInventoryHolder playerInventoryHolder) {
@@ -170,11 +205,28 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
         }
     }
 
+
+    private void Preparedraw(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        startPos=player.getPosition();
+        player.sendStatusMessage(new TextComponentTranslation("已设置玩家当前坐标为起始坐标"), true);
+    }
+
     private void blueprintdraw(PlayerInventoryHolder playerInventoryHolder) {
         EntityPlayer player = playerInventoryHolder.player;
         var s = playerInventoryHolder.getCurrentItem();
         if (!player.world.isRemote && s.getTagCompound().hasKey("SaveBlocks")) {
-            loadStructure(player, player.world, player.getPosition(), s.getTagCompound().getCompoundTag("SaveBlocks"));
+            if(startPos==null)
+            {
+                player.sendStatusMessage(new TextComponentTranslation("未找到玩家指定的放置坐标！"), true);
+                loadStructure(player, player.world, player.getPosition(), s.getTagCompound().getCompoundTag("SaveBlocks"));
+            }
+            else
+            {
+                player.sendStatusMessage(new TextComponentTranslation("已找到玩家指定的放置坐标！"), true);
+                loadStructure(player, player.world, startPos, s.getTagCompound().getCompoundTag("SaveBlocks"));
+                startPos=null;
+            }
         }
     }
 
@@ -273,15 +325,70 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
         return nbt;
     }
 
+    private void toggleMirrorX(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        player.sendStatusMessage(new TextComponentTranslation("X轴已镜像"), true);
+        oppositeX=!oppositeX;
+    }
+    private void toggleMirrorY(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        player.sendStatusMessage(new TextComponentTranslation("Y轴已镜像"), true);
+        oppositeY=!oppositeY;
+    }
+    private void toggleMirrorZ(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        player.sendStatusMessage(new TextComponentTranslation("Z轴已镜像"), true);
+        oppositeZ=!oppositeZ;
+    }
+    private void toggleRotateX(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        player.sendStatusMessage(new TextComponentTranslation("X轴已旋转"), true);
+        rotateX = !rotateX;
+    }
+
+    private void toggleRotateY(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        player.sendStatusMessage(new TextComponentTranslation("Y轴已旋转"), true);
+        rotateY = !rotateY;
+    }
+
+    private void toggleRotateZ(PlayerInventoryHolder playerInventoryHolder) {
+        EntityPlayer player = playerInventoryHolder.player;
+        player.sendStatusMessage(new TextComponentTranslation("Z轴已旋转"), true);
+        rotateZ = !rotateZ;
+    }
+
     public void loadStructure(EntityPlayer player, World world, BlockPos targetPos, NBTTagCompound nbt) {
         NBTTagList blockList = nbt.getTagList("blocks", 10);
         NBTTagList tileEntityList = nbt.getTagList("GtEntities", 10);
 
         for (int i = 0; i < blockList.tagCount(); i++) {
             NBTTagCompound blockNBT = blockList.getCompoundTagAt(i);
-            int x = blockNBT.getInteger("x") + targetPos.getX();
-            int y = blockNBT.getInteger("y") + targetPos.getY();
-            int z = blockNBT.getInteger("z") + targetPos.getZ();
+            int x = blockNBT.getInteger("x");
+            int y = blockNBT.getInteger("y");
+            int z = blockNBT.getInteger("z");
+
+            // 应用旋转
+            if (rotateX) {
+                int temp = y;
+                y = z;
+                z = -temp;
+            }
+            if (rotateY) {
+                int temp = x;
+                x = z;
+                z = -temp;
+            }
+            if (rotateZ) {
+                int temp = x;
+                x = -y;
+                y = temp;
+            }
+
+            x = x * (oppositeX ? -1 : 1) + targetPos.getX();
+            y = y * (oppositeY ? -1 : 1) + targetPos.getY();
+            z = z * (oppositeZ ? -1 : 1) + targetPos.getZ();
+
             BlockPos pos = new BlockPos(x, y, z);
             if (blockNBT.hasKey("PipeItem")) {
                 ItemStack itemStack = new ItemStack(blockNBT.getCompoundTag("PipeItem"));
@@ -302,9 +409,6 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
                     }
                 }
             } else {
-//                Block block = Block.getBlockFromName(blockNBT.getString("block"));
-//                IBlockState state = block.getStateFromMeta(blockNBT.getInteger("meta"));
-//                world.setBlockState(pos, state, 2);
                 ItemStack itemStack = new ItemStack(blockNBT.getCompoundTag("BlockItem"));
                 if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemBlock itemBlock) {
                     Block block = itemBlock.getBlock();
@@ -316,9 +420,31 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
 
         for (int i = 0; i < tileEntityList.tagCount(); i++) {
             NBTTagCompound tileNBT = tileEntityList.getCompoundTagAt(i);
-            int x = tileNBT.getInteger("x") + targetPos.getX();
-            int y = tileNBT.getInteger("y") + targetPos.getY();
-            int z = tileNBT.getInteger("z") + targetPos.getZ();
+            int x = tileNBT.getInteger("x");
+            int y = tileNBT.getInteger("y");
+            int z = tileNBT.getInteger("z");
+
+            // 应用旋转
+            if (rotateX) {
+                int temp = y;
+                y = z;
+                z = -temp;
+            }
+            if (rotateY) {
+                int temp = x;
+                x = z;
+                z = -temp;
+            }
+            if (rotateZ) {
+                int temp = x;
+                x = -y;
+                y = temp;
+            }
+
+            x = x * (oppositeX ? -1 : 1) + targetPos.getX();
+            y = y * (oppositeY ? -1 : 1) + targetPos.getY();
+            z = z * (oppositeZ ? -1 : 1) + targetPos.getZ();
+
             BlockPos pos = new BlockPos(x, y, z);
             ItemStack machine = new ItemStack(tileNBT.getCompoundTag("MachineItem"));
             if (GTUtility.getMetaTileEntity(machine) != null) {
@@ -329,11 +455,9 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
                 TileEntity holder = world.getTileEntity(pos);
 
                 if (holder instanceof IGregTechTileEntity) {
-                    MetaTileEntity sampleMetaTileEntity = GregTechAPI.MTE_REGISTRY
-                            .getObjectById(machine.getItemDamage());
+                    MetaTileEntity sampleMetaTileEntity = GregTechAPI.MTE_REGISTRY.getObjectById(machine.getItemDamage());
                     if (sampleMetaTileEntity != null) {
-                        MetaTileEntity metaTileEntity = ((IGregTechTileEntity) holder)
-                                .setMetaTileEntity(sampleMetaTileEntity);
+                        MetaTileEntity metaTileEntity = ((IGregTechTileEntity) holder).setMetaTileEntity(sampleMetaTileEntity);
                         metaTileEntity.onPlacement();
                         if (machine.getTagCompound() != null) {
                             metaTileEntity.initFromItemStackData(machine.getTagCompound());
