@@ -362,7 +362,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                     this.setWorkingEnabled(false);
                 }else
                 {
-                    if(this.heat<8900)
+                    if(this.heat<8900 && this.energyContainer.getEnergyStored()<=this.energyContainer.getEnergyCapacity()/2)
                         this.setWorkingEnabled(true);
                 }
             }

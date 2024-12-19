@@ -343,21 +343,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityAEHostablePart impleme
 
     @Override
     public IItemList<IAEFluidStack> getAvailableItems(IItemList<IAEFluidStack> iItemList) {
-        new Exception("Getting available items").printStackTrace();
-        if(online && this.yotTank!=null &&this.yotTank.isStructureFormed())
-        {
-            if(this.yotTank.getFluid()!=null)
-            {
-                if(this.yotTank.getFluidBank().getStored().longValue()<Integer.MAX_VALUE)
-                    this.fluidTank.setFluid(new FluidStack(this.yotTank.getFluid().getFluid(),this.yotTank.getFluidBank().getStored().intValue()));
-                else
-                    this.fluidTank.setFluid(new FluidStack(this.yotTank.getFluid().getFluid(),Integer.MAX_VALUE));
-            }
-            else
-                this.fluidTank.setFluid(null);
-            iItemList.add(AEFluidStack.fromFluidStack(this.fluidTank.getFluid()));
-        }
-        return iItemList;
+       return getMonitor().getStorageList();
     }
 
     @Override

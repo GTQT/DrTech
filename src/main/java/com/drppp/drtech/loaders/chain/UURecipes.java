@@ -184,7 +184,7 @@ public class UURecipes {
         //多方块控制器配方
         //大UU
         ASSEMBLY_LINE_RECIPES.recipeBuilder()
-                .inputs(UU_PRODUCTER[8].getStackForm(64))
+                .inputs(UU_PRODUCTER[8].getStackForm(4))
                 .input(CIRCUIT_GOOD_III, 8)
                 .input(ELECTRIC_PUMP_UV, 32)
                 .input(FIELD_GENERATOR_UV, 32)
@@ -211,7 +211,7 @@ public class UURecipes {
 
         //大复制
         ASSEMBLY_LINE_RECIPES.recipeBuilder()
-                .inputs(DUPLICATOR[8].getStackForm(64))
+                .inputs(DUPLICATOR[8].getStackForm(4))
                 .input(CIRCUIT_GOOD_III, 8)
                 .input(ELECTRIC_PUMP_UV, 32)
                 .input(FIELD_GENERATOR_UV, 32)
