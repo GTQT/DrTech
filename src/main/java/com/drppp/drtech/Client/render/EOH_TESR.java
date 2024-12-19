@@ -16,7 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EOH_TESR extends TileEntitySpecialRenderer<TileEntityHomoEye> {
-    public static final IModelCustom testModel= AdvancedModelLoader.loadModel(new ResourceLocation(Tags.MODID, "models/ship.obj"));
+    public static final IModelCustom testModel= AdvancedModelLoader.loadModel(new ResourceLocation(Tags.MODID, "models/shipi.obj"));
     ResourceLocation ss =new ResourceLocation("drtech","models/hongbei.png");
     @Override
     public void render(TileEntityHomoEye te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
