@@ -141,12 +141,16 @@ public class DisassemblyHandler {
                           }
                       }
                 }
-                RecipeBuilder<?> builder = DISASSEMBLER_RECIPES.recipeBuilder()
-                        .EUt((int) voltage)
-                        .duration(duration) 
-                        .inputs(outputItems.get(0));
-                inItems.forEach(x->builder.outputs(x));
-                builder.buildAndRegister();
+                ResourceLocation resourceLocation = outputItems.get(0).getItem().getRegistryName();
+                if(resourceLocation != null && resourceLocation.getNamespace().equals(GTValues.MODID))
+                {
+                    RecipeBuilder<?> builder = DISASSEMBLER_RECIPES.recipeBuilder()
+                            .EUt((int) voltage)
+                            .duration(duration)
+                            .inputs(outputItems.get(0));
+                    inItems.forEach(x->builder.outputs(x));
+                    builder.buildAndRegister();
+                }
             }
 
         }
