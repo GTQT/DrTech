@@ -178,6 +178,12 @@ tile.Meta_Machine_Casing.heat_inhibition_casing.name=热抑制机械方块
 tile.Meta_Machine_Casing.heat_cut_off_casing.name=热隔绝机械方块
 tile.Meta_Machine_Casing.solar_reflection_casing.name=太阳能反射机械方块
 tile.Meta_Machine_Casing.nuclear_part_casing.name=反应堆机械方块
+tile.Meta_Machine_Casing.jiao_ban_casing.name=多功能机械方块
+tile.Meta_Machine_Casing.metal_press_casing.name=辊压机械方块
+tile.Meta_Machine_Casing.cable_press_casing.name=线材轧机机械方块
+tile.Meta_Machine_Casing.sieve_net_casing.name=筛网方块
+tile.Meta_Machine_Casing.sieve_casing.name=筛选机械方块
+tile.Meta_Machine_Casing.centrifuge_casing.name=离心机械方块
 #YOUT_TANK
 tile.yot_tank_part.yot_part_tier_t1.name=流体单元方块(T1)
 tile.yot_tank_part.yot_part_tier_t2.name=流体单元方块(T2)
@@ -232,6 +238,11 @@ drtech.machine.type_filter.name=类型过滤器
 drtech.machine.industrial_coke_oven.name=工业焦炉
 drtech.machine.large_lighting_rod.name=大型避雷针
 drtech.machine.comb_process.name=蜂窝处理器
+drtech.machine.industrial_mixer.name=工业搅拌机
+drtech.machine.industrial_roller_press.name=工业辊压机
+drtech.machine.industrial_cable_press.name=工业线材轧机
+drtech.machine.industrial_sieve.name=工业筛选机
+drtech.machine.industrial_centrifuge.name=工业离心机
 
 #Materials
 gregtech.material.bedrock=基岩
@@ -270,6 +281,24 @@ drtech.machine.uuproducter.tip.3=§6并行=8*电压等级
 drtech.machine.duplicator.tip.1=§6享受大机器的快乐
 drtech.machine.duplicator.tip.2=§6速度为原有的2倍
 drtech.machine.duplicator.tip.3=§6并行=8*电压等级
+drtech.machine.industrial_mixer.tooltip.1=§6享受大机器的快乐
+drtech.machine.industrial_mixer.tooltip.2=§6比相同电压下的小机器快250%
+drtech.machine.industrial_mixer.tooltip.3=§6每提升一个电压等级，可多处理8个物品
+drtech.machine.industrial_roller_press.tooltip.1=§6享受大机器的快乐
+drtech.machine.industrial_roller_press.tooltip.2=§6比相同电压下的小机器快500%
+drtech.machine.industrial_roller_press.tooltip.3=§6每提升一个电压等级，可多处理4个物品
+drtech.machine.industrial_cable_press.tooltip.1=§6享受大机器的快乐
+drtech.machine.industrial_cable_press.tooltip.2=§6比相同电压下的小机器快200%
+drtech.machine.industrial_cable_press.tooltip.3=§6每提升一个电压等级，可多处理4个物品
+drtech.machine.industrial_cable_press.tooltip.4=§6耗电量为原本的75%
+drtech.machine.industrial_sieve.tooltip.1=§6享受大机器的快乐
+drtech.machine.industrial_sieve.tooltip.2=§6比相同电压下的小机器快400%
+drtech.machine.industrial_sieve.tooltip.3=§6每提升一个电压等级，可多处理4个物品
+drtech.machine.industrial_sieve.tooltip.4=§6耗电量为原本的75%
+drtech.machine.industrial_centrifuge.tooltip.1=§6享受大机器的快乐
+drtech.machine.industrial_centrifuge.tooltip.2=§6比相同电压下的小机器快150%
+drtech.machine.industrial_centrifuge.tooltip.3=§6每提升一个电压等级，可多处理6个物品
+drtech.machine.industrial_centrifuge.tooltip.4=§6耗电量为原本的90%
 drtech.machine.logcreate.tip.1=§1产量公式：(2×电压等级2-2×电压等级+5)×5×输出系数
 drtech.machine.logcreate.tip.2=§3锯 = 1x  圆锯 = 2x  链锯 = 4x
 drtech.machine.logcreate.tip.3=§3工作速度固定为5秒

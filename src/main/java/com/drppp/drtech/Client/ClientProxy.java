@@ -17,7 +17,7 @@ public class ClientProxy extends CommonProxy {
     }
     public void preLoad() {
         super.preLoad();
-        drtMetaEntities.initRenderers();
+
     }
     @SubscribeEvent
     public static void onRenderWorldLast(RenderWorldLastEvent event) {

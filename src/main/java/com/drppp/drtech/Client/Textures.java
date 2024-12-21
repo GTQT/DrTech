@@ -1,11 +1,13 @@
 package com.drppp.drtech.Client;
 
+import com.drppp.drtech.Client.Custome.CentrifugeRender;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.resources.AdoptableTextureArea;
 import gregtech.api.gui.resources.TextureArea;
 import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
+import keqing.gtqtcore.client.textures.custom.IsaMillRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +18,7 @@ public class Textures {
     public static TextureAtlasSprite LASER_PIPE_OVERLAY;
     public static TextureAtlasSprite LASER_PIPE_OVERLAY_EMISSIVE;
     public static  OrientedOverlayRenderer UUPRODUCTER_OVERLAY;
-
+    public static  OrientedOverlayRenderer INDUSTRIAL_MACHINE;
     public static  OrientedOverlayRenderer DUPLICATOR;
     public static  SimpleOverlayRenderer NEUTRON_MACHINE_CASING;
     public static SimpleOverlayRenderer MASS_GENERATION_CASING;
@@ -26,6 +28,10 @@ public class Textures {
     public static  SimpleOverlayRenderer TFFT_TANK_CASING;
     public static  SimpleOverlayRenderer NUCLEAR_PART_CASING;
     public static  SimpleOverlayRenderer SALT_INHIBITION_CASING;
+    public static  SimpleOverlayRenderer JIAO_BAN_CASING;
+    public static  SimpleOverlayRenderer SIEVE_CASING;
+    public static  SimpleOverlayRenderer CENTRIFUGE_CASING;
+    public static  OrientedOverlayRenderer CENTRIFUGE;
     public static  OrientedOverlayRenderer LARGE_UU_PRODUCTER;
     public static  OrientedOverlayRenderer ELECTRIC_IMPLOSION_OVERLAY;
     public static  OrientedOverlayRenderer TFFT_OVERLAY;
@@ -51,6 +57,7 @@ public class Textures {
     public static final TextureArea BEE_QUEEN_LOGO = TextureArea.fullImage("textures/gui/bee_queen.png");
     public static final TextureArea CROSS = TextureArea.fullImage("textures/gui/cross.png");
     public static final TextureArea CHECK_MARK = TextureArea.fullImage("textures/gui/checkmark.png");
+    public static final CentrifugeRender CENTRIFUGE_RENDER = new CentrifugeRender();
     public static void init()
     {
         MULTIPART_WIRELESS_ENERGY = new SimpleOverlayRenderer("wireless_hatch/overlay_front");
@@ -67,6 +74,7 @@ public class Textures {
 
         NEUTRON_MACHINE_CASING = new SimpleOverlayRenderer("casings/neutron_mechanical_casing");
         UUPRODUCTER_OVERLAY= new OrientedOverlayRenderer("machines/uu_producter");
+        CENTRIFUGE= new OrientedOverlayRenderer("overlay/centrifuge");
         DUPLICATOR = new OrientedOverlayRenderer("machines/duplicator");
         DISASSEMBLY = new OrientedOverlayRenderer("machines/disassembly");
         INDUSTRIAL_APIARY = new OrientedOverlayRenderer("machines/industrial_apiary");
@@ -77,10 +85,14 @@ public class Textures {
         YOT_TANK_CASING = new SimpleOverlayRenderer("casings/yot_tank_casing");
         TFFT_TANK_CASING = new SimpleOverlayRenderer("casings/tfft_casing");
         LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
+        INDUSTRIAL_MACHINE = new OrientedOverlayRenderer("multiblock/industrial_machine");
         ELECTRIC_IMPLOSION_OVERLAY = new OrientedOverlayRenderer("multiblock/electric_implosion");
         TFFT_OVERLAY = new OrientedOverlayRenderer("multiblock/tfft_tank");
         LIGHTING_ROD_OVERLAY = new OrientedOverlayRenderer("multiblock/lighting_rod");
         SALT_INHIBITION_CASING = new SimpleOverlayRenderer("casings/salt_inhibition_casing");
+        JIAO_BAN_CASING = new SimpleOverlayRenderer("casings/jiao_ban_casing");
+        SIEVE_CASING = new SimpleOverlayRenderer("casings/sieve_casing");
+        CENTRIFUGE_CASING = new SimpleOverlayRenderer("casings/centrifuge_casing");
         NUCLEAR_PART_CASING = new SimpleOverlayRenderer("casings/nuclear_part_casing");
         BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);
         PAIL_BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/pail_background.png", 500, 500, 3, 3);

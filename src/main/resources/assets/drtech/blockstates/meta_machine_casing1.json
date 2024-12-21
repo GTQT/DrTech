@@ -9,6 +9,36 @@
         "textures": {
           "all": "drtech:blocks/nuclear_part_casing"
         }
+      },
+      "jiao_ban_casing": {
+        "textures": {
+          "all": "drtech:blocks/jiao_ban_casing"
+        }
+      },
+      "metal_press_casing": {
+        "textures": {
+          "all": "gregtech:blocks/casings/solid/machine_casing_stable_titanium"
+        }
+      },
+      "cable_press_casing": {
+        "textures": {
+          "all": "gregtech:blocks/casings/solid/machine_casing_solid_steel"
+        }
+      },
+      "sieve_net_casing": {
+        "textures": {
+          "all": "drtech:blocks/sieve_net_casing"
+        }
+      },
+      "sieve_casing": {
+        "textures": {
+          "all": "drtech:blocks/sieve_casing"
+        }
+      },
+      "centrifuge_casing": {
+        "textures": {
+          "all": "drtech:blocks/centrifuge_casing"
+        }
       }
     }
   }
