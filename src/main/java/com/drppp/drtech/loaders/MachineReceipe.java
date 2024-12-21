@@ -1,5 +1,6 @@
 package com.drppp.drtech.loaders;
 
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing1;
 import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
@@ -25,6 +26,7 @@ import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
+import keqing.gtqtcore.api.unification.GTQTMaterials;
 import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -503,6 +505,64 @@ public class MachineReceipe {
                     .duration(100)
                     .buildAndRegister();
         }
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(plate, StainlessSteel,2)
+                .input(plate, GTQTMaterials.Staballoy,4)
+                .input(frameGt, GTQTMaterials.ZirconiumCarbide,1)
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING1,1,1) )
+                .circuitMeta(1)
+                .EUt(16)
+                .duration(100)
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(stickLong, RoseGold,2)
+                .input(plate, Titanium,4)
+                .input(stick, TungstenSteel,2)
+                .input(frameGt, Titanium,1)
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING1,1,2) )
+                .circuitMeta(1)
+                .EUt(16)
+                .duration(100)
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(plate, BlueSteel,4)
+                .input(stick, BlueSteel,4)
+                .input(frameGt, BlueSteel,1)
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING1,1,3) )
+                .circuitMeta(1)
+                .EUt(16)
+                .duration(100)
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(wireFine, Steel,5)
+                .input(frameGt, GTQTMaterials.EglinSteel,4)
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING1,1,4) )
+                .circuitMeta(1)
+                .EUt(16)
+                .duration(100)
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(plate, GTQTMaterials.EglinSteel,8)
+                .input(frameGt, GTQTMaterials.EnergeticAlloy,1)
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING1,1,5) )
+                .circuitMeta(1)
+                .EUt(16)
+                .duration(100)
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(stick, RoseGold,3)
+                .input(plate, GTQTMaterials.Inconel792,2)
+                .input(plate, GTQTMaterials.MaragingSteel250,4)
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING1,1,6) )
+                .circuitMeta(1)
+                .EUt(16)
+                .duration(100)
+                .buildAndRegister();
     }
 
 }

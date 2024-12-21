@@ -54,7 +54,7 @@ public class EntityWindRotor  extends EntityLiving implements IAnimatable {
     }
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<EntityWindRotor>(this, "controller", 0, this::predicate));
+        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override

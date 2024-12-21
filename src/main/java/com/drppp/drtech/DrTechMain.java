@@ -102,7 +102,7 @@ public class DrTechMain {
     @SideOnly(Side.CLIENT)
     public void ClientpreInit(FMLPreInitializationEvent event) {
         TexturesInit();
-        drtMetaEntities.initRenderers();
+        //drtMetaEntities.initRenderers();
 
     }
 
@@ -156,6 +156,7 @@ public class DrTechMain {
         {
             ItemCombs.ClientInit();
         }
+        drtMetaEntities.initRenderers();
     }
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {

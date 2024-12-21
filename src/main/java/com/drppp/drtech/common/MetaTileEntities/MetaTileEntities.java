@@ -66,6 +66,11 @@ public class MetaTileEntities {
     public static MetaTileEntityIndustrialCokeOven INDUSTRIAL_COKE_OVEN;
     public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
     public static MetaTileEntityCombProcess COMB_PROVESS;
+    public static MetaTileEntityIndustrialMixer INDUSTRIAL_MIXER;
+    public static MetaTileEntityIndustrialRollerPress INDUSTRIAL_ROLLER_PRESS;
+    public static MetaTileEntityIndustrialCablePress INDUSTRIAL_CABLE_PRESS;
+    public static MetaTileEntityIndustrialSieve INDUSTRIAL_SIEVE;
+    public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -145,6 +150,11 @@ public class MetaTileEntities {
         INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCokeOven(getmyId("industrial_coke_oven")));
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(),new MetaTileEntityLargeLightningRod(getmyId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(),new MetaTileEntityCombProcess(getmyId("comb_process")));
+        INDUSTRIAL_MIXER = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialMixer(getmyId("industrial_mixer")));
+        INDUSTRIAL_ROLLER_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialRollerPress(getmyId("industrial_roller_press")));
+        INDUSTRIAL_CABLE_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCablePress(getmyId("industrial_cable_press")));
+        INDUSTRIAL_SIEVE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialSieve(getmyId("industrial_sieve")));
+        INDUSTRIAL_CENTRIFUGE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCentrifuge(getmyId("industrial_centrifuge")));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();

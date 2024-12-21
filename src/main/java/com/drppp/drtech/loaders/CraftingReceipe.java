@@ -2,11 +2,11 @@ package com.drppp.drtech.loaders;
 
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.ItemsInit;
-import com.drppp.drtech.common.Items.MetaItems.MetaItems1;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.blocks.BlockAlvearyType;
+import gregtech.api.GTValues;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Materials;
@@ -15,8 +15,7 @@ import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import gregtech.common.items.ToolItems;
-import gregtech.common.metatileentities.electric.MetaTileEntityBatteryBuffer;
-import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
+import keqing.gtqtcore.api.unification.GTQTMaterials;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -485,6 +484,57 @@ public class CraftingReceipe {
                 'C', new UnificationEntry(plate, Rubber),
                 'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
                 'B',  new UnificationEntry(gearSmall, Materials.Steel)
+        );
+        ModHandler.addShapedRecipe("large_mixer_drt", MetaTileEntities.INDUSTRIAL_MIXER.getStackForm(),
+                "ACA",
+                "BSB",
+                "ACA",
+                'S', MIXER[IV].getStackForm(),
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
+                'A', new UnificationEntry(plate, GTQTMaterials.Staballoy),
+                'B',  new UnificationEntry(plate, GTQTMaterials.ZirconiumCarbide)
+        );
+
+        ModHandler.addShapedRecipe("larger_roller_press", MetaTileEntities.INDUSTRIAL_ROLLER_PRESS.getStackForm(),
+                "ACA",
+                "BSB",
+                "ACA",
+                'S', FORMING_PRESS[EV].getStackForm(),
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'A', new UnificationEntry(plate, Titanium),
+                'B', BENDER[EV].getStackForm()
+
+        );
+        ModHandler.addShapedRecipe("larger_cable_press", MetaTileEntities.INDUSTRIAL_CABLE_PRESS.getStackForm(),
+                "ACA",
+                "BSB",
+                "ACA",
+                'S', WIREMILL[IV].getStackForm(),
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
+                'A', new UnificationEntry(plate, BlueSteel),
+                'B', gregtech.common.metatileentities.MetaTileEntities.HULL[IV].getStackForm()
+
+        );
+        ModHandler.addShapedRecipe("larger_sieve_drt", MetaTileEntities.INDUSTRIAL_SIEVE.getStackForm(),
+                "ACA",
+                "BSB",
+                "ACA",
+                'S', SIFTER[GTValues.HV].getStackForm(),
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
+                'A', new UnificationEntry(plate, GTQTMaterials.EglinSteel),
+                'B', new UnificationEntry(cableGtQuadruple,Gold)
+
+        );
+        ModHandler.addShapedRecipe("larger_centrifuge_drt", MetaTileEntities.INDUSTRIAL_CENTRIFUGE.getStackForm(),
+                "ACA",
+                "BSB",
+                "DCD",
+                'S', CENTRIFUGE[GTValues.EV].getStackForm(),
+                'A', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'B', new UnificationEntry(plate, GTQTMaterials.Inconel792),
+                'C', gregtech.common.metatileentities.MetaTileEntities.HULL[EV].getStackForm(),
+                'D', new UnificationEntry(plate, GTQTMaterials.MaragingSteel250)
+
         );
     }
     public static ItemStack getItemStack(String itemstr, int meta)

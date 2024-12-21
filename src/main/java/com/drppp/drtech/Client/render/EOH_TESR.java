@@ -27,9 +27,6 @@ public class EOH_TESR extends TileEntitySpecialRenderer<TileEntityHomoEye> {
        FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ss);
         GlStateManager.translate(x, y, z);
         GlStateManager.translate(0.5, 0.5, 0.5);
-        float angle = (System.currentTimeMillis() % 3600) / 10.0f;
-      //  GlStateManager.rotate(angle, 0F, 0F, 1F);
-       // GlStateManager.scale(0.1,0.1,0.1);
         testModel.renderAll();
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
@@ -38,7 +35,7 @@ public class EOH_TESR extends TileEntitySpecialRenderer<TileEntityHomoEye> {
     }
     @Override
     public boolean isGlobalRenderer(TileEntityHomoEye te) {
-        return super.isGlobalRenderer(te);
+        return true;
     }
 
 }
