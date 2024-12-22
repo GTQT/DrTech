@@ -6,6 +6,7 @@
   "minVersion": "0.8.3",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "gregtech.MultiblockRecipeLogicMixin",
     "gregtech.MinxinRecipeMapMultiblockController",
     "gregtech.SimpleMachineMetaTileEntityMixin",
     "forestry.MixinModuleCore",
