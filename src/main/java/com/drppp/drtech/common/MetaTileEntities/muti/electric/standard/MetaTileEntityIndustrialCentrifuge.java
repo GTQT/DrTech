@@ -46,7 +46,7 @@ public class MetaTileEntityIndustrialCentrifuge extends RecipeMapMultiblockContr
                 .where('S', selfPredicate())
                 .where(' ', any())
                 .where('X', states(getCasingState()).setMinGlobalLimited(6)
-                        .or(autoAbilities(true, true, true, true, false, false, false))
+                        .or(autoAbilities(true, true, true, true, true, true, false))
                         .or(abilities(MultiblockAbility.MUFFLER_HATCH).setExactLimit(1))
                 )
                 .build();
