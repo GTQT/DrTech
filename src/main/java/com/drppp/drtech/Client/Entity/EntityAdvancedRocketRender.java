@@ -27,7 +27,7 @@ public class EntityAdvancedRocketRender extends RenderLiving {
         GlStateManager.disableCull();
         this.bindEntityTexture(entity);
         GlStateManager.translate(x, y, z);
-        GlStateManager.translate(0.5, 0.5, 0.5);
+       // GlStateManager.translate(0.5, 0.5, 0.5);
         model.renderAll();
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();

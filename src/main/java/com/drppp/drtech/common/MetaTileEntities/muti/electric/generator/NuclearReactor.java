@@ -347,7 +347,8 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                         for (int j = 0; j < upgradeInventory.getSlots(); j++) {
                             upgradeInventory.extractItem(j,1,false);
                         }
-                        this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), DrtConfig.NuclearExplosionRange, true);
+                        this.doExplosion(DrtConfig.NuclearExplosionRange);
+                        //this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), DrtConfig.NuclearExplosionRange, true);
                     }
                 }
             }
