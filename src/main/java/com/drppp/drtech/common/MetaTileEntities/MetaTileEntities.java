@@ -71,6 +71,7 @@ public class MetaTileEntities {
     public static MetaTileEntityIndustrialCablePress INDUSTRIAL_CABLE_PRESS;
     public static MetaTileEntityIndustrialSieve INDUSTRIAL_SIEVE;
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
+    public static SimpleMachineMetaTileEntity[] RECYCLE = new SimpleMachineMetaTileEntity[10];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_4A = new MetaTileEntityWirelessEnergyHatch[15];
@@ -155,6 +156,7 @@ public class MetaTileEntities {
         INDUSTRIAL_CABLE_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCablePress(getmyId("industrial_cable_press")));
         INDUSTRIAL_SIEVE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialSieve(getmyId("industrial_sieve")));
         INDUSTRIAL_CENTRIFUGE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCentrifuge(getmyId("industrial_centrifuge")));
+
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();
@@ -173,6 +175,7 @@ public class MetaTileEntities {
         registerSimpleMetaTileEntity(UU_PRODUCTER, 17200, "uu_producter", DrtechReceipes.UU_RECIPES, Textures.UUPRODUCTER_OVERLAY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         registerSimpleMetaTileEntity(DUPLICATOR, 17215, "duplicator", DrtechReceipes.COPY_RECIPES, Textures.DUPLICATOR, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         registerSimpleMetaTileEntity(DISASSEMBLY, 17230 , "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerSimpleMetaTileEntity(RECYCLE, 17240 , "recycle", DrtechReceipes.RECYCLE_RECIPE, gregtech.client.renderer.texture.Textures.MACERATOR_OVERLAY, true, DrtechUtils::getRL, GTUtility.defaultTankSizeFunction);
 
 
         //  ULV-MAX Wireless Energy/Dynamo Hatch (consist of high-amp version) ID 17300

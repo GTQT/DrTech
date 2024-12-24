@@ -13,6 +13,7 @@ recipemap.solar_tower.name=太阳之力
 recipemap.disassembler.name=拆解机
 recipemap.drone_pad.name=无人机狩猎
 recipemap.combs_product.name=蜂窝处理
+recipemap.recycle_items.name=回收机机
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素
@@ -431,6 +432,21 @@ drtech.machine.laser_hatch.target_16384a.uiv.name=16384安§2UIV§r激光靶仓
 drtech.machine.laser_hatch.target_16384a.uxv.name=16384安§eUXV§r激光靶仓
 drtech.machine.laser_hatch.target_16384a.opv.name=16384§9OpV§r激光靶仓
 drtech.machine.laser_hatch.target_16384a.max.name=16384安§c§lMAX§r激光靶仓
+
+#UU物质生产
+drtech.machine.recycle.lv.name=基础回收机
+drtech.machine.recycle.mv.name=进阶回收机
+drtech.machine.recycle.hv.name=进阶回收机 II
+drtech.machine.recycle.ev.name=进阶回收机 III
+drtech.machine.recycle.iv.name=精英回收机
+drtech.machine.recycle.luv.name=精英回收机 II
+drtech.machine.recycle.zpm.name=精英回收机 III
+drtech.machine.recycle.uv.name=终极回收机
+drtech.machine.recycle.uhv.name=史诗回收机
+drtech.machine.recycle.uev.name=史诗回收机 II
+drtech.machine.recycle.uiv.name=史诗回收机 III
+drtech.machine.recycle.uxv.name=史诗回收机 IV
+drtech.machine.recycle.opv.name=传奇回收机
 
 #UU物质生产
 drtech.machine.uu_producter.lv.name=基础UU物质生产机
