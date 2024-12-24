@@ -41,6 +41,7 @@ import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
+import com.drppp.drtech.loaders.builder.RecycleBuilder;
 import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import net.minecraft.block.Block;
@@ -163,6 +164,7 @@ public class DrTechMain {
         if(DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
+        RecycleBuilder.initRecycleRecipe();
     }
 
     @EventHandler
