@@ -43,7 +43,12 @@ public class DrtConfig {
     public static float NuclearExplosionRange=10;
 
     @Config.LangKey("enable_industrial_Apiary_Tx")
-    @Config.Comment("开始工业蜂箱粒子特效")
+    @Config.Comment("开启工业蜂箱粒子特效")
     @Config.RequiresMcRestart
     public static boolean EnableIndustrialApiaryTx=true;
+
+    @Config.LangKey("enable_industrial_machines")
+    @Config.Comment("启用更便宜的大机器")
+    @Config.RequiresMcRestart
+    public static boolean EnableIndustrialMachines=false;
 }

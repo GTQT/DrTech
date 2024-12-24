@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.MetaTileEntities;
 
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
@@ -142,7 +143,13 @@ public class MetaTileEntities {
         WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(getID(), new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
         YOT_HARCH = registerMetaTileEntity(getID(),new MetaTileEntityYotHatch(getmyId("yot_hatch")));
         YOUT_TANK = registerMetaTileEntity(getID(),new MetaTileEntityYotTank(getmyId("yot_tank")));
-        LARGE_EXTRUDER = registerMetaTileEntity(getID(),new MetaTileentityLargeExtruder(getmyId("large_extruder")));
+        if(DrtConfig.EnableIndustrialMachines)
+        {
+            LARGE_EXTRUDER = registerMetaTileEntity(getID(),new MetaTileentityLargeExtruder(getmyId("large_extruder")));
+        }else
+        {
+            getID();
+        }
         PASSTHROUGH_COMPUTER = registerMetaTileEntity(getID(),new MetaTileeneityPassthroughHatchComputationHatch(getmyId("passthrough_computationhatch")));
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialApiary(getmyId("industrial_apiary"),Textures.INDUSTRIAL_APIARY));
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(),new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller1"),1));
@@ -151,11 +158,17 @@ public class MetaTileEntities {
         INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCokeOven(getmyId("industrial_coke_oven")));
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(),new MetaTileEntityLargeLightningRod(getmyId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(),new MetaTileEntityCombProcess(getmyId("comb_process")));
-        INDUSTRIAL_MIXER = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialMixer(getmyId("industrial_mixer")));
-        INDUSTRIAL_ROLLER_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialRollerPress(getmyId("industrial_roller_press")));
-        INDUSTRIAL_CABLE_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCablePress(getmyId("industrial_cable_press")));
-        INDUSTRIAL_SIEVE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialSieve(getmyId("industrial_sieve")));
-        INDUSTRIAL_CENTRIFUGE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCentrifuge(getmyId("industrial_centrifuge")));
+        if(DrtConfig.EnableIndustrialMachines)
+        {
+            INDUSTRIAL_MIXER = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialMixer(getmyId("industrial_mixer")));
+            INDUSTRIAL_ROLLER_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialRollerPress(getmyId("industrial_roller_press")));
+            INDUSTRIAL_CABLE_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCablePress(getmyId("industrial_cable_press")));
+            INDUSTRIAL_SIEVE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialSieve(getmyId("industrial_sieve")));
+            INDUSTRIAL_CENTRIFUGE = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCentrifuge(getmyId("industrial_centrifuge")));
+        }else
+        {
+            getID();getID();getID();getID();getID();
+        }
 
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
