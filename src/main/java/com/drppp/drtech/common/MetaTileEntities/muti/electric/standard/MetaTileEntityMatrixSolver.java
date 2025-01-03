@@ -1,5 +1,8 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
+import com.drppp.drtech.api.Utils.CustomeRecipe;
+import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.ClickButtonWidget;
@@ -13,12 +16,14 @@ import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.unification.material.Materials;
+import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockBoilerCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -33,6 +38,9 @@ import java.util.List;
 public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     int mode = 0;
     List<RecipeMap> recipemaps = new ArrayList<>();
+    CustomeRecipe scan = new CustomeRecipe();
+    Recipe scan_recipe;
+    String NBT_TAG_NAME = "StoreRecipe";
     public MetaTileEntityMatrixSolver(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -91,41 +99,121 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
         else if(this.mode==2)
             textList.add(new TextComponentString("工作方式:"+"执行配方"));
         textList.add(new TextComponentString("配方仓库:"+ (this.recipemaps.size()==0?"空":this.recipemaps.size()+"个")));
+        if(this.scan_recipe!=null)
+        {
+            textList.add(new TextComponentString("匹配到配方"));
+        }
     }
 
     @Override
     protected void updateFormedValid() {
         if(!this.getWorld().isRemote && this.isWorkingEnabled())
         {
-            if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
-            {
-                if(mode==0)
-                {
-                    recipemaps = new ArrayList<>();
-                    for (int i = 0; i < this.inputInventory.getSlots(); i++) {
-                        ItemStack item = this.inputInventory.getStackInSlot(i).copy();
-                        if(GTUtility.getMetaTileEntity(item) != null)
-                        {
-                            var machine = GTUtility.getMetaTileEntity(item);
-                            if(machine.getRecipeMap() !=null)
-                            {
-                                recipemaps.add(machine.getRecipeMap());
-                            }
-                        }
-                    }
-                }else if(mode==1)
-                {
 
-                }
-                else if(mode==2)
-                {
+           if(mode==0)
+           {
+               recipemaps = new ArrayList<>();
+               if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
+               {
+                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
+                   {
+                       ItemStack item = this.inputInventory.getStackInSlot(i).copy();
+                       if(GTUtility.getMetaTileEntity(item) != null)
+                       {
+                           var machine = GTUtility.getMetaTileEntity(item);
+                           if(!scan.ListContainsItem(scan.machineItems,item))
+                           {
+                               scan.machineItems.add(item);
+                               scan.machines.add(machine);
+                           }
+                           if(machine.getRecipeMap() !=null)
+                           {
+                               recipemaps.add(machine.getRecipeMap());
+                           }
+                       }
+                   }
+               }
+               if(!recipemaps.isEmpty())
+               {
+                   scan_recipe = recipemaps.get(0).findRecipe(Integer.MAX_VALUE,this.inputInventory,this.inputFluidInventory);
+                   if(scan_recipe!=null)
+                   {
+                       scan = new CustomeRecipe();
+                       scan.GetDataFromRecipe(scan_recipe);
+                   }
+               }
+           }else if(mode==1)
+           {
+               if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
+               {
+                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
+                   {
+                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && this.scan!=null)
+                       {
+                            var item = this.inputInventory.getStackInSlot(i).copy();
+                            item.setCount(1);
+                            NBTTagCompound tag = scan.writeToNBT();
+                            item.setTagInfo(NBT_TAG_NAME,tag);
 
-                }
+                           if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
+                           {
+                               GTTransferUtils.insertItem(this.outputInventory,item,false);
+                           }
+                       }
+                   }
+               }
+           }
+           else if(mode==2)
+           {
+               List<CustomeRecipe> cres = new ArrayList<>();
+               if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
+               {
+                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
+                   {
+                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)))
+                       {
+                           var item = this.inputInventory.getStackInSlot(i).copy();
+                           if(item.hasTagCompound() && item.getTagCompound().hasKey(NBT_TAG_NAME))
+                           {
+                                cres.add(new CustomeRecipe(item.getTagCompound().getCompoundTag(NBT_TAG_NAME)));
+                           }
+                       }
+                   }
+               }
+               if(!cres.isEmpty())
+               {
+                   DrtechUtils.yunSuan(cres);
+                   CustomeRecipe Merged = new CustomeRecipe();
+                   for (int i = 0; i < cres.size(); i++) {
+                       Merged = CustomeRecipe.mergeRecipes(Merged,cres.get(i));
+                   }
+                   Merged.reduceToSmallest();
+                   NBTTagCompound tag = Merged.writeToNBT();
+                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
+                   {
+                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && !this.inputInventory.getStackInSlot(i).hasTagCompound())
+                       {
+                           var item = this.inputInventory.getStackInSlot(i).copy();
+                           item.setCount(1);
+                           item.setTagInfo(NBT_TAG_NAME,tag);
+                           if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
+                           {
+                               GTTransferUtils.insertItem(this.outputInventory,item,false);
+                           }
+                       }
+                   }
+               }
+           }
 
-            }
+
         }
     }
-
+    public boolean IsMatrixGem(ItemStack item)
+    {
+        if(item.getItem()== MyMetaItems.MATRIX_GEMS.getMetaItem() && item.getMetadata()==MyMetaItems.MATRIX_GEMS.getMetaValue())
+            return true;
+        return false;
+    }
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);

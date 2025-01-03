@@ -11,6 +11,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import scala.tools.nsc.transform.patmat.ScalaLogic;
+import javax.annotation.Nonnull;
 
 public class HeatExchangerItem implements IHeatExchanger , ICapabilityProvider , ISubItemHandler {
     protected final ItemStack itemStack;
@@ -33,7 +34,7 @@ public class HeatExchangerItem implements IHeatExchanger , ICapabilityProvider ,
     }
 
     @Override
-    public boolean hasCapability(@NotNull Capability<?> capability, @Nullable EnumFacing facing) {
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
         if(capability==null)
             return false;
         return capability==DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER;
@@ -41,7 +42,7 @@ public class HeatExchangerItem implements IHeatExchanger , ICapabilityProvider ,
 
     @Nullable
     @Override
-    public <T> T getCapability(@NotNull Capability<T> capability, @Nullable EnumFacing facing) {
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         return capability == DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER? (T) this : null;
     }
 
