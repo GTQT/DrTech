@@ -23,7 +23,7 @@ public class MatrixGemsBehavior implements IItemBehaviour {
                 if(recipe!=null)
                 {
                     lines.add("======配方信息======");
-                    lines.add("输入信息:");
+                    lines.add("输入信息:+++++++++++");
                     if(!recipe.inputItems.isEmpty())
                     {
                         recipe.inputItems.forEach(x->lines.add(x.getDisplayName()+"*"+x.getCount()));
@@ -32,7 +32,7 @@ public class MatrixGemsBehavior implements IItemBehaviour {
                     {
                         recipe.inputFluids.forEach(x->lines.add(x.getLocalizedName()+"*"+x.amount));
                     }
-                    lines.add("输出信息:");
+                    lines.add("输出信息:------------");
                     if(!recipe.outputItems.isEmpty())
                     {
                         recipe.outputItems.forEach(x->lines.add(x.getDisplayName()+"*"+x.getCount()));
@@ -42,6 +42,9 @@ public class MatrixGemsBehavior implements IItemBehaviour {
                         recipe.outputFluids.forEach(x->lines.add(x.getLocalizedName()+"*"+x.amount));
                     }
                     lines.add("====================");
+                    lines.add("Eu/t:"+recipe.eut);
+                    lines.add("耗时:"+recipe.during+"tick");
+                    lines.add("矩阵深度:"+recipe.deep);
                 }
             }
             else
