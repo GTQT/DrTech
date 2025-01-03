@@ -32,7 +32,7 @@ import static gregtech.api.unification.ore.OrePrefix.dustTiny;
 
 public class DisassemblyHandler {
     public  static  List<ItemStack> black_list = new ArrayList<>();
-    private static final Map<String, Tuple<ItemStack, Integer>> circuitToUse = createCircuitMap(Arrays.asList(
+    public static final Map<String, Tuple<ItemStack, Integer>> circuitToUse = createCircuitMap(Arrays.asList(
             GTQTMetaItems.GENERAL_CIRCUIT_LV.getStackForm(),
             GTQTMetaItems.GENERAL_CIRCUIT_MV.getStackForm(),
             GTQTMetaItems.GENERAL_CIRCUIT_HV.getStackForm(),
@@ -232,7 +232,7 @@ public class DisassemblyHandler {
         return circuits;
     }
 
-    private static Tuple<Boolean, String> isCircuit(ItemStack stack) {
+    public static Tuple<Boolean, String> isCircuit(ItemStack stack) {
         Set<String> stackOres = OreDictUnifier.getOreDictionaryNames(stack);
         for (String circuitOre : circuitToUse.keySet()) {
             for (String stackOre : stackOres) {

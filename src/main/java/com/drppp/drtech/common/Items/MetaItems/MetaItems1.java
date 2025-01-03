@@ -351,9 +351,10 @@ public  class MetaItems1 extends StandardMetaItem {
         MyMetaItems.TOOL_BOX = this.addItem(60,"tool_box").setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(1)
                 .addComponents(
                         new TooltipBehavior((lines) -> {
-                            lines.add(I18n.format("metaitem.upgrade.tool_box.1", new Object[0]));
-                            lines.add(I18n.format("metaitem.upgrade.tool_box.2", new Object[0]));
+                            lines.add(I18n.format("metaitem.upgrade.tool_box.1"));
+                            lines.add(I18n.format("metaitem.upgrade.tool_box.2"));
                         }));
+        MyMetaItems.MATRIX_GEMS = this.addItem(61,"matrix_gem").addComponents(new MatrixGemsBehavior()).setCreativeTabs(DrTechMain.Mytab).setMaxStackSize(64);
     }
 
     @Override

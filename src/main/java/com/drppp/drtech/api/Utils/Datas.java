@@ -12,7 +12,7 @@ import net.minecraft.block.state.IBlockState;
 
 public class Datas {
     public static final Object2ObjectMap<IBlockState, IStoreData> YOT_CASINGS = new Object2ObjectOpenHashMap<>();
-    public static final Object2ObjectMap<IBlockState, ITfftData> TFFT_CASINGS = new Object2ObjectOpenHashMap<>();
+    public static final Object2ObjectMap<IBlockState, ITfftData> TFFT_CASINGS = new Object2ObjectOpenHashMap<>();z
     public static void init()
     {
         for (BlockYotTankPart.BlockYotTankPartType type : BlockYotTankPart.BlockYotTankPartType.values()) {
