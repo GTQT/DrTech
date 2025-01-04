@@ -35,6 +35,7 @@ public class CustomeRecipe {
     public int deep=1;
     public long eut=0;
     public int during=0;
+    public boolean is_broken =false;
     public CustomeRecipe(){
 
     }
@@ -53,6 +54,7 @@ public class CustomeRecipe {
         deep = nbt.getInteger("Deep");
         eut = nbt.getLong("Eut");
         during = nbt.getInteger("During");
+        is_broken = nbt.getBoolean("IsBroken");
         machines.clear();
         for (var item : machineItems)
         {
@@ -77,6 +79,7 @@ public class CustomeRecipe {
         nbt.setInteger("Deep", deep);
         nbt.setLong("Eut", eut);
         nbt.setInteger("During", during);
+        nbt.setBoolean("IsBroken", is_broken);
 
         return nbt;
     }
@@ -141,12 +144,12 @@ public class CustomeRecipe {
             var fluidOutputs = recipe.getFluidOutputs();
             var eut = recipe.getEUt();
             var during = recipe.getDuration();
-     
+
             if(!itemInputs.isEmpty())
             {//inItems.add(x.getInputStacks().clone())
                 List<ItemStack[]> inItems = new ArrayList<>();
                 itemInputs.forEach(x -> {
-                    if (x.isConsumable) {
+                    if (!x.isNonConsumable()) {
                         inItems.add(x.getInputStacks().clone());
                     }
                 });
@@ -197,8 +200,10 @@ public class CustomeRecipe {
             {
                 fluidOutputs.forEach(x->this.outputFluids.add(x.copy()));
             }
+
             this.eut  = eut;
             this.during = during;
+            this.is_broken = false;
         }
     }
 
@@ -213,9 +218,36 @@ public class CustomeRecipe {
         mergedRecipe.cancelOutItems();
         mergedRecipe.eut = recipe1.eut+ recipe2.eut;
         mergedRecipe.during = recipe1.during+ recipe2.during;
-        mergedRecipe.deep = Math.min(1,recipe1.deep+recipe2.deep);
+        mergedRecipe.deep = Math.max(1,recipe1.deep+recipe2.deep);
+        mergedRecipe.is_broken =CheckIsBroken(mergedRecipe);
         return mergedRecipe;
     }
+
+    public static boolean CheckIsBroken(CustomeRecipe mergedRecipe) {
+        boolean b =false;
+        for (var item : mergedRecipe.inputItems)
+        {
+            if(item.getCount()<=0)
+                mergedRecipe.is_broken=true;
+        }
+        for (var item : mergedRecipe.outputItems)
+        {
+            if(item.getCount()<=0)
+                mergedRecipe.is_broken=true;
+        }
+        for (var item : mergedRecipe.inputFluids)
+        {
+            if(item.amount<=0)
+                mergedRecipe.is_broken=true;
+        }
+        for (var item : mergedRecipe.outputFluids)
+        {
+            if(item.amount<=0)
+                mergedRecipe.is_broken=true;
+        }
+        return b;
+    }
+
     private static List<ItemStack> mergeMachineStacks(List<ItemStack> list1, List<ItemStack> list2) {
         List<ItemStack> mergedList = new ArrayList<>(list1);
         for (ItemStack item : list2) {
@@ -366,51 +398,70 @@ public class CustomeRecipe {
         }
         return a;
     }
-    public boolean CheckCustomerRecipes(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks)
-    {
-        for(int i=0;i<inputItems.size();i++)
-        {
+    public boolean CheckCustomerRecipes(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks) {
+        for (int i = 0; i < inputItems.size(); i++) {
             ItemStack recipeitem = inputItems.get(i).copy();
-            if(recipeitem.isEmpty())
+            if (recipeitem.isEmpty()) {
                 continue;
+            }
+            // 确保 slots 不为 null
             List<ItemStack> slots = GTUtility.itemHandlerToList(itemhandler);
-            List<ItemStack> filterslot = slots.stream().filter(f -> f.isItemEqual(recipeitem)).collect(Collectors.toList());
-            if(filterslot==null || filterslot.size()==0)
-            {
+            if (slots == null || slots.isEmpty()) {
                 return false;
             }
-            int count=0;
-            for(ItemStack iii:filterslot)
-            {
+
+            // 增加 f 的非空检查
+            List<ItemStack> filterslot = slots.stream()
+                    .filter(f -> f != null && f.isItemEqual(recipeitem))
+                    .collect(Collectors.toList());
+            if (filterslot == null || filterslot.isEmpty()) {
+                return false;
+            }
+
+            int count = 0;
+            for (ItemStack iii : filterslot) {
                 count += iii.getCount();
             }
-            if(count<= recipeitem.getCount())
-                return false;
-        }
-        for(int i=0;i<inputFluids.size();i++)
-        {
-            FluidStack recipeitem = inputFluids.get(i).copy();
-            if(recipeitem==null || recipeitem.amount==0)
-                continue;
-             List<FluidStack> slots = GTUtility.fluidHandlerToList(tanks);
-            List<FluidStack> filterslot = slots.stream().filter(f -> f.isFluidEqual(recipeitem)).collect(Collectors.toList());
-            if(filterslot==null || filterslot.size()==0)
-            {
+            if (count < recipeitem.getCount()) { // 修复边界条件
                 return false;
             }
-            int count=0;
-            for(FluidStack iii:filterslot)
-            {
+        }
+
+        for (int i = 0; i < inputFluids.size(); i++) {
+            FluidStack recipeitem = inputFluids.get(i).copy();
+            if (recipeitem == null || recipeitem.amount == 0) {
+                continue;
+            }
+
+            // 确保 slots 不为 null
+            List<FluidStack> slots = GTUtility.fluidHandlerToList(tanks);
+            if (slots == null || slots.isEmpty()) {
+                return false;
+            }
+
+            // 增加 f 的非空检查
+            List<FluidStack> filterslot = slots.stream()
+                    .filter(f -> f != null && f.isFluidEqual(recipeitem))
+                    .collect(Collectors.toList());
+            if (filterslot == null || filterslot.isEmpty()) {
+                return false;
+            }
+
+            int count = 0;
+            for (FluidStack iii : filterslot) {
                 count += iii.amount;
             }
-            if(count<= recipeitem.amount)
+            if (count < recipeitem.amount) { // 修复边界条件
                 return false;
+            }
         }
+
         return true;
     }
 
+
     public void RunRecipe(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks,IItemHandlerModifiable outputhandler, IMultipleTankHandler outputtanks) {
-        if (CheckCustomerRecipes(itemhandler, tanks)) {
+        if (CheckCustomerRecipes(itemhandler, tanks) && !this.is_broken) {
             // 扣除物品
             for (int i = 0; i < inputItems.size(); i++) {
                 ItemStack recipeItem = inputItems.get(i).copy();
@@ -423,7 +474,7 @@ public class CustomeRecipe {
                     if (stackInSlot.isItemEqual(recipeItem)) {
                         int availableCount = stackInSlot.getCount();
                         int toRemove = Math.min(availableCount, requiredCount);
-                        stackInSlot.shrink(toRemove);
+                        itemhandler.extractItem(slot,toRemove,false);
                         requiredCount -= toRemove;
                         if (requiredCount <= 0) {
                             break;
@@ -441,10 +492,10 @@ public class CustomeRecipe {
                 int requiredAmount = recipeFluid.amount;
                 for (int tank = 0; tank < tanks.getTanks(); tank++) {
                     FluidStack fluidInTank = tanks.getTankAt(tank).getFluid();
-                    if (fluidInTank.isFluidEqual(recipeFluid)) {
+                    if (fluidInTank != null && fluidInTank.isFluidEqual(recipeFluid)) {
                         int availableAmount = fluidInTank.amount;
                         int toDrain = Math.min(availableAmount, requiredAmount);
-                        fluidInTank.amount -= toDrain;
+                        tanks.getTankAt(tank).drain(toDrain,true);
                         requiredAmount -= toDrain;
                         if (requiredAmount <= 0) {
                             break;

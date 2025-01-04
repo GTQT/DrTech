@@ -40,6 +40,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     List<RecipeMap> recipemaps = new ArrayList<>();
     CustomeRecipe scan = new CustomeRecipe();
     Recipe scan_recipe;
+    Recipe run_recipe;
     String NBT_TAG_NAME = "StoreRecipe";
     public MetaTileEntityMatrixSolver(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
@@ -87,7 +88,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     }
     private void changeProductType(Widget.ClickData clickData)
     {
-        this.mode = (++this.mode)%3;
+        this.mode = (++this.mode)%4;
     }
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {
@@ -95,9 +96,11 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
         if(this.mode==0)
             textList.add(new TextComponentString("工作方式:"+"扫描配方"));
         else if(this.mode==1)
-            textList.add(new TextComponentString("工作方式:"+"不定元矩阵运算"));
+            textList.add(new TextComponentString("工作方式:"+"输出单配方"));
         else if(this.mode==2)
-            textList.add(new TextComponentString("工作方式:"+"执行配方"));
+            textList.add(new TextComponentString("工作方式:"+"解析联和配方"));
+        else if(this.mode==3)
+            textList.add(new TextComponentString("工作方式:"+"执行配方产出"));
         textList.add(new TextComponentString("配方仓库:"+ (this.recipemaps.size()==0?"空":this.recipemaps.size()+"个")));
         if(this.scan_recipe!=null)
         {
@@ -138,8 +141,10 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                    scan_recipe = recipemaps.get(0).findRecipe(Integer.MAX_VALUE,this.inputInventory,this.inputFluidInventory);
                    if(scan_recipe!=null)
                    {
+                       var list = scan.machineItems;
                        scan = new CustomeRecipe();
                        scan.GetDataFromRecipe(scan_recipe);
+                       scan.machineItems = list;
                    }
                }
            }else if(mode==1)
@@ -204,7 +209,33 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                    }
                }
            }
-
+           else if(mode==3){
+               List<CustomeRecipe> cres = new ArrayList<>();
+               if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
+               {
+                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
+                   {
+                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)))
+                       {
+                           var item = this.inputInventory.getStackInSlot(i).copy();
+                           if(item.hasTagCompound() && item.getTagCompound().hasKey(NBT_TAG_NAME))
+                           {
+                               cres.add(new CustomeRecipe(item.getTagCompound().getCompoundTag(NBT_TAG_NAME)));
+                           }
+                       }
+                   }
+               }
+               if(!cres.isEmpty())
+               {
+                   if(inputInventory.getSlots()>0 && this.inputFluidInventory.getTanks()>0)
+                   {
+                       if( cres.get(0).CheckCustomerRecipes(this.inputInventory,this.inputFluidInventory))
+                       {
+                           cres.get(0).RunRecipe(this.inputInventory,this.inputFluidInventory,this.outputInventory,this.outputFluidInventory);
+                       }
+                   }
+               }
+           }
 
         }
     }
