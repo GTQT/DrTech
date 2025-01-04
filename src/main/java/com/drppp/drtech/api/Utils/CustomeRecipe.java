@@ -9,6 +9,7 @@ import gregtech.api.recipes.Recipe;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
+import gregtech.common.metatileentities.MetaTileEntities;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,6 +20,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,7 +82,6 @@ public class CustomeRecipe {
         nbt.setLong("Eut", eut);
         nbt.setInteger("During", during);
         nbt.setBoolean("IsBroken", is_broken);
-
         return nbt;
     }
 
@@ -399,6 +400,8 @@ public class CustomeRecipe {
         return a;
     }
     public boolean CheckCustomerRecipes(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks) {
+        if(deep<=1)
+            return false;
         for (int i = 0; i < inputItems.size(); i++) {
             ItemStack recipeitem = inputItems.get(i).copy();
             if (recipeitem.isEmpty()) {
@@ -508,5 +511,14 @@ public class CustomeRecipe {
 
         }
     }
-    
+
+
+
+
+    public static List<ItemStack> CAN_DO_WORK_MACHINES = new ArrayList<>();
+    public static void InitCanDoWorkMachines()
+    {
+        CAN_DO_WORK_MACHINES.add(MetaTileEntities.LARGE_CHEMICAL_REACTOR.getStackForm());
+        CAN_DO_WORK_MACHINES.add(MetaTileEntities.ELECTRIC_BLAST_FURNACE.getStackForm());
+    }
 }

@@ -145,28 +145,30 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                        scan = new CustomeRecipe();
                        scan.GetDataFromRecipe(scan_recipe);
                        scan.machineItems = list;
-                   }
-               }
-           }else if(mode==1)
-           {
-               if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
-               {
-                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
-                   {
-                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && this.scan!=null)
-                       {
-                            var item = this.inputInventory.getStackInSlot(i).copy();
-                            item.setCount(1);
-                            NBTTagCompound tag = scan.writeToNBT();
-                            item.setTagInfo(NBT_TAG_NAME,tag);
 
-                           if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
+                       if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
+                       {
+                           for (int i = 0; i < this.inputInventory.getSlots(); i++)
                            {
-                               GTTransferUtils.insertItem(this.outputInventory,item,false);
+                               if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && this.scan!=null)
+                               {
+                                   var item = this.inputInventory.getStackInSlot(i).copy();
+                                   item.setCount(1);
+                                   NBTTagCompound tag = scan.writeToNBT();
+                                   item.setTagInfo(NBT_TAG_NAME,tag);
+
+                                   if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
+                                   {
+                                       GTTransferUtils.insertItem(this.outputInventory,item,false);
+                                   }
+                               }
                            }
                        }
                    }
                }
+           }else if(mode==1)
+           {
+
            }
            else if(mode==2)
            {
@@ -185,7 +187,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                        }
                    }
                }
-               if(!cres.isEmpty())
+               if(!cres.isEmpty() && cres.size()>1)
                {
                    DrtechUtils.yunSuan(cres);
                    CustomeRecipe Merged = new CustomeRecipe();
