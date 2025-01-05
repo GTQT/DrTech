@@ -9,6 +9,7 @@ import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
+import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
@@ -98,6 +99,7 @@ public class DrTechMain {
         {
             ItemCombs.init();
         }
+
     }
     @EventHandler
     @SideOnly(Side.CLIENT)
@@ -165,6 +167,7 @@ public class DrTechMain {
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
         RecycleBuilder.initRecycleRecipe();
+        CustomeRecipe.InitCanDoWorkMachines();
     }
 
     @EventHandler

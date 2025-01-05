@@ -2,6 +2,9 @@ package com.drppp.drtech.api.Utils;
 
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
 
+import gregicality.multiblocks.common.metatileentities.GCYMMetaTileEntities;
+import gregtech.api.GTValues;
+import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.IMultipleTankHandler;
 import gregtech.api.items.toolitem.ItemGTTool;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -10,6 +13,7 @@ import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.MetaTileEntities;
+import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
@@ -123,7 +127,7 @@ public class CustomeRecipe {
         }
         return fluids;
     }
-    public boolean ListContainsItem(List<ItemStack> list, ItemStack item)
+    public static boolean ListContainsItem(List<ItemStack> list, ItemStack item)
     {
         boolean b = false;
         for (int i = 0; i < list.size(); i++) {
@@ -400,27 +404,40 @@ public class CustomeRecipe {
         return a;
     }
     public boolean CheckCustomerRecipes(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks) {
-        if(deep<=1)
+        if(deep<=1 || is_broken)
             return false;
+        for (int i = 0; i < machineItems.size(); i++) {
+            ItemStack machineitem = machineItems.get(i).copy();
+            if (machineitem.isEmpty()) {
+                continue;
+            }
+            List<ItemStack> slots = GTUtility.itemHandlerToList(itemhandler);
+            if (slots == null || slots.isEmpty()) {
+                return false;
+            }
+            List<ItemStack> filterslot = slots.stream()
+                    .filter(f -> f != null && f.isItemEqual(machineitem))
+                    .collect(Collectors.toList());
+            if (filterslot == null || filterslot.isEmpty()) {
+                return false;
+            }
+        }
+
         for (int i = 0; i < inputItems.size(); i++) {
             ItemStack recipeitem = inputItems.get(i).copy();
             if (recipeitem.isEmpty()) {
                 continue;
             }
-            // 确保 slots 不为 null
             List<ItemStack> slots = GTUtility.itemHandlerToList(itemhandler);
             if (slots == null || slots.isEmpty()) {
                 return false;
             }
-
-            // 增加 f 的非空检查
             List<ItemStack> filterslot = slots.stream()
                     .filter(f -> f != null && f.isItemEqual(recipeitem))
                     .collect(Collectors.toList());
             if (filterslot == null || filterslot.isEmpty()) {
                 return false;
             }
-
             int count = 0;
             for (ItemStack iii : filterslot) {
                 count += iii.getCount();
@@ -435,21 +452,16 @@ public class CustomeRecipe {
             if (recipeitem == null || recipeitem.amount == 0) {
                 continue;
             }
-
-            // 确保 slots 不为 null
             List<FluidStack> slots = GTUtility.fluidHandlerToList(tanks);
             if (slots == null || slots.isEmpty()) {
                 return false;
             }
-
-            // 增加 f 的非空检查
             List<FluidStack> filterslot = slots.stream()
                     .filter(f -> f != null && f.isFluidEqual(recipeitem))
                     .collect(Collectors.toList());
             if (filterslot == null || filterslot.isEmpty()) {
                 return false;
             }
-
             int count = 0;
             for (FluidStack iii : filterslot) {
                 count += iii.amount;
@@ -463,8 +475,9 @@ public class CustomeRecipe {
     }
 
 
-    public void RunRecipe(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks,IItemHandlerModifiable outputhandler, IMultipleTankHandler outputtanks) {
+    public void RunRecipe(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks, IItemHandlerModifiable outputhandler, IMultipleTankHandler outputtanks) {
         if (CheckCustomerRecipes(itemhandler, tanks) && !this.is_broken) {
+
             // 扣除物品
             for (int i = 0; i < inputItems.size(); i++) {
                 ItemStack recipeItem = inputItems.get(i).copy();
@@ -520,5 +533,17 @@ public class CustomeRecipe {
     {
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.LARGE_CHEMICAL_REACTOR.getStackForm());
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.ELECTRIC_BLAST_FURNACE.getStackForm());
+        CAN_DO_WORK_MACHINES.add(MetaTileEntities.DISTILLATION_TOWER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(MetaTileEntities.CANNER[GTValues.LuV].getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_MACERATOR.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_ASSEMBLER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_AUTOCLAVE.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_BENDER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_BREWERY.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_EXTRACTOR.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CENTRIFUGE.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CHEMICAL_BATH.getStackForm());
+        CAN_DO_WORK_MACHINES.add(com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ADV_ARC_FURNACE.getStackForm());
     }
 }

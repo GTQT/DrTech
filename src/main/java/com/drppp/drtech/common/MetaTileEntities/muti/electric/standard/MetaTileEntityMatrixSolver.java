@@ -10,6 +10,7 @@ import gregtech.api.gui.widgets.WidgetGroup;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
+import gregtech.api.metatileentity.multiblock.MultiMapMultiblockController;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
@@ -33,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
@@ -121,50 +123,65 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                    for (int i = 0; i < this.inputInventory.getSlots(); i++)
                    {
                        ItemStack item = this.inputInventory.getStackInSlot(i).copy();
-                       if(GTUtility.getMetaTileEntity(item) != null)
+                       if(GTUtility.getMetaTileEntity(item) != null && CustomeRecipe.ListContainsItem(CustomeRecipe.CAN_DO_WORK_MACHINES,item))
                        {
                            var machine = GTUtility.getMetaTileEntity(item);
-                           if(!scan.ListContainsItem(scan.machineItems,item))
+                           if(!CustomeRecipe.ListContainsItem(scan.machineItems,item) )
                            {
                                scan.machineItems.add(item);
                                scan.machines.add(machine);
                            }
-                           if(machine.getRecipeMap() !=null)
+                           if(machine instanceof MultiMapMultiblockController)
                            {
-                               recipemaps.add(machine.getRecipeMap());
+                                var maps = ((MultiMapMultiblockController)machine).getAvailableRecipeMaps();
+                               for (int j = 0; j < maps.length; j++) {
+                                   var rec = maps[j];
+                                   if (recipemaps.stream().noneMatch(x -> x.equals(rec))) {
+                                       recipemaps.add(rec);
+                                   }
+                               }
+                           }
+                          else if(machine.getRecipeMap() !=null)
+                           {
+                               if (recipemaps.stream().noneMatch(x -> x.equals(machine.getRecipeMap()))) {
+                                   recipemaps.add(machine.getRecipeMap());
+                               }
                            }
                        }
                    }
                }
                if(!recipemaps.isEmpty())
                {
-                   scan_recipe = recipemaps.get(0).findRecipe(Integer.MAX_VALUE,this.inputInventory,this.inputFluidInventory);
-                   if(scan_recipe!=null)
-                   {
-                       var list = scan.machineItems;
-                       scan = new CustomeRecipe();
-                       scan.GetDataFromRecipe(scan_recipe);
-                       scan.machineItems = list;
+                    for(var formap: recipemaps)
+                    {
+                        scan_recipe = formap.findRecipe(Integer.MAX_VALUE,this.inputInventory,this.inputFluidInventory);
+                        if(scan_recipe!=null)
+                        {
+                            var list = scan.machineItems;
+                            scan = new CustomeRecipe();
+                            scan.GetDataFromRecipe(scan_recipe);
+                            scan.machineItems = list;
 
-                       if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
-                       {
-                           for (int i = 0; i < this.inputInventory.getSlots(); i++)
-                           {
-                               if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && this.scan!=null)
-                               {
-                                   var item = this.inputInventory.getStackInSlot(i).copy();
-                                   item.setCount(1);
-                                   NBTTagCompound tag = scan.writeToNBT();
-                                   item.setTagInfo(NBT_TAG_NAME,tag);
+                            if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
+                            {
+                                for (int i = 0; i < this.inputInventory.getSlots(); i++)
+                                {
+                                    if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && this.scan!=null)
+                                    {
+                                        var item = this.inputInventory.getStackInSlot(i).copy();
+                                        item.setCount(1);
+                                        NBTTagCompound tag = scan.writeToNBT();
+                                        item.setTagInfo(NBT_TAG_NAME,tag);
 
-                                   if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
-                                   {
-                                       GTTransferUtils.insertItem(this.outputInventory,item,false);
-                                   }
-                               }
-                           }
-                       }
-                   }
+                                        if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
+                                        {
+                                            GTTransferUtils.insertItem(this.outputInventory,item,false);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                }
            }else if(mode==1)
            {
@@ -217,7 +234,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                {
                    for (int i = 0; i < this.inputInventory.getSlots(); i++)
                    {
-                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)))
+                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && cres.isEmpty())
                        {
                            var item = this.inputInventory.getStackInSlot(i).copy();
                            if(item.hasTagCompound() && item.getTagCompound().hasKey(NBT_TAG_NAME))
