@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class DrtechLaserBeamParticle extends GTLaserBeamParticle {
     private int particleAge = 0;

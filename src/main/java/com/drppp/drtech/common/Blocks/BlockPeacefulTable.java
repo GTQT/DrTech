@@ -2,7 +2,6 @@ package com.drppp.drtech.common.Blocks;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.Tile.TileEntityGoldenSea;
 import com.drppp.drtech.Tile.TileEntityPeacefulTable;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

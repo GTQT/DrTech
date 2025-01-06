@@ -1,6 +1,5 @@
 package com.drppp.drtech;
 
-import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.Particle.EntityParticleGroup;
 import com.drppp.drtech.Client.Particle.EntityParticleSpray;
 import com.drppp.drtech.Client.Particle.InstantParticleRender;
@@ -8,6 +7,7 @@ import com.drppp.drtech.Client.Particle.ParticleRenderer;
 import com.drppp.drtech.Client.render.BulletRenderer;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Entity.EntityGunBullet;
 import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
@@ -38,13 +38,14 @@ public final class DrTechModelRegister {
         onModelRegistration();
         EntityRenderReg();
     }
+
     @SideOnly(Side.CLIENT)
     public static void onModelRegistration() {
 
         ModelResourceLocation model = new ModelResourceLocation(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY.getRegistryName(), "inventory");
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY), 0, model);
         ModelResourceLocation model1 = new ModelResourceLocation(BlocksInit.BLOCK_HOMO_EYE.getRegistryName(), "inventory");
-       ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_HOMO_EYE), 0, model1);
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_HOMO_EYE), 0, model1);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR1), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR1.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR2), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR2.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR3), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR3.getRegistryName(), "inventory"));
@@ -59,9 +60,9 @@ public final class DrTechModelRegister {
         ItemsInit.registerItemModels();
         GeoItemsInit.onModelRegistry();
     }
+
     @SideOnly(Side.CLIENT)
-    public static void EntityRenderReg()
-    {
+    public static void EntityRenderReg() {
         RenderingRegistry.registerEntityRenderingHandler(EntityParticleGroup.class, manager -> new ParticleRenderer(manager));
         RenderingRegistry.registerEntityRenderingHandler(EntityHyperGunBullet.class, manager -> (Render<EntityHyperGunBullet>) new BulletRenderer(manager,
                 new ResourceLocation(Tags.MODID, "textures/entity/hyper_bullet.png")));

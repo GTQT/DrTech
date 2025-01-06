@@ -7,9 +7,9 @@ import java.util.List;
 
 public class LateMixin implements ILateMixinLoader {
 
-	@Override
-	public List<String> getMixinConfigs() {
-		return Collections.singletonList("mixins.drtech_late.json");
-	}
+    @Override
+    public List<String> getMixinConfigs() {
+        return Collections.singletonList("mixins.drtech_late.json");
+    }
 
 }

@@ -1,10 +1,10 @@
 package com.drppp.drtech.common.Blocks;
 
 
+import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.MetaBlocks.*;
 import com.drppp.drtech.common.Blocks.Pipe.BlockMyLaserPipe;
 import com.drppp.drtech.DrTechMain;
-import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.Utils.Datas;
 import gregtech.common.pipelike.laser.LaserPipeType;

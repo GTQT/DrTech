@@ -2,6 +2,7 @@ package com.drppp.drtech.Client.Entity;
 
 import com.drppp.drtech.Client.lib.obj.AdvancedModelLoader;
 import com.drppp.drtech.Client.lib.obj.IModelCustom;
+import com.drppp.drtech.Tags;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -12,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class EntityAdvancedRocketRender extends RenderLiving {
     private IModelCustom model;
-    private static final ResourceLocation MODEL = new ResourceLocation("drtech", "models/shipi.obj");
-    private static final ResourceLocation TEXTURE =new ResourceLocation("drtech","models/hongbei.png");
+    private static final ResourceLocation MODEL = new ResourceLocation(Tags.MODID, "models/shipi.obj");
+    private static final ResourceLocation TEXTURE =new ResourceLocation(Tags.MODID,"models/hongbei.png");
     public EntityAdvancedRocketRender(RenderManager rendermanagerIn) {
         super(rendermanagerIn, null, 0.5f);
         this.model =  AdvancedModelLoader.loadModel(MODEL);

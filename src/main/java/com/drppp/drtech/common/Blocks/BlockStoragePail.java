@@ -1,22 +1,9 @@
 package com.drppp.drtech.common.Blocks;
 
-import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.Tile.TileEntityPeacefulTable;
 import com.drppp.drtech.Tile.TileEntityStoragePail;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
-import com.drppp.drtech.api.TileEntity.TileEntityWithUI;
-import gregtech.api.capability.GregtechTileCapabilities;
-import gregtech.api.capability.IControllable;
-import gregtech.api.gui.GuiTextures;
-import gregtech.api.gui.ModularUI;
-import gregtech.api.gui.UIFactory;
-import gregtech.api.gui.resources.TextureArea;
-import gregtech.api.gui.widgets.AdvancedTextWidget;
-import gregtech.api.gui.widgets.ImageCycleButtonWidget;
-import gregtech.api.gui.widgets.ImageWidget;
-import gregtech.api.metatileentity.MetaTileEntityUIFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -35,9 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
 import java.util.Random;
-import java.util.function.BooleanSupplier;
 
 public class BlockStoragePail extends Block {
     private int level;

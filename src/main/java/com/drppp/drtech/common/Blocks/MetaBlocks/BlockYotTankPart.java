@@ -1,8 +1,8 @@
 package com.drppp.drtech.common.Blocks.MetaBlocks;
 
 import com.drppp.drtech.DrTechMain;
-import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.IStoreData;
 import com.drppp.drtech.Tags;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.IStoreData;
 import gregtech.api.block.VariantBlock;
 import gregtech.api.items.toolitem.ToolClasses;
 import net.minecraft.block.SoundType;

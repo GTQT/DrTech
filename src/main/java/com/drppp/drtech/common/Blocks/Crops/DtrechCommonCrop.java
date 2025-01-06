@@ -1,8 +1,8 @@
 package com.drppp.drtech.common.Blocks.Crops;
 
 
-import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.Tags;
+import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
@@ -13,7 +13,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.IPlantable;
 
 import java.util.Random;
 

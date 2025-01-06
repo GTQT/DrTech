@@ -39,6 +39,5 @@ dependencies {
     implementation rfg.deobf("curse.maven:pams-harvestcraft-221857:2904825")
     implementation rfg.deobf("curse.maven:modularui-624243:5153413")
     implementation rfg.deobf("curse.maven:Binnie's Mods-223525:2916129")
-    implementation rfg.deobf(files("libs/TheBetweenlands-3.9.6-universal.jar"))
-    implementation rfg.deobf(files("libs/TheBetweenlands-3.9.6-core.jar"))
+    implementation rfg.deobf("curse.maven:BdLib-70496:4675629")
 }

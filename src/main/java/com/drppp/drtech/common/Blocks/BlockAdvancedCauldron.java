@@ -6,7 +6,6 @@ import com.drppp.drtech.Tile.TileEntityAdvancedCauldron;
 import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;

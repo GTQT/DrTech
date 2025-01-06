@@ -2,6 +2,7 @@ package com.drppp.drtech.common.MetaTileEntities;
 
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.DrtConfig;
+import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
@@ -14,7 +15,6 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearR
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityEnergyTransTower;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
-import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;

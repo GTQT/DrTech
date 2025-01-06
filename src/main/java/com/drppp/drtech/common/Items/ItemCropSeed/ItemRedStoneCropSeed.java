@@ -1,8 +1,8 @@
 package com.drppp.drtech.common.Items.ItemCropSeed;
 
+import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.DrTechMain;
-import com.drppp.drtech.Tags;
 import net.minecraft.block.BlockFarmland;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;

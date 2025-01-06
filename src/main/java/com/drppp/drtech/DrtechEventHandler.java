@@ -15,7 +15,8 @@ import org.lwjgl.input.Keyboard;
 
 @Mod.EventBusSubscriber(modid = Tags.MODID)
 public class DrtechEventHandler {
-public static int ctrlflag = 0;
+    public static int ctrlflag = 0;
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void registerMaterials(MaterialEvent event) {
         DrtechMaterials.init();
@@ -26,16 +27,18 @@ public static int ctrlflag = 0;
     public static void onKeyInput(InputEvent.KeyInputEvent event) {
         if (Keybinds.CTRL.isKeyDown()) {
             ctrlflag = 1;
-        }else
-        ctrlflag = 0;
+        } else
+            ctrlflag = 0;
     }
+
     @SideOnly(Side.CLIENT)
     public static class Keybinds {
         public static final KeyBinding CTRL = new KeyBinding("key.ctrl", Keyboard.KEY_LCONTROL, "key.categories.drtech");
+
         public static void registerKeybinds() {
             ClientRegistry.registerKeyBinding(CTRL);
         }
     }
-	
-	
+
+
 }

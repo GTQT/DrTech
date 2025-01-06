@@ -1,19 +1,12 @@
 package com.drppp.drtech.common.Items;
 
-import com.drppp.drtech.Client.render.Items.GeoItemRender;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Items.GeoItems.GeoItem;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
-import software.bernie.example.registry.ItemRegistry;
 
 public class GeoItemsInit {
     private static IForgeRegistry<Item> itemRegistry;

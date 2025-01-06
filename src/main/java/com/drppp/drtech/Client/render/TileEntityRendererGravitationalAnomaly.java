@@ -8,13 +8,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.util.glu.Sphere;
+
 public class TileEntityRendererGravitationalAnomaly extends TileEntitySpecialRenderer<TileEntityGravitationalAnomaly> {
-   // public static final ResourceLocation core = new ResourceLocation("drtech:textures/blocks/gravitational_anomaly.png");
+    // public static final ResourceLocation core = new ResourceLocation("drtech:textures/blocks/gravitational_anomaly.png");
 
     private final Sphere sphere_model = new Sphere();
 
     public TileEntityRendererGravitationalAnomaly() {
     }
+
     @SideOnly(Side.CLIENT)
     public void render(TileEntityGravitationalAnomaly tileEntity, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (tileEntity.shouldRender()) {
@@ -24,7 +26,7 @@ public class TileEntityRendererGravitationalAnomaly extends TileEntitySpecialRen
             double resonateSpeed = 0.1;
             double radius;
             radius = 1d;
-            radius = radius * Math.sin((double)time * resonateSpeed) * 0.1 + radius * 0.9;
+            radius = radius * Math.sin((double) time * resonateSpeed) * 0.1 + radius * 0.9;
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
             GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
@@ -39,7 +41,7 @@ public class TileEntityRendererGravitationalAnomaly extends TileEntitySpecialRen
             GlStateManager.scale(2.0F, 2.0F, 2.0F);
             GlStateManager.rotate(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTicks, 0.0F, -1.0F, 0.0F);
             GlStateManager.rotate(player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate((float)time * speed, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate((float) time * speed, 0.0F, 0.0F, 1.0F);
             GlStateManager.translate(-0.5, -0.5, 0.0);
             GlStateManager.color(1.0F, 1.0F, 1.0F);
             GlStateManager.blendFunc(770, 771);

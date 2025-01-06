@@ -1,6 +1,7 @@
 package com.drppp.drtech.Client;
 
 import com.drppp.drtech.Client.Custome.CentrifugeRender;
+import com.drppp.drtech.Tags;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.resources.AdoptableTextureArea;
 import gregtech.api.gui.resources.TextureArea;
@@ -100,10 +101,10 @@ public class Textures {
     }
     public static void register(TextureMap textureMap) {
 
-        LASER_PIPE_SIDE = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side"));
-        LASER_PIPE_IN = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_in"));
-        LASER_PIPE_OVERLAY = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side_overlay"));
-        LASER_PIPE_OVERLAY_EMISSIVE = textureMap.registerSprite(new ResourceLocation("drtech", "blocks/pipe/pipe_laser_side_overlay_emissive"));
+        LASER_PIPE_SIDE = textureMap.registerSprite(new ResourceLocation(Tags.MODID, "blocks/pipe/pipe_laser_side"));
+        LASER_PIPE_IN = textureMap.registerSprite(new ResourceLocation(Tags.MODID, "blocks/pipe/pipe_laser_in"));
+        LASER_PIPE_OVERLAY = textureMap.registerSprite(new ResourceLocation(Tags.MODID, "blocks/pipe/pipe_laser_side_overlay"));
+        LASER_PIPE_OVERLAY_EMISSIVE = textureMap.registerSprite(new ResourceLocation(Tags.MODID, "blocks/pipe/pipe_laser_side_overlay_emissive"));
 
     }
 

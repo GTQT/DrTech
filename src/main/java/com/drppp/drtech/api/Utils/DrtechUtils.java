@@ -25,7 +25,6 @@ import java.util.List;
 
 import static com.drppp.drtech.loaders.DrtechReceipes.LOG_CREATE;
 import static gregtech.api.GregTechAPI.materialManager;
-import static net.bdew.gendustry.api.GendustryAPI.Items;
 
 public class DrtechUtils {
     public static  List<Material> listMater = new ArrayList<>();

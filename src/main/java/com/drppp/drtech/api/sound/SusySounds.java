@@ -1,6 +1,5 @@
 package com.drppp.drtech.api.sound;
 
-import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;

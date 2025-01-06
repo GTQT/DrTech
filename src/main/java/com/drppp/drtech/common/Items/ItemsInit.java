@@ -1,11 +1,11 @@
 package com.drppp.drtech.common.Items;
 
+import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemRedStoneCropSeed;
-import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import gregtech.api.block.VariantItemBlock;
 import gregtech.client.model.SimpleStateMapper;
