@@ -5,6 +5,8 @@ import baubles.api.cap.IBaublesItemHandler;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntitySapBag;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityBaseWithControl;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityMatrixSolver;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntutyLargeBeeHive;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
 import gregtech.api.util.GTUtility;
@@ -40,6 +42,30 @@ public class TopCommonProvider implements IProbeInfoProvider {
                 ItemStack stack = baubles.getStackInSlot(i);
                 if (stack.getItem()== MyMetaItems.TELEPATHIC_NECKLACE.getMetaItem() && stack.getMetadata()==MyMetaItems.TELEPATHIC_NECKLACE.getMetaValue()) {
                     flag=true;
+                }
+            }
+        }
+        if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityBaseWithControl)
+        {
+            MetaTileEntityBaseWithControl s = (MetaTileEntityBaseWithControl) GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
+            iProbeInfo.progress(s.getProgress(), s.getMaxProgress(), iProbeInfo.defaultProgressStyle()
+                    .suffix(" / " + TextFormattingUtil.formatNumbers(s.getMaxProgress()) + " t")
+                    .filledColor(0xFFEEE600)
+                    .alternateFilledColor(0xFFEEE600)
+                    .borderColor(0xFF555555).numberFormat(mcjty.theoneprobe.api.NumberFormat.COMMAS));
+            if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityMatrixSolver)
+            {
+                MetaTileEntityMatrixSolver ss= (MetaTileEntityMatrixSolver) GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
+                iProbeInfo.text("耗电:"+ss.EUT+"Eu/t");
+                iProbeInfo.text("产出信息:");
+                if(ss.isWorkingEnabled() && ss.run_recipe!=null)
+                {
+                    for (var item:ss.run_recipe.outputItems) {
+                        iProbeInfo.text(item.getDisplayName() +"*"+item.getCount());
+                    }
+                    for (var fluid:ss.run_recipe.outputFluids) {
+                        iProbeInfo.text(fluid.getLocalizedName() +"*"+fluid.amount);
+                    }
                 }
             }
         }

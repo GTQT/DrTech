@@ -157,6 +157,7 @@ public class DrTechMain {
         StructUtil.init();
         DRTAlleleBeeSpecies.setupAlleles();
         CombRecipes.initDRTCombs();
+        CustomeRecipe.InitCanDoWorkMachines();
     }
 
     @SideOnly(Side.CLIENT)
@@ -176,7 +177,7 @@ public class DrTechMain {
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
         RecycleBuilder.initRecycleRecipe();
-        CustomeRecipe.InitCanDoWorkMachines();
+
     }
 
     @EventHandler

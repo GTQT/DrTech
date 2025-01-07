@@ -381,6 +381,8 @@ public class CustomeRecipe {
             for (FluidStack fluid : outputFluids) {
                 fluid.amount=(fluid.amount / gcd);
             }
+            eut /=gcd;
+            during /=gcd;
         }
     }
 
@@ -442,7 +444,7 @@ public class CustomeRecipe {
             for (ItemStack iii : filterslot) {
                 count += iii.getCount();
             }
-            if (count < recipeitem.getCount()) { // 修复边界条件
+            if (count < recipeitem.getCount()) {
                 return false;
             }
         }
@@ -466,7 +468,7 @@ public class CustomeRecipe {
             for (FluidStack iii : filterslot) {
                 count += iii.amount;
             }
-            if (count < recipeitem.amount) { // 修复边界条件
+            if (count < recipeitem.amount) {
                 return false;
             }
         }
@@ -534,7 +536,7 @@ public class CustomeRecipe {
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.LARGE_CHEMICAL_REACTOR.getStackForm());
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.ELECTRIC_BLAST_FURNACE.getStackForm());
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.DISTILLATION_TOWER.getStackForm());
-        CAN_DO_WORK_MACHINES.add(MetaTileEntities.CANNER[GTValues.LuV].getStackForm());
+        CAN_DO_WORK_MACHINES.add(MetaTileEntities.ASSEMBLY_LINE.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_MACERATOR.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_ASSEMBLER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_AUTOCLAVE.getStackForm());
@@ -543,7 +545,18 @@ public class CustomeRecipe {
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_EXTRACTOR.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CENTRIFUGE.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CHEMICAL_BATH.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_DISTILLERY.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_POLARIZER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CUTTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ADV_ARC_FURNACE.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ROASTER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ELECTROBATH.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.INDUSTRIAL_MACERATOR.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.BIO_CENTRIFUGE.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.FROTH_FLOTATION_TANK.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.VACUUM_DRYING_FURNACE.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.STEPPER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.LASER_ENGRAVING.getStackForm());
     }
 }
