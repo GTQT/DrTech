@@ -52,7 +52,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     public List<CustomeRecipe> run_cres = new ArrayList<>();
     public long EUT =0;
     public CustomeRecipe run_recipe=null;
-
+    public int parra=1;
     public MetaTileEntityMatrixSolver(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -62,6 +62,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
         //nbt.setBoolean("IsRunning", is_running);
         nbt.setInteger("MaxProcess", maxProcess);
         nbt.setInteger("Process", process);
+        nbt.setInteger("Parra", parra);
         nbt.setLong("EUT", EUT);
         if (scan != null) {
             nbt.setTag("ScanRecipe", scan.writeToNBT());
@@ -84,6 +85,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
         //is_running = nbt.getBoolean("IsRunning");
         maxProcess = nbt.getInteger("MaxProcess");
         process = nbt.getInteger("Process");
+        parra = nbt.getInteger("Parra");
         EUT = nbt.getLong("EUT");
         if (nbt.hasKey("ScanRecipe")) {
             scan = new CustomeRecipe(nbt.getCompoundTag("ScanRecipe"));
@@ -196,6 +198,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
             textList.add(new TextComponentString("运行状态:"+isWorkingEnabled()));
             if(run_recipe!=null)
             {
+                textList.add(new TextComponentString("并行:"+parra +"/16"));
                 textList.add(new TextComponentString("耗电:"+EUT));
                 textList.add(new TextComponentString("进度:"+process+"/"+maxProcess+"Tick"));
             }
@@ -354,6 +357,8 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                             {
                                 if( rec.CheckCustomerRecipes(this.inputInventory,this.inputFluidInventory))
                                 {
+                                    int parrac = rec.CalculationParra(this.inputInventory,this.inputFluidInventory);
+                                    this.parra = parrac;
                                     run_recipe = rec;
                                     process=0;
                                     maxProcess = run_recipe.during;
@@ -362,11 +367,16 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                                     {
                                         int inputv= GTUtility.getTierByVoltage(this.getEnergyContainer().getInputVoltage());
                                         int recpev =  GTUtility.getTierByVoltage(run_recipe.eut);
-                                        if(inputv>recpev)
-                                        {
-                                            maxProcess /= ((inputv-recpev)*4);
-                                            maxProcess = Math.max(maxProcess,1);
-                                            EUT *= ((inputv-recpev)*4);
+                                        if (inputv > recpev) {
+                                            int level = inputv - recpev;
+                                            int count = 0;
+                                            while (maxProcess > 1 && count < level) {
+                                                maxProcess /= 4;
+                                                count++;
+                                            }
+                                            int rate = (int) Math.pow(4, count);
+                                            maxProcess = Math.max(maxProcess, 1);
+                                            EUT *= rate;
                                         }
                                     }
                                 }
@@ -378,7 +388,9 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                         this.getEnergyContainer().changeEnergy(-run_recipe.eut);
                         if(++process>=maxProcess)
                         {
-                            run_recipe.RunRecipe(this.inputInventory,this.inputFluidInventory,this.outputInventory,this.outputFluidInventory);
+                            for (int i = 0; i < parra; i++) {
+                                run_recipe.RunRecipe(this.inputInventory,this.inputFluidInventory,this.outputInventory,this.outputFluidInventory);
+                            }
                             process=0;
                             maxProcess=0;
                             run_recipe=null;

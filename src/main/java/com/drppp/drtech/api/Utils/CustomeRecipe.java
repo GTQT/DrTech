@@ -476,7 +476,53 @@ public class CustomeRecipe {
         return true;
     }
 
-
+    public int CalculationParra(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks)
+    {
+        int min = 999999;
+        //物品支持并行
+        for (int i = 0; i < inputItems.size(); i++) {
+            ItemStack recipeItem = inputItems.get(i).copy();
+            if (recipeItem.isEmpty()) {
+                continue;
+            }
+            int requiredCount = recipeItem.getCount();
+            int now_item = 0;
+            for (int slot = 0; slot < itemhandler.getSlots(); slot++) {
+                ItemStack stackInSlot = itemhandler.getStackInSlot(slot);
+                if (stackInSlot.isItemEqual(recipeItem)) {
+                    int availableCount = stackInSlot.getCount();
+                    now_item+=availableCount;
+                }
+            }
+            if(now_item==0 || now_item<requiredCount)
+                return 1;
+            int res = now_item/requiredCount;
+            min = Math.min(res,min);
+        }
+        //流体支持并行
+        for (int i = 0; i < inputFluids.size(); i++) {
+            FluidStack recipeFluid = inputFluids.get(i).copy();
+            if (recipeFluid == null || recipeFluid.amount == 0) {
+                continue;
+            }
+            int requiredAmount = recipeFluid.amount;
+            int now_amount = 0;
+            for (int tank = 0; tank < tanks.getTanks(); tank++) {
+                FluidStack fluidInTank = tanks.getTankAt(tank).getFluid();
+                if (fluidInTank != null && fluidInTank.isFluidEqual(recipeFluid)) {
+                    int availableAmount = fluidInTank.amount;
+                    now_amount+=availableAmount;
+                }
+            }
+            if(now_amount==0 || now_amount<requiredAmount)
+                return 1;
+            int res = now_amount/requiredAmount;
+            min = Math.min(res,min);
+        }
+        min = Math.min(min,16);
+        min = Math.max(min,1);
+        return min;
+    }
     public void RunRecipe(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks, IItemHandlerModifiable outputhandler, IMultipleTankHandler outputtanks) {
         if (CheckCustomerRecipes(itemhandler, tanks) && !this.is_broken) {
 
