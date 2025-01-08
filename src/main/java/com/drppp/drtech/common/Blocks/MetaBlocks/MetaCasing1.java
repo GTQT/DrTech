@@ -55,7 +55,8 @@ public class MetaCasing1 extends VariantBlock<MetaCasing1.MetalCasingType> {
         CABLE_PRESS_CASING("cable_press_casing"),
         SIEVE_NET_CASING("sieve_net_casing"),
         SIEVE_CASING("sieve_casing"),
-        CENTRIFUGE_CASING("centrifuge_casing");
+        CENTRIFUGE_CASING("centrifuge_casing"),
+        MATRIX_CASING("matrix_casing");
         private final String name;
 
         MetalCasingType(String name) {

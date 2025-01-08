@@ -39,6 +39,11 @@
         "textures": {
           "all": "drtech:blocks/centrifuge_casing"
         }
+      },
+      "matrix_casing": {
+        "textures": {
+          "all": "drtech:blocks/matrix_casing"
+        }
       }
     }
   }

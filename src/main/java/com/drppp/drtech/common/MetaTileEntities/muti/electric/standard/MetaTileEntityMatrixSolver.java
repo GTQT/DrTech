@@ -33,10 +33,12 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -104,28 +106,52 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     }
 
     @Override
+    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
+        super.addInformation(stack, world, tooltip, advanced);
+        tooltip.add("该机器分成三种运行模式:");
+        tooltip.add("1-配方解析====================");
+        tooltip.add("在该模式下，机器用于解析配方，并把配方写入==矩阵水晶==");
+        tooltip.add("输入总线需要放入该机器支持的大机器主方块，机器会读取该机器的配方");
+        tooltip.add("受支持的机器可以在jei进行查看/可通过大化反按U进行查询");
+        tooltip.add("输入总线/仓放入需要执行的配方的原料，然后放入矩阵水晶，机器会把配方写入矩阵水晶，并在输出总线输出");
+        tooltip.add("2-配方联和====================");
+        tooltip.add("输入总线放入多个已经写入的单配方水晶，最后一个是最终产出水晶");
+        tooltip.add("然后放入一个空的矩阵水晶，运算器会自动解析并尝试组合配方");
+        tooltip.add("最后一个带有配方的水晶不参与运算，即产出水晶");
+        tooltip.add("运算完毕后，结果可能成功可能会失败，如果失败可以检查前置步骤是否存在无法配平的循环配方");
+        tooltip.add("提示：可以尝试分步骤组装。");
+        tooltip.add("运算结束后会输出一个联合后的矩阵水晶，可用于生产");
+        tooltip.add("运算后的配方会联和所有的单配方，消除中间步骤，通过原料直接产出最终产品");
+        tooltip.add("3-配方生产====================");
+        tooltip.add("需要用配方联合后的矩阵水晶进行生产，过程会校验配方用的机器，机器需放入输入总线");
+        tooltip.add("矩阵水晶也需要放入输入总线");
+        tooltip.add("原材料也正常放入总线、仓室");
+        tooltip.add("不支持单步配方生产，即未联和运算过的配方(深度为0的配方)");
+    }
+
+    @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start()
-                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CDC CDC CDC CDC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAASAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAASAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
                 .where('S', selfPredicate())
                 .where(' ',any() )
-                .where('A',states(GTQTMetaBlocks.TURBINE_CASING1.getStateFromMeta(5)).setMinGlobalLimited(578)
+                .where('A',states(BlocksInit.COMMON_CASING1.getStateFromMeta(7)).setMinGlobalLimited(578)
                         .or(autoAbilities(true,true))
                         .or(abilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID).setMaxGlobalLimited(16))
                         .or(abilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID).setMaxGlobalLimited(16))
@@ -144,7 +170,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     }
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
-        return GTQTTextures.AD_CASING;
+        return Textures.MATRIX_CASING;
     }
     @SideOnly(Side.CLIENT)
     @NotNull

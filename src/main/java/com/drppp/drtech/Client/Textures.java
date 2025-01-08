@@ -32,6 +32,7 @@ public class Textures {
     public static  SimpleOverlayRenderer JIAO_BAN_CASING;
     public static  SimpleOverlayRenderer SIEVE_CASING;
     public static  SimpleOverlayRenderer CENTRIFUGE_CASING;
+    public static  SimpleOverlayRenderer MATRIX_CASING;
     public static  OrientedOverlayRenderer CENTRIFUGE;
     public static  OrientedOverlayRenderer LARGE_UU_PRODUCTER;
     public static  OrientedOverlayRenderer ELECTRIC_IMPLOSION_OVERLAY;
@@ -85,6 +86,7 @@ public class Textures {
         ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
         YOT_TANK_CASING = new SimpleOverlayRenderer("casings/yot_tank_casing");
         TFFT_TANK_CASING = new SimpleOverlayRenderer("casings/tfft_casing");
+        MATRIX_CASING = new SimpleOverlayRenderer("casings/matrix_casing");
         LARGE_UU_PRODUCTER = new OrientedOverlayRenderer("multiblock/large_uu_producter");
         INDUSTRIAL_MACHINE = new OrientedOverlayRenderer("multiblock/industrial_machine");
         ELECTRIC_IMPLOSION_OVERLAY = new OrientedOverlayRenderer("multiblock/electric_implosion");
