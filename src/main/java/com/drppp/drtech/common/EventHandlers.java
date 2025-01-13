@@ -2,6 +2,7 @@ package com.drppp.drtech.common;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Entity.EntityDropPod;
+import com.drppp.drtech.common.enent.DimensionBreathabilityHandler;
 import com.drppp.drtech.common.enent.MobHordeWorldData;
 import gregtech.api.util.GTTeleporter;
 import gregtech.api.util.TeleportHandler;
@@ -71,7 +72,7 @@ public class EventHandlers {
     }
 
     @SubscribeEvent
-    public static void on(TickEvent.WorldTickEvent event) {
+    public static void onWorldTick(TickEvent.WorldTickEvent event) {
 
         World world = event.world;
 
@@ -92,6 +93,13 @@ public class EventHandlers {
             MobHordeWorldData mobHordeWorldData = MobHordeWorldData.get(world);
             list.getPlayers().forEach(p -> mobHordeWorldData.getPlayerData(p.getPersistentID()).update(p));
             mobHordeWorldData.markDirty();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.player.world.getTotalWorldTime() % 20 == 0 && event.phase == TickEvent.Phase.START) {
+            DimensionBreathabilityHandler.tickPlayer(event.player);
         }
     }
 }

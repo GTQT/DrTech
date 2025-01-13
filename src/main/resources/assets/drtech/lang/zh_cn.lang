@@ -1017,7 +1017,6 @@ item.drt.comb.ethylene.name=乙烯蜂窝
 item.drt.comb.tetrafluoroethylene.name=四氟乙烯蜂窝
 item.drt.comb.cryolite.name=冰晶石蜂窝
 
-
 for.bees.species.borax=硼砂
 for.bees.species.wither=凋零
 for.bees.species.bright=璀璨
@@ -1048,6 +1047,55 @@ item.drt.honey_drop.tetrafluoroethylene.name=四氟乙烯液滴
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡
 
+# Armors
+metaitem.jet_wingpack.name=Jet Wingpack
+metaarmor.hud.engine_status=Engine: %s
+metaarmor.jet_wingpack.engine_active=Jet Wingpack: Engine Activated
+metaarmor.jet_wingpack.engine_inactive=Jet Wingpack: Engine Deactivated
+
+metaitem.simple_gas_mask.name=原始防毒面具
+metaitem.simple_gas_mask.tooltip=在无氧环境中生存
+metaitem.gas_mask.name=防毒面具
+metaitem.gas_mask.tooltip=在无氧环境中更长时间地生存
+metaitem.gas_tank.name=气体罐
+metaitem.gas_tank.tooltip=在无氧环境中更长时间地生存
+metaitem.asbestos_mask.name=石棉防毒面具
+metaitem.asbestos_mask.tooltip=在高温环境中生存
+metaitem.asbestos_chestplate.name=石棉罐
+metaitem.asbestos_chestplate.tooltip=在高温环境中生存
+metaitem.asbestos_leggings.name=石棉护腿
+metaitem.asbestos_leggings.tooltip=在高温环境中生存
+metaitem.asbestos_boots.name=石棉靴子
+metaitem.asbestos_boots.tooltip=在高温环境中生存
+metaitem.rebreather_tank.name=再呼吸器罐
+metaitem.rebreather_tank.tooltip=更长时间地储存氧气
+metaitem.reflective_mask.name=反射性防毒面具
+metaitem.reflective_mask.tooltip=减少热伤害
+metaitem.reflective_chestplate.name=反射性罐
+metaitem.reflective_chestplate.tooltip=减少热伤害
+metaitem.reflective_leggings.name=反射性护腿
+metaitem.reflective_leggings.tooltip=减少热伤害
+metaitem.reflective_boots.name=反射性靴子
+metaitem.reflective_boots.tooltip=减少热伤害
+metaitem.filtered_tank.name=过滤气体罐
+metaitem.filtered_tank.tooltip=非常长时间地储存氧气
+metaitem.nomex_mask.name=诺梅克斯防毒面具
+metaitem.nomex_mask.tooltip=无限期地待在地幔中！
+metaitem.nomex_chestplate.name=诺梅克斯罐
+metaitem.nomex_chestplate.tooltip=无限期地待在地幔中！
+metaitem.nomex_leggings.name=诺梅克斯护腿
+metaitem.nomex_leggings.tooltip=无限期地待在地幔中！
+metaitem.nomex_boots.name=诺梅克斯靴子
+metaitem.nomex_boots.tooltip=无限期地待在地幔中！
+
+death.attack.toxic_atmo=%s 的肺被撕裂了
+death.attack.suffocation=%s 无法呼吸
+
+drtech.oxygen=剩余空气：§b%s 秒§r（总共 %s）
+drtech.unlimited_oxygen=剩余空气：§2无限§r
+drtech.seconds_left=剩余生命：§2%s 秒§r
+drtech.unlimited=剩余生命：§2无限§r
+
 # Commands
 
 drtech.command.horde.usage=/mobHorde <start/stop>
@@ -1063,8 +1111,4 @@ drtech.command.horde.stop.has_active_no_invasion=没有正在进行中的入侵�
 drtech.command.horde.stop.stopped=%s入侵已结束。
 drtech.command.horde.status.usage=/mobHorde status <player>
 drtech.command.horde.status.has_active_invasion=Player %s has an active %s invasion for %d ticks. It will time out in %s ticks.
-
-
-
-
 drtech.command.horde.status.no_active_invasion=Player %s has no active invasion.entity.UTi_Golem.name=Uranium-Titanium Alloy Golemdrtech.command.horde.status.no_active_invasion=Player %s has no active invasion.entity.UTi_Golem.name=Uranium-Titanium Alloy Golemdrtech.command.horde.status.no_active_invasion=Player %s has no active invasion.

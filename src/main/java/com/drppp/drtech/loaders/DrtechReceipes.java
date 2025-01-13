@@ -2,6 +2,7 @@ package com.drppp.drtech.loaders;
 
 
 import com.drppp.drtech.api.recipes.builder.DronePadRecipeBuilder;
+import com.drppp.drtech.api.recipes.builder.NoEnergyRecipeBuilder;
 import com.drppp.drtech.loaders.builder.EImplosionRecipeBuilder;
 import gregtech.api.GTValues;
 import gregtech.api.gui.GuiTextures;
@@ -9,6 +10,7 @@ import gregtech.api.gui.widgets.ProgressWidget;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.recipes.builders.SimpleRecipeBuilder;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.core.sound.GTSoundEvents;
 import net.minecraft.init.SoundEvents;
 
 public final class DrtechReceipes {
@@ -24,6 +26,12 @@ public final class DrtechReceipes {
             .setSlotOverlay(true, false, GuiTextures.CIRCUIT_OVERLAY)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, ProgressWidget.MoveType.HORIZONTAL);
 
+
+    public static final RecipeMap<NoEnergyRecipeBuilder> JET_WINGPACK_FUELS = new RecipeMap<>("jet_wingpack_fuels", 0, 0, 1, 0, new NoEnergyRecipeBuilder(), false)
+            .setSlotOverlay(false, false, GuiTextures.DARK_CANISTER_OVERLAY)
+            .setProgressBar(GuiTextures.PROGRESS_BAR_GAS_COLLECTOR, ProgressWidget.MoveType.HORIZONTAL)
+            .setSound(GTSoundEvents.TURBINE)
+            .allowEmptyOutput();
 
     public static final RecipeMap<DronePadRecipeBuilder> DRONE_PAD = new RecipeMap<>("drone_pad", 3, 9, 3, 3, new DronePadRecipeBuilder(), false);
     public static final RecipeMap<SimpleRecipeBuilder> COMBS_PRODUCT ;

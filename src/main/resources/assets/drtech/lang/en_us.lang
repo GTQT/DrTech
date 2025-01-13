@@ -732,6 +732,85 @@ item.drt.comb.borax.name=Borax Comb
 item.drt.comb.ether.name=Ether Comb
 #Entity
 entity.UTi_Golem.name=Uranium-Titanium Alloy Golem
+
+metaitem.simple_gas_mask.name=Primitive Gas Mask
+metaitem.simple_gas_mask.tooltip=Survive in oxygenless environments
+metaitem.gas_mask.name=Gas Mask
+metaitem.gas_mask.tooltip=Survive in oxygenless environments for longer
+metaitem.gas_tank.name=Gas Tank
+metaitem.gas_tank.tooltip=Survive in oxygenless environments for longer
+metaitem.asbestos_mask.name=Asbestos Gas Mask
+metaitem.asbestos_mask.tooltip=Survive in hot environments
+metaitem.asbestos_chestplate.name=Asbestos Tank
+metaitem.asbestos_chestplate.tooltip=Survive in hot environments
+metaitem.asbestos_leggings.name=Asbestos Leggings
+metaitem.asbestos_leggings.tooltip=Survive in hot environments
+metaitem.asbestos_boots.name=Asbestos Boots
+metaitem.asbestos_boots.tooltip=Survive in hot environments
+metaitem.rebreather_tank.name=Rebreather Tank
+metaitem.rebreather_tank.tooltip=Holds oxygen for longer
+metaitem.reflective_mask.name=Reflective Gas Mask
+metaitem.reflective_mask.tooltip=Reduce heating damage
+metaitem.reflective_chestplate.name=Reflective Tank
+metaitem.reflective_chestplate.tooltip=Reduce heating damage
+metaitem.reflective_leggings.name=Reflective Leggings
+metaitem.reflective_leggings.tooltip=Reduce heating damage
+metaitem.reflective_boots.name=Reflective Boots
+metaitem.reflective_boots.tooltip=Reduce heating damage
+metaitem.filtered_tank.name=Filtered Tank
+metaitem.filtered_tank.tooltip=Holds oxygen for very long
+metaitem.nomex_mask.name=Nomex Gas Mask
+metaitem.nomex_mask.tooltip=Stay indefinitely in the mantle!
+metaitem.nomex_chestplate.name=Nomex Tank
+metaitem.nomex_chestplate.tooltip=Stay indefinitely in the mantle!
+metaitem.nomex_leggings.name=Nomex Leggings
+metaitem.nomex_leggings.tooltip=Stay indefinitely in the mantle!
+metaitem.nomex_boots.name=Nomex Boots
+metaitem.nomex_boots.tooltip=Stay indefinitely in the mantle!
+
+death.attack.toxic_atmo=%s's lungs were shredded
+death.attack.suffocation=%s couldn't breathe
+
+metaitem.simple_gas_mask.name=Primitive Gas Mask
+metaitem.simple_gas_mask.tooltip=Survive in oxygenless environments
+metaitem.gas_mask.name=Gas Mask
+metaitem.gas_mask.tooltip=Survive in oxygenless environments for longer
+metaitem.gas_tank.name=Gas Tank
+metaitem.gas_tank.tooltip=Survive in oxygenless environments for longer
+metaitem.asbestos_mask.name=Asbestos Gas Mask
+metaitem.asbestos_mask.tooltip=Survive in hot environments
+metaitem.asbestos_chestplate.name=Asbestos Tank
+metaitem.asbestos_chestplate.tooltip=Survive in hot environments
+metaitem.asbestos_leggings.name=Asbestos Leggings
+metaitem.asbestos_leggings.tooltip=Survive in hot environments
+metaitem.asbestos_boots.name=Asbestos Boots
+metaitem.asbestos_boots.tooltip=Survive in hot environments
+metaitem.rebreather_tank.name=Rebreather Tank
+metaitem.rebreather_tank.tooltip=Holds oxygen for longer
+metaitem.reflective_mask.name=Reflective Gas Mask
+metaitem.reflective_mask.tooltip=Reduce heating damage
+metaitem.reflective_chestplate.name=Reflective Tank
+metaitem.reflective_chestplate.tooltip=Reduce heating damage
+metaitem.reflective_leggings.name=Reflective Leggings
+metaitem.reflective_leggings.tooltip=Reduce heating damage
+metaitem.reflective_boots.name=Reflective Boots
+metaitem.reflective_boots.tooltip=Reduce heating damage
+metaitem.filtered_tank.name=Filtered Tank
+metaitem.filtered_tank.tooltip=Holds oxygen for very long
+metaitem.nomex_mask.name=Nomex Gas Mask
+metaitem.nomex_mask.tooltip=Stay indefinitely in the mantle!
+metaitem.nomex_chestplate.name=Nomex Tank
+metaitem.nomex_chestplate.tooltip=Stay indefinitely in the mantle!
+metaitem.nomex_leggings.name=Nomex Leggings
+metaitem.nomex_leggings.tooltip=Stay indefinitely in the mantle!
+metaitem.nomex_boots.name=Nomex Boots
+metaitem.nomex_boots.tooltip=Stay indefinitely in the mantle!
+
+drtech.oxygen=Remaining air: §b%s seconds§r (out of %s)
+drtech.unlimited_oxygen=oxygen=Remaining air: §2Unlimited§r
+drtech.seconds_left=Remaining life: §2%s seconds§r
+drtech.unlimited=Remaining life: §2Unlimited§r
+
 #Commands
 drtech.command.horde.usage=/mobHorde <start/stop>
 drtech.command.horde.start.usage=/mobHorde start <name>
@@ -747,3 +826,4 @@ drtech.command.horde.stop.stopped=%s invasion has been stopped.
 drtech.command.horde.status.usage=/mobHorde status <player>
 drtech.command.horde.status.has_active_invasion=Player %s has an active %s invasion for %d ticks. It will timeout in %s ticks.
 drtech.command.horde.status.no_active_invasion=Player %s has no active invasion.
+

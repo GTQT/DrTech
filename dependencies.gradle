@@ -40,4 +40,5 @@ dependencies {
     implementation rfg.deobf("curse.maven:modularui-624243:5153413")
     implementation rfg.deobf("curse.maven:Binnie's Mods-223525:2916129")
     implementation rfg.deobf("curse.maven:BdLib-70496:4675629")
+    implementation rfg.deobf("curse.maven:the-beneath-254629:3425551")
 }

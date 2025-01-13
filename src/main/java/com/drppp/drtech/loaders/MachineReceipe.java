@@ -54,6 +54,12 @@ import static gregtech.loaders.recipe.CraftingComponent.PUMP;
 public class MachineReceipe {
     public static void load()
     {
+        JET_WINGPACK_FUELS.recipeBuilder()
+                .fluidInputs(Water.getFluid(1))
+                .EUt(128)
+                .duration(100)
+                .buildAndRegister();
+
         DRONE_PAD.recipeBuilder()
                 .input(ingot,Iron)
                 .chancedOutput(new ItemStack(Items.BEEF,8),5000,0)

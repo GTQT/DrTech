@@ -18,6 +18,7 @@ import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.capability.DrtechCapInit;
+import com.drppp.drtech.api.capability.DrtCapabilities;
 import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -34,6 +35,7 @@ import com.drppp.drtech.common.command.CommandHordeStatus;
 import com.drppp.drtech.common.command.CommandHordeStop;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
+import com.drppp.drtech.common.enent.DimensionBreathabilityHandler;
 import com.drppp.drtech.common.enent.PollutionEffectHandler;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
@@ -50,6 +52,7 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -62,22 +65,24 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.geckolib3.GeckoLib;
 
+import static com.drppp.drtech.Tags.MODID;
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
-@Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
+@Mod(modid = MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
         dependencies = "required:genetics@[2.5.1.203,);")
 public class DrTechMain {
-    public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
+    public static final Logger LOGGER = LogManager.getLogger(MODID);
     public static CreativeTabs Mytab;
-    @Mod.Instance(Tags.MODID)
+    @Mod.Instance(MODID)
     public static DrTechMain instance;
-    @SidedProxy(modId = Tags.MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
+    @SidedProxy(modId = MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
     public static CommonProxy proxy;
     public static ClientProxy cproxy;
 
@@ -104,7 +109,7 @@ public class DrTechMain {
         if (Loader.isModLoaded("forestry")) {
             ItemCombs.init();
         }
-
+        DimensionBreathabilityHandler.loadConfig();
     }
 
     @EventHandler
@@ -148,6 +153,7 @@ public class DrTechMain {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MetaTileEntities.Init();
+        DrtCapabilities.init();
         CraftingReceipe.load();
         DrTechReceipeManager.init();
         SyncInit.init();
@@ -158,6 +164,11 @@ public class DrTechMain {
         DRTAlleleBeeSpecies.setupAlleles();
         CombRecipes.initDRTCombs();
         CustomeRecipe.InitCanDoWorkMachines();
+
+        if (FMLLaunchHandler.side() == Side.CLIENT) {
+            OBJLoader.INSTANCE.addDomain(MODID);
+        }
+
     }
 
     @SideOnly(Side.CLIENT)

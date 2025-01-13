@@ -5,7 +5,9 @@
   "target": "@env(DEFAULT)",
   "minVersion": "0.8.3",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
+  "mixins": [
+    "minecraft.EntityPlayerMixin"
+  ],
   "server": [],
   "client": []
 }
