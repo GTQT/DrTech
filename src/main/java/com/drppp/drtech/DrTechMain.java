@@ -184,7 +184,7 @@ public class DrTechMain {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        if (DrtConfig.EnableDisassembly)
+        if (DrtConfig.MachineSwitch.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
         RecycleBuilder.initRecycleRecipe();

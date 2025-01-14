@@ -37,7 +37,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -347,7 +346,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                         for (int j = 0; j < upgradeInventory.getSlots(); j++) {
                             upgradeInventory.extractItem(j,1,false);
                         }
-                        this.doExplosion(DrtConfig.NuclearExplosionRange);
+                        this.doExplosion(DrtConfig.MachineSwitch.NuclearExplosionRange);
                         //this.getWorld().createExplosion(null, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), DrtConfig.NuclearExplosionRange, true);
                     }
                 }

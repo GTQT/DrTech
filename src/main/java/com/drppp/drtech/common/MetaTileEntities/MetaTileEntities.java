@@ -143,7 +143,7 @@ public class MetaTileEntities {
         WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(getID(), new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
         YOT_HARCH = registerMetaTileEntity(getID(),new MetaTileEntityYotHatch(getmyId("yot_hatch")));
         YOUT_TANK = registerMetaTileEntity(getID(),new MetaTileEntityYotTank(getmyId("yot_tank")));
-        if(DrtConfig.EnableIndustrialMachines)
+        if(DrtConfig.MachineSwitch.EnableIndustrialMachines)
         {
             LARGE_EXTRUDER = registerMetaTileEntity(getID(),new MetaTileentityLargeExtruder(getmyId("large_extruder")));
         }else
@@ -158,7 +158,7 @@ public class MetaTileEntities {
         INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialCokeOven(getmyId("industrial_coke_oven")));
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(),new MetaTileEntityLargeLightningRod(getmyId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(),new MetaTileEntityCombProcess(getmyId("comb_process")));
-        if(DrtConfig.EnableIndustrialMachines)
+        if(DrtConfig.MachineSwitch.EnableIndustrialMachines)
         {
             INDUSTRIAL_MIXER = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialMixer(getmyId("industrial_mixer")));
             INDUSTRIAL_ROLLER_PRESS = registerMetaTileEntity(getID(),new MetaTileEntityIndustrialRollerPress(getmyId("industrial_roller_press")));

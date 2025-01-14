@@ -22,8 +22,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static com.drppp.drtech.DrtConfig.onPlayerLoggedAtTheBetweenLand;
-import static com.drppp.drtech.DrtConfig.onPlayerLoggedInEvent;
+import static com.drppp.drtech.DrtConfig.HordeSwitch.onPlayerLoggedAtTheBetweenLand;
+import static com.drppp.drtech.DrtConfig.HordeSwitch.onPlayerLoggedInEvent;
 
 @Mod.EventBusSubscriber(modid = Tags.MODID)
 public class EventHandlers {

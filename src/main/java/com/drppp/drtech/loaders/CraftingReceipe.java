@@ -199,7 +199,7 @@ public class CraftingReceipe {
                 'W', Blocks.GRASS,
                 'S', Items.IRON_INGOT
         );
-        if(DrtConfig.EnableIndustrialMachines)
+        if(DrtConfig.MachineSwitch.EnableIndustrialMachines)
         {
             ModHandler.addShapedRecipe(true, "large_extruder", MetaTileEntities.LARGE_EXTRUDER.getStackForm(),
                     "LCL", "PSP", "OWO",
@@ -489,7 +489,7 @@ public class CraftingReceipe {
                 'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
                 'B',  new UnificationEntry(gearSmall, Materials.Steel)
         );
-        if(DrtConfig.EnableIndustrialMachines)
+        if(DrtConfig.MachineSwitch.EnableIndustrialMachines)
         {
             ModHandler.addShapedRecipe("large_mixer_drt", MetaTileEntities.INDUSTRIAL_MIXER.getStackForm(),
                     "ACA",

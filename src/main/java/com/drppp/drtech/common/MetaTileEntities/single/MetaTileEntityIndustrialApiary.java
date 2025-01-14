@@ -30,7 +30,6 @@ import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -266,7 +265,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     @Override
     public void update() {
         super.update();
-        if (getWorld().isRemote && DrtConfig.EnableIndustrialApiaryTx)
+        if (getWorld().isRemote && DrtConfig.MachineSwitch.EnableIndustrialApiaryTx)
         {
             if (isWorking()) {
                 if (usedQueen != null && !usedQueen.isEmpty()) {
