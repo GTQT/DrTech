@@ -18,7 +18,6 @@ import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import com.drppp.drtech.api.capability.DrtCapabilities;
 import com.drppp.drtech.api.sound.SusySounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -153,7 +152,6 @@ public class DrTechMain {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MetaTileEntities.Init();
-        DrtCapabilities.init();
         CraftingReceipe.load();
         DrTechReceipeManager.init();
         SyncInit.init();
