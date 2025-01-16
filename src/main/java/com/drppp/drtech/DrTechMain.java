@@ -18,7 +18,7 @@ import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import com.drppp.drtech.api.sound.SusySounds;
+import com.drppp.drtech.api.sound.Sounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.common.CommonProxy;
@@ -100,7 +100,7 @@ public class DrTechMain {
         GeckoLib.initialize();
         Textures.init();
         drtMetaEntities.init();
-        SusySounds.registerSounds();
+        Sounds.registerSounds();
         TileEntityUIFactory.INSTANCE.init();
         DrtDimType.init();
         WorldRegisterHandler.init();

@@ -1047,12 +1047,6 @@ item.drt.honey_drop.tetrafluoroethylene.name=四氟乙烯液滴
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡
 
-# Armors
-metaitem.jet_wingpack.name=Jet Wingpack
-metaarmor.hud.engine_status=Engine: %s
-metaarmor.jet_wingpack.engine_active=Jet Wingpack: Engine Activated
-metaarmor.jet_wingpack.engine_inactive=Jet Wingpack: Engine Deactivated
-
 metaitem.simple_gas_mask.name=原始防毒面具
 metaitem.simple_gas_mask.tooltip=在无氧环境中生存
 metaitem.gas_mask.name=防毒面具
@@ -1095,6 +1089,9 @@ drtech.oxygen=剩余空气：§b%s 秒§r（总共 %s）
 drtech.unlimited_oxygen=剩余空气：§2无限§r
 drtech.seconds_left=剩余生命：§2%s 秒§r
 drtech.unlimited=剩余生命：§2无限§r
+drtech.dimension_applicable=适用维度：%s
+attribute.modifier.plus.0=+%d %s
+attribute.name.generic.armor=护甲
 
 # Commands
 

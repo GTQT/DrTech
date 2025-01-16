@@ -1,7 +1,6 @@
 package com.drppp.drtech.api.ItemHandler;
 
 import gregtech.api.items.armor.ArmorMetaItem;
-import gregtech.api.items.armor.IArmorLogic;
 import gregtech.api.items.armor.ISpecialArmorLogic;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.common.items.behaviors.TooltipBehavior;
@@ -46,12 +45,12 @@ public interface IBreathingArmorLogic extends ISpecialArmorLogic {
 
             @Override
             public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-                return onRightClick(world, player, hand);
+                return onRightClick(player, hand);
             }
         });
     }
 
-    default ActionResult<ItemStack> onRightClick(World world, EntityPlayer player, EnumHand hand) {
+    default ActionResult<ItemStack> onRightClick(EntityPlayer player, EnumHand hand) {
         if (player.getHeldItem(hand).getItem() instanceof ArmorMetaItem) {
             ItemStack armor = player.getHeldItem(hand);
             if (armor.getItem() instanceof ArmorMetaItem &&
