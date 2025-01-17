@@ -13,3 +13,5 @@
 小玩意：重力屏蔽仪（创造飞行）、透明激光管（暂时未加入特效渲染）。
 
 产线：凋零骷髅头 -> 下界之星粉。
+## Credited Works
+- [SUSY](https://github.com/SymmetricDevs/) for many of its multiblocks.
