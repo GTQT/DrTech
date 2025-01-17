@@ -7,6 +7,7 @@ import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.api.Utils.RecipeMerger;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import gregtech.api.gui.GuiTextures;
@@ -126,7 +127,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
         tooltip.add("需要用配方联合后的矩阵水晶进行生产，过程会校验配方用的机器，机器需放入输入总线");
         tooltip.add("矩阵水晶也需要放入输入总线");
         tooltip.add("原材料也正常放入总线、仓室");
-        tooltip.add("不支持单步配方生产，即未联和运算过的配方(深度为0的配方)");
+        tooltip.add("不支持单步配方生产，即未联和运算过的配方(深度为1的配方)");
     }
 
     @Override
@@ -208,7 +209,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
         if(this.mode==0)
         {
             textList.add(new TextComponentString("工作方式:"+"扫描输出单配方"));
-            textList.add(new TextComponentString("配方仓库:"+ (this.recipemaps.size()==0?"空":this.recipemaps.size()+"个")));
+            textList.add(new TextComponentString("配方仓库:"+ (this.recipemaps.isEmpty() ?"空":this.recipemaps.size()+"个")));
             if(this.scan_recipe!=null)
             {
                 textList.add(new TextComponentString("匹配到配方"));
@@ -221,6 +222,10 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
         else if(this.mode==3)
         {
             textList.add(new TextComponentString("工作方式:"+"执行配方产出"));
+            if(!run_cres.isEmpty())
+                textList.add(new TextComponentString("可执行列表:"+run_cres.size()));
+            else
+                textList.add(new TextComponentString("无可执行配方"));
             textList.add(new TextComponentString("运行状态:"+isWorkingEnabled()));
             if(run_recipe!=null)
             {
@@ -328,23 +333,28 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                }
                if(!cres.isEmpty() && cres.size()>1)
                {
-                   DrtechUtils.yunSuan(cres);
+                   RecipeMerger.yunSuan(cres);
                    CustomeRecipe Merged = new CustomeRecipe();
+                   Merged.deep=0;
                    for (int i = 0; i < cres.size(); i++) {
                        Merged = CustomeRecipe.mergeRecipes(Merged,cres.get(i));
                    }
-                   Merged.reduceToSmallest();
-                   NBTTagCompound tag = Merged.writeToNBT();
-                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
+                   //CustomeRecipe Merged = RecipeMerger.yunSuanR(cres);
+                   if (Merged != null)
                    {
-                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && !this.inputInventory.getStackInSlot(i).hasTagCompound())
+                       //Merged.reduceToSmallest();
+                       NBTTagCompound tag = Merged.writeToNBT();
+                       for (int i = 0; i < this.inputInventory.getSlots(); i++)
                        {
-                           var item = this.inputInventory.getStackInSlot(i).copy();
-                           item.setCount(1);
-                           item.setTagInfo(NBT_TAG_NAME,tag);
-                           if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
+                           if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && !this.inputInventory.getStackInSlot(i).hasTagCompound())
                            {
-                               GTTransferUtils.insertItem(this.outputInventory,item,false);
+                               var item = this.inputInventory.getStackInSlot(i).copy();
+                               item.setCount(1);
+                               item.setTagInfo(NBT_TAG_NAME,tag);
+                               if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
+                               {
+                                   GTTransferUtils.insertItem(this.outputInventory,item,false);
+                               }
                            }
                        }
                    }

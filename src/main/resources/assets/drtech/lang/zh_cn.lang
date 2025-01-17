@@ -245,6 +245,7 @@ drtech.machine.industrial_roller_press.name=工业辊压机
 drtech.machine.industrial_cable_press.name=工业线材轧机
 drtech.machine.industrial_sieve.name=工业筛选机
 drtech.machine.industrial_centrifuge.name=工业离心机
+drtech.machine.rocket_launch_pad.name=火箭发射平台
 
 #Materials
 gregtech.material.bedrock=基岩

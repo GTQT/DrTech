@@ -72,6 +72,7 @@ public class MetaTileEntities {
     public static MetaTileEntityIndustrialCablePress INDUSTRIAL_CABLE_PRESS;
     public static MetaTileEntityIndustrialSieve INDUSTRIAL_SIEVE;
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
+    public static MetaTileEntityRocketLaunchPad ROCKET_LAUNCH_PAD;
     public static SimpleMachineMetaTileEntity[] RECYCLE = new SimpleMachineMetaTileEntity[10];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH = new MetaTileEntityWirelessEnergyHatch[15];
@@ -169,7 +170,7 @@ public class MetaTileEntities {
         {
             getID();getID();getID();getID();getID();
         }
-
+        ROCKET_LAUNCH_PAD = registerMetaTileEntity(getID(),new MetaTileEntityRocketLaunchPad(getmyId("rocket_launch_pad")));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();

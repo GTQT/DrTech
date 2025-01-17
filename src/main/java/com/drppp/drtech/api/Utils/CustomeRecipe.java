@@ -408,8 +408,8 @@ public class CustomeRecipe {
     public boolean CheckCustomerRecipes(IItemHandlerModifiable itemhandler, IMultipleTankHandler tanks) {
         if(deep<=1 || is_broken)
             return false;
-        for (int i = 0; i < machineItems.size(); i++) {
-            ItemStack machineitem = machineItems.get(i).copy();
+        for (ItemStack machineItem : machineItems) {
+            ItemStack machineitem = machineItem.copy();
             if (machineitem.isEmpty()) {
                 continue;
             }
@@ -425,8 +425,8 @@ public class CustomeRecipe {
             }
         }
 
-        for (int i = 0; i < inputItems.size(); i++) {
-            ItemStack recipeitem = inputItems.get(i).copy();
+        for (ItemStack inputItem : inputItems) {
+            ItemStack recipeitem = inputItem.copy();
             if (recipeitem.isEmpty()) {
                 continue;
             }
@@ -449,8 +449,8 @@ public class CustomeRecipe {
             }
         }
 
-        for (int i = 0; i < inputFluids.size(); i++) {
-            FluidStack recipeitem = inputFluids.get(i).copy();
+        for (FluidStack inputFluid : inputFluids) {
+            FluidStack recipeitem = inputFluid.copy();
             if (recipeitem == null || recipeitem.amount == 0) {
                 continue;
             }
@@ -583,6 +583,7 @@ public class CustomeRecipe {
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.ELECTRIC_BLAST_FURNACE.getStackForm());
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.DISTILLATION_TOWER.getStackForm());
         CAN_DO_WORK_MACHINES.add(MetaTileEntities.ASSEMBLY_LINE.getStackForm());
+        CAN_DO_WORK_MACHINES.add(MetaTileEntities.VACUUM_FREEZER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_MACERATOR.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_ASSEMBLER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_AUTOCLAVE.getStackForm());
@@ -594,6 +595,7 @@ public class CustomeRecipe {
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_DISTILLERY.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_POLARIZER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CUTTER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_ELECTROLYZER.getStackForm());
         CAN_DO_WORK_MACHINES.add(com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ADV_ARC_FURNACE.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ROASTER.getStackForm());
