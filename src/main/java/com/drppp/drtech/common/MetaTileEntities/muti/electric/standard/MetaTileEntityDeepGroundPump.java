@@ -1,9 +1,7 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
-import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.capability.IMultipleTankHandler;
-import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.ClickButtonWidget;
@@ -12,8 +10,6 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
-import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.unification.material.Materials;
@@ -40,16 +36,20 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
-import static gregtech.api.unification.material.Materials.*;
-import static keqing.gtqtcore.api.unification.GTQTMaterials.*;
+import static gregtech.api.unification.material.Materials.Water;
+import static keqing.gtqtcore.api.unification.GTQTMaterials.SuperheatedSteam;
 
 public class MetaTileEntityDeepGroundPump extends MetaTileEntityBaseWithControl {
-    public int Deep=0;
+    public int Deep = 0;
     public double Temp;
     public double Heat;
-    int water;
-
     public int thresholdPercentage = 1;
+    int water;
+    FluidStack WATER_STACK = Water.getFluid(1000);
+
+    public MetaTileEntityDeepGroundPump(ResourceLocation metaTileEntityId) {
+        super(metaTileEntityId);
+    }
 
     @Override
     @Nonnull
@@ -71,12 +71,6 @@ public class MetaTileEntityDeepGroundPump extends MetaTileEntityBaseWithControl 
     private void decrementThreshold(Widget.ClickData clickData) {
         this.thresholdPercentage = MathHelper.clamp(thresholdPercentage - 1, 1, 10);
     }
-
-
-    public MetaTileEntityDeepGroundPump(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId);
-    }
-
 
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         data.setInteger("water", water);
@@ -106,51 +100,43 @@ public class MetaTileEntityDeepGroundPump extends MetaTileEntityBaseWithControl 
         tooltip.add(I18n.format("提供水时将按比例消耗交换仓温度生产蒸汽废气 ，过热蒸汽，高压蒸汽（按温度区分）"));
         tooltip.add(I18n.format("调节节流阀控制换热效率"));
     }
-    FluidStack WATER_STACK = Water.getFluid(1000);
 
     @Override
     protected void updateFormedValid() {
         IMultipleTankHandler inputTank = getInputFluidInventory();
-        if (water<100000&&WATER_STACK.isFluidStackIdentical(inputTank.drain(WATER_STACK, false))) {
+        if (water < 100000 && WATER_STACK.isFluidStackIdentical(inputTank.drain(WATER_STACK, false))) {
             inputTank.drain(WATER_STACK, true);
-            water+=1;
+            water += 1;
         }
 
         ItemStack item;
-        int deep=0;
-        if(Deep<10000) for (int i = 0; i < this.getInputInventory().getSlots(); i++)
-        {
+        int deep = 0;
+        if (Deep < 10000) for (int i = 0; i < this.getInputInventory().getSlots(); i++) {
             item = this.getInputInventory().getStackInSlot(i);
-            if(item.getItem()== MyMetaItems.PIPIE_1.getMetaItem() && item.getMetadata()==MyMetaItems.PIPIE_1.getMetaValue())
-            {
-                deep+= item.getCount();
-            }else if(item.getItem()== MyMetaItems.PIPIE_5.getMetaItem() && item.getMetadata()==MyMetaItems.PIPIE_5.getMetaValue())
-            {
-                deep+= item.getCount()*5;
-            }
-            else if(item.getItem()== MyMetaItems.PIPIE_10.getMetaItem() && item.getMetadata()==MyMetaItems.PIPIE_10.getMetaValue())
-            {
-                deep+= item.getCount()*10;
+            if (item.getItem() == MyMetaItems.PIPIE_1.getMetaItem() && item.getMetadata() == MyMetaItems.PIPIE_1.getMetaValue()) {
+                deep += item.getCount();
+            } else if (item.getItem() == MyMetaItems.PIPIE_5.getMetaItem() && item.getMetadata() == MyMetaItems.PIPIE_5.getMetaValue()) {
+                deep += item.getCount() * 5;
+            } else if (item.getItem() == MyMetaItems.PIPIE_10.getMetaItem() && item.getMetadata() == MyMetaItems.PIPIE_10.getMetaValue()) {
+                deep += item.getCount() * 10;
             }
         }
 
-        if(Deep!=deep)Deep=deep;
+        if (Deep != deep) Deep = deep;
 
-        Temp= 20+Deep*0.03;//这里表示当前的温度
-        if(Heat<Temp) Heat= (Temp-Heat)/Heat;//升温曲线
+        Temp = 20 + Deep * 0.03;//这里表示当前的温度
+        if (Heat < Temp) Heat = (Temp - Heat) / Heat;//升温曲线
 
-        if(water<1000)return;
-        water-=thresholdPercentage;
-        Heat-=Heat/10000;
+        if (water < 1000) return;
+        water -= thresholdPercentage;
+        Heat -= Heat / 10000;
 
-        if(Heat>5000) {
-            GTTransferUtils.addFluidsToFluidHandler(getOutputFluidInventory(), false, Collections.singletonList(HighPressureSteam.getFluid(  ((Deep-5000)/1000 +1)*thresholdPercentage     )));
-        }
-        else if(Heat>1000) {
-            GTTransferUtils.addFluidsToFluidHandler(getOutputFluidInventory(), false, Collections.singletonList(HighPressureSteam.getFluid(  ((Deep-1000)/1000 +1)*8*thresholdPercentage    )));
-        }
-        else if(Heat>500) {
-            GTTransferUtils.addFluidsToFluidHandler(getOutputFluidInventory(), false, Collections.singletonList(HighPressureSteam.getFluid(  ((Deep-500)/100 +1)*32*thresholdPercentage     )));
+        if (Heat > 5000) {
+            GTTransferUtils.addFluidsToFluidHandler(getOutputFluidInventory(), false, Collections.singletonList(SuperheatedSteam.getFluid(((Deep - 5000) / 1000 + 1) * thresholdPercentage)));
+        } else if (Heat > 1000) {
+            GTTransferUtils.addFluidsToFluidHandler(getOutputFluidInventory(), false, Collections.singletonList(SuperheatedSteam.getFluid(((Deep - 1000) / 1000 + 1) * 8 * thresholdPercentage)));
+        } else if (Heat > 500) {
+            GTTransferUtils.addFluidsToFluidHandler(getOutputFluidInventory(), false, Collections.singletonList(SuperheatedSteam.getFluid(((Deep - 500) / 100 + 1) * 32 * thresholdPercentage)));
         }
 
 
@@ -168,15 +154,15 @@ public class MetaTileEntityDeepGroundPump extends MetaTileEntityBaseWithControl 
                 .aisle("              C ", "A   A   A     C ", "BBBBBBBBB     C ", "BCCCCCCCCCCCCCC ", "B C C C B     C ", "BBBBBBBBB     C ", "              A ", "             BAB", "             BAB", "             BAB", "              A ", "              A ", "              A ", "              A ", "              A ", "              A ", "              A ", "              A ", "              A ")
                 .aisle("A   A   A BBBB B", "A   A   A    B B", "BBBBBBBBBBBBBB B", "BBBBSBBBB    B B", "BBBBBBBBBBBBBB B", "BBBBBBBBB    B B", "             B B", "             BBB", "             BBB", "             BBB", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ", "                ")
                 .where('S', selfPredicate())
-                .where(' ',any() )
-                .where('C',states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.TUNGSTENSTEEL_PIPE)))
+                .where(' ', any())
+                .where('C', states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.TUNGSTENSTEEL_PIPE)))
                 .where('A', frames(Materials.Steel))
                 .where('B', states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN))
-                                .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
-                                .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(1))
-                                .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
-                                .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
-                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMinGlobalLimited(1).setPreviewCount(1))
+                        .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
+                        .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(1))
+                        .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
+                        .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
+                        .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMinGlobalLimited(1).setPreviewCount(1))
                 )
                 .build();
     }
@@ -194,9 +180,9 @@ public class MetaTileEntityDeepGroundPump extends MetaTileEntityBaseWithControl 
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {
         super.addDisplayText(textList);
-        textList.add(new TextComponentTranslation("drtech.deep_ground_pump.deep",this.Deep));
-        textList.add(new TextComponentTranslation("水量：%s",this.water));
-        textList.add(new TextComponentTranslation("反应仓温度：%s",this.Heat));
+        textList.add(new TextComponentTranslation("drtech.deep_ground_pump.deep", this.Deep));
+        textList.add(new TextComponentTranslation("水量：%s", this.water));
+        textList.add(new TextComponentTranslation("反应仓温度：%s", this.Heat));
     }
 
     @Override

@@ -14,8 +14,6 @@ import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.recipes.RecipeMaps;
 import gregtech.client.renderer.ICubeRenderer;
-import gregtech.common.blocks.BlockTurbineCasing;
-import gregtech.common.blocks.MetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -38,7 +36,7 @@ public class MetaTileEntityIndustrialSieve extends RecipeMapMultiblockController
 
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, UP,BACK )
+        return FactoryBlockPattern.start(RIGHT, UP, BACK)
                 .aisle("XXXXX", "XXXXX", "XXXXX")
                 .aisle("XXXXX", "XAAAX", "XAAAX")
                 .aisle("XXXXX", "XAAAX", "XAAAX")
@@ -57,15 +55,18 @@ public class MetaTileEntityIndustrialSieve extends RecipeMapMultiblockController
     protected IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.SIEVE_CASING);
     }
+
     protected IBlockState getCasingState1() {
         return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.SIEVE_NET_CASING);
     }
+
     @SideOnly(Side.CLIENT)
     @NotNull
     @Override
     protected ICubeRenderer getFrontOverlay() {
         return Textures.INDUSTRIAL_MACHINE;
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.SIEVE_CASING;
@@ -75,6 +76,7 @@ public class MetaTileEntityIndustrialSieve extends RecipeMapMultiblockController
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityIndustrialSieve(this.metaTileEntityId);
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -90,24 +92,25 @@ public class MetaTileEntityIndustrialSieve extends RecipeMapMultiblockController
         public SelfRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
             super(tileEntity, hasPerfectOC);
         }
+
         @Override
         public void setMaxProgress(int maxProgress) {
-            this.maxProgressTime = (int)Math.ceil(maxProgress * 0.2);
+            this.maxProgressTime = (int) Math.ceil(maxProgress * 0.2);
         }
 
         @Override
         protected boolean drawEnergy(int recipeEUt, boolean simulate) {
-            return super.drawEnergy((int)(recipeEUt*0.75), simulate);
+            return super.drawEnergy((int) (recipeEUt * 0.75), simulate);
         }
 
         @Override
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
-                if(GTValues.V[i]==this.getMaxVoltage())
+                if (GTValues.V[i] == this.getMaxVoltage())
                     tire = i;
             }
-            return tire*4;
+            return tire * 4;
         }
     }
 }

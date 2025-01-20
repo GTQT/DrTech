@@ -1,4 +1,5 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
+
 import com.drppp.drtech.api.recipes.properties.DroneDimensionProperty;
 import com.drppp.drtech.common.Entity.EntityDrone;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
@@ -28,20 +29,42 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.util.UUID;
 
-import static com.drppp.drtech.loaders.DrtechReceipes.DISASSEMBLER_RECIPES;
 import static com.drppp.drtech.loaders.DrtechReceipes.DRONE_PAD;
 
 public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
 
-    private AxisAlignedBB landingAreaBB;
     public EntityDrone drone = null;
     public boolean droneReachedSky;
+    private AxisAlignedBB landingAreaBB;
 
     public MetaTileEntityDronePad(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, DRONE_PAD);
         this.recipeMapWorkable = new DronePadWorkable(this);
+    }
+
+    private static IBlockState getFirstCasingState() {
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
+    }
+
+    private static IBlockState getSecondCasingState() {
+        return MetaBlocks.CLEANROOM_CASING.getState(BlockCleanroomCasing.CasingType.PLASCRETE);
+    }
+
+    private static IBlockState getThirdCasingState() {
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
+    }
+
+    private static IBlockState getFourthCasingState() {
+        return MetaBlocks.TURBINE_CASING.getState(BlockTurbineCasing.TurbineCasingType.STEEL_GEARBOX);
+    }
+
+    private static IBlockState getBoilerCasingState() {
+        return MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE);
+    }
+
+    private static IBlockState getFrameState() {
+        return MetaBlocks.FRAMES.get(Materials.Steel).getBlock(Materials.Steel);
     }
 
     @Override
@@ -74,29 +97,6 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
                 .where('#', air())
                 .build();
     }
-    private static IBlockState getFirstCasingState() {
-        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
-    }
-
-    private static IBlockState getSecondCasingState() {
-        return MetaBlocks.CLEANROOM_CASING.getState(BlockCleanroomCasing.CasingType.PLASCRETE);
-    }
-
-    private static IBlockState getThirdCasingState() {
-        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
-    }
-
-    private static IBlockState getFourthCasingState() {
-        return MetaBlocks.TURBINE_CASING.getState(BlockTurbineCasing.TurbineCasingType.STEEL_GEARBOX);
-    }
-
-    private static IBlockState getBoilerCasingState() {
-        return MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE);
-    }
-
-    private static IBlockState getFrameState() {
-        return MetaBlocks.FRAMES.get(Materials.Steel).getBlock(Materials.Steel);
-    }
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -114,7 +114,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         return this.drone;
     }
 
-    public void setDrone( EntityDrone drone) {
+    public void setDrone(EntityDrone drone) {
         this.drone = drone;
     }
 

@@ -126,18 +126,18 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
 
     private IBlockState getCasingState() {
 
-            return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.NEUTRON_MACHINE_CASING);
+        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.NEUTRON_MACHINE_CASING);
     }
 
     @NotNull
     private TraceabilityPredicate getFramePredicate() {
-            return frames(Materials.NaquadahAlloy);
+        return frames(Materials.NaquadahAlloy);
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart sourcePart) {
-            return com.drppp.drtech.Client.Textures.NEUTRON_MACHINE_CASING;
+        return com.drppp.drtech.Client.Textures.NEUTRON_MACHINE_CASING;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
                             ITextComponent amountInfo = TextComponentUtil.stringWithColor(
                                     TextFormatting.BLUE,
                                     TextFormattingUtil.formatNumbers(
-                                            minerLogic.getFluidToProduce() * 20L / FluidDrillLogic.MAX_PROGRESS *2) +
+                                            minerLogic.getFluidToProduce() * 20L / FluidDrillLogic.MAX_PROGRESS * 2) +
                                             " L/t");
                             tl.add(TextComponentUtil.translationWithColor(
                                     TextFormatting.GRAY,
@@ -225,11 +225,11 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
     }
 
     public int getRigMultiplier() {
-            return 96;
+        return 96;
     }
 
     public int getDepletionChance() {
-            return 12;
+        return 12;
     }
 
     @SideOnly(Side.CLIENT)
@@ -238,6 +238,7 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
     protected ICubeRenderer getFrontOverlay() {
         return Textures.FLUID_RIG_OVERLAY;
     }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {

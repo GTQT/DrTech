@@ -44,7 +44,6 @@ import com.drppp.drtech.loaders.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
 import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
-import com.drppp.drtech.loaders.builder.RecycleBuilder;
 import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import net.minecraft.block.Block;
@@ -185,7 +184,6 @@ public class DrTechMain {
         if (DrtConfig.MachineSwitch.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
-        RecycleBuilder.initRecycleRecipe();
 
     }
 

@@ -29,7 +29,7 @@ public class MetaGlasses1 extends VariantActiveBlock<MetaGlasses1.CasingType> {
         setResistance(5.0F);
         setSoundType(SoundType.GLASS);
         setHarvestLevel(ToolClasses.PICKAXE, 1);
-        setDefaultState(getState(CasingType.UU_GALSS));
+        setDefaultState(getState(CasingType.RECOMBINATION_GLASS_BLOCK));
         setCreativeTab(DrTechMain.Mytab);
         //this.useNeighborBrightness = true;
     }
@@ -68,8 +68,6 @@ public class MetaGlasses1 extends VariantActiveBlock<MetaGlasses1.CasingType> {
                 super.shouldSideBeRendered(state, world, pos, side);
     }
     public enum CasingType implements IStringSerializable {
-        UU_GALSS("uu_glass_block", 1),
-        COPY_GALSS("copy_glass_block", 1),
         RECOMBINATION_GLASS_BLOCK("recombination_glass_block", 1);
 
 

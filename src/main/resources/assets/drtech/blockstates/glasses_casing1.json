@@ -1,34 +1,6 @@
 {
   "forge_marker": 1,
   "variants": {
-    "active=false,variant=uu_glass_block": {
-      "model": "minecraft:cube_all",
-      "ambientocclusion": false,
-      "textures": {
-        "all": "drtech:blocks/glasses/uu_glass_block"
-      }
-    },
-    "active=true,variant=uu_glass_block": {
-      "model": "minecraft:cube_all",
-      "ambientocclusion": false,
-      "textures": {
-        "all": "drtech:blocks/glasses/uu_glass_block"
-      }
-    },
-    "active=false,variant=copy_glass_block": {
-      "model": "minecraft:cube_all",
-      "ambientocclusion": false,
-      "textures": {
-        "all": "drtech:blocks/glasses/copy_glass_block"
-      }
-    },
-    "active=true,variant=copy_glass_block": {
-      "model": "minecraft:cube_all",
-      "ambientocclusion": false,
-      "textures": {
-        "all": "drtech:blocks/glasses/copy_glass_block"
-      }
-    },
     "active=false,variant=recombination_glass_block": {
       "model": "minecraft:cube_all",
       "ambientocclusion": false,

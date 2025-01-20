@@ -4,7 +4,6 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
-import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.google.common.collect.Lists;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -27,8 +26,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -38,9 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase implements IControllable, IDataInfoProvider, IWorkable {
-    private boolean isActive = false;
-    private boolean isWorkingEnabled = true;
+public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase implements IControllable, IDataInfoProvider, IWorkable {
     public int process;
     public int maxProcess;
     protected IItemHandlerModifiable inputInventory;
@@ -49,12 +44,17 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
     protected IMultipleTankHandler outputFluidInventory;
     protected IEnergyContainer energyContainer;
     protected IEnergyContainer outEnergyContainer;
+    private boolean isActive = false;
+    private boolean isWorkingEnabled = true;
+
     public MetaTileEntityBaseWithControl(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
+
     public IEnergyContainer getEnergyContainer() {
         return this.energyContainer;
     }
+
     public IEnergyContainer getOutEnergyContainer() {
         return this.outEnergyContainer;
     }
@@ -74,19 +74,12 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
     public IMultipleTankHandler getOutputFluidInventory() {
         return this.outputFluidInventory;
     }
+
     @Override
     public boolean isWorkingEnabled() {
         return this.isWorkingEnabled;
     }
-    public void setActive(boolean active) {
-        if (this.isActive != active) {
-            this.isActive = active;
-            World world = this.getWorld();
-            if (world != null && !world.isRemote) {
-                this.writeCustomData(GregtechDataCodes.WORKABLE_ACTIVE, buf -> buf.writeBoolean(active));
-            }
-        }
-    }
+
     @Override
     public void setWorkingEnabled(boolean b) {
         this.isWorkingEnabled = b;
@@ -108,7 +101,17 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
     }
 
     public boolean isActive() {
-        return this.isActive&&isStructureFormed();
+        return this.isActive && isStructureFormed();
+    }
+
+    public void setActive(boolean active) {
+        if (this.isActive != active) {
+            this.isActive = active;
+            World world = this.getWorld();
+            if (world != null && !world.isRemote) {
+                this.writeCustomData(GregtechDataCodes.WORKABLE_ACTIVE, buf -> buf.writeBoolean(active));
+            }
+        }
     }
 
     @Override
@@ -145,6 +148,7 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         super.invalidateStructure();
         this.resetTileAbilities();
     }
+
     protected void initializeAbilities() {
         var im_item = this.getAbilities(MultiblockAbility.IMPORT_ITEMS);
         var im_itemCC = this.getAbilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID);
@@ -155,8 +159,7 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         var im_fluid = this.getAbilities(MultiblockAbility.IMPORT_FLUIDS);
         List<IFluidTank> tanks = new ArrayList<>();
         tanks.addAll(im_fluid);
-        if(!im_itemCC.isEmpty())
-        {
+        if (!im_itemCC.isEmpty()) {
             for (int i = 0; i < im_itemCC.size(); i++) {
                 tanks.addAll(im_itemCC.get(i).getFluidTanks());
             }
@@ -172,8 +175,7 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         var ex_fluid = this.getAbilities(MultiblockAbility.EXPORT_FLUIDS);
         List<IFluidTank> extanks = new ArrayList<>();
         extanks.addAll(ex_fluid);
-        if(!ex_itemCC.isEmpty())
-        {
+        if (!ex_itemCC.isEmpty()) {
             for (int i = 0; i < ex_itemCC.size(); i++) {
                 extanks.addAll(ex_itemCC.get(i).getFluidTanks());
             }
@@ -191,9 +193,11 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         this.energyContainer = new EnergyContainerList(Lists.newArrayList());
         this.outEnergyContainer = new EnergyContainerList(Lists.newArrayList());
     }
+
     protected boolean allowSameFluidFillForOutputs() {
         return true;
     }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
@@ -201,6 +205,7 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), isActive(),
                 isWorkingEnabled());
     }
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
@@ -215,6 +220,7 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
         isActive = data.getBoolean("isActive");
         isWorkingEnabled = data.getBoolean("isWorkingEnabled");
     }
+
     @Override
     public void writeInitialSyncData(PacketBuffer buf) {
         super.writeInitialSyncData(buf);
@@ -240,24 +246,24 @@ public class MetaTileEntityBaseWithControl  extends MultiblockWithDisplayBase im
             scheduleRenderUpdate();
         }
     }
+
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
         if (capability == GregtechTileCapabilities.CAPABILITY_CONTROLLABLE) {
             return GregtechTileCapabilities.CAPABILITY_CONTROLLABLE.cast(this);
-        }else if (capability == GregtechTileCapabilities.CAPABILITY_WORKABLE) {
+        } else if (capability == GregtechTileCapabilities.CAPABILITY_WORKABLE) {
             return GregtechTileCapabilities.CAPABILITY_WORKABLE.cast(this);
-        }else if (capability == GregtechTileCapabilities.CAPABILITY_COVER_HOLDER) {
+        } else if (capability == GregtechTileCapabilities.CAPABILITY_COVER_HOLDER) {
             return GregtechTileCapabilities.CAPABILITY_COVER_HOLDER.cast(this);
         }
         return super.getCapability(capability, side);
     }
 
-    public boolean drainEnergy(long energy)
-    {
-        if(this.energyContainer==null)
+    public boolean drainEnergy(long energy) {
+        if (this.energyContainer == null)
             return false;
-        if(this.energyContainer.getEnergyStored()<energy)
-           return  false;
+        if (this.energyContainer.getEnergyStored() < energy)
+            return false;
         this.energyContainer.changeEnergy(-energy);
         return true;
     }

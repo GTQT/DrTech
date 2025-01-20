@@ -31,6 +31,7 @@ import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.utils.TooltipHelper;
+import keqing.gtqtcore.common.block.GTQTMetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -56,6 +57,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
+import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.TI_BORON_SILICATE_GLASS;
 
 public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase implements IControllable, IProgressBarMultiblock {
     private static final String NBT_FLUID_BANK = "FluidBank";
@@ -274,7 +276,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected IBlockState getGlassState() {
         if(Loader.isModLoaded(GtqtCoreLinkage.GTQTCORE_ID))
         {
-            return keqing.gtqtcore.common.block.GTQTMetaBlocks.GLASS_CASING.getState( keqing.gtqtcore.common.block.blocks.GTQTBlockGlassCasing.CasingType.TI_BORON_SILICATE_GLASS);
+            return GTQTMetaBlocks.blockMultiblockGlass1.getState(TI_BORON_SILICATE_GLASS);
         }
         return BlocksInit.TRANSPARENT_CASING.getState(MetaGlasses.CasingType.TI_BORON_SILICATE_GLASS_BLOCK);
     }

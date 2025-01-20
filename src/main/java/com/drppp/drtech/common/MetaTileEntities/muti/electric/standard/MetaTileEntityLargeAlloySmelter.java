@@ -9,7 +9,10 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
-import gregtech.api.pattern.*;
+import gregtech.api.pattern.BlockPattern;
+import gregtech.api.pattern.FactoryBlockPattern;
+import gregtech.api.pattern.MultiblockShapeInfo;
+import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.recipes.RecipeMaps;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
@@ -38,6 +41,7 @@ import static gregtech.api.util.RelativeDirection.*;
 
 public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockController {
     private int leve = 1;
+
     public MetaTileEntityLargeAlloySmelter(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, RecipeMaps.ALLOY_SMELTER_RECIPES);
         this.recipeMapWorkable = new SelfRecipeLogic(this, true);
@@ -45,14 +49,14 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
 
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, UP,BACK )
+        return FactoryBlockPattern.start(RIGHT, UP, BACK)
                 .aisle(" AAA ", " BBB ", " CCC ", " BBB ", " AAA ")
                 .aisle("AAAAA", "B   B", "C   C", "B   B", "AAAAA")
                 .aisle("AAAAA", "B   B", "C   C", "B   B", "AAMAA")
                 .aisle("AAAAA", "B   B", "C   C", "B   B", "AAAAA")
                 .aisle(" ASA ", " BBB ", " CCC ", " BBB ", " AAA ")
                 .where('S', selfPredicate())
-                .where('C',states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE)))
+                .where('C', states(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE)))
                 .where('A', states(getCasingState()).setMinGlobalLimited(20)
                         .or(autoAbilities(true, true, true, true, false, false, false)))
                 .where('B', heatingCoils())
@@ -72,12 +76,12 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
                 .aisle("#ISO#", "#CCC#", "#GGG#", "#CCC#", "#XXX#")
                 .where('S', LARGE_ALLOY_SMELTER, EnumFacing.SOUTH)
                 .where('X', getCasingState())
-                .where('G',MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE))
+                .where('G', MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE))
                 .where('M', MetaTileEntities.MUFFLER_HATCH[GTValues.HV], EnumFacing.UP)
                 .where('I', MetaTileEntities.ITEM_IMPORT_BUS[GTValues.HV], EnumFacing.SOUTH)
                 .where('O', MetaTileEntities.ITEM_EXPORT_BUS[GTValues.HV], EnumFacing.SOUTH)
                 .where('E', MetaTileEntities.ENERGY_INPUT_HATCH[GTValues.EV], EnumFacing.NORTH)
-                .where('H', MetaTileEntities.MAINTENANCE_HATCH ,EnumFacing.SOUTH)
+                .where('H', MetaTileEntities.MAINTENANCE_HATCH, EnumFacing.SOUTH)
                 .where('#', Blocks.AIR.getDefaultState());
         GregTechAPI.HEATING_COILS.entrySet().stream()
                 .sorted(Comparator.comparingInt(entry -> entry.getValue().getTier()))
@@ -98,6 +102,7 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityLargeAlloySmelter(this.metaTileEntityId);
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -113,7 +118,7 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
         super.formStructure(context);
         Object type = context.get("CoilType");
         if (type instanceof IHeatingCoilBlockStats) {
-            this.leve = ((IHeatingCoilBlockStats)type).getLevel();
+            this.leve = ((IHeatingCoilBlockStats) type).getLevel();
         } else {
             this.leve = 1;
         }
@@ -122,7 +127,7 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
-        data.setInteger("CoinLevel",this.leve);
+        data.setInteger("CoinLevel", this.leve);
         return data;
     }
 
@@ -136,18 +141,20 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
         public SelfRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
             super(tileEntity, hasPerfectOC);
         }
+
         @Override
         public void setMaxProgress(int maxProgress) {
-            this.maxProgressTime = (int)(maxProgress * 0.5);
+            this.maxProgressTime = (int) (maxProgress * 0.5);
         }
+
         @Override
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
-                if(GTValues.V[i]==this.getMaxVoltage())
+                if (GTValues.V[i] == this.getMaxVoltage())
                     tire = i;
             }
-            return (tire+leve-1)*2;
+            return (tire + leve - 1) * 2;
         }
     }
 }

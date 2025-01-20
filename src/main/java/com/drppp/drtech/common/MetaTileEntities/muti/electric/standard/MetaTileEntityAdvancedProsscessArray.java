@@ -18,6 +18,7 @@ import java.util.List;
 
 public class MetaTileEntityAdvancedProsscessArray extends MetaTileEntityProcessingArray {
     private final int tier;
+
     public MetaTileEntityAdvancedProsscessArray(ResourceLocation metaTileEntityId, int tier) {
         super(metaTileEntityId, tier);
         this.tier = tier;
@@ -46,6 +47,7 @@ public class MetaTileEntityAdvancedProsscessArray extends MetaTileEntityProcessi
                 .where('#', air())
                 .build();
     }
+
     @Override
     protected void initializeAbilities() {
         this.inputInventory = new ItemHandlerList(this.getAbilities(MultiblockAbility.IMPORT_ITEMS));
@@ -55,8 +57,9 @@ public class MetaTileEntityAdvancedProsscessArray extends MetaTileEntityProcessi
 
         List<IEnergyContainer> energyContainer = new ArrayList(this.getAbilities(MultiblockAbility.INPUT_ENERGY));
         energyContainer.addAll(this.getAbilities(MultiblockAbility.INPUT_LASER));
-        this.energyContainer=new EnergyContainerList(energyContainer);
+        this.energyContainer = new EnergyContainerList(energyContainer);
     }
+
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity tileEntity) {
         return new MetaTileEntityAdvancedProsscessArray(this.metaTileEntityId, this.tier);
     }

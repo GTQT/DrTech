@@ -6,7 +6,6 @@ import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
-import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.Utils.RecipeMerger;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
@@ -26,7 +25,6 @@ import gregtech.api.recipes.RecipeMap;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
-import keqing.gtqtcore.client.textures.GTQTTextures;
 import keqing.gtqtcore.common.block.GTQTMetaBlocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -45,7 +43,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
+public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
     public int mode = 0;
     public List<RecipeMap> recipemaps = new ArrayList<>();
     public CustomeRecipe scan = new CustomeRecipe();
@@ -53,12 +51,14 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     public String NBT_TAG_NAME = "StoreRecipe";
     //执行配方用变量
     public List<CustomeRecipe> run_cres = new ArrayList<>();
-    public long EUT =0;
-    public CustomeRecipe run_recipe=null;
-    public int parra=1;
+    public long EUT = 0;
+    public CustomeRecipe run_recipe = null;
+    public int parra = 1;
+
     public MetaTileEntityMatrixSolver(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         nbt.setInteger("Mode", mode);
@@ -133,27 +133,27 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start()
-                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA" )
-                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAASAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA" )
+                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA", "                 ", "                 ", "                 ", "                 ", "                 ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
+                .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAASAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA")
                 .where('S', selfPredicate())
-                .where(' ',any() )
-                .where('A',states(BlocksInit.COMMON_CASING1.getStateFromMeta(7)).setMinGlobalLimited(578)
-                        .or(autoAbilities(true,true))
+                .where(' ', any())
+                .where('A', states(BlocksInit.COMMON_CASING1.getStateFromMeta(7)).setMinGlobalLimited(578)
+                        .or(autoAbilities(true, true))
                         .or(abilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID).setMaxGlobalLimited(16))
                         .or(abilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID).setMaxGlobalLimited(16))
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
@@ -163,16 +163,18 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(16))
                         .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMaxGlobalLimited(16))
                 )
-                .where('B', states(GTQTMetaBlocks.KQCC.getStateFromMeta(10)))
+                .where('B', states(GTQTMetaBlocks.blocksResearchSystem.getStateFromMeta(0)))
                 .where('D', states(BlocksInit.COMMON_CASING.getStateFromMeta(3)))
                 .where('C', states(BlocksInit.TRANSPARENT_CASING1.getStateFromMeta(2))
                 )
                 .build();
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.MATRIX_CASING;
     }
+
     @SideOnly(Side.CLIENT)
     @NotNull
     @Override
@@ -183,13 +185,14 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), this.isWorkingEnabled()&&isStructureFormed(), this.isWorkingEnabled()&&isStructureFormed());
+        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), this.isWorkingEnabled() && isStructureFormed(), this.isWorkingEnabled() && isStructureFormed());
     }
 
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityMatrixSolver(this.metaTileEntityId);
     }
+
     @Override
     @Nonnull
     protected Widget getFlexButton(int x, int y, int width, int height) {
@@ -199,39 +202,35 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                 .setTooltipText("drtech.multiblock.lbh.changep"));
         return group;
     }
-    private void changeProductType(Widget.ClickData clickData)
-    {
-        this.mode = (++this.mode)%4;
+
+    private void changeProductType(Widget.ClickData clickData) {
+        this.mode = (++this.mode) % 4;
     }
+
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {
         super.addDisplayText(textList);
-        if(this.mode==0)
-        {
-            textList.add(new TextComponentString("工作方式:"+"扫描输出单配方"));
-            textList.add(new TextComponentString("配方仓库:"+ (this.recipemaps.isEmpty() ?"空":this.recipemaps.size()+"个")));
-            if(this.scan_recipe!=null)
-            {
+        if (this.mode == 0) {
+            textList.add(new TextComponentString("工作方式:" + "扫描输出单配方"));
+            textList.add(new TextComponentString("配方仓库:" + (this.recipemaps.isEmpty() ? "空" : this.recipemaps.size() + "个")));
+            if (this.scan_recipe != null) {
                 textList.add(new TextComponentString("匹配到配方"));
             }
-        }
-        else if(this.mode==1)
-            textList.add(new TextComponentString("工作方式:"+"待定"));
-        else if(this.mode==2)
-            textList.add(new TextComponentString("工作方式:"+"解析联和配方"));
-        else if(this.mode==3)
-        {
-            textList.add(new TextComponentString("工作方式:"+"执行配方产出"));
-            if(!run_cres.isEmpty())
-                textList.add(new TextComponentString("可执行列表:"+run_cres.size()));
+        } else if (this.mode == 1)
+            textList.add(new TextComponentString("工作方式:" + "待定"));
+        else if (this.mode == 2)
+            textList.add(new TextComponentString("工作方式:" + "解析联和配方"));
+        else if (this.mode == 3) {
+            textList.add(new TextComponentString("工作方式:" + "执行配方产出"));
+            if (!run_cres.isEmpty())
+                textList.add(new TextComponentString("可执行列表:" + run_cres.size()));
             else
                 textList.add(new TextComponentString("无可执行配方"));
-            textList.add(new TextComponentString("运行状态:"+isWorkingEnabled()));
-            if(run_recipe!=null)
-            {
-                textList.add(new TextComponentString("并行:"+parra +"/16"));
-                textList.add(new TextComponentString("耗电:"+EUT));
-                textList.add(new TextComponentString("进度:"+process+"/"+maxProcess+"Tick"));
+            textList.add(new TextComponentString("运行状态:" + isWorkingEnabled()));
+            if (run_recipe != null) {
+                textList.add(new TextComponentString("并行:" + parra + "/16"));
+                textList.add(new TextComponentString("耗电:" + EUT));
+                textList.add(new TextComponentString("进度:" + process + "/" + maxProcess + "Tick"));
             }
         }
 
@@ -239,170 +238,129 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
 
     @Override
     protected void updateFormedValid() {
-        if(!this.getWorld().isRemote && this.isWorkingEnabled() && this.isStructureFormed())
-        {
+        if (!this.getWorld().isRemote && this.isWorkingEnabled() && this.isStructureFormed()) {
 
-           if(mode==0)
-           {
-               recipemaps = new ArrayList<>();
-               if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
-               {
-                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
-                   {
-                       ItemStack item = this.inputInventory.getStackInSlot(i).copy();
-                       if(GTUtility.getMetaTileEntity(item) != null && CustomeRecipe.ListContainsItem(CustomeRecipe.CAN_DO_WORK_MACHINES,item))
-                       {
-                           var machine = GTUtility.getMetaTileEntity(item);
-                           if(!CustomeRecipe.ListContainsItem(scan.machineItems,item) )
-                           {
-                               scan.machineItems.add(item);
-                               scan.machines.add(machine);
-                           }
-                           if(machine instanceof MultiMapMultiblockController)
-                           {
-                                var maps = ((MultiMapMultiblockController)machine).getAvailableRecipeMaps();
-                               for (int j = 0; j < maps.length; j++) {
-                                   var rec = maps[j];
-                                   if (recipemaps.stream().noneMatch(x -> x.equals(rec))) {
-                                       recipemaps.add(rec);
-                                   }
-                               }
-                           }
-                          else if(machine.getRecipeMap() !=null)
-                           {
-                               if (recipemaps.stream().noneMatch(x -> x.equals(machine.getRecipeMap()))) {
-                                   recipemaps.add(machine.getRecipeMap());
-                               }
-                           }
-                       }
-                   }
-               }
-               if(!recipemaps.isEmpty())
-               {
-                    for(var formap: recipemaps)
-                    {
-                        scan_recipe = formap.findRecipe(Integer.MAX_VALUE,this.inputInventory,this.inputFluidInventory);
-                        if(scan_recipe!=null)
-                        {
+            if (mode == 0) {
+                recipemaps = new ArrayList<>();
+                if (this.inputInventory != null && this.inputInventory.getSlots() > 0) {
+                    for (int i = 0; i < this.inputInventory.getSlots(); i++) {
+                        ItemStack item = this.inputInventory.getStackInSlot(i).copy();
+                        if (GTUtility.getMetaTileEntity(item) != null && CustomeRecipe.ListContainsItem(CustomeRecipe.CAN_DO_WORK_MACHINES, item)) {
+                            var machine = GTUtility.getMetaTileEntity(item);
+                            if (!CustomeRecipe.ListContainsItem(scan.machineItems, item)) {
+                                scan.machineItems.add(item);
+                                scan.machines.add(machine);
+                            }
+                            if (machine instanceof MultiMapMultiblockController) {
+                                var maps = ((MultiMapMultiblockController) machine).getAvailableRecipeMaps();
+                                for (int j = 0; j < maps.length; j++) {
+                                    var rec = maps[j];
+                                    if (recipemaps.stream().noneMatch(x -> x.equals(rec))) {
+                                        recipemaps.add(rec);
+                                    }
+                                }
+                            } else if (machine.getRecipeMap() != null) {
+                                if (recipemaps.stream().noneMatch(x -> x.equals(machine.getRecipeMap()))) {
+                                    recipemaps.add(machine.getRecipeMap());
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!recipemaps.isEmpty()) {
+                    for (var formap : recipemaps) {
+                        scan_recipe = formap.findRecipe(Integer.MAX_VALUE, this.inputInventory, this.inputFluidInventory);
+                        if (scan_recipe != null) {
                             var list = scan.machineItems;
                             scan = new CustomeRecipe();
                             scan.GetDataFromRecipe(scan_recipe);
                             scan.machineItems = list;
 
-                            if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
-                            {
-                                for (int i = 0; i < this.inputInventory.getSlots(); i++)
-                                {
-                                    if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && this.scan!=null)
-                                    {
+                            if (this.inputInventory != null && this.inputInventory.getSlots() > 0) {
+                                for (int i = 0; i < this.inputInventory.getSlots(); i++) {
+                                    if (IsMatrixGem(this.inputInventory.getStackInSlot(i)) && this.scan != null) {
                                         var item = this.inputInventory.getStackInSlot(i).copy();
                                         item.setCount(1);
                                         NBTTagCompound tag = scan.writeToNBT();
-                                        item.setTagInfo(NBT_TAG_NAME,tag);
+                                        item.setTagInfo(NBT_TAG_NAME, tag);
 
-                                        if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
-                                        {
-                                            GTTransferUtils.insertItem(this.outputInventory,item,false);
+                                        if (this.outputInventory != null && this.outputInventory.getSlots() > 0 && !this.inputInventory.extractItem(i, 1, false).isEmpty()) {
+                                            GTTransferUtils.insertItem(this.outputInventory, item, false);
                                         }
                                     }
                                 }
                             }
                         }
                     }
-               }
-           }else if(mode==1)
-           {
+                }
+            } else if (mode == 1) {
 
-           }
-           else if(mode==2)
-           {
-               List<CustomeRecipe> cres = new ArrayList<>();
-               if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
-               {
-                   for (int i = 0; i < this.inputInventory.getSlots(); i++)
-                   {
-                       if(IsMatrixGem(this.inputInventory.getStackInSlot(i)))
-                       {
-                           var item = this.inputInventory.getStackInSlot(i).copy();
-                           if(item.hasTagCompound() && item.getTagCompound().hasKey(NBT_TAG_NAME))
-                           {
+            } else if (mode == 2) {
+                List<CustomeRecipe> cres = new ArrayList<>();
+                if (this.inputInventory != null && this.inputInventory.getSlots() > 0) {
+                    for (int i = 0; i < this.inputInventory.getSlots(); i++) {
+                        if (IsMatrixGem(this.inputInventory.getStackInSlot(i))) {
+                            var item = this.inputInventory.getStackInSlot(i).copy();
+                            if (item.hasTagCompound() && item.getTagCompound().hasKey(NBT_TAG_NAME)) {
                                 cres.add(new CustomeRecipe(item.getTagCompound().getCompoundTag(NBT_TAG_NAME)));
-                           }
-                       }
-                   }
-               }
-               if(!cres.isEmpty() && cres.size()>1)
-               {
-                   RecipeMerger.yunSuan(cres);
-                   CustomeRecipe Merged = new CustomeRecipe();
-                   Merged.deep=0;
-                   for (int i = 0; i < cres.size(); i++) {
-                       Merged = CustomeRecipe.mergeRecipes(Merged,cres.get(i));
-                   }
-                   //CustomeRecipe Merged = RecipeMerger.yunSuanR(cres);
-                   if (Merged != null)
-                   {
-                       //Merged.reduceToSmallest();
-                       NBTTagCompound tag = Merged.writeToNBT();
-                       for (int i = 0; i < this.inputInventory.getSlots(); i++)
-                       {
-                           if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && !this.inputInventory.getStackInSlot(i).hasTagCompound())
-                           {
-                               var item = this.inputInventory.getStackInSlot(i).copy();
-                               item.setCount(1);
-                               item.setTagInfo(NBT_TAG_NAME,tag);
-                               if(this.outputInventory!=null && this.outputInventory.getSlots()>0 && !this.inputInventory.extractItem(i,1,false).isEmpty())
-                               {
-                                   GTTransferUtils.insertItem(this.outputInventory,item,false);
-                               }
-                           }
-                       }
-                   }
-               }
-           }
-           else if(mode==3){
-               if(!isWorkingEnabled() || run_cres.isEmpty())
-               {
-                   run_cres = new ArrayList<>();
-                   if(this.inputInventory!=null && this.inputInventory.getSlots()>0)
-                   {
-                       for (int i = 0; i < this.inputInventory.getSlots(); i++)
-                       {
-                           if(IsMatrixGem(this.inputInventory.getStackInSlot(i)) && run_cres.isEmpty())
-                           {
-                               var item = this.inputInventory.getStackInSlot(i).copy();
-                               if(item.hasTagCompound() && item.getTagCompound().hasKey(NBT_TAG_NAME))
-                               {
-                                   run_cres.add(new CustomeRecipe(item.getTagCompound().getCompoundTag(NBT_TAG_NAME)));
-                               }
-                           }
-                       }
-                   }
-               }
-               if(!run_cres.isEmpty() && !isWorkingEnabled())
-               {
-                   setWorkingEnabled(true);
-               }
-               if(isWorkingEnabled() && !run_cres.isEmpty())
-               {
-                    if(run_recipe==null)
-                    {
-                        for (var rec: run_cres)
-                        {
-                            if(inputInventory.getSlots()>0 && this.inputFluidInventory.getTanks()>0)
-                            {
-                                if( rec.CheckCustomerRecipes(this.inputInventory,this.inputFluidInventory))
-                                {
-                                    int parrac = rec.CalculationParra(this.inputInventory,this.inputFluidInventory);
+                            }
+                        }
+                    }
+                }
+                if (!cres.isEmpty() && cres.size() > 1) {
+                    RecipeMerger.yunSuan(cres);
+                    CustomeRecipe Merged = new CustomeRecipe();
+                    Merged.deep = 0;
+                    for (int i = 0; i < cres.size(); i++) {
+                        Merged = CustomeRecipe.mergeRecipes(Merged, cres.get(i));
+                    }
+                    //CustomeRecipe Merged = RecipeMerger.yunSuanR(cres);
+                    if (Merged != null) {
+                        //Merged.reduceToSmallest();
+                        NBTTagCompound tag = Merged.writeToNBT();
+                        for (int i = 0; i < this.inputInventory.getSlots(); i++) {
+                            if (IsMatrixGem(this.inputInventory.getStackInSlot(i)) && !this.inputInventory.getStackInSlot(i).hasTagCompound()) {
+                                var item = this.inputInventory.getStackInSlot(i).copy();
+                                item.setCount(1);
+                                item.setTagInfo(NBT_TAG_NAME, tag);
+                                if (this.outputInventory != null && this.outputInventory.getSlots() > 0 && !this.inputInventory.extractItem(i, 1, false).isEmpty()) {
+                                    GTTransferUtils.insertItem(this.outputInventory, item, false);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (mode == 3) {
+                if (!isWorkingEnabled() || run_cres.isEmpty()) {
+                    run_cres = new ArrayList<>();
+                    if (this.inputInventory != null && this.inputInventory.getSlots() > 0) {
+                        for (int i = 0; i < this.inputInventory.getSlots(); i++) {
+                            if (IsMatrixGem(this.inputInventory.getStackInSlot(i)) && run_cres.isEmpty()) {
+                                var item = this.inputInventory.getStackInSlot(i).copy();
+                                if (item.hasTagCompound() && item.getTagCompound().hasKey(NBT_TAG_NAME)) {
+                                    run_cres.add(new CustomeRecipe(item.getTagCompound().getCompoundTag(NBT_TAG_NAME)));
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!run_cres.isEmpty() && !isWorkingEnabled()) {
+                    setWorkingEnabled(true);
+                }
+                if (isWorkingEnabled() && !run_cres.isEmpty()) {
+                    if (run_recipe == null) {
+                        for (var rec : run_cres) {
+                            if (inputInventory.getSlots() > 0 && this.inputFluidInventory.getTanks() > 0) {
+                                if (rec.CheckCustomerRecipes(this.inputInventory, this.inputFluidInventory)) {
+                                    int parrac = rec.CalculationParra(this.inputInventory, this.inputFluidInventory);
                                     this.parra = parrac;
                                     run_recipe = rec;
-                                    process=0;
+                                    process = 0;
                                     maxProcess = run_recipe.during;
                                     EUT = rec.eut;
-                                    if(this.getEnergyContainer()!=null)
-                                    {
-                                        int inputv= GTUtility.getTierByVoltage(this.getEnergyContainer().getInputVoltage());
-                                        int recpev =  GTUtility.getTierByVoltage(run_recipe.eut);
+                                    if (this.getEnergyContainer() != null) {
+                                        int inputv = GTUtility.getTierByVoltage(this.getEnergyContainer().getInputVoltage());
+                                        int recpev = GTUtility.getTierByVoltage(run_recipe.eut);
                                         if (inputv > recpev) {
                                             int level = inputv - recpev;
                                             int count = 0;
@@ -419,34 +377,28 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl{
                             }
                         }
                     }
-                    if(run_recipe!=null && this.getEnergyContainer()!=null  && this.getEnergyContainer().getEnergyStored()>=run_recipe.eut && GTUtility.getTierByVoltage(this.getEnergyContainer().getInputVoltage())>= GTUtility.getTierByVoltage(run_recipe.eut))
-                    {
+                    if (run_recipe != null && this.getEnergyContainer() != null && this.getEnergyContainer().getEnergyStored() >= run_recipe.eut && GTUtility.getTierByVoltage(this.getEnergyContainer().getInputVoltage()) >= GTUtility.getTierByVoltage(run_recipe.eut)) {
                         this.getEnergyContainer().changeEnergy(-run_recipe.eut);
-                        if(++process>=maxProcess)
-                        {
+                        if (++process >= maxProcess) {
                             for (int i = 0; i < parra; i++) {
-                                run_recipe.RunRecipe(this.inputInventory,this.inputFluidInventory,this.outputInventory,this.outputFluidInventory);
+                                run_recipe.RunRecipe(this.inputInventory, this.inputFluidInventory, this.outputInventory, this.outputFluidInventory);
                             }
-                            process=0;
-                            maxProcess=0;
-                            run_recipe=null;
+                            process = 0;
+                            maxProcess = 0;
+                            run_recipe = null;
                         }
                     }
-               }
-               else
-               {
-                   setWorkingEnabled(false);
+                } else {
+                    setWorkingEnabled(false);
 
-               }
-           }
+                }
+            }
 
         }
     }
-    public boolean IsMatrixGem(ItemStack item)
-    {
-        if(item.getItem()== MyMetaItems.MATRIX_GEMS.getMetaItem() && item.getMetadata()==MyMetaItems.MATRIX_GEMS.getMetaValue())
-            return true;
-        return false;
+
+    public boolean IsMatrixGem(ItemStack item) {
+        return item.getItem() == MyMetaItems.MATRIX_GEMS.getMetaItem() && item.getMetadata() == MyMetaItems.MATRIX_GEMS.getMetaValue();
     }
 
 }
