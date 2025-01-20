@@ -11,9 +11,6 @@ public final class MyMetaItems {
     public static MetaItem<?>.MetaValueItem ENERGY_ELEMENT_5;
     public static MetaItem<?>.MetaValueItem GRAVITY_SHIELD;
     public static MetaItem<?>.MetaValueItem SKULL_DUST;
-    public static MetaItem<?>.MetaValueItem SCRAP;
-    public static MetaItem<?>.MetaValueItem CD_ROM;
-    public static MetaItem<?>.MetaValueItem UU_MATER;
     public static MetaItem<?>.MetaValueItem PIPIE_1;
     public static MetaItem<?>.MetaValueItem PIPIE_5;
     public static MetaItem<?>.MetaValueItem PIPIE_10;

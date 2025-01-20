@@ -1,9 +1,9 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
+import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaGlasses1;
-import com.drppp.drtech.Client.Textures;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -16,6 +16,7 @@ import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.utils.TooltipHelper;
+import keqing.gtqtcore.common.block.GTQTMetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -29,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.drppp.drtech.loaders.DrtechReceipes.MOLECULAR_RECOMBINATION;
+import static keqing.gtqtcore.common.block.blocks.BlockMultiblockCasing.CasingType.MASS_GENERATION_CASING;
+import static keqing.gtqtcore.common.block.blocks.BlockMultiblockCasing.CasingType.MASS_GENERATION_COIL_CASING;
 
 
 public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblockController {
@@ -37,6 +40,19 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
         super(metaTileEntityId, MOLECULAR_RECOMBINATION);
         this.recipeMapWorkable = new LargeMoecularRecombinationLogic(this, true);
     }
+
+    private static IBlockState getCasingState() {
+        return GTQTMetaBlocks.blockMultiblockCasing.getState(MASS_GENERATION_CASING);
+    }
+
+    private static IBlockState getCasingState2() {
+        return GTQTMetaBlocks.blockMultiblockCasing.getState(MASS_GENERATION_COIL_CASING);
+    }
+
+    private static IBlockState getCasingState3() {
+        return BlocksInit.TRANSPARENT_CASING1.getState(MetaGlasses1.CasingType.RECOMBINATION_GLASS_BLOCK);
+    }
+
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity metaTileEntityHolder) {
         return new MetaTileEntityLargeMolecularRecombination(this.metaTileEntityId);
@@ -64,18 +80,6 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
                 .build();
     }
 
-    private static IBlockState getCasingState() {
-        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.MASS_GENERATION_CASING);
-    }
-
-    private static IBlockState getCasingState2() {
-        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.MASS_GENERATION_COIL_CASING);
-    }
-
-    private static IBlockState getCasingState3() {
-        return BlocksInit.TRANSPARENT_CASING1.getState(MetaGlasses1.CasingType.RECOMBINATION_GLASS_BLOCK);
-    }
-
     @SideOnly(Side.CLIENT)
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
@@ -92,6 +96,7 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
     public boolean hasMufflerMechanics() {
         return false;
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, boolean advanced) {
         super.addInformation(stack, player, tooltip, advanced);
@@ -110,10 +115,10 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
-                if(GTValues.V[i]==this.getMaxVoltage())
+                if (GTValues.V[i] == this.getMaxVoltage())
                     tire = i;
             }
-            return tire*2;
+            return tire * 2;
         }
     }
 

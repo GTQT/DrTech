@@ -38,7 +38,7 @@ public class MetaTileEntityIndustrialMixer extends RecipeMapMultiblockController
 
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, UP,BACK )
+        return FactoryBlockPattern.start(RIGHT, UP, BACK)
                 .aisle("XXX", "XXX", "XXX", "XXX")
                 .aisle("XXX", "XAX", "XAX", "XXX")
                 .aisle("XXX", "XSX", "XXX", "XXX")
@@ -50,22 +50,27 @@ public class MetaTileEntityIndustrialMixer extends RecipeMapMultiblockController
                 )
                 .build();
     }
+
     @Override
     public boolean canBeDistinct() {
         return true;
     }
+
     protected IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.JIAO_BAN_CASING);
     }
+
     protected IBlockState getCasingState1() {
         return MetaBlocks.TURBINE_CASING.getState(BlockTurbineCasing.TurbineCasingType.TITANIUM_TURBINE_CASING);
     }
+
     @SideOnly(Side.CLIENT)
     @NotNull
     @Override
     protected ICubeRenderer getFrontOverlay() {
         return Textures.INDUSTRIAL_MACHINE;
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.JIAO_BAN_CASING;
@@ -75,6 +80,7 @@ public class MetaTileEntityIndustrialMixer extends RecipeMapMultiblockController
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityIndustrialMixer(this.metaTileEntityId);
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -89,19 +95,20 @@ public class MetaTileEntityIndustrialMixer extends RecipeMapMultiblockController
         public SelfRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
             super(tileEntity, hasPerfectOC);
         }
+
         @Override
         public void setMaxProgress(int maxProgress) {
-            this.maxProgressTime = (int)Math.ceil(maxProgress * 0.285);
+            this.maxProgressTime = (int) Math.ceil(maxProgress * 0.285);
         }
 
         @Override
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
-                if(GTValues.V[i]==this.getMaxVoltage())
+                if (GTValues.V[i] == this.getMaxVoltage())
                     tire = i;
             }
-            return tire*8;
+            return tire * 8;
         }
     }
 }

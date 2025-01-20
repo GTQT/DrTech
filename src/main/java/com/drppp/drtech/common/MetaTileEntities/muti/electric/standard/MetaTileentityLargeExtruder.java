@@ -32,21 +32,6 @@ public class MetaTileentityLargeExtruder extends RecipeMapMultiblockController {
         this.recipeMapWorkable = new SelfRecipeLogic(this, true);
     }
 
-    @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
-                .aisle("##XXX", "##XXX", "##XXX")
-                .aisle("##XXX", "##XPX", "##XGX").setRepeatable(2)
-                .aisle("XXXXX", "XXXPX", "XXXGX")
-                .aisle("XXXXX", "XXXPX", "XXXGX")
-                .aisle("XXXXX", "XSXXX", "XXXXX")
-                .where('S', selfPredicate())
-                .where('X', states(getCasingState()).setMinGlobalLimited(40).or(autoAbilities(true,true,true,true,false,false,true)))
-                .where('P', states(getCasingState2()))
-                .where('G', states(getCasingState3()))
-                .where('#', any())
-                .build();
-    }
     private static IBlockState getCasingState() {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TUNGSTENSTEEL_ROBUST);
     }
@@ -60,9 +45,26 @@ public class MetaTileentityLargeExtruder extends RecipeMapMultiblockController {
     }
 
     @Override
+    protected @NotNull BlockPattern createStructurePattern() {
+        return FactoryBlockPattern.start()
+                .aisle("##XXX", "##XXX", "##XXX")
+                .aisle("##XXX", "##XPX", "##XGX").setRepeatable(2)
+                .aisle("XXXXX", "XXXPX", "XXXGX")
+                .aisle("XXXXX", "XXXPX", "XXXGX")
+                .aisle("XXXXX", "XSXXX", "XXXXX")
+                .where('S', selfPredicate())
+                .where('X', states(getCasingState()).setMinGlobalLimited(40).or(autoAbilities(true, true, true, true, false, false, true)))
+                .where('P', states(getCasingState2()))
+                .where('G', states(getCasingState3()))
+                .where('#', any())
+                .build();
+    }
+
+    @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileentityLargeExtruder(this.metaTileEntityId);
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.ROBUST_TUNGSTENSTEEL_CASING;
@@ -72,6 +74,7 @@ public class MetaTileentityLargeExtruder extends RecipeMapMultiblockController {
     public boolean canBeDistinct() {
         return true;
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -80,24 +83,27 @@ public class MetaTileentityLargeExtruder extends RecipeMapMultiblockController {
         tooltip.add(I18n.format("drtech.machine.large_extruder.tooltip.2"));
         tooltip.add(I18n.format("drtech.machine.large_extruder.tooltip.3"));
     }
+
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {
         public SelfRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
             super(tileEntity, hasPerfectOC);
         }
+
         @Override
         public void setMaxProgress(int maxProgress) {
-            this.maxProgressTime = (int)Math.ceil(maxProgress * 0.25);
+            this.maxProgressTime = (int) Math.ceil(maxProgress * 0.25);
         }
+
         @Override
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
-                if(GTValues.V[i]==this.getMaxVoltage())
+                if (GTValues.V[i] == this.getMaxVoltage())
                     tire = i;
             }
-            if(tire>GTValues.UV)
-                return tire*8;
-            return tire*4;
+            if (tire > GTValues.UV)
+                return tire * 8;
+            return tire * 4;
         }
     }
 }

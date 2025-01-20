@@ -9,17 +9,19 @@ public class MetaTileEntityAdvancedAssemblyLine extends MetaTileEntityAssemblyLi
     public MetaTileEntityAdvancedAssemblyLine(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
+
     protected class AssemblyLineRecipeLogic extends MultiblockRecipeLogic {
 
         public AssemblyLineRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
             super(tileEntity, hasPerfectOC);
         }
+
         @Override
         protected boolean drawEnergy(int recipeEUt, boolean simulate) {
-            long resultEnergy = this.getEnergyStored() - (long)recipeEUt/2;
+            long resultEnergy = this.getEnergyStored() - (long) recipeEUt / 2;
             if (resultEnergy >= 0L && resultEnergy <= this.getEnergyCapacity()) {
                 if (!simulate) {
-                    this.getEnergyContainer().changeEnergy((long)(-recipeEUt));
+                    this.getEnergyContainer().changeEnergy(-recipeEUt);
                 }
 
                 return true;
@@ -27,6 +29,7 @@ public class MetaTileEntityAdvancedAssemblyLine extends MetaTileEntityAssemblyLi
                 return false;
             }
         }
+
         @Override
         public int getParallelLimit() {
             return 2;

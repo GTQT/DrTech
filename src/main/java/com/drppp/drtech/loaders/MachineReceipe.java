@@ -157,59 +157,7 @@ public class MachineReceipe {
                 .output(Items.DIAMOND)
                 .explosivesAmount(OreDictUnifier.get(OrePrefix.dust, Carbon))
                 .buildAndRegister();
-        //160秒
-        UU_RECIPES.recipeBuilder()
-                .circuitMeta(1)
-                .fluidOutputs(Materials.UUMatter.getFluid(1))
-                .EUt(256)
-                .duration(3200)
-                .buildAndRegister();
-        UU_RECIPES.recipeBuilder()
-                .input(MyMetaItems.SCRAP)
-                .fluidOutputs(Materials.UUMatter.getFluid(1))
-                .EUt(256)
-                .duration(1600)
-                .buildAndRegister();
-        //扫描和复制配方
-        DrtechUtils.initList();
-        for (int i = 0; i < DrtechUtils.listMater.size(); i++) {
-            ItemStack is = MyMetaItems.CD_ROM.getStackForm();
-            NBTTagCompound compound = new NBTTagCompound();
-            compound.setString("Name",DrtechUtils.getName(DrtechUtils.listMater.get(i)));
-            is.setTagCompound(compound);
-            int mass  =(int)DrtechUtils.listMater.get(i).getMass();
-            var buid =  SCANNER_RECIPES.recipeBuilder()
-                    .input(MyMetaItems.CD_ROM)
-                    .outputs(is)
-                    .duration(DrtechUtils.baseTime*2*mass)
-                    .EUt(30);
-           var copybuild =  COPY_RECIPES.recipeBuilder()
-                    .notConsumable(is)
-                    .fluidInputs(Materials.UUMatter.getFluid(mass))
-                    .duration(DrtechUtils.baseTime*mass)
-                    .EUt(30);
-            if(DrtechUtils.listMater.get(i).hasProperty(PropertyKey.DUST))
-            {
-                buid.input(dust,DrtechUtils.listMater.get(i),1);
-                copybuild.output(dust,DrtechUtils.listMater.get(i),1);
-            }
-            else if(DrtechUtils.listMater.get(i).hasFluid())
-            {
-                buid.fluidInputs(DrtechUtils.listMater.get(i).getFluid(144));
-                copybuild.fluidOutputs(DrtechUtils.listMater.get(i).getFluid(144));
-            }
-            else
-                continue;
-            buid.buildAndRegister();
-            copybuild.buildAndRegister();
-            SCANNER_RECIPES.recipeBuilder()
-                    .input(MyMetaItems.CD_ROM)
-                    .notConsumable(is)
-                    .outputs(is)
-                    .duration(100)
-                    .EUt(30)
-                    .buildAndRegister();
-        }
+
         for (int i = 0; i < 4; i++) {
             DrtechUtils.addLogCreate(30,100,1,i);
         }
@@ -268,14 +216,6 @@ public class MachineReceipe {
         {
             ForestryLinkage.MachineRecipeInit();
         }
-        ASSEMBLER_RECIPES.recipeBuilder()
-                .input(OrePrefix.plate, Polyethylene)
-                .input(dust, Silver)
-                .fluidInputs(Glue.getFluid(144))
-                .output(MyMetaItems.CD_ROM)
-                .EUt(30)
-                .duration(200)
-                .buildAndRegister();
         FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
                 .input(OrePrefix.block, BorosilicateGlass)
                 .fluidInputs(Titanium.getFluid(576))
@@ -317,18 +257,6 @@ public class MachineReceipe {
                 .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING,1,6))
                 .EUt(491520)
                 .duration(200)
-                .buildAndRegister();
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
-                .fluidInputs(UUMatter.getFluid(1000))
-                .output(MyMetaItems.UU_MATER)
-                .EUt(16)
-                .duration(10)
-                .buildAndRegister();
-        EXTRACTOR_RECIPES.recipeBuilder()
-                .fluidOutputs(UUMatter.getFluid(1000))
-                .input(MyMetaItems.UU_MATER)
-                .EUt(16)
-                .duration(10)
                 .buildAndRegister();
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.frameGt, Wood)

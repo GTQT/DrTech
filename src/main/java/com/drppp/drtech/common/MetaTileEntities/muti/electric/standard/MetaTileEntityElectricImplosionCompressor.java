@@ -29,6 +29,21 @@ public class MetaTileEntityElectricImplosionCompressor extends RecipeMapMultiblo
         super(metaTileEntityId, EIMPLOSION_RECIPES);
         this.recipeMapWorkable = new ImplosionCompressor(this, false);
     }
+
+    private static IBlockState getCasingState() {
+
+
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TUNGSTENSTEEL_ROBUST);
+    }
+
+    private static IBlockState getCasingState2() {
+        return MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.TUNGSTENSTEEL_PIPE);
+    }
+
+    private static IBlockState getCasingState3() {
+        return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
+    }
+
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity metaTileEntityHolder) {
         return new MetaTileEntityElectricImplosionCompressor(this.metaTileEntityId);
@@ -55,36 +70,24 @@ public class MetaTileEntityElectricImplosionCompressor extends RecipeMapMultiblo
                 .build();
     }
 
-    private static IBlockState getCasingState() {
-
-
-        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TUNGSTENSTEEL_ROBUST);
-    }
-
-    private static IBlockState getCasingState2() {
-        return MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.TUNGSTENSTEEL_PIPE);
-    }
-
-    private static IBlockState getCasingState3() {
-        return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
-    }
-
     @SideOnly(Side.CLIENT)
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.ROBUST_TUNGSTENSTEEL_CASING;
     }
-/*
-    @SideOnly(Side.CLIENT)
-    @Override
-    protected  ICubeRenderer getFrontOverlay() {
-        return com.drppp.drtech.Client.Textures.ELECTRIC_IMPLOSION_OVERLAY;
-    }
-*/
+
+    /*
+        @SideOnly(Side.CLIENT)
+        @Override
+        protected  ICubeRenderer getFrontOverlay() {
+            return com.drppp.drtech.Client.Textures.ELECTRIC_IMPLOSION_OVERLAY;
+        }
+    */
     @Override
     public boolean hasMufflerMechanics() {
         return true;
     }
+
     protected class ImplosionCompressor extends MultiblockRecipeLogic {
 
         public ImplosionCompressor(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
@@ -95,10 +98,10 @@ public class MetaTileEntityElectricImplosionCompressor extends RecipeMapMultiblo
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
-                if(GTValues.V[i]==this.getMaxVoltage())
+                if (GTValues.V[i] == this.getMaxVoltage())
                     tire = i;
             }
-            return tire*8;
+            return tire * 8;
         }
     }
 

@@ -14,36 +14,7 @@
         "textures": {
           "all": "drtech:blocks/neutron_mechanical_casing"
         }
-      },"mass_generation_casing": {
-        "textures": {
-          "all": "drtech:blocks/mass_generation_casing"
-        }
-      },"mass_generation_coil_casing": {
-        "textures": {
-          "all": "drtech:blocks/mass_generation_coil_casing"
-        }
       },
-      "buncher_casing": {
-        "textures": {
-          "all": "drtech:blocks/buncher_casing"
-        }
-      },
-      "resonator_casing": {
-        "textures": {
-          "all": "drtech:blocks/resonator_casing"
-        }
-      },
-      "high_voltage_capacitor_block_casing": {
-        "textures": {
-          "all": "drtech:blocks/high_voltage_capacitor_block_casing"
-        }
-      },
-      "element_constrains_machine_casing": {
-        "textures": {
-          "all": "drtech:blocks/element_constrains_machine_casing"
-        }
-      },
-
       "aseptic_machine_casing": {
         "textures": {
           "all": "drtech:blocks/aseptic_machine_casing"

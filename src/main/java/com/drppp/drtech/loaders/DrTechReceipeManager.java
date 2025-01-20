@@ -10,7 +10,6 @@ public class DrTechReceipeManager {
         MachineReceipe.load();
         MobsDropsRecipe.load();
         FluidStoreRecpie.init();
-        UURecipes.init();
         LaserBending.init();
         if (Mods.Genetics.isModLoaded()) BinneRecipes.init();
         NuclearRecipe.load();

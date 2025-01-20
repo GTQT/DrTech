@@ -1,11 +1,11 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.loaders.DrtechReceipes;
-import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
-import com.drppp.drtech.api.Utils.DrtechUtils;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -37,10 +37,10 @@ import java.util.List;
 import static gregtech.api.util.RelativeDirection.*;
 
 public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
-    public static int max_heat=100000;
-    public int heat=0;
-    public int tick=0;
-    public int eff=1;
+    public static int max_heat = 100000;
+    public int heat = 0;
+    public int tick = 0;
+    public int eff = 1;
     private int tire = 0;
 
     public MetaTileEntitySolarTower(ResourceLocation metaTileEntityId) {
@@ -63,16 +63,16 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
                 .aisle("###########", "###########", "###########", "###########", "###########", "#####S#####", "###########", "###########", "###########", "###########", "###########")
                 .where('S', selfPredicate())
                 .where('#', any())
-                .where('T', states( BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING)).setMinGlobalLimited(210)
+                .where('T', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING)).setMinGlobalLimited(210)
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setExactLimit(1))
 
                 )
-                .where('Y', states( BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING)))
-                .where('G', states( BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING)))
-                .where('R', states( BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_INHIBITION_CASING)))
+                .where('Y', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING)))
+                .where('G', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING)))
+                .where('R', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_INHIBITION_CASING)))
                 .build();
     }
 
@@ -89,8 +89,8 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
-        data.setInteger("Eff",this.eff);
-        data.setInteger("Heat",this.heat);
+        data.setInteger("Eff", this.eff);
+        data.setInteger("Heat", this.heat);
         return data;
     }
 
@@ -104,23 +104,24 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
     @Override
     protected void formStructure(PatternMatchContext context) {
         super.formStructure(context);
-        BlockPos pos = this.getPos().add(0,-27,0);
+        BlockPos pos = this.getPos().add(0, -27, 0);
         getTire(pos);
     }
-    private void getTire(BlockPos pos )
-    {
+
+    private void getTire(BlockPos pos) {
         int[][] block = new int[31][31];
-        for (int i = pos.getX()-15,ii=0; i <= pos.getX()+15; i++,ii++) {
-            for (int j = pos.getZ()-15,jj=0; j <= pos.getZ()+15; j++,jj++) {
-                IBlockState state =  getWorld().getBlockState(new BlockPos(i,pos.getY(),j));
-                if(state == BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_REFLECTION_CASING))
+        for (int i = pos.getX() - 15, ii = 0; i <= pos.getX() + 15; i++, ii++) {
+            for (int j = pos.getZ() - 15, jj = 0; j <= pos.getZ() + 15; j++, jj++) {
+                IBlockState state = getWorld().getBlockState(new BlockPos(i, pos.getY(), j));
+                if (state == BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_REFLECTION_CASING))
                     block[ii][jj] = 1;
                 else
                     block[ii][jj] = 0;
             }
         }
-       this.tire =  DrtechUtils.getSolarTire(block);
+        this.tire = DrtechUtils.getSolarTire(block);
     }
+
     @Override
     public void invalidateStructure() {
         super.invalidateStructure();
@@ -140,14 +141,13 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {
         super.addDisplayText(textList);
-        textList.add(new TextComponentTranslation("drtech.machine.solarpower.tire",this.tire));
-        textList.add(new TextComponentTranslation("drtech.machine.solarpower.eff",this.eff));
-        textList.add(new TextComponentTranslation("drtech.machine.solarpower.heat",this.heat));
+        textList.add(new TextComponentTranslation("drtech.machine.solarpower.tire", this.tire));
+        textList.add(new TextComponentTranslation("drtech.machine.solarpower.eff", this.eff));
+        textList.add(new TextComponentTranslation("drtech.machine.solarpower.heat", this.heat));
     }
-    private int getBuff()
-    {
-        switch (this.tire)
-        {
+
+    private int getBuff() {
+        switch (this.tire) {
             case 0:
                 return 0;
             case 1:
@@ -164,10 +164,9 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
                 return 0;
         }
     }
-    private int getReflectConut()
-    {
-        switch (this.tire)
-        {
+
+    private int getReflectConut() {
+        switch (this.tire) {
             case 0:
                 return 0;
             case 1:
@@ -190,6 +189,7 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         // 白天时间从0到12000刻
         return timeOfDay < 12000;
     }
+
     protected class SolarTowerRecipeLogic extends MultiblockRecipeLogic {
 
         public SolarTowerRecipeLogic(RecipeMapMultiblockController tileEntity) {
@@ -200,23 +200,19 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         public void update() {
             super.update();
             tick++;
-            if(tick>200)
-            {
+            if (tick > 200) {
                 eff += 1;
-                eff = Math.min(eff,100);
-                if(isDaytime(getWorld()))
-                {
-                    double x = (7000-Math.pow(Math.abs(heat-5000),0.8))/7000;
-                    double h  = getReflectConut() * x * (10+Math.pow(2,tire-1));
-                    heat += (int)h;
-                    heat = Math.min(heat,max_heat);
+                eff = Math.min(eff, 100);
+                if (isDaytime(getWorld())) {
+                    double x = (7000 - Math.pow(Math.abs(heat - 5000), 0.8)) / 7000;
+                    double h = getReflectConut() * x * (10 + Math.pow(2, tire - 1));
+                    heat += (int) h;
+                    heat = Math.min(heat, max_heat);
+                } else {
+                    heat -= 10;
+                    heat = Math.max(heat, 0);
                 }
-                else
-                {
-                    heat-=10;
-                    heat = Math.max(heat,0);
-                }
-                tick=0;
+                tick = 0;
             }
         }
 
@@ -224,19 +220,18 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         protected void outputRecipeOutputs() {
             this.fluidOutputs.clear();
             List<FluidStack> fluidOutput = new ArrayList<>();
-            if(eff==100 && heat>=30000)
-            {
+            if (eff == 100 && heat >= 30000) {
                 for (int i = 0; i < this.getInputTank().getTanks(); i++) {
-                   if(isFluidSalt(this.getInputTank().getTankAt(i).getFluid().getFluid()))
-                   {
-                      int amount = Math.min( this.getInputTank().getTankAt(i).getFluidAmount(),heat);
-                       this.getInputTank().getTankAt(i).drain(amount,true);
-                       fluidOutput.add(new FluidStack(DrtechMaterials.HotSunSalt.getFluid(),amount));
-                   }
+                    if (isFluidSalt(this.getInputTank().getTankAt(i).getFluid().getFluid())) {
+                        int amount = Math.min(this.getInputTank().getTankAt(i).getFluidAmount(), heat);
+                        this.getInputTank().getTankAt(i).drain(amount, true);
+                        fluidOutput.add(new FluidStack(DrtechMaterials.HotSunSalt.getFluid(), amount));
+                    }
                 }
-                GTTransferUtils.addFluidsToFluidHandler(this.getOutputTank(),false,fluidOutput);
+                GTTransferUtils.addFluidsToFluidHandler(this.getOutputTank(), false, fluidOutput);
             }
         }
+
         public boolean isFluidSalt(Fluid fluid) {
             return DrtechMaterials.HotSunSalt.getFluid().equals(fluid);
         }

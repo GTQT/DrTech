@@ -1,7 +1,7 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.GTValues;
@@ -58,6 +58,7 @@ public class MetaTileEntityLogFactory extends RecipeMapMultiblockController {
     public ICubeRenderer getBaseTexture(IMultiblockPart sourcePart) {
         return Textures.ASEPTIC_MACHINE_CASING;
     }
+
     protected IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.ASEPTIC_MACHINE_CASING);
     }
@@ -73,66 +74,65 @@ public class MetaTileEntityLogFactory extends RecipeMapMultiblockController {
 
     }
 
-    protected class LogFactoryRecipeLogic extends MultiblockRecipeLogic{
+    protected class LogFactoryRecipeLogic extends MultiblockRecipeLogic {
         public LogFactoryRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
             super(tileEntity, hasPerfectOC);
         }
+
         @Override
         public void setMaxProgress(int maxProgress) {
             this.maxProgressTime = 100;
         }
+
         @Override
         protected void outputRecipeOutputs() {
-            int voltire= getVolLevel();
-            int outNum = (2*voltire*voltire-2*voltire+5)*5*getCoe();
+            int voltire = getVolLevel();
+            int outNum = (2 * voltire * voltire - 2 * voltire + 5) * 5 * getCoe();
             setOutPutItem(outNum);
             GTTransferUtils.addItemsToItemHandler(this.getOutputInventory(), false, this.itemOutputs);
             GTTransferUtils.addFluidsToFluidHandler(this.getOutputTank(), false, this.fluidOutputs);
         }
-        private void setOutPutItem(int num)
-        {
-           if(num !=0)
-           {
-               List<ItemStack> MyitemOutputs = new ArrayList<>();
-               for (ItemStack item: this.itemOutputs
-               ) {
-                   int group = num/64;
-                   for (int i = 0; i < group; i++) {
-                       MyitemOutputs.add(new ItemStack(item.getItem(),64,item.getMetadata()));
-                   }
-                   MyitemOutputs.add(new ItemStack(item.getItem(),num%64,item.getMetadata()));
-               }
-               GTTransferUtils.addItemsToItemHandler(this.getOutputInventory(), false, MyitemOutputs);
 
-               
-           }
-        }
-    private int getCoe() {
-        int coe = 0;
-        var slots = this.getInputInventory().getSlots();
-        for (int i = 0; i < slots; i++) {
-            ItemStack item =  this.getInputInventory().getStackInSlot(i);
-            if(item.getItem().getRegistryName().getPath().equals("saw") )
-            {
-                coe = 1;
-            }else if(item.getItem().getRegistryName().getPath().equals("buzzsaw") )
-            {
-                coe = 2;
-            }
-            else if(item.getItem().getRegistryName().getPath().equals("chainsaw_lv") )
-            {
-                coe = 4;
+        private void setOutPutItem(int num) {
+            if (num != 0) {
+                List<ItemStack> MyitemOutputs = new ArrayList<>();
+                for (ItemStack item : this.itemOutputs
+                ) {
+                    int group = num / 64;
+                    for (int i = 0; i < group; i++) {
+                        MyitemOutputs.add(new ItemStack(item.getItem(), 64, item.getMetadata()));
+                    }
+                    MyitemOutputs.add(new ItemStack(item.getItem(), num % 64, item.getMetadata()));
+                }
+                GTTransferUtils.addItemsToItemHandler(this.getOutputInventory(), false, MyitemOutputs);
+
+
             }
         }
-        return coe;
-    }
-    public int getVolLevel() {
-        int tire = 1;
-        for (int i = 0; i < GTValues.V.length; i++) {
-            if(GTValues.V[i]==this.getMaxVoltage())
-                tire = i;
+
+        private int getCoe() {
+            int coe = 0;
+            var slots = this.getInputInventory().getSlots();
+            for (int i = 0; i < slots; i++) {
+                ItemStack item = this.getInputInventory().getStackInSlot(i);
+                if (item.getItem().getRegistryName().getPath().equals("saw")) {
+                    coe = 1;
+                } else if (item.getItem().getRegistryName().getPath().equals("buzzsaw")) {
+                    coe = 2;
+                } else if (item.getItem().getRegistryName().getPath().equals("chainsaw_lv")) {
+                    coe = 4;
+                }
+            }
+            return coe;
         }
-        return tire;
-    }
+
+        public int getVolLevel() {
+            int tire = 1;
+            for (int i = 0; i < GTValues.V.length; i++) {
+                if (GTValues.V[i] == this.getMaxVoltage())
+                    tire = i;
+            }
+            return tire;
+        }
     }
 }

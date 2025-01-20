@@ -39,7 +39,7 @@ public class MetaTileEntityIndustrialCentrifuge extends RecipeMapMultiblockContr
 
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, UP,BACK )
+        return FactoryBlockPattern.start(RIGHT, UP, BACK)
                 .aisle("XXX", "XXX", "XXX")
                 .aisle("XXX", "X X", "XXX")
                 .aisle("XXX", "XSX", "XXX")
@@ -51,32 +51,39 @@ public class MetaTileEntityIndustrialCentrifuge extends RecipeMapMultiblockContr
                 )
                 .build();
     }
+
     @Override
     public boolean canBeDistinct() {
         return true;
     }
+
     protected IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.CENTRIFUGE_CASING);
     }
+
     @SideOnly(Side.CLIENT)
     @NotNull
     @Override
     protected ICubeRenderer getFrontOverlay() {
         return Textures.CENTRIFUGE;
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.CENTRIFUGE_CASING;
     }
+
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
         Textures.CENTRIFUGE_RENDER.renderSided(renderState, translation, pipeline, getFrontFacing(), isStructureFormed(), this.getRecipeLogic().isWorking());
     }
+
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityIndustrialCentrifuge(this.metaTileEntityId);
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -95,22 +102,22 @@ public class MetaTileEntityIndustrialCentrifuge extends RecipeMapMultiblockContr
 
         @Override
         protected boolean drawEnergy(int recipeEUt, boolean simulate) {
-            return super.drawEnergy((int)(recipeEUt*0.9), simulate);
+            return super.drawEnergy((int) (recipeEUt * 0.9), simulate);
         }
 
         @Override
         public void setMaxProgress(int maxProgress) {
-            this.maxProgressTime = (int)Math.ceil(maxProgress * 0.4);
+            this.maxProgressTime = (int) Math.ceil(maxProgress * 0.4);
         }
 
         @Override
         public int getParallelLimit() {
             int tire = 1;
             for (int i = 0; i < GTValues.V.length; i++) {
-                if(GTValues.V[i]==this.getMaxVoltage())
+                if (GTValues.V[i] == this.getMaxVoltage())
                     tire = i;
             }
-            return tire*6;
+            return tire * 6;
         }
     }
 }
