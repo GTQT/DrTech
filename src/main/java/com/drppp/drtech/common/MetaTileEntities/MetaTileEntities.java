@@ -80,6 +80,7 @@ public class MetaTileEntities {
     public static MetaTileEntityYotHatch YOT_HARCH;
     public static MetaTileEntityYotTank YOUT_TANK;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
+    public static MetaTileEntityBeneathTrans BENEATH_TRANS;
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
@@ -128,7 +129,7 @@ public class MetaTileEntities {
         INFINITE_FLUID_DRILLING_RIG = registerMetaTileEntity(getID(), new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
-        getID();
+        BENEATH_TRANS = registerMetaTileEntity(getID(), new MetaTileEntityBeneathTrans(getmyId("beneath_trans")));
         LARGE_LARGE = registerMetaTileEntity(getID(), new MetaTileEntityElectricImplosionCompressor(getmyId("electric_implosion_compressor")));
         LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(), new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
         getID();

@@ -47,6 +47,13 @@ public class CraftingReceipe {
                 'F', new ItemStack(BlocksInit.COMMON_CASING,1,8),
                 'M', MetaItems.CONVEYOR_MODULE_IV);
 
+        ModHandler.addShapedRecipe("beneath_trans", MetaTileEntities.BENEATH_TRANS.getStackForm(),
+                "WMW", "EFE", "WMW",
+                'W', MetaItems.FIELD_GENERATOR_HV,
+                'E', new UnificationEntry(OrePrefix.plate, StainlessSteel),
+                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[3].getStackForm(),
+                'M', new UnificationEntry(circuit,MarkerMaterials.Tier.HV));
+
         ModHandler.addShapedRecipe("drone_pad", MetaTileEntities.DRONE_PAD.getStackForm(),
                 "WMW", "EFE", "WMW",
                 'W', MetaItems.ELECTRIC_PISTON_EV,

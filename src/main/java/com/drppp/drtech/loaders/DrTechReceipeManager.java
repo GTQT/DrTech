@@ -2,6 +2,7 @@ package com.drppp.drtech.loaders;
 
 import com.drppp.drtech.api.Utils.Mods;
 import com.drppp.drtech.loaders.chain.*;
+import com.drppp.drtech.loaders.misc.ArmorRecipes;
 import com.drppp.drtech.loaders.misc.BinneRecipes;
 
 public class DrTechReceipeManager {
@@ -10,6 +11,7 @@ public class DrTechReceipeManager {
         MachineReceipe.load();
         MobsDropsRecipe.load();
         FluidStoreRecpie.init();
+        ArmorRecipes.init();
         LaserBending.init();
         if (Mods.Genetics.isModLoaded()) BinneRecipes.init();
         NuclearRecipe.load();

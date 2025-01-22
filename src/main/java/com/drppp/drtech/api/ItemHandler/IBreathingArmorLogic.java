@@ -20,7 +20,7 @@ public interface IBreathingArmorLogic extends ISpecialArmorLogic {
     boolean mayBreatheWith(ItemStack stack, EntityPlayer player);
 
 
-    double tryTick(ItemStack stack, EntityPlayer player);
+    double getDamageAbsorbed(ItemStack stack, EntityPlayer player);
 
     default ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, @NotNull ItemStack armor, DamageSource source, double damage,
                                                         EntityEquipmentSlot equipmentSlot) {
@@ -45,12 +45,12 @@ public interface IBreathingArmorLogic extends ISpecialArmorLogic {
 
             @Override
             public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-                return onRightClick(player, hand);
+                return onRightClick(world, player, hand);
             }
         });
     }
 
-    default ActionResult<ItemStack> onRightClick(EntityPlayer player, EnumHand hand) {
+    default ActionResult<ItemStack> onRightClick(World world, EntityPlayer player, EnumHand hand) {
         if (player.getHeldItem(hand).getItem() instanceof ArmorMetaItem) {
             ItemStack armor = player.getHeldItem(hand);
             if (armor.getItem() instanceof ArmorMetaItem &&
