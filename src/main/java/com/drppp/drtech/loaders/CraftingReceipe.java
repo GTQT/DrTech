@@ -26,15 +26,18 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import static com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.BENEATH_TRANS;
 import static gregicality.multiblocks.api.unification.GCYMMaterials.MolybdenumDisilicide;
-import static gregtech.api.GTValues.EV;
-import static gregtech.api.GTValues.IV;
+import static gregtech.api.GTValues.*;
+import static gregtech.api.GTValues.MV;
+import static gregtech.api.recipes.RecipeMaps.ASSEMBLY_LINE_RECIPES;
 import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.ore.OrePrefix.*;
 import static gregtech.common.metatileentities.MetaTileEntities.*;
 import static gregtech.loaders.recipe.CraftingComponent.*;
 import static gregtech.loaders.recipe.CraftingComponent.HULL;
 import static gregtech.loaders.recipe.CraftingComponent.PUMP;
+import static keqing.gtqtcore.common.items.GTQTMetaItems.DISK_8;
 
 public class CraftingReceipe {
     public static void load()
@@ -47,12 +50,20 @@ public class CraftingReceipe {
                 'F', new ItemStack(BlocksInit.COMMON_CASING,1,8),
                 'M', MetaItems.CONVEYOR_MODULE_IV);
 
-        ModHandler.addShapedRecipe("beneath_trans", MetaTileEntities.BENEATH_TRANS.getStackForm(),
-                "WMW", "EFE", "WMW",
-                'W', MetaItems.FIELD_GENERATOR_HV,
-                'E', new UnificationEntry(OrePrefix.plate, StainlessSteel),
-                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[3].getStackForm(),
-                'M', new UnificationEntry(circuit,MarkerMaterials.Tier.HV));
+        ASSEMBLY_LINE_RECIPES.recipeBuilder()
+                .input(gregtech.common.metatileentities.MetaTileEntities.HULL[3],16)
+                .inputs(MetaItems.FIELD_GENERATOR_MV.getStackForm(16))
+                .inputs(MetaItems.SENSOR_MV.getStackForm(16))
+                .input(OrePrefix.circuit, MarkerMaterials.Tier.HV, 4)
+                .input(OrePrefix.pipeSmallFluid, Aluminium, 4)
+                .input(OrePrefix.plate, StainlessSteel, 4)
+                .fluidInputs(Polyethylene.getFluid(GTValues.L * 4))
+                .scannerResearch(b -> b
+                        .researchStack(DISK_8.getStackForm())
+                        .duration(1200)
+                        .EUt(VA[MV]))
+                .output(BENEATH_TRANS)
+                .duration(800).EUt(VA[MV]).buildAndRegister();
 
         ModHandler.addShapedRecipe("drone_pad", MetaTileEntities.DRONE_PAD.getStackForm(),
                 "WMW", "EFE", "WMW",

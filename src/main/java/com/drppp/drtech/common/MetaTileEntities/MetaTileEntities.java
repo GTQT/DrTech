@@ -130,6 +130,7 @@ public class MetaTileEntities {
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
         BENEATH_TRANS = registerMetaTileEntity(getID(), new MetaTileEntityBeneathTrans(getmyId("beneath_trans")));
+
         LARGE_LARGE = registerMetaTileEntity(getID(), new MetaTileEntityElectricImplosionCompressor(getmyId("electric_implosion_compressor")));
         LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(), new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
         getID();
