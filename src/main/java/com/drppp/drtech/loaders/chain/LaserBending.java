@@ -19,6 +19,7 @@ public class LaserBending {
 
         for (int i = 0; i < 9; i++)
         {
+            if(HULL[IV+i]==null)return;
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -32,6 +33,7 @@ public class LaserBending {
         }
         for (int i = 0; i < 9; i++)
         {
+            if(HULL[IV+i]==null)return;
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -45,6 +47,7 @@ public class LaserBending {
         }
         for (int i = 0; i < 9; i++)
         {
+            if(HULL[IV+i]==null)return;
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -58,6 +61,7 @@ public class LaserBending {
         }
         for (int i = 0; i < 9; i++)
         {
+            if(HULL[IV+i]==null)return;
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -71,6 +75,7 @@ public class LaserBending {
         }
         for (int i = 0; i < 9; i++)
         {
+            if(HULL[IV+i]==null)return;
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
