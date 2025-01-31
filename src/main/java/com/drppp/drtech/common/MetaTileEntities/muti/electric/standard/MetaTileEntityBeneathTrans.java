@@ -66,6 +66,7 @@ public class MetaTileEntityBeneathTrans extends MetaTileEntityBaseWithControl {
 
     }
     private void transport(EntityPlayer entityPlayer) {
+        if(!isStructureFormed())return;
         if(this.getPos().getY()>=10)
         {
             entityPlayer.sendStatusMessage(new TextComponentString("设备需接触基岩层！"), true);

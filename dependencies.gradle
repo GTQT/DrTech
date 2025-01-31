@@ -34,7 +34,6 @@ dependencies {
     implementation rfg.deobf("curse.maven:ae2-extended-life-570458:5411078")
     implementation rfg.deobf("curse.maven:gregtech-food-option-477021:5585788")
     implementation rfg.deobf(files("libs/gtqtcore-1.0.jar"))
-    implementation rfg.deobf(files("libs/Thaumcraft-1.12.2-6.1.BETA26.jar"))
     implementation rfg.deobf("curse.maven:forestry-59751:2684780")
     implementation rfg.deobf("curse.maven:pams-harvestcraft-221857:2904825")
     implementation rfg.deobf("curse.maven:modularui-624243:5153413")

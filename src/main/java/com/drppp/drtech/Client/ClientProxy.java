@@ -20,13 +20,4 @@ public class ClientProxy extends CommonProxy {
         super.preLoad();
 
     }
-    @SubscribeEvent
-    public static void onRenderWorldLast(RenderWorldLastEvent event) {
-        StructureSelectRenderer.render(event);
-    }
-    @SubscribeEvent
-    public static void stitchTexture(TextureStitchEvent.Pre event) {
-        TextureMap map = event.getMap();
-        MyMetaItems.armorItem.registerIngameModels(map);
-    }
 }

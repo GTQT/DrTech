@@ -6,7 +6,6 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
-import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MeTaTileEntityWindDrivenGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearReactor;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
@@ -76,7 +75,6 @@ public class MetaTileEntities {
     public static MetaTileEntitySolarTower SOLAR_TOWER;
     public static MetatileEntityTwentyFiveFluidTank TFFT;
     public static MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
-    public static MeTaTileEntityWindDrivenGenerator WIND_DRIVEN_GENERATOR_HV;
     public static MetaTileEntityYotHatch YOT_HARCH;
     public static MetaTileEntityYotTank YOUT_TANK;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
@@ -142,7 +140,7 @@ public class MetaTileEntities {
         SOLAR_TOWER = registerMetaTileEntity(getID(), new MetaTileEntitySolarTower(getmyId("solar_tower")));
         TFFT = registerMetaTileEntity(getID(), new MetatileEntityTwentyFiveFluidTank(getmyId("tfft_tank")));
         TRANS_TOWER = registerMetaTileEntity(getID(), new MetaTileEntityEnergyTransTower(getmyId("trans_tower")));
-        WIND_DRIVEN_GENERATOR_HV = registerMetaTileEntity(getID(), new MeTaTileEntityWindDrivenGenerator(getmyId("wind_driven_generator")));
+        getID();
         YOT_HARCH = registerMetaTileEntity(getID(), new MetaTileEntityYotHatch(getmyId("yot_hatch")));
         YOUT_TANK = registerMetaTileEntity(getID(), new MetaTileEntityYotTank(getmyId("yot_tank")));
         if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {

@@ -18,7 +18,6 @@ import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import com.drppp.drtech.api.sound.Sounds;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.common.CommonProxy;
@@ -28,13 +27,8 @@ import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
-import com.drppp.drtech.common.command.CommandHordeBase;
-import com.drppp.drtech.common.command.CommandHordeStart;
-import com.drppp.drtech.common.command.CommandHordeStatus;
-import com.drppp.drtech.common.command.CommandHordeStop;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
-import com.drppp.drtech.common.enent.DimensionBreathabilityHandler;
 import com.drppp.drtech.common.enent.PollutionEffectHandler;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
@@ -99,7 +93,6 @@ public class DrTechMain {
         GeckoLib.initialize();
         Textures.init();
         drtMetaEntities.init();
-        Sounds.registerSounds();
         TileEntityUIFactory.INSTANCE.init();
         DrtDimType.init();
         WorldRegisterHandler.init();
@@ -107,7 +100,6 @@ public class DrTechMain {
         if (Loader.isModLoaded("forestry")) {
             ItemCombs.init();
         }
-        DimensionBreathabilityHandler.loadConfig();
     }
 
     @EventHandler
@@ -193,17 +185,5 @@ public class DrTechMain {
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
-        proxy.load();
-
     }
-
-    @Mod.EventHandler
-    public void onServerStarting(FMLServerStartingEvent event) {
-        CommandHordeBase hordeCommand = new CommandHordeBase();
-        event.registerServerCommand(hordeCommand);
-        hordeCommand.addSubcommand(new CommandHordeStart());
-        hordeCommand.addSubcommand(new CommandHordeStop());
-        hordeCommand.addSubcommand(new CommandHordeStatus());
-    }
-
 }
