@@ -1,6 +1,6 @@
 package com.drppp.drtech.common.Items.Behavior;
 
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.items.metaitem.stats.IDataItem;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import net.minecraft.client.resources.I18n;
@@ -29,7 +29,7 @@ public class DataItemBehavior implements IItemBehaviour, IDataItem {
 
     @Override
     public void addInformation(@NotNull ItemStack itemStack, List<String> lines) {
-        if(itemStack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && itemStack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
+        if(itemStack.getItem()== DrMetaItems.POS_CARD.getMetaItem() && itemStack.getMetadata()==DrMetaItems.POS_CARD.getMetaValue())
         {
             NBTTagCompound compound = itemStack.getTagCompound();
             String name  ="无";

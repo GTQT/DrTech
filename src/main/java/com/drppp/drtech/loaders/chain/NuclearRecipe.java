@@ -2,7 +2,7 @@ package com.drppp.drtech.loaders.chain;
 
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import gregtech.api.fluids.store.FluidStorageKeys;
 import gregtech.api.items.metaitem.MetaItem;
@@ -364,7 +364,7 @@ public class NuclearRecipe {
         RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.dust,Materials.Uranium238,6)
                 .input(OrePrefix.dustTiny,Materials.Uranium235,3)
-                .input(MyMetaItems.NULL_FUEL_ROD)
+                .input(DrMetaItems.NULL_FUEL_ROD)
                 .fluidInputs(Oxygen.getFluid(FluidStorageKeys.LIQUID, 1000))
                 .circuitMeta(1)
                 .output(MetaItemsReactor.U_FUEL_ROD_1X)
@@ -403,7 +403,7 @@ public class NuclearRecipe {
                 .buildAndRegister();
         RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.dust,Materials.Thorium,3)
-                .input(MyMetaItems.NULL_FUEL_ROD)
+                .input(DrMetaItems.NULL_FUEL_ROD)
                 .circuitMeta(1)
                 .output(MetaItemsReactor.Th_FUEL_ROD_1X)
                 .EUt(32)
@@ -442,14 +442,14 @@ public class NuclearRecipe {
         RecipeMaps.BENDER_RECIPES.recipeBuilder()
                 .input(OrePrefix.plate,Materials.Iron)
                 .circuitMeta(21)
-                .output(MyMetaItems.NULL_FUEL_ROD)
+                .output(DrMetaItems.NULL_FUEL_ROD)
                 .EUt(16)
                 .duration(20)
                 .buildAndRegister();
         RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.dust,Materials.Uranium238,6)
                 .input(OrePrefix.dust,Materials.Plutonium239,3)
-                .input(MyMetaItems.NULL_FUEL_ROD)
+                .input(DrMetaItems.NULL_FUEL_ROD)
                 .fluidInputs(Oxygen.getFluid(FluidStorageKeys.LIQUID, 1000))
                 .circuitMeta(1)
                 .output(MetaItemsReactor.U_MOX_FUEL_ROD_1X)
@@ -583,7 +583,7 @@ public class NuclearRecipe {
         RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.dust,Materials.NaquadahEnriched,12)
                 .input(OrePrefix.dust,Materials.Plutonium239,12)
-                .input(MyMetaItems.NULL_FUEL_ROD)
+                .input(DrMetaItems.NULL_FUEL_ROD)
                 .fluidInputs(Oxygen.getFluid(FluidStorageKeys.LIQUID, 4000))
                 .circuitMeta(1)
                 .output(MetaItemsReactor.Nq_MOX_FUEL_ROD_1X)

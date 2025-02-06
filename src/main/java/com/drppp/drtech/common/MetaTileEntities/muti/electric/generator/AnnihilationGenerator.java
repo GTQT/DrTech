@@ -8,7 +8,7 @@ import com.drppp.drtech.Client.lib.obj.IModelCustom;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaGlasses;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.Logic.AnnihilationGeneratorLogic;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import gregtech.api.GTValues;
@@ -93,14 +93,14 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
             var slots = itemImportInventory.getSlots();
             for (int i = 0; i < slots; i++) {
                 ItemStack item =  itemImportInventory.getStackInSlot(i);
-                if(item.getItem()== MyMetaItems.ENERGY_ELEMENT_1.getMetaItem() && item.getMetadata()==MyMetaItems.ENERGY_ELEMENT_1.getMetaValue())
+                if(item.getItem()== DrMetaItems.ENERGY_ELEMENT_1.getMetaItem() && item.getMetadata()==DrMetaItems.ENERGY_ELEMENT_1.getMetaValue())
                 {
                     if(((TileEntityGravitationalAnomaly)entity).weight+50 <= 400)
                     {
                         ((TileEntityGravitationalAnomaly)entity).weight +=50;
                         itemImportInventory.extractItem(i,1,false);
                     }
-                }else if(item.getItem()== MyMetaItems.ENERGY_ELEMENT_2.getMetaItem() && item.getMetadata()==MyMetaItems.ENERGY_ELEMENT_2.getMetaValue())
+                }else if(item.getItem()== DrMetaItems.ENERGY_ELEMENT_2.getMetaItem() && item.getMetadata()==DrMetaItems.ENERGY_ELEMENT_2.getMetaValue())
                 {
                     if(((TileEntityGravitationalAnomaly)entity).weight+100 <= 800)
                     {
@@ -108,7 +108,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
                         itemImportInventory.extractItem(i,1,false);
                     }
                 }
-                else if(item.getItem()== MyMetaItems.ENERGY_ELEMENT_3.getMetaItem() && item.getMetadata()==MyMetaItems.ENERGY_ELEMENT_3.getMetaValue())
+                else if(item.getItem()== DrMetaItems.ENERGY_ELEMENT_3.getMetaItem() && item.getMetadata()==DrMetaItems.ENERGY_ELEMENT_3.getMetaValue())
                 {
                     if(((TileEntityGravitationalAnomaly)entity).weight+150 <= 1200)
                     {
@@ -116,7 +116,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
                         itemImportInventory.extractItem(i,1,false);
                     }
                 }
-                else if(item.getItem()== MyMetaItems.ENERGY_ELEMENT_4.getMetaItem() && item.getMetadata()==MyMetaItems.ENERGY_ELEMENT_4.getMetaValue())
+                else if(item.getItem()== DrMetaItems.ENERGY_ELEMENT_4.getMetaItem() && item.getMetadata()==DrMetaItems.ENERGY_ELEMENT_4.getMetaValue())
                 {
                     if(((TileEntityGravitationalAnomaly)entity).weight+200 <= 1600)
                     {
@@ -124,7 +124,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
                         itemImportInventory.extractItem(i,1,false);
                     }
                 }
-                else if(item.getItem()== MyMetaItems.ENERGY_ELEMENT_5.getMetaItem() && item.getMetadata()==MyMetaItems.ENERGY_ELEMENT_5.getMetaValue())
+                else if(item.getItem()== DrMetaItems.ENERGY_ELEMENT_5.getMetaItem() && item.getMetadata()==DrMetaItems.ENERGY_ELEMENT_5.getMetaValue())
                 {
                     if(((TileEntityGravitationalAnomaly)entity).weight+300 <= 2000)
                     {

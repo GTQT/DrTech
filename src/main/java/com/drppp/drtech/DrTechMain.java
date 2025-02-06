@@ -25,7 +25,7 @@ import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
@@ -87,7 +87,7 @@ public class DrTechMain {
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
         Mytab = new MyCreativeTabs("mytab");
-        MyMetaItems.MetaItemsInit();
+        DrMetaItems.MetaItemsInit();
         FuelRodInit();
         DrtechCapInit.init();
         GeckoLib.initialize();

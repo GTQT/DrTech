@@ -1,6 +1,6 @@
 package com.drppp.drtech.intergations.Forestry;
 
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.multiblock.CleanroomType;
@@ -36,7 +36,7 @@ public class CombRecipes {
         addProcessGT(DrtCombType.BORAX, new Material[] { Materials.Borax }, Voltage.LV);
         addProcessGT(DrtCombType.BRIGHT, new Material[] { Materials.NetherStar }, Voltage.EV);
         addCentrifugeToMaterial(DrtCombType.WITHER, new Material[] { Materials.Coal }, new int[] { 60 * 100 },
-                new int[] { 9 }, Voltage.MV, MyMetaItems.SKULL_DUST.getStackForm(), 15 * 100);
+                new int[] { 9 }, Voltage.MV, DrMetaItems.SKULL_DUST.getStackForm(), 15 * 100);
         addCentrifugeToMaterial(DrtCombType.MUTAGENIC_AGENT, new Material[] {  }, new int[] {  },
                 new int[] { 9 }, Voltage.HV, new ItemStack(GTDropItem.getByNameOrId("gregtech:gt.honey_drop"),1,3), 100 * 100);
         addProcessGT(DrtCombType.MUTAGENIC_AGENT, new Material[] { Materials.Uranium238,Materials.Uranium235,Materials.Plutonium239 }, Voltage.EV);

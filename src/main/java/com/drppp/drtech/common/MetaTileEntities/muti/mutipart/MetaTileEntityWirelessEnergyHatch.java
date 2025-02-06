@@ -8,7 +8,7 @@ import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.WirelessNetwork.WirelessNetworkManager;
 import com.drppp.drtech.api.capability.impl.EnergyContainerWireless;
 import com.drppp.drtech.common.Items.MetaItems.MetaItems1;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.GTValues;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.gui.GuiTextures;
@@ -106,7 +106,7 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
     @Override
     public boolean onRightClick(EntityPlayer playerIn, EnumHand hand, EnumFacing facing, CuboidRayTraceResult hitResult) {
         ItemStack is = playerIn.getHeldItem(EnumHand.MAIN_HAND);
-        if(is.getItem()== MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && is.getMetadata()==MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue())
+        if(is.getItem()== DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && is.getMetadata()==DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue())
         {
             NBTTagCompound compound = is.getTagCompound();
             if(compound!=null && compound.hasKey("PUUIDMost"))

@@ -4,7 +4,7 @@ import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntitySapBag;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityBaseWithControl;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityMatrixSolver;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntutyLargeBeeHive;
@@ -40,7 +40,7 @@ public class TopCommonProvider implements IProbeInfoProvider {
             IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(entityPlayer);
             for (int i = 0; i < baubles.getSlots(); ++i) {
                 ItemStack stack = baubles.getStackInSlot(i);
-                if (stack.getItem()== MyMetaItems.TELEPATHIC_NECKLACE.getMetaItem() && stack.getMetadata()==MyMetaItems.TELEPATHIC_NECKLACE.getMetaValue()) {
+                if (stack.getItem()== DrMetaItems.TELEPATHIC_NECKLACE.getMetaItem() && stack.getMetadata()==DrMetaItems.TELEPATHIC_NECKLACE.getMetaValue()) {
                     flag=true;
                 }
             }

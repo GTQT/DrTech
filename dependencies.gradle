@@ -22,7 +22,7 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-    implementation 'zone.rong:mixinbooter:8.8'
+    implementation 'zone.rong:mixinbooter:8.9'
     implementation rfg.deobf(files("libs/Baubles-1.12-1.5.2.jar"))
     implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848")
     implementation rfg.deobf("curse.maven:gregtech-ce-unofficial-557242:5519022")
@@ -33,11 +33,13 @@ dependencies {
     implementation rfg.deobf("curse.maven:gregicality-multiblocks-564858:5508050")
     implementation rfg.deobf("curse.maven:ae2-extended-life-570458:5411078")
     implementation rfg.deobf("curse.maven:gregtech-food-option-477021:5585788")
-    implementation rfg.deobf(files("libs/gtqtcore-1.0.jar"))
+    implementation rfg.deobf(files("libs/gtqtcore-1.7.1.jar"))
+    implementation rfg.deobf(files("libs/supercritical-1.7.1.jar"))
     implementation rfg.deobf("curse.maven:forestry-59751:2684780")
     implementation rfg.deobf("curse.maven:pams-harvestcraft-221857:2904825")
     implementation rfg.deobf("curse.maven:modularui-624243:5153413")
     implementation rfg.deobf("curse.maven:Binnie's Mods-223525:2916129")
     implementation rfg.deobf("curse.maven:BdLib-70496:4675629")
     implementation rfg.deobf("curse.maven:the-beneath-254629:3425551")
+    implementation rfg.deobf("curse.maven:applecore-224472:2969118")
 }

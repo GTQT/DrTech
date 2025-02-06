@@ -8,7 +8,7 @@ import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.Utils.RecipeMerger;
 import com.drppp.drtech.common.Blocks.BlocksInit;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.ClickButtonWidget;
@@ -398,7 +398,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
     }
 
     public boolean IsMatrixGem(ItemStack item) {
-        return item.getItem() == MyMetaItems.MATRIX_GEMS.getMetaItem() && item.getMetadata() == MyMetaItems.MATRIX_GEMS.getMetaValue();
+        return item.getItem() == DrMetaItems.MATRIX_GEMS.getMetaItem() && item.getMetadata() == DrMetaItems.MATRIX_GEMS.getMetaValue();
     }
 
 }

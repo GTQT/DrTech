@@ -1,6 +1,6 @@
 package com.drppp.drtech.api.Utils;
 
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
 import net.minecraft.init.Biomes;
 import net.minecraft.item.ItemStack;
@@ -182,11 +182,11 @@ public enum  GT_ApiaryUpgrade {
     }
 
     public ItemStack get(int count) {
-        return new ItemStack(MyMetaItems.UPGRADE_PLAIN.getMetaItem(), count, meta);
+        return new ItemStack(DrMetaItems.UPGRADE_PLAIN.getMetaItem(), count, meta);
     }
 
     public static boolean isUpgrade(ItemStack s) {
-        return s.getItem()==MyMetaItems.UPGRADE_SPEED1.getMetaItem() && (s.getMetadata()>=29 && s.getMetadata()<=59);
+        return s.getItem()==DrMetaItems.UPGRADE_SPEED1.getMetaItem() && (s.getMetadata()>=29 && s.getMetadata()<=59);
     }
 
     private static final HashMap<Integer, GT_ApiaryUpgrade> quickLookup = new HashMap<>();

@@ -2,7 +2,7 @@ package com.drppp.drtech.Client;
 
 import com.drppp.drtech.Client.render.StructureSelectRenderer;
 import com.drppp.drtech.common.CommonProxy;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;

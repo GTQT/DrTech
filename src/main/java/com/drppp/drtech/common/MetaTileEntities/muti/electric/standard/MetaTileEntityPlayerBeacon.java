@@ -5,7 +5,7 @@ import baubles.api.cap.IBaublesItemHandler;
 import codechicken.lib.raytracer.CuboidRayTraceResult;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.WirelessNetwork.WirelessNetworkManager;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
 import gregtech.api.gui.GuiTextures;
@@ -209,14 +209,14 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
     @Override
     public void onLeftClick(EntityPlayer player, EnumFacing facing, CuboidRayTraceResult hitResult) {
         ItemStack is = player.getHeldItem(EnumHand.MAIN_HAND);
-        if (is.getItem() == MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && is.getMetadata() == MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue()) {
+        if (is.getItem() == DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && is.getMetadata() == DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue()) {
             NBTTagCompound compound = is.getTagCompound();
             if (compound != null && compound.hasKey("PUUIDMost")) {
                 UUID id = compound.getUniqueId("PUUID");
                 setUUID(id);
             }
 
-        } else if (is.getItem() == MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && is.getMetadata() == MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue() && player.isSneaking()) {
+        } else if (is.getItem() == DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && is.getMetadata() == DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue() && player.isSneaking()) {
             addPlayerUUID(player.getUniqueID());
         }
     }

@@ -1,7 +1,7 @@
 package com.drppp.drtech.common.Items.Behavior;
 
 import com.drppp.drtech.api.Utils.CustomeRecipe;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,7 @@ import java.util.List;
 public class MatrixGemsBehavior implements IItemBehaviour {
     @Override
     public void addInformation(@NotNull ItemStack itemStack, List<String> lines) {
-        if(itemStack.getItem()== MyMetaItems.MATRIX_GEMS.getMetaItem() && itemStack.getMetadata()==MyMetaItems.MATRIX_GEMS.getMetaValue())
+        if(itemStack.getItem()== DrMetaItems.MATRIX_GEMS.getMetaItem() && itemStack.getMetadata()==DrMetaItems.MATRIX_GEMS.getMetaValue())
         {
             NBTTagCompound compound = itemStack.getTagCompound();
             if(compound!=null && compound.hasKey("StoreRecipe"))

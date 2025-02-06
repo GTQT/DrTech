@@ -1,6 +1,6 @@
 package com.drppp.drtech.Tile;
 
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -26,7 +26,7 @@ public class TileEntityGoldenSea extends TileEntity implements ITickable {
                 ItemStack stack = entityItem.getItem();
 
                 // 检查是否为金元宝
-                if (stack.getItem()== MyMetaItems.GOLD_COIN.getMetaItem() && stack.getMetadata()==MyMetaItems.GOLD_COIN.getMetaValue()) {
+                if (stack.getItem()== DrMetaItems.GOLD_COIN.getMetaItem() && stack.getMetadata()==DrMetaItems.GOLD_COIN.getMetaValue()) {
                     // 复制金元宝并喷射出去
                     ItemStack doubleApple = stack.copy();
                     doubleApple.setCount(2); // 设置数量为2

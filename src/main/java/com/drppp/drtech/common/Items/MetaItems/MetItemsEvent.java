@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public class MetItemsEvent {
     public static void  onItemRightClick( World world, EntityPlayer player, EnumHand hand) {
         ItemStack item = player.getHeldItem(hand);
-        if(item.getItem()== MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue())
+        if(item.getItem()== DrMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && item.getMetadata()==DrMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue())
         {
             ItemStack currentGun = player.getHeldItem(hand);
             if(!hasEnergy(currentGun))
@@ -47,7 +47,7 @@ public class MetItemsEvent {
                     setLastRightClick(currentGun, currentTime);
                 }
             }
-        }else if(item.getItem()== MyMetaItems.ELECTRIC_PLASMA_GUN.getMetaItem() && item.getMetadata()==MyMetaItems.ELECTRIC_PLASMA_GUN.getMetaValue())
+        }else if(item.getItem()== DrMetaItems.ELECTRIC_PLASMA_GUN.getMetaItem() && item.getMetadata()==DrMetaItems.ELECTRIC_PLASMA_GUN.getMetaValue())
         {
             ItemStack currentGun = player.getHeldItem(hand);
             if(!hasEnergy(currentGun))
@@ -70,7 +70,7 @@ public class MetItemsEvent {
                 }
 
             }
-        }else if(item.getItem()== MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaItem() && item.getMetadata()==MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaValue())
+        }else if(item.getItem()== DrMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaItem() && item.getMetadata()==DrMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaValue())
         {
             ItemStack currentGun = player.getHeldItem(hand);
             if(!hasEnergy(currentGun))
@@ -96,7 +96,7 @@ public class MetItemsEvent {
     }
     public static void onItemUse(EntityPlayer player, @NotNull World world, @NotNull BlockPos pos, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
-        if(player.isSneaking() && stack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
+        if(player.isSneaking() && stack.getItem()== DrMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==DrMetaItems.POS_CARD.getMetaValue())
         {
             if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector)
             {
@@ -110,7 +110,7 @@ public class MetItemsEvent {
 
 
         }
-        else  if(stack.getItem()== MyMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==MyMetaItems.POS_CARD.getMetaValue())
+        else  if(stack.getItem()== DrMetaItems.POS_CARD.getMetaItem() && stack.getMetadata()==DrMetaItems.POS_CARD.getMetaValue())
         {
             if( world.getTileEntity(pos)!=null &&  world.getTileEntity(pos)instanceof TileEntityConnector && stack.hasTagCompound())
             {
@@ -133,7 +133,7 @@ public class MetItemsEvent {
     }
 
     public static void hitEntity(ItemStack stack, EntityLivingBase targetEntity, EntityLivingBase attacker) {
-        if (stack.getItem()== MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && stack.getMetadata()==MyMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue() && targetEntity instanceof EntityLivingBase && attacker instanceof EntityPlayer)
+        if (stack.getItem()== DrMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaItem() && stack.getMetadata()==DrMetaItems.TACTICAL_LASER_SUBMACHINE_GUN.getMetaValue() && targetEntity instanceof EntityLivingBase && attacker instanceof EntityPlayer)
         {
             EntityPlayer player = (EntityPlayer) attacker;
             EntityLivingBase enemyEntity =  targetEntity;
@@ -147,7 +147,7 @@ public class MetItemsEvent {
                 }
             }
         }
-        else if(stack.getItem()== MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaItem() && stack.getMetadata()==MyMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaValue() && targetEntity instanceof EntityLivingBase && attacker instanceof EntityPlayer)
+        else if(stack.getItem()== DrMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaItem() && stack.getMetadata()==DrMetaItems.ADVANCED_TACHINO_DISRUPTOR.getMetaValue() && targetEntity instanceof EntityLivingBase && attacker instanceof EntityPlayer)
         {
             EntityPlayer player = (EntityPlayer) attacker;
             EntityLivingBase enemyEntity = (EntityLivingBase) targetEntity;

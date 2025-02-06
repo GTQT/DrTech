@@ -1,6 +1,6 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.capability.IMultipleTankHandler;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.Widget;
@@ -20,7 +20,6 @@ import gregtech.client.utils.TooltipHelper;
 import gregtech.common.blocks.BlockBoilerCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
-import keqing.gtqtcore.common.metatileentities.multi.multiblock.standard.MetaTileEntityBaseWithControl;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -113,11 +112,11 @@ public class MetaTileEntityDeepGroundPump extends MetaTileEntityBaseWithControl 
         int deep = 0;
         if (Deep < 10000) for (int i = 0; i < this.getInputInventory().getSlots(); i++) {
             item = this.getInputInventory().getStackInSlot(i);
-            if (item.getItem() == MyMetaItems.PIPIE_1.getMetaItem() && item.getMetadata() == MyMetaItems.PIPIE_1.getMetaValue()) {
+            if (item.getItem() == DrMetaItems.PIPIE_1.getMetaItem() && item.getMetadata() == DrMetaItems.PIPIE_1.getMetaValue()) {
                 deep += item.getCount();
-            } else if (item.getItem() == MyMetaItems.PIPIE_5.getMetaItem() && item.getMetadata() == MyMetaItems.PIPIE_5.getMetaValue()) {
+            } else if (item.getItem() == DrMetaItems.PIPIE_5.getMetaItem() && item.getMetadata() == DrMetaItems.PIPIE_5.getMetaValue()) {
                 deep += item.getCount() * 5;
-            } else if (item.getItem() == MyMetaItems.PIPIE_10.getMetaItem() && item.getMetadata() == MyMetaItems.PIPIE_10.getMetaValue()) {
+            } else if (item.getItem() == DrMetaItems.PIPIE_10.getMetaItem() && item.getMetadata() == DrMetaItems.PIPIE_10.getMetaValue()) {
                 deep += item.getCount() * 10;
             }
         }

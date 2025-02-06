@@ -2,7 +2,7 @@ package com.drppp.drtech.common.Items.Behavior;
 
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.WirelessNetwork.WirelessNetworkManager;
-import com.drppp.drtech.common.Items.MetaItems.MyMetaItems;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.AdvancedTextWidget;
@@ -81,7 +81,7 @@ public class WirelessPanelBehavior implements IItemBehaviour, ItemUIFactory {
     }
     @Override
     public void addInformation(@NotNull ItemStack itemStack, List<String> lines) {
-        if(itemStack.getItem()== MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && itemStack.getMetadata()==MyMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue())
+        if(itemStack.getItem()== DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaItem() && itemStack.getMetadata()==DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL.getMetaValue())
         {
             lines.add(I18n.format("behavior.data_item.wireless_panel.data.2"));
             lines.add(I18n.format("behavior.data_item.wireless_panel.data.3"));
