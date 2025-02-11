@@ -71,7 +71,7 @@ import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodIn
         dependencies = "required:genetics@[2.5.1.203,);")
 public class DrTechMain {
     public static final Logger LOGGER = LogManager.getLogger(MODID);
-    public static CreativeTabs Mytab;
+    public static CreativeTabs DrTechTab;
     @Mod.Instance(MODID)
     public static DrTechMain instance;
     @SidedProxy(modId = MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
@@ -86,7 +86,7 @@ public class DrTechMain {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        Mytab = new MyCreativeTabs("mytab");
+        DrTechTab = new MyCreativeTabs("mytab");
         DrMetaItems.MetaItemsInit();
         FuelRodInit();
         DrtechCapInit.init();

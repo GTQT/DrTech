@@ -14,13 +14,13 @@ import net.minecraft.world.World;
 
 public class KillGrassBehavior implements IItemBehaviour {
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos posin, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand){
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos posin, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
         if (world.isRemote) return EnumActionResult.PASS;
         BlockPos pos = player.getPosition();
         int radius = 16; // 清除半径
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
-                for (int y = (int)hitY-4; y < (int)hitY+4; y++) {
+                for (int y = (int) hitY - 4; y < (int) hitY + 4; y++) {
                     BlockPos currentPos = pos.add(x, y, z);
                     Block block = world.getBlockState(currentPos).getBlock();
                     if (block == Blocks.TALLGRASS || block instanceof BlockTallGrass || block instanceof BlockDoublePlant) {

@@ -69,6 +69,20 @@ metaitem.th_fuel_rod_4x.name=四联燃料棒(钍)
 metaitem.th_fuel_rod_1x_ex.name=枯竭燃料棒(钍)
 metaitem.th_fuel_rod_2x_ex.name=双联枯竭燃料棒(钍)
 metaitem.th_fuel_rod_4x_ex.name=四联枯竭燃料棒(钍)
+# 泰拉燃料棒
+metaitem.terra_fuel_rod_1x.name=燃料棒(泰拉)
+metaitem.terra_fuel_rod_2x.name=双联燃料棒(泰拉)
+metaitem.terra_fuel_rod_4x.name=四联燃料棒(泰拉)
+metaitem.terra_fuel_rod_1x_ex.name=枯竭燃料棒(泰拉)
+metaitem.terra_fuel_rod_2x_ex.name=双联枯竭燃料棒(泰拉)
+metaitem.terra_fuel_rod_4x_ex.name=四联枯竭燃料棒(泰拉)
+# 奥利哈燃料棒
+metaitem.ollivann_fuel_rod_1x.name=燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_2x.name=双联燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_4x.name=四联燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_1x_ex.name=枯竭燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_2x_ex.name=双联枯竭燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_4x_ex.name=四联枯竭燃料棒(奥利哈)
 metaitem.heat_vent.name=散热片
 metaitem.component_heat_vent.name=元件散热片
 metaitem.advanced_component_heat_vent.name=高级元件散热片

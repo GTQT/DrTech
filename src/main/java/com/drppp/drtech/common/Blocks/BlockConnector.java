@@ -22,7 +22,7 @@ public class BlockConnector extends Block {
         super(Material.IRON);
         this.setResistance(10F);
         this.setRegistryName(Tags.MODID,"connector_"+tire);
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".connector_"+tire);
         this.tire = tire;
     }

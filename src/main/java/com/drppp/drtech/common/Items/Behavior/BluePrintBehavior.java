@@ -37,7 +37,6 @@ import net.minecraft.world.World;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
 
@@ -45,9 +44,9 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
 
     BlockPos startPos;
 
-    private boolean oppositeX=false;
-    private boolean oppositeY=false;
-    private boolean oppositeZ=false;
+    private boolean oppositeX = false;
+    private boolean oppositeY = false;
+    private boolean oppositeZ = false;
 
     private boolean rotateX = false;
     private boolean rotateY = false;
@@ -156,9 +155,9 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
     private void clear(PlayerInventoryHolder playerInventoryHolder) {
         EntityPlayer player = playerInventoryHolder.player;
         player.sendStatusMessage(new TextComponentTranslation("已还原所有状态"), true);
-        oppositeX=false;
-        oppositeY=false;
-        oppositeZ=false;
+        oppositeX = false;
+        oppositeY = false;
+        oppositeZ = false;
 
         rotateX = false;
         rotateY = false;
@@ -208,7 +207,7 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
 
     private void Preparedraw(PlayerInventoryHolder playerInventoryHolder) {
         EntityPlayer player = playerInventoryHolder.player;
-        startPos=player.getPosition();
+        startPos = player.getPosition();
         player.sendStatusMessage(new TextComponentTranslation("已设置玩家当前坐标为起始坐标"), true);
     }
 
@@ -216,16 +215,13 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
         EntityPlayer player = playerInventoryHolder.player;
         var s = playerInventoryHolder.getCurrentItem();
         if (!player.world.isRemote && s.getTagCompound().hasKey("SaveBlocks")) {
-            if(startPos==null)
-            {
+            if (startPos == null) {
                 player.sendStatusMessage(new TextComponentTranslation("未找到玩家指定的放置坐标！"), true);
                 loadStructure(player, player.world, player.getPosition(), s.getTagCompound().getCompoundTag("SaveBlocks"));
-            }
-            else
-            {
+            } else {
                 player.sendStatusMessage(new TextComponentTranslation("已找到玩家指定的放置坐标！"), true);
                 loadStructure(player, player.world, startPos, s.getTagCompound().getCompoundTag("SaveBlocks"));
-                startPos=null;
+                startPos = null;
             }
         }
     }
@@ -328,18 +324,21 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
     private void toggleMirrorX(PlayerInventoryHolder playerInventoryHolder) {
         EntityPlayer player = playerInventoryHolder.player;
         player.sendStatusMessage(new TextComponentTranslation("X轴已镜像"), true);
-        oppositeX=!oppositeX;
+        oppositeX = !oppositeX;
     }
+
     private void toggleMirrorY(PlayerInventoryHolder playerInventoryHolder) {
         EntityPlayer player = playerInventoryHolder.player;
         player.sendStatusMessage(new TextComponentTranslation("Y轴已镜像"), true);
-        oppositeY=!oppositeY;
+        oppositeY = !oppositeY;
     }
+
     private void toggleMirrorZ(PlayerInventoryHolder playerInventoryHolder) {
         EntityPlayer player = playerInventoryHolder.player;
         player.sendStatusMessage(new TextComponentTranslation("Z轴已镜像"), true);
-        oppositeZ=!oppositeZ;
+        oppositeZ = !oppositeZ;
     }
+
     private void toggleRotateX(PlayerInventoryHolder playerInventoryHolder) {
         EntityPlayer player = playerInventoryHolder.player;
         player.sendStatusMessage(new TextComponentTranslation("X轴已旋转"), true);

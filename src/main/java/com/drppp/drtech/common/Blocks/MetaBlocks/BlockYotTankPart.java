@@ -33,7 +33,7 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
         setSoundType(SoundType.METAL);
         setHarvestLevel(ToolClasses.WRENCH, 3); // Diamond level, can be mined by a steel wrench or better
         setDefaultState(getState(BlockYotTankPartType.YOT_PART_TIER_T1));
-        setCreativeTab(DrTechMain.Mytab);
+        setCreativeTab(DrTechMain.DrTechTab);
     }
 
     @Override

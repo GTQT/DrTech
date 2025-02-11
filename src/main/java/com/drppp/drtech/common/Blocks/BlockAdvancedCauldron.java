@@ -20,7 +20,7 @@ public class BlockAdvancedCauldron extends BlockCauldron {
         this.setHardness(2.0F);
         this.setTranslationKey("advanced_cauldron");
         this.setRegistryName(Tags.MODID,"advanced_cauldron");
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
     }
 
     @Nullable

@@ -28,7 +28,6 @@ public class BlocksInit {
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
     public static final BlockStoragePail BLOCK_STORAGE_PAIL = new BlockStoragePail("compress",1);
-    public static final MetaGlasses TRANSPARENT_CASING = new MetaGlasses("glasses_casing");
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
     public static final MetaCasing1 COMMON_CASING1 = new MetaCasing1();
@@ -56,7 +55,6 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityPeacefulTable.class, new ResourceLocation(Tags.MODID, "peaceful_table"));
         GameRegistry.registerTileEntity(TileEntityStoragePail.class, new ResourceLocation(Tags.MODID, "storage_pail"));
         GameRegistry.registerTileEntity(TileEntitySapBag.class, new ResourceLocation(Tags.MODID, "sap_bag"));
-        event.getRegistry().register(TRANSPARENT_CASING);
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
         event.getRegistry().register(COMMON_CASING1);
@@ -68,7 +66,7 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityTimeTable.class, new ResourceLocation(Tags.MODID, "time_table"));
         MY_LASER_PIPE.setRegistryName("my_laser_pipe_normal");
         MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
-        MY_LASER_PIPE.setCreativeTab(DrTechMain.Mytab);
+        MY_LASER_PIPE.setCreativeTab(DrTechMain.DrTechTab);
         event.getRegistry().register(MY_LASER_PIPE);
         Datas.init();
     }

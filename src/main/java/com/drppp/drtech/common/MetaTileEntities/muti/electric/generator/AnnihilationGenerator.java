@@ -3,11 +3,8 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.generator;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.drppp.drtech.Client.lib.obj.AdvancedModelLoader;
-import com.drppp.drtech.Client.lib.obj.IModelCustom;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.common.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.Logic.AnnihilationGeneratorLogic;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
@@ -35,6 +32,7 @@ import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.integration.jei.basic.GTOreInfo;
+import keqing.gtqtcore.common.block.GTQTMetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -63,6 +61,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.FORCE_FIELD_CONSTRAINED_GLASS;
+import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.TI_BORON_SILICATE_GLASS;
 
 public class AnnihilationGenerator extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable, IFastRenderMetaTileEntity {
     private final AnnihilationGeneratorLogic logic;
@@ -195,7 +196,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.GRAVITATION_FIELD_CASING);
     }
     protected IBlockState getGlassesState() {
-        return BlocksInit.TRANSPARENT_CASING.getState(MetaGlasses.CasingType.NE_BORON_SILICATE_GLASS_BLOCK);
+        return GTQTMetaBlocks.blockMultiblockGlass1.getState(FORCE_FIELD_CONSTRAINED_GLASS);
     }
     @SideOnly(Side.CLIENT)
     @Override

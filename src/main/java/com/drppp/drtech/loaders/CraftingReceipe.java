@@ -47,7 +47,7 @@ public class CraftingReceipe {
                 "WMW", "EFE", "WMW",
                 'W', MetaItems.FIELD_GENERATOR_IV,
                 'E', new UnificationEntry(OrePrefix.plate, Materials.Iridium),
-                'F', new ItemStack(BlocksInit.COMMON_CASING,1,8),
+                'F', new ItemStack(BlocksInit.COMMON_CASING,1,2),
                 'M', MetaItems.CONVEYOR_MODULE_IV);
 
         ASSEMBLY_LINE_RECIPES.recipeBuilder()
@@ -76,7 +76,7 @@ public class CraftingReceipe {
                 "WAW", "EFE", "MBM",
                 'W', new UnificationEntry(OrePrefix.screw,Materials.TungstenSteel),
                 'E', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
-                'F', new ItemStack(BlocksInit.COMMON_CASING,1,9),
+                'F', new ItemStack(BlocksInit.COMMON_CASING,1,3),
                 'M', MetaItems.FIELD_GENERATOR_LV,
                 'A', new UnificationEntry(OrePrefix.plate,Materials.Polytetrafluoroethylene),
                 'B',  new UnificationEntry(OrePrefix.rotor,Materials.StainlessSteel)
@@ -85,7 +85,7 @@ public class CraftingReceipe {
                 "WAW", "EFE", "MBM",
                 'W', new UnificationEntry(OrePrefix.screw,Materials.TungstenSteel),
                 'E', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
-                'F', new ItemStack(BlocksInit.COMMON_CASING,1,10),
+                'F', new ItemStack(BlocksInit.COMMON_CASING,1,4),
                 'M', MetaItems.FIELD_GENERATOR_LV,
                 'A', new UnificationEntry(OrePrefix.plate,Materials.Polytetrafluoroethylene),
                 'B',  new UnificationEntry(OrePrefix.rotor,Materials.StainlessSteel)

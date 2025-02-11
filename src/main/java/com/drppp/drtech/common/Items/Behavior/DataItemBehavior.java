@@ -29,18 +29,16 @@ public class DataItemBehavior implements IItemBehaviour, IDataItem {
 
     @Override
     public void addInformation(@NotNull ItemStack itemStack, List<String> lines) {
-        if(itemStack.getItem()== DrMetaItems.POS_CARD.getMetaItem() && itemStack.getMetadata()==DrMetaItems.POS_CARD.getMetaValue())
-        {
+        if (itemStack.getItem() == DrMetaItems.POS_CARD.getMetaItem() && itemStack.getMetadata() == DrMetaItems.POS_CARD.getMetaValue()) {
             NBTTagCompound compound = itemStack.getTagCompound();
-            String name  ="无";
-            if (compound != null) name = "X:"+compound.getInteger("x") +"Y:"+compound.getInteger("y")+"Z:"+compound.getInteger("z");
+            String name = "无";
+            if (compound != null)
+                name = "X:" + compound.getInteger("x") + "Y:" + compound.getInteger("y") + "Z:" + compound.getInteger("z");
             lines.add(I18n.format("behavior.data_item.poscard.data", name));
             lines.add(I18n.format("behavior.data_item.poscard.opera"));
-        }
-        else
-        {
+        } else {
             NBTTagCompound compound = itemStack.getTagCompound();
-            String name  ="空";
+            String name = "空";
             if (compound != null) name = compound.getString("Name");
             lines.add(I18n.format("behavior.data_item.cd_rom.title"));
             lines.add(I18n.format("behavior.data_item.cd_rom.data", name));

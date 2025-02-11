@@ -9,7 +9,7 @@ public class BlockWasteDirt extends Block {
     public BlockWasteDirt() {
         super(Material.GRASS);
         this.setRegistryName(Tags.MODID,"waste_dirt");
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".waste_dirt");
     }
 }

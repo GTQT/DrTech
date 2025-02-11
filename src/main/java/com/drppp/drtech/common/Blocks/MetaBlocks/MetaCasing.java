@@ -23,7 +23,7 @@ public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
         setHarvestLevel("wrench", 2);
         setDefaultState(getState(MetalCasingType.GRAVITATION_FIELD_CASING));
         setRegistryName("meta_machine_casing");
-        setCreativeTab(DrTechMain.Mytab);
+        setCreativeTab(DrTechMain.DrTechTab);
     }
 
     @Override

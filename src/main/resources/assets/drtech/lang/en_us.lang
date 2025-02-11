@@ -50,12 +50,33 @@ metaitem.u_mox_fuel_rod_4x.name=MOX Fuel Rod (4x)
 metaitem.u_mox_fuel_rod_1x_ex.name=Exhausted MOX Fuel Rod (1x)
 metaitem.u_mox_fuel_rod_2x_ex.name=Exhausted MOX Fuel Rod (2x)
 metaitem.u_mox_fuel_rod_4x_ex.name=Exhausted MOX Fuel Rod (4x)
+metaitem.nq_mox_fuel_rod_1x.name=燃料棒(富集硅岩MOX)
+metaitem.nq_mox_fuel_rod_2x.name=双联燃料棒(富集硅岩MOXMOX)
+metaitem.nq_mox_fuel_rod_4x.name=四联燃料棒(富集硅岩MOXMOX)
+metaitem.nq_mox_fuel_rod_1x_ex.name=枯竭燃料棒(富集硅岩MOX)
+metaitem.nq_mox_fuel_rod_2x_ex.name=双联枯竭燃料棒(富集硅岩MOX)
+metaitem.nq_mox_fuel_rod_4x_ex.name=四联枯竭燃料棒(富集硅岩MOX)
 metaitem.th_fuel_rod_1x.name=Thorium Fuel Rod (1x)
 metaitem.th_fuel_rod_2x.name=Thorium Fuel Rod (2x)
 metaitem.th_fuel_rod_4x.name=Thorium Fuel Rod (4x)
 metaitem.th_fuel_rod_1x_ex.name=Exhausted Thorium Fuel Rod (1x)
 metaitem.th_fuel_rod_2x_ex.name=Exhausted Thorium Fuel Rod (2x)
 metaitem.th_fuel_rod_4x_ex.name=Exhausted Thorium Fuel Rod (4x)
+# 泰拉燃料棒
+metaitem.terra_fuel_rod_1x.name=燃料棒(泰拉)
+metaitem.terra_fuel_rod_2x.name=双联燃料棒(泰拉)
+metaitem.terra_fuel_rod_4x.name=四联燃料棒(泰拉)
+metaitem.terra_fuel_rod_1x_ex.name=枯竭燃料棒(泰拉)
+metaitem.terra_fuel_rod_2x_ex.name=双联枯竭燃料棒(泰拉)
+metaitem.terra_fuel_rod_4x_ex.name=四联枯竭燃料棒(泰拉)
+# 奥利哈燃料棒
+metaitem.ollivann_fuel_rod_1x.name=燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_2x.name=双联燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_4x.name=四联燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_1x_ex.name=枯竭燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_2x_ex.name=双联枯竭燃料棒(奥利哈)
+metaitem.ollivann_fuel_rod_4x_ex.name=四联枯竭燃料棒(奥利哈)
+
 metaitem.heat_vent.name=Heat Sink
 metaitem.component_heat_vent.name=Component Heat Sink
 metaitem.advanced_component_heat_vent.name=Advanced Component Heat Sink

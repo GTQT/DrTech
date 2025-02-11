@@ -1,6 +1,5 @@
 package com.drppp.drtech.common.Items.Behavior;
 
-import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntityHolder;
@@ -11,7 +10,6 @@ import gregtech.common.metatileentities.storage.MetaTileEntityDrum;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -26,7 +24,6 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.UUID;
 
 import static gregtech.api.unification.material.Materials.SolderingAlloy;
 
@@ -66,12 +63,10 @@ public class HandPumpBehavior implements IItemBehaviour {
             } else if (tileEntity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null)) {
                 drainFromCapabilities(tileEntity, player, fluidHandlerItem, capacity, content);
                 return EnumActionResult.SUCCESS;
-            }else if(GTUtility.getMetaTileEntity(world,pos) instanceof MetaTileEntityMaintenanceHatch)
-            {
-                if(fluidHandlerItem.getTankProperties()[0].getContents().getFluid().equals(SolderingAlloy.getFluid()) && fluidHandlerItem.getTankProperties()[0].getContents().amount>=144)
-                {
-                    fluidHandlerItem.drain(144,true);
-                    ((MetaTileEntityMaintenanceHatch)(GTUtility.getMetaTileEntity(world,pos))).fixAllMaintenanceProblems();
+            } else if (GTUtility.getMetaTileEntity(world, pos) instanceof MetaTileEntityMaintenanceHatch) {
+                if (fluidHandlerItem.getTankProperties()[0].getContents().getFluid().equals(SolderingAlloy.getFluid()) && fluidHandlerItem.getTankProperties()[0].getContents().amount >= 144) {
+                    fluidHandlerItem.drain(144, true);
+                    ((MetaTileEntityMaintenanceHatch) (GTUtility.getMetaTileEntity(world, pos))).fixAllMaintenanceProblems();
                 }
             }
 
@@ -104,11 +99,12 @@ public class HandPumpBehavior implements IItemBehaviour {
         }
 
     }
+
     @Override
     public void addInformation(@NotNull ItemStack itemStack, List<String> lines) {
-         lines.add(I18n.format("behavior.data_item.hand_pump.data.1"));
-         lines.add(I18n.format("behavior.data_item.hand_pump.data.2"));
-         lines.add(I18n.format("behavior.data_item.hand_pump.data.3"));
-         lines.add(I18n.format("behavior.data_item.hand_pump.data.4"));
+        lines.add(I18n.format("behavior.data_item.hand_pump.data.1"));
+        lines.add(I18n.format("behavior.data_item.hand_pump.data.2"));
+        lines.add(I18n.format("behavior.data_item.hand_pump.data.3"));
+        lines.add(I18n.format("behavior.data_item.hand_pump.data.4"));
     }
 }

@@ -28,7 +28,7 @@ public class BlockTimeTable extends Block {
         this.setHardness(1);
         this.setResistance(10F);
         this.setSoundType(SoundType.METAL);
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setRegistryName(Tags.MODID,"time_table");
         this.setTranslationKey(Tags.MODID+".Time_Table");
     }

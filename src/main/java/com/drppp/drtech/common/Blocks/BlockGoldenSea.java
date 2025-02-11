@@ -19,7 +19,7 @@ public class BlockGoldenSea extends Block {
         super(Material.IRON);
         this.setResistance(10F);
         this.setRegistryName(Tags.MODID,"golden_sea");
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".golden_sea");
     }
     @Nonnull

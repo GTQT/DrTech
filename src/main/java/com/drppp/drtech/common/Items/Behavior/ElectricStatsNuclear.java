@@ -36,66 +36,9 @@ public class ElectricStatsNuclear implements IItemComponent, IItemCapabilityProv
 
     public ElectricStatsNuclear(long maxCharge, long tier, boolean chargeable, boolean dischargeable) {
         this.maxCharge = maxCharge;
-        this.tier = (int)tier;
+        this.tier = (int) tier;
         this.chargeable = chargeable;
         this.dischargeable = dischargeable;
-    }
-
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack itemStack = player.getHeldItem(hand);
-        IElectricItem electricItem = (IElectricItem)itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, (EnumFacing)null);
-        if (electricItem != null && electricItem.canProvideChargeExternally() && player.isSneaking()) {
-            if (!world.isRemote) {
-                boolean isInDischargeMode = isInDischargeMode(itemStack);
-                String locale = "metaitem.electric.discharge_mode." + (isInDischargeMode ? "disabled" : "enabled");
-                player.sendStatusMessage(new TextComponentTranslation(locale, new Object[0]), true);
-                setInDischargeMode(itemStack, !isInDischargeMode);
-            }
-
-            return ActionResult.newResult(EnumActionResult.SUCCESS, itemStack);
-        } else {
-            return ActionResult.newResult(EnumActionResult.PASS, itemStack);
-        }
-    }
-
-    public void onUpdate(ItemStack itemStack, Entity entity) {
-        IElectricItem electricItem = (IElectricItem)itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, (EnumFacing)null);
-        long amount = (long)((double)GTValues.V[this.tier] * 0.01d);
-        amount = Math.max(amount,1);
-        electricItem.charge(amount,this.tier,false,false);
-        if (!entity.world.isRemote && entity instanceof EntityPlayer) {
-            EntityPlayer entityPlayer = (EntityPlayer)entity;
-            if (electricItem != null && electricItem.canProvideChargeExternally() && isInDischargeMode(itemStack) && electricItem.getCharge() > 0L) {
-                IInventory inventoryPlayer = entityPlayer.inventory;
-                long transferLimit = electricItem.getTransferLimit();
-                if (Mods.Baubles.isModLoaded()) {
-                    inventoryPlayer = BaublesModule.getBaublesWrappedInventory(entityPlayer);
-                }
-
-                for(int i = 0; i < ((IInventory)inventoryPlayer).getSizeInventory(); ++i) {
-                    ItemStack itemInSlot = ((IInventory)inventoryPlayer).getStackInSlot(i);
-                    IElectricItem slotElectricItem = (IElectricItem)itemInSlot.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, (EnumFacing)null);
-                    IEnergyStorage feEnergyItem = (IEnergyStorage)itemInSlot.getCapability(CapabilityEnergy.ENERGY, (EnumFacing)null);
-                    if (slotElectricItem != null && !slotElectricItem.canProvideChargeExternally()) {
-                        long chargedAmount = chargeElectricItem(transferLimit, electricItem, slotElectricItem);
-                        if (chargedAmount > 0L) {
-                            transferLimit -= chargedAmount;
-                            if (transferLimit == 0L) {
-                                break;
-                            }
-                        }
-                    } else if (ConfigHolder.compat.energy.nativeEUToFE && feEnergyItem != null && feEnergyItem.getEnergyStored() < feEnergyItem.getMaxEnergyStored()) {
-                        int energyMissing = feEnergyItem.getMaxEnergyStored() - feEnergyItem.getEnergyStored();
-                        long euToCharge = FeCompat.toEu((long)energyMissing, ConfigHolder.compat.energy.feToEuRatio);
-                        long energyToTransfer = Math.min(euToCharge, transferLimit);
-                        long maxDischargeAmount = Math.min(energyToTransfer, electricItem.discharge(energyToTransfer, electricItem.getTier(), false, true, true));
-                        FeCompat.insertEu(feEnergyItem, maxDischargeAmount);
-                        electricItem.discharge(maxDischargeAmount, electricItem.getTier(), false, true, false);
-                    }
-                }
-            }
-        }
-
     }
 
     private static long chargeElectricItem(long maxDischargeAmount, IElectricItem source, IElectricItem target) {
@@ -122,45 +65,30 @@ public class ElectricStatsNuclear implements IItemComponent, IItemCapabilityProv
         } else if (tagCompound != null) {
             tagCompound.removeTag("DischargeMode");
             if (tagCompound.isEmpty()) {
-                itemStack.setTagCompound((NBTTagCompound)null);
+                itemStack.setTagCompound(null);
             }
-        }
-
-    }
-
-    public void addInformation(ItemStack itemStack, List<String> lines) {
-        IElectricItem electricItem = (IElectricItem)itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, (EnumFacing)null);
-        if (electricItem != null && electricItem.canProvideChargeExternally()) {
-            addTotalChargeTooltip(lines, electricItem.getMaxCharge(), electricItem.getTier());
-            if (isInDischargeMode(itemStack)) {
-                lines.add(I18n.format("metaitem.electric.discharge_mode.enabled", new Object[0]));
-            } else {
-                lines.add(I18n.format("metaitem.electric.discharge_mode.disabled", new Object[0]));
-            }
-
-            lines.add(I18n.format("metaitem.electric.discharge_mode.tooltip", new Object[0]));
         }
 
     }
 
     private static void addTotalChargeTooltip(List<String> tooltip, long maxCharge, int tier) {
         Instant start = Instant.now();
-        Instant end = Instant.now().plusSeconds((long)((double)maxCharge * 1.0 / (double)GTValues.V[tier] / 20.0));
+        Instant end = Instant.now().plusSeconds((long) ((double) maxCharge / (double) GTValues.V[tier] / 20.0));
         Duration duration = Duration.between(start, end);
         long chargeTime;
         String unit;
         if (duration.getSeconds() <= 180L) {
             chargeTime = duration.getSeconds();
-            unit = I18n.format("metaitem.battery.charge_unit.second", new Object[0]);
+            unit = I18n.format("metaitem.battery.charge_unit.second");
         } else if (duration.toMinutes() <= 180L) {
             chargeTime = duration.toMinutes();
-            unit = I18n.format("metaitem.battery.charge_unit.minute", new Object[0]);
+            unit = I18n.format("metaitem.battery.charge_unit.minute");
         } else {
             chargeTime = duration.toHours();
-            unit = I18n.format("metaitem.battery.charge_unit.hour", new Object[0]);
+            unit = I18n.format("metaitem.battery.charge_unit.hour");
         }
 
-        tooltip.add(I18n.format("metaitem.battery.charge_time", new Object[]{chargeTime, unit, GTValues.VNF[tier]}));
+        tooltip.add(I18n.format("metaitem.battery.charge_time", chargeTime, unit, GTValues.VNF[tier]));
     }
 
     private static boolean isInDischargeMode(ItemStack itemStack) {
@@ -168,8 +96,83 @@ public class ElectricStatsNuclear implements IItemComponent, IItemCapabilityProv
         return tagCompound != null && tagCompound.getBoolean("DischargeMode");
     }
 
+    public static ElectricStatsNuclear createBattery(long maxCharge, int tier, boolean rechargeable) {
+        return new ElectricStatsNuclear(maxCharge, tier, rechargeable, true);
+    }
+
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack itemStack = player.getHeldItem(hand);
+        IElectricItem electricItem = itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
+        if (electricItem != null && electricItem.canProvideChargeExternally() && player.isSneaking()) {
+            if (!world.isRemote) {
+                boolean isInDischargeMode = isInDischargeMode(itemStack);
+                String locale = "metaitem.electric.discharge_mode." + (isInDischargeMode ? "disabled" : "enabled");
+                player.sendStatusMessage(new TextComponentTranslation(locale), true);
+                setInDischargeMode(itemStack, !isInDischargeMode);
+            }
+
+            return ActionResult.newResult(EnumActionResult.SUCCESS, itemStack);
+        } else {
+            return ActionResult.newResult(EnumActionResult.PASS, itemStack);
+        }
+    }
+
+    public void onUpdate(ItemStack itemStack, Entity entity) {
+        IElectricItem electricItem = itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
+        long amount = (long) ((double) GTValues.V[this.tier] * 0.01d);
+        amount = Math.max(amount, 1);
+        electricItem.charge(amount, this.tier, false, false);
+        if (!entity.world.isRemote && entity instanceof EntityPlayer entityPlayer) {
+            if (electricItem != null && electricItem.canProvideChargeExternally() && isInDischargeMode(itemStack) && electricItem.getCharge() > 0L) {
+                IInventory inventoryPlayer = entityPlayer.inventory;
+                long transferLimit = electricItem.getTransferLimit();
+                if (Mods.Baubles.isModLoaded()) {
+                    inventoryPlayer = BaublesModule.getBaublesWrappedInventory(entityPlayer);
+                }
+
+                for (int i = 0; i < inventoryPlayer.getSizeInventory(); ++i) {
+                    ItemStack itemInSlot = inventoryPlayer.getStackInSlot(i);
+                    IElectricItem slotElectricItem = itemInSlot.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
+                    IEnergyStorage feEnergyItem = itemInSlot.getCapability(CapabilityEnergy.ENERGY, null);
+                    if (slotElectricItem != null && !slotElectricItem.canProvideChargeExternally()) {
+                        long chargedAmount = chargeElectricItem(transferLimit, electricItem, slotElectricItem);
+                        if (chargedAmount > 0L) {
+                            transferLimit -= chargedAmount;
+                            if (transferLimit == 0L) {
+                                break;
+                            }
+                        }
+                    } else if (ConfigHolder.compat.energy.nativeEUToFE && feEnergyItem != null && feEnergyItem.getEnergyStored() < feEnergyItem.getMaxEnergyStored()) {
+                        int energyMissing = feEnergyItem.getMaxEnergyStored() - feEnergyItem.getEnergyStored();
+                        long euToCharge = FeCompat.toEu(energyMissing, ConfigHolder.compat.energy.feToEuRatio);
+                        long energyToTransfer = Math.min(euToCharge, transferLimit);
+                        long maxDischargeAmount = Math.min(energyToTransfer, electricItem.discharge(energyToTransfer, electricItem.getTier(), false, true, true));
+                        FeCompat.insertEu(feEnergyItem, maxDischargeAmount);
+                        electricItem.discharge(maxDischargeAmount, electricItem.getTier(), false, true, false);
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void addInformation(ItemStack itemStack, List<String> lines) {
+        IElectricItem electricItem = itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
+        if (electricItem != null && electricItem.canProvideChargeExternally()) {
+            addTotalChargeTooltip(lines, electricItem.getMaxCharge(), electricItem.getTier());
+            if (isInDischargeMode(itemStack)) {
+                lines.add(I18n.format("metaitem.electric.discharge_mode.enabled"));
+            } else {
+                lines.add(I18n.format("metaitem.electric.discharge_mode.disabled"));
+            }
+
+            lines.add(I18n.format("metaitem.electric.discharge_mode.tooltip"));
+        }
+
+    }
+
     public int getMaxStackSize(ItemStack itemStack, int defaultValue) {
-        ElectricItem electricItem = (ElectricItem)itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, (EnumFacing)null);
+        ElectricItem electricItem = (ElectricItem) itemStack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
         return electricItem != null && electricItem.getCharge() != 0L ? 1 : defaultValue;
     }
 
@@ -179,7 +182,7 @@ public class ElectricStatsNuclear implements IItemComponent, IItemCapabilityProv
 
     public void getSubItems(ItemStack itemStack, CreativeTabs creativeTab, NonNullList<ItemStack> subItems) {
         ItemStack copy = itemStack.copy();
-        IElectricItem electricItem = (IElectricItem)copy.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, (EnumFacing)null);
+        IElectricItem electricItem = copy.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
         if (electricItem != null) {
             electricItem.charge(electricItem.getMaxCharge(), electricItem.getTier(), true, false);
             subItems.add(copy);
@@ -191,9 +194,5 @@ public class ElectricStatsNuclear implements IItemComponent, IItemCapabilityProv
 
     public ICapabilityProvider createProvider(ItemStack itemStack) {
         return new ElectricItem(itemStack, this.maxCharge, this.tier, this.chargeable, this.dischargeable);
-    }
-
-    public static ElectricStatsNuclear createBattery(long maxCharge, int tier, boolean rechargeable) {
-        return new ElectricStatsNuclear(maxCharge, (long)tier, rechargeable, true);
     }
 }

@@ -1,7 +1,5 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.drppp.drtech.common.Blocks.BlocksInit;
-import com.drppp.drtech.common.Blocks.MetaBlocks.MetaGlasses;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -17,6 +15,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
+import keqing.gtqtcore.common.block.GTQTMetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Biomes;
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.drppp.drtech.loaders.DrtechReceipes.MOB_KILLER;
+import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.TI_BORON_SILICATE_GLASS;
 
 
 public class MetaTileEntityMobsKiller extends RecipeMapMultiblockController {
@@ -58,7 +58,7 @@ public class MetaTileEntityMobsKiller extends RecipeMapMultiblockController {
     }
 
     private static IBlockState getCasingState3() {
-        return BlocksInit.TRANSPARENT_CASING.getState(MetaGlasses.CasingType.TI_BORON_SILICATE_GLASS_BLOCK);
+        return GTQTMetaBlocks.blockMultiblockGlass1.getState(TI_BORON_SILICATE_GLASS);
     }
 
     @Override

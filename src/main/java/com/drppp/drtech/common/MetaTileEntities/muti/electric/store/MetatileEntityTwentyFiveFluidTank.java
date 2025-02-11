@@ -5,9 +5,7 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.common.Blocks.MetaBlocks.MetaGlasses;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import com.drppp.drtech.api.Utils.Datas;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -274,11 +272,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     }
 
     protected IBlockState getGlassState() {
-        if(Loader.isModLoaded(GtqtCoreLinkage.GTQTCORE_ID))
-        {
-            return GTQTMetaBlocks.blockMultiblockGlass1.getState(TI_BORON_SILICATE_GLASS);
-        }
-        return BlocksInit.TRANSPARENT_CASING.getState(MetaGlasses.CasingType.TI_BORON_SILICATE_GLASS_BLOCK);
+        return GTQTMetaBlocks.blockMultiblockGlass1.getState(TI_BORON_SILICATE_GLASS);
     }
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {

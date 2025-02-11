@@ -3,24 +3,24 @@ package com.drppp.drtech.common.Items.MetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 
 public class MetaItemsReactor {
-    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_1X ;
-    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_2X ;
-    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_4X ;
-    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_1X_EX ;
-    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_2X_EX ;
-    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_4X_EX ;
-    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_1X ;
-    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_2X ;
-    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_4X ;
-    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_1X_EX ;
-    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_2X_EX ;
-    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_4X_EX ;
-    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_1X ;
-    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_2X ;
-    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_4X ;
-    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_1X_EX ;
-    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_2X_EX ;
-    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_4X_EX ;
+    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_1X;
+    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_2X;
+    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_4X;
+    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_1X_EX;
+    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_2X_EX;
+    public static MetaItem<?>.MetaValueItem U_FUEL_ROD_4X_EX;
+    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_1X;
+    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_2X;
+    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_4X;
+    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_1X_EX;
+    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_2X_EX;
+    public static MetaItem<?>.MetaValueItem Th_FUEL_ROD_4X_EX;
+    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_1X;
+    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_2X;
+    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_4X;
+    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_1X_EX;
+    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_2X_EX;
+    public static MetaItem<?>.MetaValueItem U_MOX_FUEL_ROD_4X_EX;
     public static MetaItem<?>.MetaValueItem HEAT_VENT;
     public static MetaItem<?>.MetaValueItem ADVANCED_HEAT_VENT;
     public static MetaItem<?>.MetaValueItem REACTOR_HEAT_VENT;
@@ -47,14 +47,26 @@ public class MetaItemsReactor {
     public static MetaItem<?>.MetaValueItem UPGRADE_CATCH;
     public static MetaItem<?>.MetaValueItem UPGRADE_STOP;
     public static MetaItem<?>.MetaValueItem UPGRADE_REFLECT;
-    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_1X ;
-    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_2X ;
-    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_4X ;
-    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_1X_EX ;
-    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_2X_EX ;
-    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_4X_EX ;
-    public static void FuelRodInit()
-    {
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_1X;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_2X;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_4X;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_1X_EX;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_2X_EX;
+    public static MetaItem<?>.MetaValueItem Nq_MOX_FUEL_ROD_4X_EX;
+    public static MetaItem<?>.MetaValueItem TERRA_FUEL_ROD_1X;
+    public static MetaItem<?>.MetaValueItem TERRA_FUEL_ROD_2X;
+    public static MetaItem<?>.MetaValueItem TERRA_FUEL_ROD_4X;
+    public static MetaItem<?>.MetaValueItem TERRA_FUEL_ROD_1X_EX;
+    public static MetaItem<?>.MetaValueItem TERRA_FUEL_ROD_2X_EX;
+    public static MetaItem<?>.MetaValueItem TERRA_FUEL_ROD_4X_EX;
+    public static MetaItem<?>.MetaValueItem OLLIVANN_FUEL_ROD_1X;
+    public static MetaItem<?>.MetaValueItem OLLIVANN_FUEL_ROD_2X;
+    public static MetaItem<?>.MetaValueItem OLLIVANN_FUEL_ROD_4X;
+    public static MetaItem<?>.MetaValueItem OLLIVANN_FUEL_ROD_1X_EX;
+    public static MetaItem<?>.MetaValueItem OLLIVANN_FUEL_ROD_2X_EX;
+    public static MetaItem<?>.MetaValueItem OLLIVANN_FUEL_ROD_4X_EX;
+
+    public static void FuelRodInit() {
         MetaItemsReactorReg metaItemFuelRod = new MetaItemsReactorReg();
         metaItemFuelRod.setRegistryName("meta_items_fuel_rod");
     }

@@ -2,7 +2,6 @@ package com.drppp.drtech.common.Items.Behavior;
 
 import com.drppp.drtech.api.capability.CoolantCellItem;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
-import com.drppp.drtech.api.capability.NeutronReflectorItem;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.api.items.metaitem.stats.IItemCapabilityProvider;
 import gregtech.api.items.metaitem.stats.IItemComponent;
@@ -14,7 +13,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import java.util.List;
 
 public class CoolantCellBehavior implements IItemComponent, IItemCapabilityProvider, IItemBehaviour, IItemMaxStackSizeProvider {
-    private int maxDurability;
+    private final int maxDurability;
 
     public CoolantCellBehavior(int maxDurability) {
         this.maxDurability = maxDurability;
@@ -22,14 +21,14 @@ public class CoolantCellBehavior implements IItemComponent, IItemCapabilityProvi
 
     @Override
     public ICapabilityProvider createProvider(ItemStack itemStack) {
-        return new CoolantCellItem(itemStack,maxDurability);
+        return new CoolantCellItem(itemStack, maxDurability);
     }
 
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
-        var ca = itemStack.getCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null);
-        lines.add(I18n.format("heatvent.date.tip1",ca.getDurability()));
-        lines.add(I18n.format("heatvent.date.tip2",ca.getMaxDurability()));
+        var ca = itemStack.getCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL, null);
+        lines.add(I18n.format("heatvent.date.tip1", ca.getDurability()));
+        lines.add(I18n.format("heatvent.date.tip2", ca.getMaxDurability()));
         IItemBehaviour.super.addInformation(itemStack, lines);
     }
 

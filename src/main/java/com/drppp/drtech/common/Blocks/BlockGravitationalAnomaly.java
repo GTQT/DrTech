@@ -30,7 +30,7 @@ public class BlockGravitationalAnomaly extends Block {
         this.setResistance(5000000.0F);
         this.disableStats();
         this.setRegistryName(Tags.MODID,"gravitational_anomaly");
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".gravitational_anomaly");
         this.boundingBox =new AxisAlignedBB(0.30000001192092896, 0.30000001192092896, 0.30000001192092896, 0.6000000238418579, 0.6000000238418579, 0.6000000238418579);
 

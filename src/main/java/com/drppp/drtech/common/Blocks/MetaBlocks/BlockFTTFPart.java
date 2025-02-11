@@ -32,7 +32,7 @@ public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartTy
         setSoundType(SoundType.METAL);
         setHarvestLevel(ToolClasses.WRENCH, 3); // Diamond level, can be mined by a steel wrench or better
         setDefaultState(getState(BlockYotTankPartType.TFFT_PART_TIER_T1));
-        setCreativeTab(DrTechMain.Mytab);
+        setCreativeTab(DrTechMain.DrTechTab);
     }
 
     @Override

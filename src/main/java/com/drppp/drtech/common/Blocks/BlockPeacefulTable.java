@@ -16,7 +16,7 @@ public class BlockPeacefulTable extends Block {
         super(Material.WOOD);
         this.setResistance(5F);
         this.setRegistryName(Tags.MODID,"peaceful_table");
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".peaceful_table");
     }
     @Nonnull

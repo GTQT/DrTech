@@ -28,7 +28,7 @@ public class BlockSapBag extends Block {
         this.setResistance(25F);
         this.setHardness(5f);
         this.setRegistryName(Tags.MODID,"sap_bag");
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".SapBag");
     }
 

@@ -22,7 +22,7 @@ public class BlockHomoEye extends Block {
         this.setResistance(10.0F);
         this.disableStats();
         this.setRegistryName(Tags.MODID,"homo_eye");
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".homo_eye");
     }
 

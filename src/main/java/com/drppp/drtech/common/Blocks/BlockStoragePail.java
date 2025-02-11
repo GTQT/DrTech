@@ -31,7 +31,7 @@ public class BlockStoragePail extends Block {
         this.setResistance(25F);
         this.setHardness(5f);
         this.setRegistryName(Tags.MODID,"storage_"+name);
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
         this.setTranslationKey(Tags.MODID+".storage_"+name);
         this.level = level;
     }

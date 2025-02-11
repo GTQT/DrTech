@@ -17,7 +17,7 @@ public class ItemRedStoneCropSeed extends Item {
     public ItemRedStoneCropSeed(String RegistryName) {
         this.setRegistryName(Tags.MODID, RegistryName);
         this.setTranslationKey(Tags.MODID + "." + RegistryName);
-        this.setCreativeTab(DrTechMain.Mytab);
+        this.setCreativeTab(DrTechMain.DrTechTab);
     }
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {

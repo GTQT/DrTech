@@ -30,7 +30,7 @@ public class MetaGlasses1 extends VariantActiveBlock<MetaGlasses1.CasingType> {
         setSoundType(SoundType.GLASS);
         setHarvestLevel(ToolClasses.PICKAXE, 1);
         setDefaultState(getState(CasingType.RECOMBINATION_GLASS_BLOCK));
-        setCreativeTab(DrTechMain.Mytab);
+        setCreativeTab(DrTechMain.DrTechTab);
         //this.useNeighborBrightness = true;
     }
     @Override

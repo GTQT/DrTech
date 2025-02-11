@@ -9,7 +9,6 @@ import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.intergations.Forestry.ForestryLinkage;
 import com.drppp.drtech.intergations.GTFOLinkage;
 import com.drppp.drtech.intergations.GtqtCoreLinkage;
-import com.drppp.drtech.intergations.HarvestcraftFishChain;
 import com.drppp.drtech.intergations.HarvestcraftLinkage;
 import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.blocks.BlockAlvearyType;
@@ -196,79 +195,40 @@ public class MachineReceipe {
         if (Loader.isModLoaded("forestry")) {
             ForestryLinkage.MachineRecipeInit();
         }
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
-                .input(OrePrefix.block, BorosilicateGlass)
-                .fluidInputs(Titanium.getFluid(576))
-                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING, 1, 0))
-                .EUt(480)
-                .duration(200)
-                .buildAndRegister();
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
-                .input(OrePrefix.block, BorosilicateGlass)
-                .fluidInputs(Tungsten.getFluid(576))
-                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING, 1, 1))
-                .EUt(1920)
-                .duration(200)
-                .buildAndRegister();
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
-                .input(OrePrefix.block, BorosilicateGlass)
-                .fluidInputs(Chrome.getFluid(576))
-                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING, 1, 3))
-                .EUt(7680)
-                .duration(200)
-                .buildAndRegister();
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
-                .input(OrePrefix.block, BorosilicateGlass)
-                .fluidInputs(Iridium.getFluid(576))
-                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING, 1, 4))
-                .EUt(30720)
-                .duration(200)
-                .buildAndRegister();
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
-                .input(OrePrefix.block, BorosilicateGlass)
-                .fluidInputs(Osmium.getFluid(576))
-                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING, 1, 5))
-                .EUt(122880)
-                .duration(200)
-                .buildAndRegister();
-        FLUID_SOLIDFICATION_RECIPES.recipeBuilder()
-                .input(OrePrefix.block, BorosilicateGlass)
-                .fluidInputs(Neutronium.getFluid(576))
-                .outputs(new ItemStack(BlocksInit.TRANSPARENT_CASING, 1, 6))
-                .EUt(491520)
-                .duration(200)
-                .buildAndRegister();
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.frameGt, Wood)
                 .input(OrePrefix.pipeTinyFluid, Steel, 2)
                 .input(MetaItems.VOLTAGE_COIL_MV)
                 .input(MetaItems.PLANT_BALL, 4)
                 .input(OrePrefix.plank, Wood, 3)
-                .outputs(new ItemStack(BlocksInit.COMMON_CASING, 1, 8))
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING, 1, 2))
                 .circuitMeta(4)
                 .duration(100)
                 .EUt(64)
                 .buildAndRegister();
-        ASSEMBLER_RECIPES.recipeBuilder()
-                .input(OrePrefix.frameGt, Steel)
-                .input(OrePrefix.plate, EnderPearl, 4)
-                .input(OrePrefix.plate, Steel, 4)
-                .circuitMeta(6)
-                .fluidInputs(Polytetrafluoroethylene.getFluid(144))
-                .outputs(new ItemStack(BlocksInit.COMMON_CASING, 1, 10))
-                .EUt(480)
-                .duration(100)
-                .buildAndRegister();
+
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.frameGt, StainlessSteel)
                 .input(OrePrefix.plate, EnderPearl, 4)
                 .input(OrePrefix.plate, StainlessSteel, 4)
                 .circuitMeta(3)
                 .fluidInputs(Polytetrafluoroethylene.getFluid(144))
-                .outputs(new ItemStack(BlocksInit.COMMON_CASING, 1, 9))
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING, 1, 3))
                 .EUt(480)
                 .duration(100)
                 .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(OrePrefix.frameGt, Steel)
+                .input(OrePrefix.plate, EnderPearl, 4)
+                .input(OrePrefix.plate, Steel, 4)
+                .circuitMeta(6)
+                .fluidInputs(Polytetrafluoroethylene.getFluid(144))
+                .outputs(new ItemStack(BlocksInit.COMMON_CASING, 1, 4))
+                .EUt(480)
+                .duration(100)
+                .buildAndRegister();
+
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.plate, Polyethylene)
                 .input(Items.PAPER)
