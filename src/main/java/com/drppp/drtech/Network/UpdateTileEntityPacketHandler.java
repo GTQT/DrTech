@@ -1,4 +1,4 @@
-package com.drppp.drtech.Sync;
+package com.drppp.drtech.Network;
 
 import com.drppp.drtech.Tile.TileEntityConnector;
 import net.minecraft.nbt.NBTTagCompound;

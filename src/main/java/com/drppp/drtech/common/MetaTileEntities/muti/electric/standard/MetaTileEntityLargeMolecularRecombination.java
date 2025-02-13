@@ -120,6 +120,11 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
             }
             return tire * 2;
         }
+
+        @Override
+        public void setMaxProgress(int maxProgress) {
+            this.maxProgressTime = (int) Math.ceil(maxProgress * 0.75);
+        }
     }
 
 }

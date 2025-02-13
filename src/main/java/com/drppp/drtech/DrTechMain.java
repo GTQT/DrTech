@@ -7,7 +7,7 @@ import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Client.render.EOH_TESR;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
-import com.drppp.drtech.Sync.SyncInit;
+import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.Tile.TileEntityHomoEye;
 import com.drppp.drtech.Tile.TileEntityTimeTable;
@@ -18,6 +18,7 @@ import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.capability.DrtechCapInit;
+import com.drppp.drtech.command.CommandTeleportDimension;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.common.CommonProxy;
@@ -181,6 +182,7 @@ public class DrTechMain {
 
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandTeleportDimension());
     }
 
     @Mod.EventHandler

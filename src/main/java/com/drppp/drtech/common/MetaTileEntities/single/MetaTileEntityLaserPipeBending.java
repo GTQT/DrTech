@@ -59,7 +59,12 @@ public class MetaTileEntityLaserPipeBending extends MetaTileEntity {
         }
 
     }
-
+    public boolean isValidFrontFacing(EnumFacing facing) {
+        if (this.hasFrontFacing() && this.getFrontFacing() == facing) {
+            return false;
+        }
+        return true;
+    }
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
         super.addInformation(stack, world, tooltip, advanced);
