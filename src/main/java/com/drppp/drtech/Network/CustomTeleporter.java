@@ -31,7 +31,7 @@ public class CustomTeleporter implements ITeleporter {
             player.setPositionAndUpdate(safePos.getX() + 0.5, safePos.getY() + 1, safePos.getZ() + 0.5);
 
             // 确保区块加载
-            world.getChunkProvider().provideChunk(safePos.getX() >> 4, safePos.getZ() >> 4);
+            world.getChunkProvider().getLoadedChunk(safePos.getX() >> 4, safePos.getZ() >> 4);
 
             // 检查碰撞
             if (!world.getCollisionBoxes(player, player.getEntityBoundingBox()).isEmpty()) {
