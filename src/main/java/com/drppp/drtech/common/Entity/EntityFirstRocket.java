@@ -12,11 +12,11 @@ public class EntityFirstRocket  extends Entity {
     private static final double DESCEND_SPEED = 0.45; // 下降速度
     private static final double ASCEND_SPEED = 0.45;  // 上升速度
     private boolean isRising = false; // 是否处于上升状态
-
+    private int landingTicks = 0; // 停留计时器
     public EntityFirstRocket(World world) {
         super(world);
         this.setSize(1.0F, 2.0F);
-        this.noClip = true;
+        this.noClip = false;
     }
 
     @Override
@@ -50,8 +50,17 @@ public class EntityFirstRocket  extends Entity {
                     passenger.dismountRidingEntity();
                 }
 
-                // 切换到上升状态
-                this.isRising = true;
+                // 开始停留计时
+                if (this.landingTicks == 0) {
+                    this.landingTicks = 60; // 3 秒（60 ticks）
+                } else {
+                    this.landingTicks--;
+
+                    // 停留时间结束，切换到上升状态
+                    if (this.landingTicks <= 0) {
+                        this.isRising = true;
+                    }
+                }
             }
         } else {
             // 缓慢上升
@@ -99,11 +108,13 @@ public class EntityFirstRocket  extends Entity {
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound) {
         this.isRising = compound.getBoolean("isRising");
+        this.landingTicks = compound.getInteger("landingTicks");
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound compound) {
         compound.setBoolean("isRising", this.isRising);
+        compound.setInteger("landingTicks", this.landingTicks);
     }
 
     @Override

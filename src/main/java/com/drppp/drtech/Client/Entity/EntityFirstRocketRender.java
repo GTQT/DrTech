@@ -28,7 +28,7 @@ public class EntityFirstRocketRender extends Render {
         GlStateManager.disableCull();
         this.bindEntityTexture(entity);
         GlStateManager.translate(x, y, z);
-        GlStateManager.scale(0.5, 0.5, 0.5);
+        GlStateManager.scale(0.35, 0.35, 0.35);
         model.renderAll();
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
