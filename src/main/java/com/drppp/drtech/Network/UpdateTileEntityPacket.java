@@ -1,4 +1,4 @@
-package com.drppp.drtech.Sync;
+package com.drppp.drtech.Network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;

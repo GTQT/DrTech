@@ -1,7 +1,7 @@
 package com.drppp.drtech.api.Utils;
 
-import com.drppp.drtech.Sync.SyncInit;
-import com.drppp.drtech.Sync.UpdateTileEntityPacket;
+import com.drppp.drtech.Network.SyncInit;
+import com.drppp.drtech.Network.UpdateTileEntityPacket;
 import com.drppp.drtech.Tags;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.unification.material.Material;
@@ -15,7 +15,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -1,13 +1,10 @@
-package com.drppp.drtech.Sync;
+package com.drppp.drtech.Network;
 
 import com.drppp.drtech.Tile.TileEntityConnector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IThreadListener;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
