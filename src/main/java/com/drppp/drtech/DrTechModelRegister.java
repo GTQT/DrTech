@@ -5,6 +5,7 @@ import com.drppp.drtech.Client.Particle.EntityParticleSpray;
 import com.drppp.drtech.Client.Particle.InstantParticleRender;
 import com.drppp.drtech.Client.Particle.ParticleRenderer;
 import com.drppp.drtech.Client.render.BulletRenderer;
+import com.drppp.drtech.Client.render.Items.RenderItemAdvancedRocket;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
 import com.drppp.drtech.common.Blocks.BlocksInit;
@@ -16,6 +17,7 @@ import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -35,6 +37,7 @@ public final class DrTechModelRegister {
     public static void onModelReg(ModelRegistryEvent event) {
         OBJLoader.INSTANCE.addDomain("drtech");
         B3DLoader.INSTANCE.addDomain("drtech");
+        TileEntityItemStackRenderer.instance = new RenderItemAdvancedRocket();
         onModelRegistration();
         EntityRenderReg();
     }

@@ -30,7 +30,8 @@ import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
-import com.drppp.drtech.common.enent.PollutionEffectHandler;
+import com.drppp.drtech.common.event.PollutionEffectHandler;
+import com.drppp.drtech.common.event.RocketFuelHUD;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
 import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
@@ -170,6 +171,7 @@ public class DrTechMain {
             ItemCombs.ClientInit();
         }
         drtMetaEntities.initRenderers();
+        MinecraftForge.EVENT_BUS.register(new RocketFuelHUD());
     }
 
     @EventHandler
@@ -188,4 +190,5 @@ public class DrTechMain {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
     }
+
 }

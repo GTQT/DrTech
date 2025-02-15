@@ -21,7 +21,7 @@ public class drtMetaEntities {
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "uti_golem"), EntityUTiGolem.class,"UTi Golem",4,DrTechMain.instance,64,3,true);
         EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "uti_golem"),0x48e06e, 0x199038);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "advanced_rocket"), EntityAdvancedRocket.class,"Advanced Rocket",5,DrTechMain.instance,64,3,true);
-        EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "advanced_rocket"),0x58e12e, 0x1412038);
+        //EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "advanced_rocket"),0x58e12e, 0x1412038);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "first_rocket"), EntityFirstRocket.class,"First Rocket",6,DrTechMain.instance,64,3,true);
     }
 

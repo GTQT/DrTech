@@ -23,7 +23,6 @@ public class CommandTeleportDimension extends CommandBase {
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if (sender instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) sender;
-
             // 解析参数
             int dimension = parseInt(args[0]);
             BlockPos pos = args.length >= 3
@@ -37,6 +36,7 @@ public class CommandTeleportDimension extends CommandBase {
 
     @Override
     public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-        return true;
+        return sender instanceof EntityPlayerMP
+                && sender.canUseCommand(4, this.getName());
     }
 }

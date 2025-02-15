@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.enent;
+package com.drppp.drtech.common.event;
 
 import com.drppp.drtech.World.Biome.BiomeHandler;
 import net.minecraft.entity.player.EntityPlayer;
