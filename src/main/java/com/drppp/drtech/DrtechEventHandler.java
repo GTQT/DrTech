@@ -1,5 +1,7 @@
 package com.drppp.drtech;
 
+import com.drppp.drtech.Network.PacketJumpKey;
+import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.World.SaveDatas.PlayerSpawnData;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.common.Entity.EntityAdvancedRocket;
@@ -59,58 +61,26 @@ public class DrtechEventHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onKeyInput(InputEvent.KeyInputEvent event) {
-        if (Keybinds.CTRL.isKeyDown()) {
+         if (Keybinds.CTRL.isKeyDown()) {
             ctrlflag = 1;
         } else
             ctrlflag = 0;
+        if(Keybinds.ROCKET_FLY.isKeyDown())
+        {
+            SyncInit.PRESSED_NETWORK.sendToServer(new PacketJumpKey(true));
+        }
     }
 
     @SideOnly(Side.CLIENT)
     public static class Keybinds {
         public static final KeyBinding CTRL = new KeyBinding("key.ctrl", Keyboard.KEY_LCONTROL, "key.categories.drtech");
+        public static final KeyBinding ROCKET_FLY = new KeyBinding("key.rocket_fly", Keyboard.KEY_SPACE, "key.categories.drtech");
 
         public static void registerKeybinds() {
             ClientRegistry.registerKeyBinding(CTRL);
+            ClientRegistry.registerKeyBinding(ROCKET_FLY);
         }
     }
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
-        System.out.println("!111");
-        if (event.getType() != RenderGameOverlayEvent.ElementType.EXPERIENCE) {
-            return; // 只在经验条渲染时执行
-        }
 
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer player = mc.player;
-
-        // 检查玩家是否骑乘 EntityAdvancedRocket
-        if (player.getRidingEntity() instanceof EntityAdvancedRocket) {
-            EntityAdvancedRocket rocket = (EntityAdvancedRocket) player.getRidingEntity();
-            int fuelAmount = rocket.getFuelAmount();
-            int maxFuel = 1000; // 假设最大燃料量为 100
-
-            // 获取屏幕分辨率
-            ScaledResolution resolution = new ScaledResolution(mc);
-            int width = resolution.getScaledWidth();
-            int height = resolution.getScaledHeight();
-
-            // 绘制背景条
-            int barWidth = 100; // 进度条宽度
-            int barHeight = 10; // 进度条高度
-            int x = (width - barWidth) / 2; // 水平居中
-            int y = height - 30; // 距离屏幕底部 30 像素
-
-            Gui.drawRect(x, y, x + barWidth, y + barHeight, 0xFF000000); // 黑色背景
-
-            // 绘制燃料条
-            int fuelWidth = (int) ((float) fuelAmount / maxFuel * barWidth);
-            Gui.drawRect(x, y, x + fuelWidth, y + barHeight, 0xFF00FF00); // 绿色燃料条
-
-            // 绘制文字
-            String text = "Fuel: " + fuelAmount + "/" + maxFuel;
-            mc.fontRenderer.drawStringWithShadow(text, x, y - 12, 0xFFFFFF); // 白色文字
-        }
-    }
 
 }

@@ -89,18 +89,8 @@ public class MetaTileEntityRocketLaunchPad extends MetaTileEntityBaseWithControl
                 );
                 for (Entity targetEntity : getWorld().getEntitiesWithinAABB(EntityAdvancedRocket.class, aabb)) {
                     if (targetEntity instanceof EntityAdvancedRocket rocket) { // 判断是否为 EntityAdvancedRocket
-                        rocket.setDimId( -1);
+                        rocket.setDimId( 301);
                         rocket.setFuelAmount(1000);
-                        if (rocket.isBeingRidden()) {
-                            List<Entity> passengers = rocket.getPassengers();
-                            for (Entity passenger : passengers) {
-                                if (passenger instanceof EntityPlayer player) {
-                                    teleportPlayerToDimension(player, rocket.getDimId());
-                                    rocket.setDead();
-                                }
-                            }
-
-                        }
                     }
                 }
             }

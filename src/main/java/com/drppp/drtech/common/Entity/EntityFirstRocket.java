@@ -55,7 +55,6 @@ public class EntityFirstRocket  extends Entity {
                     this.landingTicks = 60; // 3 秒（60 ticks）
                 } else {
                     this.landingTicks--;
-
                     // 停留时间结束，切换到上升状态
                     if (this.landingTicks <= 0) {
                         this.isRising = true;
@@ -63,12 +62,9 @@ public class EntityFirstRocket  extends Entity {
                 }
             }
         } else {
-            // 缓慢上升
             this.motionY = ASCEND_SPEED;
             this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-
-            // 检查是否到达 y = 255
-            if (this.posY >= 255) {
+            if (this.posY >= 555) {
                 this.setDead(); // 销毁实体
             }
         }
