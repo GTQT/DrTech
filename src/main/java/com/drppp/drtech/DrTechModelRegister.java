@@ -6,6 +6,7 @@ import com.drppp.drtech.Client.Particle.InstantParticleRender;
 import com.drppp.drtech.Client.Particle.ParticleRenderer;
 import com.drppp.drtech.Client.render.BulletRenderer;
 import com.drppp.drtech.Client.render.Items.RenderItemAdvancedRocket;
+import com.drppp.drtech.Client.render.Items.RenderItemWaterMill;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
 import com.drppp.drtech.common.Blocks.BlocksInit;
@@ -37,7 +38,6 @@ public final class DrTechModelRegister {
     public static void onModelReg(ModelRegistryEvent event) {
         OBJLoader.INSTANCE.addDomain("drtech");
         B3DLoader.INSTANCE.addDomain("drtech");
-        TileEntityItemStackRenderer.instance = new RenderItemAdvancedRocket();
         onModelRegistration();
         EntityRenderReg();
     }
@@ -47,8 +47,8 @@ public final class DrTechModelRegister {
 
         ModelResourceLocation model = new ModelResourceLocation(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY.getRegistryName(), "inventory");
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY), 0, model);
-        ModelResourceLocation model1 = new ModelResourceLocation(BlocksInit.BLOCK_HOMO_EYE.getRegistryName(), "inventory");
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_HOMO_EYE), 0, model1);
+        ModelResourceLocation model1 = new ModelResourceLocation(BlocksInit.BLOCK_WATER_MILL.getRegistryName(), "inventory");
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_WATER_MILL), 0, model1);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR1), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR1.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR2), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR2.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR3), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR3.getRegistryName(), "inventory"));
@@ -59,7 +59,7 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_SAP_BAG), 0, new ModelResourceLocation(BlocksInit.BLOCK_SAP_BAG.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON), 0, new ModelResourceLocation(BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_TIME_TABLE), 0, new ModelResourceLocation(BlocksInit.BLOCK_TIME_TABLE.getRegistryName(), "inventory"));
-
+        ItemsInit.ITEM_BLOCK_WATER_MILL.setTileEntityItemStackRenderer(new RenderItemWaterMill());
         ItemsInit.registerItemModels();
         GeoItemsInit.onModelRegistry();
     }

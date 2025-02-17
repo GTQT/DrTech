@@ -31,7 +31,7 @@ public class DrtechEventHandler {
     public static int ctrlflag = 0;
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.player instanceof EntityPlayerMP) {
+        if (event.player instanceof EntityPlayerMP && DrtConfig.EnableRocketDitch) {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
             World world = player.world;
 

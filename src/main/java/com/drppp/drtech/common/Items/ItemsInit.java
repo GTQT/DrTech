@@ -15,6 +15,7 @@ import gregtech.common.pipelike.laser.ItemBlockLaserPipe;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.model.ModelLoader;
@@ -31,7 +32,7 @@ import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
     public static  final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new  ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID,"gravitational_anomaly");
-    public static  final Item ITEM_BLOCK_HOMO_EYE = new  ItemBlock(BlocksInit.BLOCK_HOMO_EYE).setRegistryName(Tags.MODID,"homo_eye");
+    public static  final Item ITEM_BLOCK_WATER_MILL = new  ItemBlock(BlocksInit.BLOCK_WATER_MILL).setRegistryName(Tags.MODID,"water_mill");
     public static  final Item ITEM_CONNECTOR1 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR1).setRegistryName(Tags.MODID,"connector_1");
     public static  final Item ITEM_CONNECTOR2 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID,"connector_2");
     public static  final Item ITEM_CONNECTOR3 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID,"connector_3");
@@ -49,7 +50,7 @@ public class ItemsInit {
     public static void init(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
-        event.getRegistry().register(ITEM_BLOCK_HOMO_EYE);
+        event.getRegistry().register(ITEM_BLOCK_WATER_MILL);
         event.getRegistry().register(ITEM_RED_STONE_SEED);
         event.getRegistry().register(ITEM_LAPIS_SEED);
         event.getRegistry().register(ITEM_FLU_SEED);

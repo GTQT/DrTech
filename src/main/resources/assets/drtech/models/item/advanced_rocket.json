@@ -1,9 +1,5 @@
 {
     "parent": "builtin/entity",
-    "loader": "forge:obj",
-    "model": "drtech:models/item/shipi.obj",
-    "textures": {
-        "particle": "drtech:items/advanced_rocket"
-    }
+    "loader": "forge:obj"
 }
 
