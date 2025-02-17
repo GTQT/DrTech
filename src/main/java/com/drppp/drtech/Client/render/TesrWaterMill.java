@@ -32,7 +32,6 @@ public class TesrWaterMill extends TileEntitySpecialRenderer<TileEntityWaterMill
             rotationAngle = (rotationAngle + 1.0F) % 360.0F;
             time = 0;
         }
-        GlStateManager.rotate(rotationAngle, 0.0F, 1.0F, 0.0F);
         GlStateManager.translate(-0.5F, -0.5F, -0.5F);
         waterMill.renderAll();
         GlStateManager.popMatrix();
