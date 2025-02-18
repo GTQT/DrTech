@@ -22,8 +22,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BlockStoneAxle extends Block {
-    private static final AxisAlignedBB hitboxEW = new AxisAlignedBB(0, 0, 0, 1, .5, .5).offset(0, 0.25, 0.25);
-    private static final AxisAlignedBB hitboxSN = new AxisAlignedBB(0, 0, 0, .5, .5, 1).offset(0.25, 0.25, 0);
+    private static final AxisAlignedBB hitboxEW = new AxisAlignedBB(0, 0, 0, 1.5, .5, .5).offset(0, 0.25, 0.25);
+    private static final AxisAlignedBB hitboxSN = new AxisAlignedBB(0, 0, 0, .5, .5, 1.5).offset(0.25, 0.25, 0);
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public BlockStoneAxle() {
         super(Material.ROCK);

@@ -25,6 +25,10 @@ public class DrtConfig {
     @Config.Comment("启用更便宜的大机器")
     @Config.RequiresMcRestart
     public static boolean EnableIndustrialMachines = false;
+    @Config.LangKey("mill_exchange_rate")
+    @Config.Comment("水车推力转换效率")
+    @Config.RequiresMcRestart
+    public static double MillExchangeRate = 10.0d;
 
     @Config.Comment("Config options for DrTech")
     public static MachineSwitch MachineSwitch = new MachineSwitch();

@@ -4,6 +4,7 @@ import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntitySapBag;
+import com.drppp.drtech.api.capability.IRotationSpeed;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityBaseWithControl;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityMatrixSolver;
@@ -44,6 +45,13 @@ public class TopCommonProvider implements IProbeInfoProvider {
                     flag=true;
                 }
             }
+        }
+        if(world.getTileEntity(iProbeHitData.getPos())!=null && world.getTileEntity(iProbeHitData.getPos()) instanceof IRotationSpeed)
+        {
+            IRotationSpeed rs = (IRotationSpeed) world.getTileEntity(iProbeHitData.getPos());
+            iProbeInfo.text("旋转动量:"+rs.getEnergy().getEnergyOutput()+"RU");
+            iProbeInfo.text("输出方向:"+rs.getFacing());
+            iProbeInfo.text("旋转速度:"+rs.getSpeed());
         }
         if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityBaseWithControl)
         {

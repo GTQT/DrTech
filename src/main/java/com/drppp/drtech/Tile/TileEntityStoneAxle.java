@@ -2,6 +2,7 @@ package com.drppp.drtech.Tile;
 
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
+import com.drppp.drtech.api.capability.IRotationSpeed;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -15,12 +16,12 @@ import org.jetbrains.annotations.Nullable;
 
 
 
-public class TileEntityStoneAxle extends TileEntity implements ITickable {
+public class TileEntityStoneAxle extends TileEntity implements ITickable, IRotationSpeed {
 
     private IRotationEnergy ru = new RotationEnergyHandler();
     private EnumFacing facing = EnumFacing.NORTH;
     private int rotationTicks = 0;
-    private int rotationSpeed = 5;
+    private int rotationSpeed = 0;
     public int getRotationTicks() {
         return rotationTicks;
     }
@@ -77,12 +78,18 @@ public class TileEntityStoneAxle extends TileEntity implements ITickable {
         }
         if(!getWorld().isRemote)
         {
-            BlockPos oppositePos = pos.offset(facing.getOpposite());
+            BlockPos oppositePos = pos.offset(facing.getOpposite()).offset(facing.getOpposite());
             if (world.isBlockLoaded(oppositePos)) {
                 var tile =  world.getTileEntity(oppositePos);
                 if(tile!=null && tile.hasCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing))
                 {
                     this.ru = tile.getCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing);
+                    if(tile instanceof IRotationSpeed)
+                        this.setRotationSpeed(((IRotationSpeed)tile).getSpeed());
+                }else
+                {
+                    this.ru.setRuEnergy(0);
+                    this.setRotationSpeed(0);
                 }
             }
         }
@@ -90,7 +97,7 @@ public class TileEntityStoneAxle extends TileEntity implements ITickable {
 
     @Override
     public boolean hasCapability(Capability<?> capability, @org.jetbrains.annotations.Nullable EnumFacing facing) {
-        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing.getOpposite())
+        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing)
             return true;
         return super.hasCapability(capability, facing);
     }
@@ -98,9 +105,23 @@ public class TileEntityStoneAxle extends TileEntity implements ITickable {
     @org.jetbrains.annotations.Nullable
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing.getOpposite())
+        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing)
             return DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY.cast(ru);
         return super.getCapability(capability, facing);
     }
 
+    @Override
+    public int getSpeed() {
+        return this.getRotationSpeed();
+    }
+
+    @Override
+    public void setSpeed(int speed) {
+        this.setRotationSpeed(speed);
+    }
+
+    @Override
+    public IRotationEnergy getEnergy() {
+        return ru;
+    }
 }
