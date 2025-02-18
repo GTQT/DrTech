@@ -6,6 +6,7 @@ import com.drppp.drtech.Client.Particle.InstantParticleRender;
 import com.drppp.drtech.Client.Particle.ParticleRenderer;
 import com.drppp.drtech.Client.render.BulletRenderer;
 import com.drppp.drtech.Client.render.Items.RenderItemAdvancedRocket;
+import com.drppp.drtech.Client.render.Items.RenderItemStoneAxle;
 import com.drppp.drtech.Client.render.Items.RenderItemWaterMill;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
@@ -49,6 +50,7 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY), 0, model);
         ModelResourceLocation model1 = new ModelResourceLocation(BlocksInit.BLOCK_WATER_MILL.getRegistryName(), "inventory");
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_WATER_MILL), 0, model1);
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_STONE_AXLE), 0, new ModelResourceLocation(BlocksInit.BLOCK_STONE_AXLE.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR1), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR1.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR2), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR2.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR3), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR3.getRegistryName(), "inventory"));
@@ -60,6 +62,7 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON), 0, new ModelResourceLocation(BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_TIME_TABLE), 0, new ModelResourceLocation(BlocksInit.BLOCK_TIME_TABLE.getRegistryName(), "inventory"));
         ItemsInit.ITEM_BLOCK_WATER_MILL.setTileEntityItemStackRenderer(new RenderItemWaterMill());
+        ItemsInit.ITEM_BLOCK_STONE_AXLE.setTileEntityItemStackRenderer(new RenderItemStoneAxle());
         ItemsInit.registerItemModels();
         GeoItemsInit.onModelRegistry();
     }

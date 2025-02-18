@@ -4,11 +4,13 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Client.render.TesrStoneAxle;
 import com.drppp.drtech.Client.render.TesrWaterMill;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
+import com.drppp.drtech.Tile.TileEntityStoneAxle;
 import com.drppp.drtech.Tile.TileEntityWaterMill;
 import com.drppp.drtech.Tile.TileEntityTimeTable;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
@@ -114,10 +116,11 @@ public class DrTechMain {
 
     @SideOnly(Side.CLIENT)
     public void TexturesInit() {
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
         try {
+            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
+            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWaterMill.class, new TesrWaterMill());
+            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityStoneAxle.class, new TesrStoneAxle());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

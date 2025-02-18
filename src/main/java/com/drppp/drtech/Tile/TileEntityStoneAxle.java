@@ -9,20 +9,18 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityWaterMill extends TileEntity implements ITickable {
+
+
+public class TileEntityStoneAxle extends TileEntity implements ITickable {
 
     private IRotationEnergy ru = new RotationEnergyHandler();
     private EnumFacing facing = EnumFacing.NORTH;
     private int rotationTicks = 0;
     private int rotationSpeed = 5;
-
-    public TileEntityWaterMill() {
-        ru.setRuEnergy(250);
-    }
-
     public int getRotationTicks() {
         return rotationTicks;
     }
@@ -77,20 +75,32 @@ public class TileEntityWaterMill extends TileEntity implements ITickable {
                 rotationTicks = 0;
             }
         }
+        if(!getWorld().isRemote)
+        {
+            BlockPos oppositePos = pos.offset(facing.getOpposite());
+            if (world.isBlockLoaded(oppositePos)) {
+                var tile =  world.getTileEntity(oppositePos);
+                if(tile!=null && tile.hasCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing))
+                {
+                    this.ru = tile.getCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing);
+                }
+            }
+        }
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing)
+    public boolean hasCapability(Capability<?> capability, @org.jetbrains.annotations.Nullable EnumFacing facing) {
+        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing.getOpposite())
             return true;
         return super.hasCapability(capability, facing);
     }
 
-    @Nullable
+    @org.jetbrains.annotations.Nullable
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing)
+        if(capability== DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY && facing==this.facing.getOpposite())
             return DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY.cast(ru);
         return super.getCapability(capability, facing);
     }
+
 }
