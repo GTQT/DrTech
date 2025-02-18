@@ -1,6 +1,7 @@
 itemGroup.mytab=DR科技
 key.categories.drtech=Dr科技
 key.ctrl=飞行戒指加速
+key.rocket_fly=火箭起飞
 #recipemap
 recipemap.eimplosion_compressor.name=电力聚爆压缩机
 recipemap.uu_producter.name=UU物质生产
@@ -43,6 +44,8 @@ item.drtech.flu_seed.name=萤石种子
 item.gt.tool.once_wrench.name=一次性扳手
 item.gt.tool.once_hammer.name=一次性锤子
 item.gt.tool.once_wire_cutter.name=一次性剪线钳
+item.advanced_rocket.name=高级火箭
+tile.drtech.water_mill.name=原始水车
 
 #FUEL_ROD
 metaitem.u_fuel_rod_1x.name=燃料棒(铀)
@@ -1062,6 +1065,7 @@ item.drt.honey_drop.ethylene.name=乙烯液滴
 item.drt.honey_drop.tetrafluoroethylene.name=四氟乙烯液滴
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡
+entity.Advanced Rocket.name=高级火箭
 
 metaitem.simple_gas_mask.name=原始防毒面具
 metaitem.simple_gas_mask.tooltip=在无氧环境中生存

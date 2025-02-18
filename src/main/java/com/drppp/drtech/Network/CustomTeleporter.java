@@ -23,22 +23,11 @@ public class CustomTeleporter implements ITeleporter {
     public void placeEntity(World world, Entity entity, float yaw) {
         if (entity instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) entity;
-
-            // 从 y = 255 开始向下搜索非空气方块
             BlockPos safePos = findSafePosition(world, targetPos);
-
-            // 设置玩家位置
             player.setPositionAndUpdate(safePos.getX() + 0.5, safePos.getY() + 1, safePos.getZ() + 0.5);
-
-            // 确保区块加载
-            world.getChunkProvider().provideChunk(safePos.getX() >> 4, safePos.getZ() >> 4);
-
-            // 检查碰撞
             if (!world.getCollisionBoxes(player, player.getEntityBoundingBox()).isEmpty()) {
                 player.setPositionAndUpdate(safePos.getX() + 0.5, safePos.getY() + 2, safePos.getZ() + 0.5);
             }
-
-            // 触发传送事件
             MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(player, player.dimension, world.provider.getDimension()));
         }
     }

@@ -1,5 +1,6 @@
 package com.drppp.drtech.common.Items;
 
+import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
@@ -14,6 +15,7 @@ import gregtech.common.pipelike.laser.ItemBlockLaserPipe;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.model.ModelLoader;
@@ -30,7 +32,7 @@ import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
     public static  final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new  ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID,"gravitational_anomaly");
-    public static  final Item ITEM_BLOCK_HOMO_EYE = new  ItemBlock(BlocksInit.BLOCK_HOMO_EYE).setRegistryName(Tags.MODID,"homo_eye");
+    public static  final Item ITEM_BLOCK_WATER_MILL = new  ItemBlock(BlocksInit.BLOCK_WATER_MILL).setRegistryName(Tags.MODID,"water_mill");
     public static  final Item ITEM_CONNECTOR1 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR1).setRegistryName(Tags.MODID,"connector_1");
     public static  final Item ITEM_CONNECTOR2 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID,"connector_2");
     public static  final Item ITEM_CONNECTOR3 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID,"connector_3");
@@ -44,10 +46,11 @@ public class ItemsInit {
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
     public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID,BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID,BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
+    public static  final Item ITEM_ROCKET = new ItemAdvancedRocket();
     public static void init(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
-        event.getRegistry().register(ITEM_BLOCK_HOMO_EYE);
+        event.getRegistry().register(ITEM_BLOCK_WATER_MILL);
         event.getRegistry().register(ITEM_RED_STONE_SEED);
         event.getRegistry().register(ITEM_LAPIS_SEED);
         event.getRegistry().register(ITEM_FLU_SEED);
@@ -61,6 +64,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_SAP_BAG);
         event.getRegistry().register(ITEM_BLOCK_ADVANCED_CAULDRON);
         event.getRegistry().register(ITEM_BLOCK_TIME_TABLE);
+        event.getRegistry().register(ITEM_ROCKET);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1,  VariantItemBlock::new));
@@ -89,6 +93,7 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_ROCKET, 0, new ModelResourceLocation(ITEM_ROCKET.getRegistryName(), "inventory"));
         if(Loader.isModLoaded("forestry"))
         {
             ((com.drppp.drtech.intergations.Forestry.DrtCombItem) ItemCombs.ITEM_COMBS).registerModel(ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);

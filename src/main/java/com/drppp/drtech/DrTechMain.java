@@ -4,12 +4,12 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.Client.render.EOH_TESR;
+import com.drppp.drtech.Client.render.TesrWaterMill;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
-import com.drppp.drtech.Tile.TileEntityHomoEye;
+import com.drppp.drtech.Tile.TileEntityWaterMill;
 import com.drppp.drtech.Tile.TileEntityTimeTable;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
@@ -30,7 +30,8 @@ import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
-import com.drppp.drtech.common.enent.PollutionEffectHandler;
+import com.drppp.drtech.common.event.PollutionEffectHandler;
+import com.drppp.drtech.common.event.RocketFuelHUD;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
 import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
@@ -116,7 +117,7 @@ public class DrTechMain {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
         try {
-            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHomoEye.class, new EOH_TESR());
+            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWaterMill.class, new TesrWaterMill());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -170,6 +171,7 @@ public class DrTechMain {
             ItemCombs.ClientInit();
         }
         drtMetaEntities.initRenderers();
+        MinecraftForge.EVENT_BUS.register(new RocketFuelHUD());
     }
 
     @EventHandler
@@ -188,4 +190,5 @@ public class DrTechMain {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
     }
+
 }

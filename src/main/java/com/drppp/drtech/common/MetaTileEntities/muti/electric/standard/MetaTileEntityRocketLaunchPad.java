@@ -1,5 +1,6 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
+import com.drppp.drtech.Network.DimensionTeleporter;
 import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
 import com.drppp.drtech.common.Entity.EntityAdvancedRocket;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -16,6 +17,7 @@ import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.blocks.StoneVariantBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -87,17 +89,8 @@ public class MetaTileEntityRocketLaunchPad extends MetaTileEntityBaseWithControl
                 );
                 for (Entity targetEntity : getWorld().getEntitiesWithinAABB(EntityAdvancedRocket.class, aabb)) {
                     if (targetEntity instanceof EntityAdvancedRocket rocket) { // 判断是否为 EntityAdvancedRocket
-                        rocket.DimId = -1;
-                        rocket.fuel_amount = 1000;
-                        if (rocket.isBeingRidden()) {
-                            List<Entity> passengers = rocket.getPassengers();
-                            for (Entity passenger : passengers) {
-                                if (passenger instanceof EntityPlayer player) {
-                                    teleportPlayerToDimension(player, rocket.DimId);
-                                }
-                            }
-
-                        }
+                        rocket.setDimId( 301);
+                        rocket.setFuelAmount(1000);
                     }
                 }
             }
@@ -110,16 +103,8 @@ public class MetaTileEntityRocketLaunchPad extends MetaTileEntityBaseWithControl
         if (player.world.provider.getDimension() == targetDimId) {
             return;
         }
+        // 执行传送
+        DimensionTeleporter.teleportToDimension((EntityPlayerMP) player, targetDimId, null);
 
-        // 切换维度
-        WorldServer targetWorld = player.getServer().getWorld(targetDimId);
-        if (targetWorld != null) {
-            player.changeDimension(targetDimId, (world, entity, yaw) -> {
-                // 在目标维度中执行必要的初始化逻辑（例如火箭落地）
-                entity.setPosition(0, 120, 0); // 设置玩家在目标维度中的位置
-            });
-        } else {
-            player.sendMessage(new TextComponentString("目标维度不存在！"));
-        }
     }
 }

@@ -5,21 +5,20 @@ import com.drppp.drtech.Client.lib.obj.IModelCustom;
 import com.drppp.drtech.Tags;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-public class EntityAdvancedRocketRender extends Render {
+public class EntityFirstRocketRender extends Render {
     private IModelCustom model;
     private static final ResourceLocation MODEL = new ResourceLocation(Tags.MODID, "models/shipi.obj");
-    private static final ResourceLocation TEXTURE =new ResourceLocation(Tags.MODID,"models/hongbei.png");
-    public EntityAdvancedRocketRender(RenderManager rendermanagerIn) {
+    private static final ResourceLocation TEXTURE =new ResourceLocation(Tags.MODID,"models/rocket1.png");
+    public EntityFirstRocketRender(RenderManager rendermanagerIn) {
         super(rendermanagerIn);
         this.model =  AdvancedModelLoader.loadModel(MODEL);
     }
+
 
     @Override
     public void doRender(Entity entity, double x, double y, double z, float entityYaw, float partialTicks) {
@@ -29,7 +28,7 @@ public class EntityAdvancedRocketRender extends Render {
         GlStateManager.disableCull();
         this.bindEntityTexture(entity);
         GlStateManager.translate(x, y, z);
-        // GlStateManager.translate(0.5, 0.5, 0.5);
+        GlStateManager.scale(0.35, 0.35, 0.35);
         model.renderAll();
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
