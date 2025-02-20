@@ -13,10 +13,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEnti
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.*;
-import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
-import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLaserPipeBending;
-import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityTypeFilter;
-import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
+import com.drppp.drtech.common.MetaTileEntities.single.*;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
@@ -101,6 +98,7 @@ public class MetaTileEntities {
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_16384 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_65536 = new MetaTileEntityLaserPipeBending[10]; // IV+
+    public static MetaTileEntityRuGenerator  RU_GENERATOR;
     static int startID = 16999;
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
@@ -170,6 +168,7 @@ public class MetaTileEntities {
             getID();
         }
         ROCKET_LAUNCH_PAD = registerMetaTileEntity(getID(), new MetaTileEntityRocketLaunchPad(getmyId("rocket_launch_pad")));
+        RU_GENERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuGenerator(getmyId("ru_generator")));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();

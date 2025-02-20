@@ -35,6 +35,7 @@ dependencies {
     implementation rfg.deobf("curse.maven:gregtech-food-option-477021:5585788")
     implementation rfg.deobf(files("libs/gtqtcore-1.7.2.jar"))
     implementation rfg.deobf(files("libs/supercritical-1.7.1.jar"))
+    implementation rfg.deobf(files("libs/industrialcraft-2-2.8.222-ex112.jar"))
     implementation rfg.deobf("curse.maven:forestry-59751:2684780")
     implementation rfg.deobf("curse.maven:pams-harvestcraft-221857:2904825")
     implementation rfg.deobf("curse.maven:modularui-624243:5153413")

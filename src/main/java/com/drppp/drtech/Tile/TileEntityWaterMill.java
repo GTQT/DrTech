@@ -6,6 +6,9 @@ import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import com.drppp.drtech.api.capability.IRotationSpeed;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
+import com.drppp.drtech.common.Items.ItemsInit;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -95,17 +98,27 @@ public class TileEntityWaterMill extends TileEntity implements ITickable, IRotat
                 setRotationSpeed(calculateSpeedFromFlow(flowMagnitude));
             }
             ru.setRuEnergy((int)(DrtConfig.MillExchangeRate * flowMagnitude));
+            if(getWorld().getTileEntity(getPos().offset(facing.getOpposite())) instanceof TileEntityWaterMill)
+            {
+                TileEntityWaterMill before =  (TileEntityWaterMill)getWorld().getTileEntity(getPos().offset(facing.getOpposite()));
+                ru.setRuEnergy(before.getEnergy().getEnergyOutput()+this.ru.getEnergyOutput());
+                if(ru.getEnergyOutput()>155)
+                {
+                    getWorld().setBlockToAir(getPos());
+                    getWorld().spawnEntity(new EntityItem(getWorld(),getPos().getX(),getPos().getY(),getPos().getZ(),new ItemStack(ItemsInit.ITEM_BLOCK_WATER_MILL)));
+                }
+            }
         }
     }
     private int calculateSpeedFromFlow(double flowMagnitude) {
         if (flowMagnitude < 1.0) {
             return 0; // 静止或几乎无流动
         } else if (flowMagnitude < 2.0) {
-            return 1; // 缓慢流动
+            return 3; // 缓慢流动
         } else if (flowMagnitude < 3.0) {
-            return 3; // 中等流动
+            return 5; // 中等流动
         } else {
-            return 5; // 快速流动
+            return 6; // 快速流动
         }
     }
     @Override

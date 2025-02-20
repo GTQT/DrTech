@@ -183,8 +183,6 @@ tile.drtech.Time_Table.name=时间之瓶挂机桌
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=中子机械方块
 tile.Meta_Machine_Casing.mass_generation_casing.name=质量发生机械方块
-tile.Meta_Machine_Casing.mass_generation_coil_casing.name=质量发生线圈方块
-tile.Meta_Machine_Casing.mass_generation_coil_casing.name=质量发生线圈方块
 tile.Meta_Machine_Casing.buncher_casing.name=调制腔
 tile.Meta_Machine_Casing.resonator_casing.name=谐振腔
 tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=高压流电容方块
@@ -265,6 +263,7 @@ drtech.machine.industrial_cable_press.name=工业线材轧机
 drtech.machine.industrial_sieve.name=工业筛选机
 drtech.machine.industrial_centrifuge.name=工业离心机
 drtech.machine.rocket_launch_pad.name=火箭发射平台
+drtech.machine.ru_generator.name=旋转能发电机
 
 #Materials
 gregtech.material.bedrock=基岩
@@ -553,7 +552,6 @@ drtech.machine.disassembly.uiv.name=史诗拆解机 III
 drtech.machine.disassembly.uxv.name=史诗拆解机 IV
 drtech.machine.disassembly.opv.name=传奇拆解机
 
-drtech.machine.matrix_solver.name=不定元矩阵运算器
 
 drtech.machine.wireless_energy_hatch.input.ulv.name=无线能源仓（§8ULV§r）
 drtech.machine.wireless_energy_hatch.input.lv.name=无线能源仓（§7LV§r）
@@ -1114,19 +1112,3 @@ drtech.dimension_applicable=适用维度：%s
 attribute.modifier.plus.0=+%d %s
 attribute.name.generic.armor=护甲
 
-# Commands
-
-drtech.command.horde.usage=/mobHorde <start/stop>
-drtech.command.horde.start.usage=/mobHorde start <名称>
-drtech.command.horde.start.argument_required=用法：/mobHorde start <名称>.
-drtech.command.horde.start.no_such_horde=不存在名为%s的军团
-drtech.command.horde.start.unable_to_run=无法生成%s军团，这可能是由维度限制或光照等原因造成。
-drtech.command.horde.start.error_executing_horde=军团生物未正确生成。
-drtech.command.horde.start.has_active_invasion=已有正在进行中的%s入侵。
-drtech.command.horde.start.started=%s入侵已开始。
-drtech.command.horde.stop.usage=/mobHorde stop
-drtech.command.horde.stop.has_active_no_invasion=没有正在进行中的入侵。
-drtech.command.horde.stop.stopped=%s入侵已结束。
-drtech.command.horde.status.usage=/mobHorde status <player>
-drtech.command.horde.status.has_active_invasion=Player %s has an active %s invasion for %d ticks. It will time out in %s ticks.
-drtech.command.horde.status.no_active_invasion=Player %s has no active invasion.entity.UTi_Golem.name=Uranium-Titanium Alloy Golemdrtech.command.horde.status.no_active_invasion=Player %s has no active invasion.entity.UTi_Golem.name=Uranium-Titanium Alloy Golemdrtech.command.horde.status.no_active_invasion=Player %s has no active invasion.
