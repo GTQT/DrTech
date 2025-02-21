@@ -5,6 +5,7 @@ import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.RuMachine.MetaTileEntityRuMachine;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearReactor;
@@ -20,6 +21,7 @@ import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
+import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.util.GTUtility;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
 import net.minecraft.util.ResourceLocation;
@@ -99,6 +101,7 @@ public class MetaTileEntities {
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_16384 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_65536 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityRuGenerator  RU_GENERATOR;
+    public static  MetaTileEntityRuMachine RU_MACERATOR;
     static int startID = 16999;
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
@@ -169,6 +172,7 @@ public class MetaTileEntities {
         }
         ROCKET_LAUNCH_PAD = registerMetaTileEntity(getID(), new MetaTileEntityRocketLaunchPad(getmyId("rocket_launch_pad")));
         RU_GENERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuGenerator(getmyId("ru_generator")));
+        RU_MACERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_macerator"), RecipeMaps.MACERATOR_RECIPES, gregtech.client.renderer.texture.Textures.MACERATOR_OVERLAY,1,true));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();
