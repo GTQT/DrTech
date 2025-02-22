@@ -172,7 +172,7 @@ public class MetaTileEntities {
         }
         ROCKET_LAUNCH_PAD = registerMetaTileEntity(getID(), new MetaTileEntityRocketLaunchPad(getmyId("rocket_launch_pad")));
         RU_GENERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuGenerator(getmyId("ru_generator")));
-        RU_MACERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_macerator"), RecipeMaps.MACERATOR_RECIPES, gregtech.client.renderer.texture.Textures.MACERATOR_OVERLAY,1,true));
+        RU_MACERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_macerator"), RecipeMaps.MACERATOR_RECIPES, Textures.RU_SHREDDER,1,true));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();

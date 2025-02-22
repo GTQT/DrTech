@@ -2,6 +2,7 @@ package com.drppp.drtech.Client;
 
 import com.drppp.drtech.Client.Custome.CentrifugeRender;
 import com.drppp.drtech.Tags;
+import gregtech.api.GTValues;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.resources.AdoptableTextureArea;
 import gregtech.api.gui.resources.TextureArea;
@@ -43,6 +44,7 @@ public class Textures {
     public static SimpleOverlayRenderer WIRELESS_HATCH_HATCH;
     public static OrientedOverlayRenderer DISASSEMBLY;
     public static OrientedOverlayRenderer INDUSTRIAL_APIARY;
+    public static OrientedOverlayRenderer RU_SHREDDER;
     public static  OrientedOverlayRenderer FILTER_OVERLAY;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_4x;
@@ -60,6 +62,7 @@ public class Textures {
     public static final TextureArea CROSS = TextureArea.fullImage("textures/gui/cross.png");
     public static final TextureArea CHECK_MARK = TextureArea.fullImage("textures/gui/checkmark.png");
     public static final CentrifugeRender CENTRIFUGE_RENDER = new CentrifugeRender();
+    public static final SimpleSidedCubeRenderer[] MACHINE_CASINGS = new SimpleSidedCubeRenderer[4];
     public static void init()
     {
         MULTIPART_WIRELESS_ENERGY = new SimpleOverlayRenderer("wireless_hatch/overlay_front");
@@ -80,6 +83,7 @@ public class Textures {
         DUPLICATOR = new OrientedOverlayRenderer("machines/duplicator");
         DISASSEMBLY = new OrientedOverlayRenderer("machines/disassembly");
         INDUSTRIAL_APIARY = new OrientedOverlayRenderer("machines/industrial_apiary");
+        RU_SHREDDER = new OrientedOverlayRenderer("machines/ru_shredder");
         FILTER_OVERLAY = new OrientedOverlayRenderer("machines/type_filter");
         MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
         ASEPTIC_MACHINE_CASING = new SimpleOverlayRenderer("casings/aseptic_machine_casing");
@@ -100,6 +104,10 @@ public class Textures {
         BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);
         PAIL_BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/pail_background.png", 500, 500, 3, 3);
         WIRELESS_HATCH_HATCH = new SimpleOverlayRenderer("overlay/wireless_hatch/overlay_front");
+        for(int i = 0; i < MACHINE_CASINGS.length; ++i) {
+            String voltageName = GTValues.VN[i].toLowerCase();
+            MACHINE_CASINGS[i] = new SimpleSidedCubeRenderer("casings/drtmachine/" + voltageName);
+        }
     }
     public static void register(TextureMap textureMap) {
 

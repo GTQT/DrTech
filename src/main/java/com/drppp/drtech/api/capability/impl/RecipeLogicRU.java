@@ -19,14 +19,14 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
     protected long getEnergyInputPerSecond() {
         if(ru==null)
             return 0;
-        return ru.getEnergyOutput();
+        return ru.getEnergyOutput()/2;
     }
 
     @Override
     protected long getEnergyStored() {
         if(ru==null)
             return 0;
-        return ru.getEnergyOutput();
+        return ru.getEnergyOutput()/2;
     }
 
     @Override
@@ -47,6 +47,6 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
 
     @Override
     public long getMaxVoltage() {
-        return GTValues.V[2];
+        return GTValues.V[1];
     }
 }

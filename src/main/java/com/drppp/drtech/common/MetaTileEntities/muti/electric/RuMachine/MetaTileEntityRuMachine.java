@@ -31,6 +31,7 @@ import gregtech.api.util.GTUtility;
 import gregtech.client.particle.IMachineParticleEffect;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import gregtech.client.utils.RenderUtil;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -111,7 +112,7 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
     protected void initializeInventory() {
         super.initializeInventory();
         this.outputItemInventory = new ItemHandlerProxy(new GTItemStackHandler(this, 0), this.exportItems);
-        this.outputFluidInventory = new FluidHandlerProxy(new FluidTankList(false, new IFluidTank[0]), this.exportFluids);
+        this.outputFluidInventory = new FluidHandlerProxy(new FluidTankList(false), this.exportFluids);
         if (this.hasGhostCircuitInventory()) {
             this.circuitInventory = new GhostCircuitItemStackHandler(this);
             this.circuitInventory.addNotifiableMetaTileEntity(this);
@@ -163,7 +164,10 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         }
 
     }
-
+    @SideOnly(Side.CLIENT)
+    protected SimpleSidedCubeRenderer getBaseRenderer() {
+        return com.drppp.drtech.Client.Textures.MACHINE_CASINGS[0];
+    }
     @SideOnly(Side.CLIENT)
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
@@ -195,8 +199,11 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
                 {
                     IRotationEnergy iru = te.getCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,getFrontFacing());
                     this.ru.setRuEnergy(iru.getEnergyOutput());
+                    this.energyContainer.changeEnergy(-this.energyContainer.getEnergyStored());
+                    this.energyContainer.changeEnergy(iru.getEnergyOutput());
                 }
                 else {
+                    this.energyContainer.changeEnergy(-this.energyContainer.getEnergyStored());
                     this.ru.setRuEnergy(0);
                 }
             }
