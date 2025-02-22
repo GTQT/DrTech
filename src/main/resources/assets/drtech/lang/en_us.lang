@@ -265,6 +265,7 @@ drtech.machine.industrial_centrifuge.name=Industrial Centrifuge
 drtech.machine.rocket_launch_pad.name=Rocket Launch Pad
 drtech.machine.ru_generator.name=Rotating Energy Generator
 drtech.machine.ru_macerator.name=旋转能粉碎机
+drtech.machine.ru_mixer.name=Ru Mixer
 #Materials
 gregtech.material.bedrock=Bedrock
 

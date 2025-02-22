@@ -2,6 +2,7 @@ package com.drppp.drtech.intergations.top.provider;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntitySapBag;
 import com.drppp.drtech.api.capability.IRotationSpeed;
@@ -19,6 +20,7 @@ import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.items.ItemStackHandler;
@@ -49,9 +51,9 @@ public class TopCommonProvider implements IProbeInfoProvider {
         if(world.getTileEntity(iProbeHitData.getPos())!=null && world.getTileEntity(iProbeHitData.getPos()) instanceof IRotationSpeed)
         {
             IRotationSpeed rs = (IRotationSpeed) world.getTileEntity(iProbeHitData.getPos());
-            iProbeInfo.text("旋转动量:"+rs.getEnergy().getEnergyOutput()+"RU");
-            iProbeInfo.text("输出方向:"+rs.getFacing());
-            iProbeInfo.text("旋转速度:"+rs.getSpeed());
+            iProbeInfo.text(TextFormatting.BOLD+"旋转动量:"+ TextFormatting.GREEN+rs.getEnergy().getEnergyOutput()+"/"+ DrtConfig.MaxRu +"RU");
+            iProbeInfo.text(TextFormatting.BOLD+"输出方向:"+TextFormatting.GREEN+rs.getFacing());
+            iProbeInfo.text(TextFormatting.BOLD+"旋转速度:"+TextFormatting.GREEN+rs.getSpeed());
         }
         if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityBaseWithControl)
         {

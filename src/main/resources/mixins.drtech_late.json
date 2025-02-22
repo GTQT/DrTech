@@ -6,10 +6,12 @@
   "minVersion": "0.8.3",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "gregtech.MultiblockRecipeLogicMixin",
-    "gregtech.MinxinRecipeMapMultiblockController",
     "forestry.MixinModuleCore",
-    "forestry.MixinModuleMachine"
+    "forestry.MixinModuleMachine",
+    "gregtech.ElectricContainerInfoProviderMixin",
+    "gregtech.MinxinRecipeMapMultiblockController",
+    "gregtech.MultiblockRecipeLogicMixin",
+    "gregtech.RecipeLogicInfoProviderMixin"
   ],
   "server": [],
   "client":[]

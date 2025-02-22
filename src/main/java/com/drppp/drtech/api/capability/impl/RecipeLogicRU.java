@@ -1,5 +1,6 @@
 package com.drppp.drtech.api.capability.impl;
 
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.AbstractRecipeLogic;
@@ -48,5 +49,32 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
     @Override
     public long getMaxVoltage() {
         return GTValues.V[1];
+    }
+    @Override
+    protected void updateRecipeProgress() {
+        if (this.canRecipeProgress && this.drawEnergy(this.recipeEUt, true)) {
+            this.drawEnergy(this.recipeEUt, false);
+            if (++this.progressTime > this.getMaxProgress()) {
+                this.completeRecipe();
+            }
+
+            if (this.hasNotEnoughEnergy && this.getEnergyInputPerSecond() > 19L * (long)this.recipeEUt) {
+                this.hasNotEnoughEnergy = false;
+            }
+        } else if (this.recipeEUt > 0) {
+            this.hasNotEnoughEnergy = true;
+            this.decreaseProgress();
+        }
+
+    }
+    @Override
+    public int getMaxProgress() {
+        if(ru.getEnergyOutput()>this.recipeEUt)
+        {
+            int max = this.maxProgressTime;
+            double reductionRatio = ((double) ru.getEnergyOutput() - ((double)recipeEUt*2)) / ((double)DrtConfig.MaxRu - ((double)recipeEUt*2));
+            return Math.max(1,(int)(max - (max - max/2) * reductionRatio));
+        }
+        return super.getMaxProgress();
     }
 }

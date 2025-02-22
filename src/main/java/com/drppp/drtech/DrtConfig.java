@@ -29,7 +29,10 @@ public class DrtConfig {
     @Config.Comment("水车推力转换效率")
     @Config.RequiresMcRestart
     public static double MillExchangeRate = 10.0d;
-
+    @Config.LangKey("water_mill_max_ru")
+    @Config.Comment("木质水车和轴承最大承受RU")
+    @Config.RequiresMcRestart
+    public static int MaxRu = 192;
     @Config.Comment("Config options for DrTech")
     public static MachineSwitch MachineSwitch = new MachineSwitch();
 

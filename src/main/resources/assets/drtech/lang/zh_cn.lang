@@ -265,6 +265,7 @@ drtech.machine.industrial_centrifuge.name=工业离心机
 drtech.machine.rocket_launch_pad.name=火箭发射平台
 drtech.machine.ru_generator.name=旋转能发电机
 drtech.machine.ru_macerator.name=旋转能粉碎机
+drtech.machine.ru_mixer.name=旋转能搅拌机
 
 #Materials
 gregtech.material.bedrock=基岩

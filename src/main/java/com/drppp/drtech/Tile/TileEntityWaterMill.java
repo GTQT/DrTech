@@ -102,7 +102,7 @@ public class TileEntityWaterMill extends TileEntity implements ITickable, IRotat
             {
                 TileEntityWaterMill before =  (TileEntityWaterMill)getWorld().getTileEntity(getPos().offset(facing.getOpposite()));
                 ru.setRuEnergy(before.getEnergy().getEnergyOutput()+this.ru.getEnergyOutput());
-                if(ru.getEnergyOutput()>155)
+                if(ru.getEnergyOutput()> DrtConfig.MaxRu)
                 {
                     getWorld().setBlockToAir(getPos());
                     getWorld().spawnEntity(new EntityItem(getWorld(),getPos().getX(),getPos().getY(),getPos().getZ(),new ItemStack(ItemsInit.ITEM_BLOCK_WATER_MILL)));

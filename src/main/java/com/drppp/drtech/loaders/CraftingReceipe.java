@@ -561,7 +561,36 @@ public class CraftingReceipe {
 
             );
         }
+        ModHandler.addShapedRecipe("drt_twater_mill", new ItemStack(BlocksInit.BLOCK_WATER_MILL),
+                "ABA",
+                "BCB",
+                "ABA",
+                'C', new UnificationEntry(screw, Steel),
+                'A', new UnificationEntry(frameGt, TreatedWood),
+                'B', new UnificationEntry(plate,TreatedWood)
 
+        );
+        ModHandler.addShapedRecipe("drt_wood_axle", new ItemStack(BlocksInit.BLOCK_STONE_AXLE),
+                "AAA",
+                "BCB",
+                "AAA",
+                'C', new UnificationEntry(stick, Steel),
+                'B', new UnificationEntry(screw, Steel),
+                'A', new UnificationEntry(plate,TreatedWood)
+        );
+        ModHandler.addShapedRecipe("drt_ru_fensuiji", MetaTileEntities.RU_MACERATOR.getStackForm(),
+                "AGA",
+                "BCB",
+                "AGA",
+                'C', getItemStack("gregtech:steam_casing"),
+                'G', new UnificationEntry(gear, Steel),
+                'B', new UnificationEntry(screw, Steel),
+                'A', new UnificationEntry(plate,Bronze)
+        );
+    }
+    public static ItemStack getItemStack(String itemstr)
+    {
+        return  getItemStack(itemstr, 0);
     }
     public static ItemStack getItemStack(String itemstr, int meta)
     {

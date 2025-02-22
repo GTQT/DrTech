@@ -1,9 +1,13 @@
 package com.drppp.drtech.Tile;
 
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import com.drppp.drtech.api.capability.IRotationSpeed;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
+import com.drppp.drtech.common.Items.ItemsInit;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -86,6 +90,11 @@ public class TileEntityStoneAxle extends TileEntity implements ITickable, IRotat
                     this.ru = tile.getCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing);
                     if(tile instanceof IRotationSpeed)
                         this.setRotationSpeed(((IRotationSpeed)tile).getSpeed());
+                    if(ru.getEnergyOutput()> DrtConfig.MaxRu)
+                    {
+                        getWorld().setBlockToAir(getPos());
+                        getWorld().spawnEntity(new EntityItem(getWorld(),getPos().getX(),getPos().getY(),getPos().getZ(),new ItemStack(ItemsInit.ITEM_BLOCK_STONE_AXLE)));
+                    }
                 }else
                 {
                     this.ru.setRuEnergy(0);

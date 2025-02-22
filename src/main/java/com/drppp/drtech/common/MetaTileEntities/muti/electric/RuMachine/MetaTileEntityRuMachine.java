@@ -6,6 +6,7 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
+import com.drppp.drtech.api.capability.RuMachineAcceptFacing;
 import com.drppp.drtech.api.capability.impl.RecipeLogicRU;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
 import gregtech.api.GTValues;
@@ -67,6 +68,7 @@ import java.util.function.IntSupplier;
 public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  implements IActiveOutputSide, IGhostSlotConfigurable {
 
     private final boolean hasFrontFacing;
+    private final RuMachineAcceptFacing[] acceptFacing;
     //protected final GTItemStackHandler chargerInventory;
     protected @Nullable GhostCircuitItemStackHandler circuitInventory;
     private EnumFacing outputFacingItems;
@@ -82,15 +84,16 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
     protected final @Nullable IMachineParticleEffect tickingParticle;
     protected final @Nullable IMachineParticleEffect randomParticle;
     private  IRotationEnergy ru;
-    public MetaTileEntityRuMachine(ResourceLocation metaTileEntityId, RecipeMap<?> recipeMap, ICubeRenderer renderer, int tier, boolean hasFrontFacing) {
-        this(metaTileEntityId, recipeMap, renderer, tier, hasFrontFacing, GTUtility.defaultTankSizeFunction);
+    //最后一个参数是接收能源的方向 目前只能水平接收  因为水车轴承只能横着放
+    public MetaTileEntityRuMachine(ResourceLocation metaTileEntityId, RecipeMap<?> recipeMap, ICubeRenderer renderer, int tier, boolean hasFrontFacing,RuMachineAcceptFacing[] acceptFacing) {
+        this(metaTileEntityId, recipeMap, renderer, tier, hasFrontFacing, GTUtility.defaultTankSizeFunction,acceptFacing);
     }
 
-    public MetaTileEntityRuMachine(ResourceLocation metaTileEntityId, RecipeMap<?> recipeMap, ICubeRenderer renderer, int tier, boolean hasFrontFacing, Function<Integer, Integer> tankScalingFunction) {
-        this(metaTileEntityId, recipeMap, renderer, tier, hasFrontFacing, tankScalingFunction, null, null);
+    public MetaTileEntityRuMachine(ResourceLocation metaTileEntityId, RecipeMap<?> recipeMap, ICubeRenderer renderer, int tier, boolean hasFrontFacing, Function<Integer, Integer> tankScalingFunction,RuMachineAcceptFacing[] acceptFacing) {
+        this(metaTileEntityId, recipeMap, renderer, tier, hasFrontFacing, tankScalingFunction, null, null,acceptFacing);
     }
 
-    public MetaTileEntityRuMachine(ResourceLocation metaTileEntityId, RecipeMap<?> recipeMap, ICubeRenderer renderer, int tier, boolean hasFrontFacing, Function<Integer, Integer> tankScalingFunction, @Nullable IMachineParticleEffect tickingParticle, @Nullable IMachineParticleEffect randomParticle) {
+    public MetaTileEntityRuMachine(ResourceLocation metaTileEntityId, RecipeMap<?> recipeMap, ICubeRenderer renderer, int tier, boolean hasFrontFacing, Function<Integer, Integer> tankScalingFunction, @Nullable IMachineParticleEffect tickingParticle, @Nullable IMachineParticleEffect randomParticle,RuMachineAcceptFacing[] acceptFacing) {
         super(metaTileEntityId, recipeMap, renderer, tier, tankScalingFunction);
         this.allowInputFromOutputSideItems = false;
         this.allowInputFromOutputSideFluids = false;
@@ -98,6 +101,7 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         //this.chargerInventory = new GTItemStackHandler(this, 1);
         this.tickingParticle = tickingParticle;
         this.randomParticle = randomParticle;
+        this.acceptFacing = acceptFacing;
 
     }
     @Override
@@ -106,7 +110,7 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         return new RecipeLogicRU(this, recipeMap, ru);
     }
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity tileEntity) {
-        return new MetaTileEntityRuMachine(this.metaTileEntityId, this.workable.getRecipeMap(), this.renderer, this.getTier(), this.hasFrontFacing, this.getTankScalingFunction(), this.tickingParticle, this.randomParticle);
+        return new MetaTileEntityRuMachine(this.metaTileEntityId, this.workable.getRecipeMap(), this.renderer, this.getTier(), this.hasFrontFacing, this.getTankScalingFunction(), this.tickingParticle, this.randomParticle,this.acceptFacing);
     }
 
     protected void initializeInventory() {
@@ -194,17 +198,31 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         if (!this.getWorld().isRemote) {
             if(this.ru!=null)
             {
-                TileEntity te = getWorld().getTileEntity(this.getPos().offset(getFrontFacing().getOpposite()));
-                if(te!=null && te.hasCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,getFrontFacing()))
+                //根据传递的方向获取
+                EnumFacing[] facings = getCanAcceptFacing();
+                if(facings!=null)
                 {
-                    IRotationEnergy iru = te.getCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,getFrontFacing());
-                    this.ru.setRuEnergy(iru.getEnergyOutput());
-                    this.energyContainer.changeEnergy(-this.energyContainer.getEnergyStored());
-                    this.energyContainer.changeEnergy(iru.getEnergyOutput());
+                    boolean flag=false;
+                    for (var f: facings)
+                    {
+                        TileEntity te = getWorld().getTileEntity(this.getPos().offset(f));
+                        if(te!=null && te.hasCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,f.getOpposite()) && !flag)
+                        {
+                            flag=true;
+                            IRotationEnergy iru = te.getCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,f.getOpposite());
+                            this.ru.setRuEnergy(iru.getEnergyOutput());
+                            this.energyContainer.changeEnergy(-this.energyContainer.getEnergyStored());
+                            this.energyContainer.changeEnergy(iru.getEnergyOutput());
+                        }
+                        if(!flag)
+                        {
+                            clearEnergy();
+                        }
+                    }
                 }
-                else {
-                    this.energyContainer.changeEnergy(-this.energyContainer.getEnergyStored());
-                    this.ru.setRuEnergy(0);
+                else
+                {
+                    clearEnergy();
                 }
             }
             if (this.getOffsetTimer() % 5L == 0L) {
@@ -221,7 +239,33 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         }
 
     }
-
+    private void clearEnergy()
+    {
+        this.energyContainer.changeEnergy(-this.energyContainer.getEnergyStored());
+        this.ru.setRuEnergy(0);
+    }
+    private EnumFacing[] getCanAcceptFacing()
+    {
+        if(this.acceptFacing==null || this.acceptFacing.length==0)
+            return null;
+        EnumFacing[] result=new EnumFacing[this.acceptFacing.length];
+        for (int i = 0; i < this.acceptFacing.length; i++)
+        {
+            if(this.acceptFacing[i] == RuMachineAcceptFacing.UP )
+                result[i] = EnumFacing.UP;
+            if(this.acceptFacing[i] == RuMachineAcceptFacing.DOWN)
+                result[i] = EnumFacing.DOWN;
+            if(this.acceptFacing[i] == RuMachineAcceptFacing.FRONT)
+                result[i] = getFrontFacing();
+            if(this.acceptFacing[i] == RuMachineAcceptFacing.BACK)
+                result[i] = getFrontFacing().getOpposite();
+            if(this.acceptFacing[i] == RuMachineAcceptFacing.LEFT)
+                result[i] = getFrontFacing().rotateY();
+            if(this.acceptFacing[i] == RuMachineAcceptFacing.RIGHT)
+                result[i] = getFrontFacing().getOpposite().rotateY();
+        }
+        return  result;
+    }
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick() {
         if (this.randomParticle != null && this.isActive()) {
