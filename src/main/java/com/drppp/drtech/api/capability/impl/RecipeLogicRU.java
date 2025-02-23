@@ -6,6 +6,7 @@ import gregtech.api.GTValues;
 import gregtech.api.capability.impl.AbstractRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.recipes.RecipeMap;
+import org.jetbrains.annotations.NotNull;
 
 public class RecipeLogicRU  extends AbstractRecipeLogic {
 
@@ -45,7 +46,14 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
             return true;
         return false;
     }
-
+    protected boolean hasEnoughPower(int @NotNull [] resultOverclock) {
+        int recipeEUt = resultOverclock[0];
+        if (recipeEUt >= 0) {
+            return this.getEnergyStored() >= (long)recipeEUt;
+        } else {
+            return this.getEnergyStored() - (long)recipeEUt <= this.getEnergyCapacity();
+        }
+    }
     @Override
     public long getMaxVoltage() {
         return GTValues.V[1];

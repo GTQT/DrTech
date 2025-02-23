@@ -7,9 +7,11 @@ import binnie.genetics.item.GeneticsItems;
 import binnie.genetics.machine.AdvGeneticMachine;
 import binnie.genetics.machine.GeneticMachine;
 import binnie.genetics.machine.LaboratoryMachine;
+import com.drppp.drtech.loaders.CraftingReceipe;
 import forestry.api.recipes.RecipeManagers;
 import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.recipes.ModHandler;
+import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
@@ -24,6 +26,7 @@ import static binnie.genetics.modules.ModuleCore.*;
 import static gregtech.api.GTValues.VA;
 import static gregtech.api.recipes.RecipeMaps.*;
 import static gregtech.api.unification.material.MarkerMaterials.Tier.EV;
+import static gregtech.api.unification.material.MarkerMaterials.Tier.HV;
 import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.ore.OrePrefix.*;
 import static gregtech.common.blocks.BlockGlassCasing.CasingType.TEMPERED_GLASS;
@@ -37,44 +40,176 @@ public class BinneRecipes {
         //基因工程-分包 配方修改！
 
         //机器
-        ModHandler.addShapedRecipe("incubator", LaboratoryMachine.Incubator.get(1), "GFG", "XCX", "APA", 'C', GeneticsItems.LaboratoryCasing.get(1), 'F', MetaTileEntities.ELECTRIC_FURNACE[5].getStackForm(), 'X', "circuitEv", 'G', MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS), 'P', ELECTRIC_PISTON_IV, 'A', ROBOT_ARM_IV);
+        ModHandler.addShapedRecipe("incubator", LaboratoryMachine.Incubator.get(1),
+                "GFG",
+                        "XCX",
+                        "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Blocks.FURNACE,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', CraftingReceipe.getItemStack("gregtech:machine", 1611),
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
 
-        ModHandler.addShapedRecipe("analyzer", LaboratoryMachine.Analyser.get(1), "GBG", "XCX", "APA", 'C', GeneticsItems.LaboratoryCasing.get(1), 'B', Mods.Forestry.item("portable_alyzer"), 'X', "circuitEv", 'G', MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS), 'P', ELECTRIC_PISTON_IV, 'A', GeneticsItems.DNADye.get(1));
-        ModHandler.addShapedRecipe("genepool", LaboratoryMachine.Genepool.get(1), "GBG", "XCX", "APA", 'C', GeneticsItems.LaboratoryCasing.get(1), 'B', ELECTRIC_PISTON_IV, 'X', "circuitEv", 'G', MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS), 'P', ELECTRIC_PISTON_IV, 'A', MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS));
-        ModHandler.addShapedRecipe("acclimatizer", LaboratoryMachine.Acclimatiser.get(1), "GBG", "XCX", "APA", 'C', GeneticsItems.LaboratoryCasing.get(1), 'B', VOLTAGE_COIL_IV, 'X', "circuitEv", 'G', MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS), 'P', ELECTRIC_PISTON_IV, 'A', FLUID_REGULATOR_EV);
+        ModHandler.addShapedRecipe("analyzer", LaboratoryMachine.Analyser.get(1),
+                "GFG",
+                "XCX",
+                "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Blocks.CHEST,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', GeneticsItems.DNADye.get(1),
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
+        ModHandler.addShapedRecipe("genepool", LaboratoryMachine.Genepool.get(1),
+                "GFG",
+                "XCX",
+                "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Blocks.CHEST,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', CraftingReceipe.getItemStack("gregtech:machine", 1611),
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
+        ModHandler.addShapedRecipe("acclimatizer", LaboratoryMachine.Acclimatiser.get(1),
+                "GFG",
+                "XCX",
+                "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Items.LAVA_BUCKET,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', Items.WATER_BUCKET,
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
 
-        ModHandler.addShapedRecipe("isolator", GeneticMachine.Isolator.get(1), "GBG", "XCX", "APA", 'C', GeneticsItems.LaboratoryCasing.get(1), 'B', ELECTRIC_PUMP_IV, 'X', GeneticsItems.IntegratedCircuit.get(1), 'G', MetaTileEntities.CHEMICAL_REACTOR[5].getStackForm(), 'P', ELECTRIC_PISTON_IV, 'A', GeneticsItems.Enzyme.get(1));
-        ModHandler.addShapedRecipe("polymeriser", GeneticMachine.Polymeriser.get(1), "GBG", "XCX", "GPG", 'C', GeneticsItems.LaboratoryCasing.get(1), 'B', ROBOT_ARM_IV, 'X', GeneticsItems.IntegratedCircuit.get(1), 'G', MetaTileEntities.CHEMICAL_REACTOR[5].getStackForm(), 'P', ELECTRIC_PISTON_IV);
-        ModHandler.addShapedRecipe("sequencer", GeneticMachine.Sequencer.get(1), "GBG", "XCX", "APA", 'C', GeneticsItems.LaboratoryCasing.get(1), 'B', ELECTRIC_PISTON_IV, 'X', GeneticsItems.IntegratedCircuit.get(1), 'G', MetaTileEntities.CHEMICAL_REACTOR[5].getStackForm(), 'P', ELECTRIC_PISTON_IV, 'A', GeneticsItems.FluorescentDye.get(1));
-        ModHandler.addShapedRecipe("inoculator", GeneticMachine.Inoculator.get(1), "GBG", "XCX", "APA", 'C', GeneticsItems.LaboratoryCasing.get(1), 'B', CONVEYOR_MODULE_IV, 'X', GeneticsItems.IntegratedCircuit.get(1), 'G', MetaTileEntities.CHEMICAL_REACTOR[5].getStackForm(), 'P', ELECTRIC_PISTON_IV, 'A', Items.EMERALD);
+        ModHandler.addShapedRecipe("isolator", GeneticMachine.Isolator.get(1),
+                "GFG",
+                "XCX",
+                "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Blocks.CHEST,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', CraftingReceipe.getItemStack("genetics:misc", 3),
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
+        ModHandler.addShapedRecipe("polymeriser", GeneticMachine.Polymeriser.get(1),
+                "GFG",
+                "XCX",
+                "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Blocks.CHEST,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', CraftingReceipe.getItemStack("genetics:misc", 7),
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
+        ModHandler.addShapedRecipe("sequencer", GeneticMachine.Sequencer.get(1),
+                "GFG",
+                "XCX",
+                "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Blocks.CHEST,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', CraftingReceipe.getItemStack("genetics:misc", 2),
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
+        ModHandler.addShapedRecipe("inoculator", CraftingReceipe.getItemStack("<genetics:adv_machine>"),
+                "GFG",
+                "XCX",
+                "APA",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'F', Blocks.CHEST,
+                'X', GeneticsItems.IntegratedCircuit.get(1),
+                'G', new UnificationEntry(plate,Emerald),
+                'P', ELECTRIC_MOTOR_MV,
+                'A', new UnificationEntry(gearSmall,StainlessSteel));
 
-        ModHandler.addShapedRecipe("splicer", AdvGeneticMachine.Splicer.get(1), "GBG", "XCX", "APA", 'C', GeneticsItems.IntegratedCasing.get(1), 'B', CONVEYOR_MODULE_IV, 'X', GeneticsItems.IntegratedCPU.get(1), 'G', MetaTileEntities.CHEMICAL_REACTOR[5].getStackForm(), 'P', ELECTRIC_PISTON_IV, 'A', Items.BLAZE_ROD);
-        ModHandler.addShapedRecipe("lab_machine", LaboratoryMachine.LabMachine.get(1), "IGI", "GCG", "IGI", 'C', GeneticsItems.LaboratoryCasing.get(1), 'I', "plateTungstenSteel", 'G', MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS));
-
-
+        ModHandler.addShapedRecipe("splicer", CraftingReceipe.getItemStack("genetics:adv_machine"),
+                "GBG",
+                        "XCX",
+                        "APA",
+                'C', GeneticsItems.IntegratedCasing.get(1),
+                'X', GeneticsItems.IntegratedCPU.get(1),
+                'B', CraftingReceipe.getItemStack("gregtech:machine", 1629),
+                'G',  new UnificationEntry(plate,Diamond),
+                'P', ELECTRIC_MOTOR_HV,
+                'A', new UnificationEntry(gearSmall,Diamond));
+        ModHandler.addShapedRecipe("lab_machine", LaboratoryMachine.LabMachine.get(1),
+                "IGI",
+                        "GCG",
+                        "IGI",
+                'C', GeneticsItems.LaboratoryCasing.get(1),
+                'I', Blocks.GLASS_PANE,
+                'G', new UnificationEntry(plate,StainlessSteel));
         //物品
         //laboratory casing id 0
-        ModHandler.addShapedRecipe(true, "laboratory_casing", LaboratoryCasing.get(1), "PYP", "YSY", "PYP", 'S', MetaTileEntities.HULL[5].getStackForm(), 'P', new UnificationEntry(screw, RhodiumPlatedPalladium), 'Y', new UnificationEntry(plate, Iridium));
-
+         ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(CraftingReceipe.getItemStack("forestry:sturdy_machine"))
+                .input(plate,Aluminium,4)
+                 .outputs(CraftingReceipe.getItemStack("<genetics:misc>"))
+                 .EUt(120)
+                 .duration(1200)
+                 .buildAndRegister();
+        ;
         //id 5 6 7
-        ASSEMBLER_RECIPES.recipeBuilder().inputs(MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS,4)).input(Items.PAPER).input(screw, PPB, 2).input(plate, Iridium, 8).input(wireFine, Platinum, 4).outputs(GeneticsItems.EmptySequencer.get(itemGenetics, 1)).circuitMeta(20).EUt(VA[5]).duration(200).fluidInputs(Zylon.getFluid(144)).cleanroom(CleanroomType.CLEANROOM).buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(Blocks.GLASS_PANE,2)
+                .outputs(GeneticsItems.EmptySequencer.get(itemGenetics, 1))
+                .circuitMeta(20)
+                .EUt(24)
+                .duration(200)
+                .fluidInputs(Gold.getFluid(288))
+                .buildAndRegister();
 
-        ASSEMBLER_RECIPES.recipeBuilder().inputs(MetaBlocks.TRANSPARENT_CASING.getItemVariant(TEMPERED_GLASS,6)).outputs(GeneticsItems.EMPTY_SERUM.get(itemGenetics, 1)).circuitMeta(21).fluidInputs(Zylon.getFluid(144)).cleanroom(CleanroomType.CLEANROOM).EUt(VA[5]).duration(200).buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .input(Blocks.GLASS_PANE,4)
+                .outputs(GeneticsItems.EMPTY_SERUM.get(itemGenetics, 1))
+                .circuitMeta(21)
+                .fluidInputs(Gold.getFluid(144))
+                .EUt(48)
+                .duration(200)
+                .buildAndRegister();
 
-        ASSEMBLER_RECIPES.recipeBuilder().inputs(GeneticsItems.EMPTY_SERUM.get(itemGenetics, 6)).input(stick, Iridium, 2).input(rotor, RhodiumPlatedPalladium, 1).outputs(GeneticsItems.EMPTY_GENOME.get(itemGenetics, 1)).fluidInputs(Zylon.getFluid(576)).cleanroom(CleanroomType.CLEANROOM).EUt(VA[5]).duration(200).buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(GeneticsItems.EMPTY_SERUM.get(itemGenetics, 10))
+                .outputs(GeneticsItems.EMPTY_GENOME.get(itemGenetics, 1))
+                .fluidInputs(Gold.getFluid(576))
+                .EUt(96)
+                .duration(200)
+                .buildAndRegister();
 
         ModHandler.addSmeltingRecipe(new ItemStack(itemSequencer), GeneticsItems.EmptySequencer.get(itemGenetics, 1), 0.0f);
         ModHandler.addSmeltingRecipe(new ItemStack(itemSerum), GeneticsItems.EMPTY_SERUM.get(itemGenetics, 1), 0.0f);
         ModHandler.addSmeltingRecipe(new ItemStack(itemSerumArray), GeneticsItems.EMPTY_GENOME.get(itemGenetics, 1), 0.0f);
 
         //8  基板
-        ASSEMBLER_RECIPES.recipeBuilder().input(MetaItems.ELITE_CIRCUIT_BOARD).input(wireFine, Platinum, 16).input(screw, PPB, 8).input(rotor, RhodiumPlatedPalladium, 8).input(circuit, EV, 4).input(pipeNormalFluid, TungstenSteel, 1).fluidInputs(Zylon.getFluid(576)).outputs(GeneticsItems.IntegratedCircuit.get(itemGenetics, 1)).EUt(VA[5]).duration(400).buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(CraftingReceipe.getItemStack("forestry:chipsets",1))
+                .input(circuit, HV, 2)
+                .fluidInputs(StainlessSteel.getFluid(576))
+                .outputs(GeneticsItems.IntegratedCircuit.get(itemGenetics, 1))
+                .EUt(64).duration(400).buildAndRegister();
 
         //9  电路
-        CIRCUIT_ASSEMBLER_RECIPES.recipeBuilder().inputs(GeneticsItems.IntegratedCircuit.get(itemGenetics, 1)).input(CRYSTAL_CENTRAL_PROCESSING_UNIT).input(ADVANCED_SMD_CAPACITOR, 6).input(ADVANCED_SMD_DIODE, 4).input(ADVANCED_SMD_TRANSISTOR, 6).input(wireFine, NiobiumTitanium, 8).outputs(GeneticsItems.IntegratedCPU.get(itemGenetics, 1)).cleanroom(CleanroomType.CLEANROOM).EUt(VA[5]).duration(400).buildAndRegister();
+        CIRCUIT_ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(CraftingReceipe.getItemStack("gregtech:meta_item_1", 403))
+                .inputs(CraftingReceipe.getItemStack("forestry:thermionic_tubes", 5))
+                .fluidInputs(Gold.getFluid(144))
+                .circuitMeta(23)
+                .outputs(GeneticsItems.IntegratedCPU.get(itemGenetics, 1))
+                .EUt(20)
+                .duration(400)
+                .buildAndRegister();
 
         //10 外壳
-        ASSEMBLER_RECIPES.recipeBuilder().inputs(GeneticsItems.LaboratoryCasing.get(itemGenetics, 1)).inputs(GeneticsItems.IntegratedCPU.get(itemGenetics, 8)).input(screw, PPB, 8).input(stick, RhodiumPlatedPalladium, 8).input(wireFine, Platinum, 16).outputs(GeneticsItems.IntegratedCasing.get(itemGenetics, 1)).fluidInputs(Zylon.getFluid(1440)).cleanroom(CleanroomType.CLEANROOM).EUt(VA[5]).duration(800).buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(GeneticsItems.LaboratoryCasing.get(itemGenetics, 1))
+                .inputs(GeneticsItems.IntegratedCPU.get(itemGenetics, 2))
+                .outputs(GeneticsItems.IntegratedCasing.get(itemGenetics, 1))
+                .fluidInputs(Glowstone.getFluid(144*2))
+                .circuitMeta(23)
+                .EUt(480)
+                .duration(800)
+                .buildAndRegister();
 
         RecipeManagers.carpenterManager.addRecipe(100, Binnie.LIQUID.getFluidStack(ManagerLiquid.WATER, 2000), ItemStack.EMPTY,
                 new ItemStack(database),
