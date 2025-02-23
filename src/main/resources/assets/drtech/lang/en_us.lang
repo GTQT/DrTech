@@ -419,6 +419,7 @@ drtech.gui.industrial_apiary.tooltip.1.enabled=Machine is executing
 drtech.gui.industrial_apiary.tooltip.2.disabled=Cancel processing state
 drtech.gui.industrial_apiary.tooltip.2.enabled=Enable processing state
 behavior.matrix_gems.info=Stored Data: %s
+drtech.universal.tooltip.voltage_in=§a动能等级：§f%,d Tire（对应电压 %s§f）
 #Fluid
 gregtech.material.cold_sun_salt=Cold Solar Salt
 gregtech.material.hot_sun_salt=Hot Solar Salt

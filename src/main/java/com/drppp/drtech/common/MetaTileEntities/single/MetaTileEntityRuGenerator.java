@@ -14,6 +14,7 @@ import gregtech.api.metatileentity.TieredMetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import gregtech.client.utils.PipelineUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -132,6 +133,12 @@ public class MetaTileEntityRuGenerator extends TieredMetaTileEntity {
         tooltip.add("利用RU旋转能进行发电");
         tooltip.add("RU->EU转换效率未4:1");
     }
+
+    @Override
+    protected SimpleSidedCubeRenderer getBaseRenderer() {
+        return com.drppp.drtech.Client.Textures.MACHINE_CASINGS[0];
+    }
+
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
         this.renderOverlays(renderState, translation, pipeline);

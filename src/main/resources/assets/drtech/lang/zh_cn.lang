@@ -430,6 +430,7 @@ drtech.gui.industrial_apiary.tooltip.1.enabled=机器正在执行
 drtech.gui.industrial_apiary.tooltip.2.disabled=取消处理状态
 drtech.gui.industrial_apiary.tooltip.2.enabled=启用处理状态
 behavior.matrix_gems.info=已存储数据:%s
+drtech.universal.tooltip.voltage_in=§a动能等级：§f%,d Tire（对应电压 %s§f）
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

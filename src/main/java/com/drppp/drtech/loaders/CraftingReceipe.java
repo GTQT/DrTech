@@ -587,6 +587,25 @@ public class CraftingReceipe {
                 'B', new UnificationEntry(screw, Steel),
                 'A', new UnificationEntry(plate,Bronze)
         );
+        ModHandler.addShapedRecipe("drt_ru_mixer", MetaTileEntities.RU_MIXER.getStackForm(),
+                "AGA",
+                "BCB",
+                "AGA",
+                'C', getItemStack("gregtech:steam_casing"),
+                'G', new UnificationEntry(rotor, Steel),
+                'B', new UnificationEntry(screw, Steel),
+                'A', new UnificationEntry(plate,Bronze)
+        );
+        ModHandler.addShapedRecipe("ru_generator", MetaTileEntities.RU_GENERATOR.getStackForm(),
+                "PCP",
+                "RMR",
+                "EWE",
+                'M', gregtech.common.metatileentities.MetaTileEntities.HULL[GTValues.LV].getStackForm(),
+                'E', MetaItems.ELECTRIC_MOTOR_LV,
+                'R', new UnificationEntry(OrePrefix.rotor, Tin),
+                'C', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
+                'W', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
+                'P', new UnificationEntry(OrePrefix.rotor, Materials.Bronze));
     }
     public static ItemStack getItemStack(String itemstr)
     {
