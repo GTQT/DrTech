@@ -34,6 +34,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import gregtech.client.utils.RenderUtil;
+import gregtech.common.ConfigHolder;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -59,6 +60,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -518,8 +520,8 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         super.clearMachineInventory(itemBuffer);
         //clearInventory(itemBuffer, this.chargerInventory);
     }
-
     protected ModularUI.Builder createGuiTemplate(EntityPlayer player) {
+
         RecipeMap<?> workableRecipeMap = this.workable.getRecipeMap();
         int yOffset = 0;
         if (workableRecipeMap.getMaxInputs() >= 6 || workableRecipeMap.getMaxFluidInputs() >= 6 || workableRecipeMap.getMaxOutputs() >= 6 || workableRecipeMap.getMaxFluidOutputs() >= 6) {
@@ -528,38 +530,44 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
 
         AbstractRecipeLogic var10001 = this.workable;
         Objects.requireNonNull(var10001);
-        ModularUI.Builder var10000 = workableRecipeMap.createUITemplate(var10001::getProgressPercent, this.importItems, this.exportItems, this.importFluids, this.exportFluids, yOffset).widget(new LabelWidget(5, 5, this.getMetaFullName()));
-//                .widget((new SlotWidget(this.chargerInventory, 0, 79, 62 + yOffset, true, true, false))
-//                        .setBackgroundTexture(new IGuiTexture[]{GuiTextures.SLOT, GuiTextures.CHARGER_OVERLAY})
-//                        .setTooltipText("gregtech.gui.charger_slot.tooltip", GTValues.VNF[this.getTier()], GTValues.VNF[this.getTier()]));
+
+        ModularUI.Builder var10000 = workableRecipeMap
+                .createUITemplate(var10001::getProgressPercent, this.importItems, this.exportItems, this.importFluids, this.exportFluids, yOffset)
+                .widget(new LabelWidget(5, 5, this.getMetaFullName()));
+
+        // 反射修改背景纹理
+        try {
+            Field backgroundField = ModularUI.Builder.class.getDeclaredField("background");
+            backgroundField.setAccessible(true);
+
+            IGuiTexture customBackground = GuiTextures.BACKGROUND_STEAM.get(
+                    true);
+            backgroundField.set(var10000, customBackground);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to modify ModularUI background", e);
+        }
+
         ImageWidget var8 = (new ImageWidget(79, 42 + yOffset, 18, 18, GuiTextures.INDICATOR_NO_ENERGY)).setIgnoreColor(true);
         AbstractRecipeLogic var10002 = this.workable;
         Objects.requireNonNull(var10002);
-        ModularUI.Builder builder = var10000.widget(var8.setPredicate(var10002::isHasNotEnoughEnergy)).bindPlayerInventory(player.inventory, GuiTextures.SLOT, yOffset);
+
+        ModularUI.Builder builder = var10000.widget(var8.setPredicate(var10002::isHasNotEnoughEnergy)).bindPlayerInventory(player.inventory, GuiTextures.SLOT_STEAM.get(true), yOffset);
         int leftButtonStartX = 7;
         if (this.exportItems.getSlots() > 0) {
-            builder.widget((new ToggleButtonWidget(leftButtonStartX, 62 + yOffset, 18, 18, GuiTextures.BUTTON_ITEM_OUTPUT, this::isAutoOutputItems, this::setAutoOutputItems)).setTooltipText("gregtech.gui.item_auto_output.tooltip", new Object[0]).shouldUseBaseBackground());
+            builder.widget((new ToggleButtonWidget(leftButtonStartX, 62 + yOffset, 18, 18, GuiTextures.BUTTON_ITEM_OUTPUT, this::isAutoOutputItems, this::setAutoOutputItems)).setTooltipText("gregtech.gui.item_auto_output.tooltip").shouldUseBaseBackground());
             leftButtonStartX += 18;
         }
 
         if (this.exportFluids.getTanks() > 0) {
-            builder.widget((new ToggleButtonWidget(leftButtonStartX, 62 + yOffset, 18, 18, GuiTextures.BUTTON_FLUID_OUTPUT, this::isAutoOutputFluids, this::setAutoOutputFluids)).setTooltipText("gregtech.gui.fluid_auto_output.tooltip", new Object[0]).shouldUseBaseBackground());
+            builder.widget((new ToggleButtonWidget(leftButtonStartX, 62 + yOffset, 18, 18, GuiTextures.BUTTON_FLUID_OUTPUT, this::isAutoOutputFluids, this::setAutoOutputFluids)).setTooltipText("gregtech.gui.fluid_auto_output.tooltip").shouldUseBaseBackground());
             leftButtonStartX += 18;
         }
 
-        int var10004 = 62 + yOffset;
-        String[] var10007 = this.workable.getAvailableOverclockingTiers();
-        AbstractRecipeLogic var10008 = this.workable;
-        Objects.requireNonNull(var10008);
-        IntSupplier var9 = var10008::getOverclockTier;
-        AbstractRecipeLogic var10009 = this.workable;
-        Objects.requireNonNull(var10009);
-        builder.widget((new CycleButtonWidget(leftButtonStartX, var10004, 18, 18, var10007, var9, var10009::setOverclockTier)).setTooltipHoverString("gregtech.gui.overclock.description").setButtonTexture(GuiTextures.BUTTON_OVERCLOCK));
         if (this.exportItems.getSlots() + this.exportFluids.getTanks() <= 9) {
-            ImageWidget logo = (new ImageWidget(152, 63 + yOffset, 17, 17, (Boolean)GTValues.XMAS.get() ? GuiTextures.GREGTECH_LOGO_XMAS : GuiTextures.GREGTECH_LOGO)).setIgnoreColor(true);
             if (this.circuitInventory != null) {
-                SlotWidget circuitSlot = (new GhostCircuitSlotWidget(this.circuitInventory, 0, 124, 62 + yOffset)).setBackgroundTexture(new IGuiTexture[]{GuiTextures.SLOT, this.getCircuitSlotOverlay()});
-                builder.widget(circuitSlot.setConsumer(this::getCircuitSlotTooltip)).widget(logo);
+                SlotWidget circuitSlot = (new GhostCircuitSlotWidget(this.circuitInventory, 0, leftButtonStartX, 62 + yOffset)).setBackgroundTexture(GuiTextures.SLOT_STEAM.get(true), this.getCircuitSlotOverlay());
+                builder.widget(circuitSlot.setConsumer(this::getCircuitSlotTooltip));
             }
         }
 

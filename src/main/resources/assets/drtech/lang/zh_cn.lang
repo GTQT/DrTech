@@ -266,7 +266,13 @@ drtech.machine.rocket_launch_pad.name=火箭发射平台
 drtech.machine.ru_generator.name=旋转能发电机
 drtech.machine.ru_macerator.name=旋转能粉碎机
 drtech.machine.ru_mixer.name=旋转能搅拌机
-
+drtech.machine.ru_sifter.name=旋转能筛
+drtech.machine.ru_compressor.name=旋转能压缩机
+drtech.machine.ru_extruder.name=旋转能提取机
+drtech.machine.ru_hammer.name=旋转能锻造锤
+drtech.machine.ru_wiremill.name=旋转能线材轧机
+drtech.machine.ru_bender.name=旋转能卷板机
+drtech.machine.ru_centrifuge.name=旋转能离心机
 #Materials
 gregtech.material.bedrock=基岩
 

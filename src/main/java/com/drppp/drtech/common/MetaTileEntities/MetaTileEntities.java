@@ -102,8 +102,15 @@ public class MetaTileEntities {
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_16384 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_65536 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityRuGenerator  RU_GENERATOR;
-    public static  MetaTileEntityRuMachine RU_MACERATOR;
-    public static  MetaTileEntityRuMachine RU_MIXER;
+    public static MetaTileEntityRuMachine RU_MACERATOR;
+    public static MetaTileEntityRuMachine RU_MIXER;
+    public static MetaTileEntityRuMachine RU_SIFTER;
+    public static MetaTileEntityRuMachine RU_COMPRESSOR;
+    public static MetaTileEntityRuMachine RU_EXTRUDER;
+    public static MetaTileEntityRuMachine RU_WIREMILL;
+    public static MetaTileEntityRuMachine RU_HAMMER;
+    public static MetaTileEntityRuMachine RU_BENDER;
+    public static MetaTileEntityRuMachine RU_CENTRIFUGE;
     static int startID = 16999;
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
@@ -177,6 +184,13 @@ public class MetaTileEntities {
 
         RU_MACERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_macerator"), RecipeMaps.MACERATOR_RECIPES, Textures.RU_SHREDDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
         RU_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_mixer"), RecipeMaps.MIXER_RECIPES, Textures.RU_MIXER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_SIFTER = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_sifter"), RecipeMaps.SIFTER_RECIPES, Textures.RU_SIFTER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_COMPRESSOR= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_compressor"), RecipeMaps.COMPRESSOR_RECIPES, Textures.RU_COMPRESSOR,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_EXTRUDER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_extruder"), RecipeMaps.EXTRUDER_RECIPES, Textures.RU_EXTRUDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_HAMMER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_hammer"), RecipeMaps.FORGE_HAMMER_RECIPES, Textures.RU_HAMMER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_WIREMILL= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_wiremill"), RecipeMaps.WIREMILL_RECIPES, Textures.RU_WIREMILL,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_BENDER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_bender"), RecipeMaps.BENDER_RECIPES, Textures.RU_BENDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_CENTRIFUGE= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_centrifuge"), RecipeMaps.CENTRIFUGE_RECIPES, Textures.RU_CENTRIFUGE,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();
