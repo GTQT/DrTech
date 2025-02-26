@@ -46,7 +46,7 @@ item.gt.tool.once_hammer.name=Disposable Hammer
 item.gt.tool.once_wire_cutter.name=Disposable Wire Cutter
 item.advanced_rocket.name=Advanced Rocket
 tile.drtech.water_mill.name=Primitive Water Wheel
-tile.drtech.stone_axle.name=Drive Shaft
+tile.drtech.wood_axle.name=Drive Shaft
 
 #FUEL_ROD
 metaitem.u_fuel_rod_1x.name=Fuel Rod (Uranium)

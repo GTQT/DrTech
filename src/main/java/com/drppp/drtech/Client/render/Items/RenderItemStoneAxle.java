@@ -10,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 public class RenderItemStoneAxle extends TileEntityItemStackRenderer {
-    public static final IModelCustom waterMill = AdvancedModelLoader.loadModel(new ResourceLocation(Tags.MODID, "models/obj/stone_axle.obj"));
+    public static final IModelCustom waterMill = AdvancedModelLoader.loadModel(new ResourceLocation(Tags.MODID, "models/obj/wood_axle.obj"));
     ResourceLocation texture = new ResourceLocation(Tags.MODID, "models/obj/water_wheel.png");
     private float rotationAngle = 0.0F;
     private int time=0;

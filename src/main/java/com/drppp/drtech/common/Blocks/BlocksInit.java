@@ -20,7 +20,7 @@ import java.util.Random;
 public class BlocksInit {
     public static final BlockGravitationalAnomaly BLOCK_GRAVITATIONAL_ANOMALY = new BlockGravitationalAnomaly();
     public static final BlockWaterMill BLOCK_WATER_MILL = new BlockWaterMill();
-    public static final BlockStoneAxle BLOCK_STONE_AXLE = new BlockStoneAxle();
+    public static final BlockWoodAxle BLOCK_WOOD_AXLE = new BlockWoodAxle();
     public static final BlockConnector BLOCK_CONNECTOR1 = new BlockConnector(1);
     public static final BlockConnector BLOCK_CONNECTOR2 = new BlockConnector(2);
     public static final BlockConnector BLOCK_CONNECTOR3 = new BlockConnector(3);
@@ -42,9 +42,9 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
         GameRegistry.registerTileEntity(TileEntityGravitationalAnomaly.class, new ResourceLocation(Tags.MODID, "gravitational_anomaly"));
         event.getRegistry().register(BLOCK_WATER_MILL);
-        event.getRegistry().register(BLOCK_STONE_AXLE);
+        event.getRegistry().register(BLOCK_WOOD_AXLE);
         GameRegistry.registerTileEntity(TileEntityWaterMill.class, new ResourceLocation(Tags.MODID, "water_mill"));
-        GameRegistry.registerTileEntity(TileEntityStoneAxle.class, new ResourceLocation(Tags.MODID, "stone_axle"));
+        GameRegistry.registerTileEntity(TileEntityWoodAxle.class, new ResourceLocation(Tags.MODID, "wood_axle"));
         event.getRegistry().register(BLOCK_CONNECTOR1);
         event.getRegistry().register(BLOCK_CONNECTOR2);
         event.getRegistry().register(BLOCK_CONNECTOR3);

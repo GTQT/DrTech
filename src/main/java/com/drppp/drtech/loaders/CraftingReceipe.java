@@ -562,21 +562,19 @@ public class CraftingReceipe {
 
             );
         }
-        ModHandler.addShapedRecipe("drt_twater_mill", new ItemStack(BlocksInit.BLOCK_WATER_MILL),
+        ModHandler.addShapedRecipe("water_mill", new ItemStack(BlocksInit.BLOCK_WATER_MILL),
                 "ABA",
                 "BCB",
                 "ABA",
-                'C', new UnificationEntry(screw, Steel),
+                'C', new UnificationEntry(screw, Iron),
                 'A', new UnificationEntry(frameGt, TreatedWood),
                 'B', new UnificationEntry(plate,TreatedWood)
 
         );
-        ModHandler.addShapedRecipe("drt_wood_axle", new ItemStack(BlocksInit.BLOCK_STONE_AXLE),
-                "AAA",
-                "BCB",
-                "AAA",
-                'C', new UnificationEntry(stick, Steel),
-                'B', new UnificationEntry(screw, Steel),
+        ModHandler.addShapedRecipe("wood_axle", new ItemStack(BlocksInit.BLOCK_WOOD_AXLE),
+                "AAA", "BCB", "AAA",
+                'C', new UnificationEntry(stick, Iron),
+                'B', new UnificationEntry(screw, Iron),
                 'A', new UnificationEntry(plate,TreatedWood)
         );
         ModHandler.addShapedRecipe("ru_macerator", MetaTileEntities.RU_MACERATOR.getStackForm(),
@@ -596,29 +594,32 @@ public class CraftingReceipe {
         ModHandler.addShapedRecipe( "ru_compressor", MetaTileEntities.RU_COMPRESSOR.getStackForm(),
                 "XXX", "PMP", "XXX",
                 'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper),
+                'X',  new UnificationEntry(plate, Materials.Iron),
                 'P', OreDictNames.craftingPiston);
 
         ModHandler.addShapedRecipe( "ru_extruder", MetaTileEntities.RU_EXTRUDER.getStackForm(),
-                "XXX", "PMG", "XXX",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper),
-                'P', OreDictNames.craftingPiston,
-                'G', new UnificationEntry(ring, Materials.Iron));
-
-        ModHandler.addShapedRecipe( "ru_sifter", MetaTileEntities.RU_SIFTER.getStackForm(),
-                "XXX", "PMG", "XXX",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper),
-                'P', OreDictNames.craftingPiston,
-                'G', new UnificationEntry(screw, Materials.Iron));
-
-        ModHandler.addShapedRecipe("ru_hammer", MetaTileEntities.RU_HAMMER.getStackForm(),
-                "XXX", "PMG", "XXX",
+                "GPG", "SMS", "GXG",
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
+                'S', new UnificationEntry(screw, Materials.Tin),
                 'P', OreDictNames.craftingPiston,
-                'G', new UnificationEntry(screw, Materials.Iron));
+                'G', new UnificationEntry(spring, Materials.Copper));
+
+        ModHandler.addShapedRecipe( "ru_sifter", MetaTileEntities.RU_SIFTER.getStackForm(),
+                "GPG", "SMS", "GXG",
+                'M', Blocks.BRICK_BLOCK,
+                'X',  new UnificationEntry(plate, Materials.Iron),
+                'S', new UnificationEntry(spring, Materials.Copper),
+                'P', OreDictNames.craftingPiston,
+                'G', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper));
+
+        ModHandler.addShapedRecipe("ru_hammer", MetaTileEntities.RU_HAMMER.getStackForm(),
+                "GPG", "SMS", "GXG",
+                'M', Blocks.BRICK_BLOCK,
+                'X',  new UnificationEntry(plate, Materials.Iron),
+                'S', new UnificationEntry(spring, Materials.Copper),
+                'P', OreDictNames.craftingPiston,
+                'G', new UnificationEntry(screw, Materials.Tin));
 
         ModHandler.addShapedRecipe( "ru_wiremill", MetaTileEntities.RU_WIREMILL.getStackForm(),
                 "XXX", "PMG", "XXX",
@@ -635,9 +636,10 @@ public class CraftingReceipe {
                 'G', new UnificationEntry(ring, Materials.Iron));
 
         ModHandler.addShapedRecipe("ru_centrifuge", MetaTileEntities.RU_CENTRIFUGE.getStackForm(),
-                "XXX", "PMP", "XXX",
+                "XSX", "PMP", "XSX",
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
+                'S', new UnificationEntry(spring, Materials.Copper),
                 'P', OreDictNames.craftingPiston);
 
         ModHandler.addShapedRecipe("ru_generator", MetaTileEntities.RU_GENERATOR.getStackForm(),

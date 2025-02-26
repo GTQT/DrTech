@@ -4,11 +4,9 @@ package com.drppp.drtech.Client.render;
 import com.drppp.drtech.Client.lib.obj.AdvancedModelLoader;
 import com.drppp.drtech.Client.lib.obj.IModelCustom;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.Tile.TileEntityStoneAxle;
-import com.drppp.drtech.Tile.TileEntityWaterMill;
+import com.drppp.drtech.Tile.TileEntityWoodAxle;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -17,13 +15,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 @SideOnly(Side.CLIENT)
-public class TesrStoneAxle extends TileEntitySpecialRenderer<TileEntityStoneAxle> {
-    public static final IModelCustom waterMill = AdvancedModelLoader.loadModel(new ResourceLocation(Tags.MODID, "models/obj/stone_axle.obj"));
+public class TesrStoneAxle extends TileEntitySpecialRenderer<TileEntityWoodAxle> {
+    public static final IModelCustom waterMill = AdvancedModelLoader.loadModel(new ResourceLocation(Tags.MODID, "models/obj/wood_axle.obj"));
     ResourceLocation texture = new ResourceLocation(Tags.MODID, "models/obj/water_wheel.png");
     private float rotationAngle = 0.0F;
     private int time=0;
     @Override
-    public void render(TileEntityStoneAxle te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+    public void render(TileEntityWoodAxle te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
 
         GlStateManager.pushMatrix();
         FMLClientHandler.instance().getClient().getTextureManager().bindTexture(texture);
@@ -49,7 +47,7 @@ public class TesrStoneAxle extends TileEntitySpecialRenderer<TileEntityStoneAxle
     }
 
     @Override
-    public boolean isGlobalRenderer(TileEntityStoneAxle te) {
+    public boolean isGlobalRenderer(TileEntityWoodAxle te) {
         return true;
     }
 

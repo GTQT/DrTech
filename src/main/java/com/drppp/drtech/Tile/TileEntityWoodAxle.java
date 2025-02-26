@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 
-public class TileEntityStoneAxle extends TileEntity implements ITickable, IRotationSpeed {
+public class TileEntityWoodAxle extends TileEntity implements ITickable, IRotationSpeed {
 
     private IRotationEnergy ru = new RotationEnergyHandler();
     private EnumFacing facing = EnumFacing.NORTH;
@@ -60,14 +60,14 @@ public class TileEntityStoneAxle extends TileEntity implements ITickable, IRotat
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        this.facing = EnumFacing.byHorizontalIndex(compound.getInteger("facing"));
+        this.facing = EnumFacing.byIndex(compound.getInteger("facing"));
         this.rotationSpeed = compound.getInteger("rotationSpeed");
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        compound.setInteger("facing", this.facing.getHorizontalIndex());
+        compound.setInteger("facing", this.facing.getIndex());
         compound.setInteger("rotationSpeed", this.rotationSpeed);
         return compound;
     }
@@ -93,7 +93,7 @@ public class TileEntityStoneAxle extends TileEntity implements ITickable, IRotat
                     if(ru.getEnergyOutput()> DrtConfig.MaxRu)
                     {
                         getWorld().setBlockToAir(getPos());
-                        getWorld().spawnEntity(new EntityItem(getWorld(),getPos().getX(),getPos().getY(),getPos().getZ(),new ItemStack(ItemsInit.ITEM_BLOCK_STONE_AXLE)));
+                        getWorld().spawnEntity(new EntityItem(getWorld(),getPos().getX(),getPos().getY(),getPos().getZ(),new ItemStack(ItemsInit.ITEM_BLOCK_WOOD_AXLE)));
                     }
                 }else
                 {
