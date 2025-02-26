@@ -17,6 +17,8 @@ public class DrtechCommonCapabilities {
     public static Capability<INeutronReflector> CAPABILITY_NEUTRON_REFLECTOR= null;
     @CapabilityInject(ICoolantCell.class)
     public static Capability<ICoolantCell> CAPABILITY_COOLANT_CELL= null;
-    @CapabilityInject(ICoolantCell.class)
+    @CapabilityInject(IRotationEnergy.class)
     public static Capability<IRotationEnergy> CAPABILITY_ROTATION_ENERGY= null;
+    @CapabilityInject(IHeatEnergy.class)
+    public static Capability<IHeatEnergy> CAPABILITY_HEAT_ENERGY= null;
 }

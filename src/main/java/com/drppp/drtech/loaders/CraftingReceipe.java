@@ -648,10 +648,10 @@ public class CraftingReceipe {
                 "EWE",
                 'M', gregtech.common.metatileentities.MetaTileEntities.HULL[GTValues.LV].getStackForm(),
                 'E', MetaItems.ELECTRIC_MOTOR_LV,
-                'R', new UnificationEntry(OrePrefix.rotor, Tin),
+                'R', new UnificationEntry(gear, Tin),
                 'C', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
                 'W', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
-                'P', new UnificationEntry(OrePrefix.rotor, Materials.Bronze));
+                'P', new UnificationEntry(OrePrefix.gear, Materials.Bronze));
 
         ModHandler.removeRecipeByName("gregtech:dust_bronze");
         ModHandler.removeRecipeByName("gregtech:dust_brass");

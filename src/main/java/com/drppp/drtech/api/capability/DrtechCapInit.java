@@ -1,5 +1,7 @@
 package com.drppp.drtech.api.capability;
 
+import com.drppp.drtech.api.capability.impl.HeatEnergyHandler;
+import com.drppp.drtech.api.capability.impl.HeatEnergyStore;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
 import com.drppp.drtech.api.capability.impl.RotationEnergyStore;
 import gregtech.api.capability.SimpleCapabilityManager;
@@ -35,5 +37,6 @@ public class DrtechCapInit {
         registerCapabilityWithNoDefault(ICoolantCell.class);
         registerCapabilityWithNoDefault(INuclearDataShow.class);
         CapabilityManager.INSTANCE.register(IRotationEnergy.class,new RotationEnergyStore(), RotationEnergyHandler::new);
+        CapabilityManager.INSTANCE.register(IHeatEnergy.class,new HeatEnergyStore(), HeatEnergyHandler::new);
     }
 }

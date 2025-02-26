@@ -172,7 +172,7 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
     }
     @SideOnly(Side.CLIENT)
     protected SimpleSidedCubeRenderer getBaseRenderer() {
-        return com.drppp.drtech.Client.Textures.MACHINE_CASINGS[0];
+        return com.drppp.drtech.Client.Textures.MACHINE_CASINGS[this.getTier()-1];
     }
     @SideOnly(Side.CLIENT)
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
