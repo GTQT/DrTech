@@ -16,6 +16,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEnti
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.*;
 import com.drppp.drtech.common.MetaTileEntities.single.*;
+import com.drppp.drtech.common.MetaTileEntities.single.hu.MetaTileEntityCombustionchamber;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
@@ -111,6 +112,8 @@ public class MetaTileEntities {
     public static MetaTileEntityRuMachine RU_HAMMER;
     public static MetaTileEntityRuMachine RU_BENDER;
     public static MetaTileEntityRuMachine RU_CENTRIFUGE;
+    public static MetaTileEntityCombustionchamber HU_BURRING_BOXS[] = new MetaTileEntityCombustionchamber[8];
+    public static MetaTileEntityCombustionchamber HU_DENSE_BURRING_BOXS[] = new MetaTileEntityCombustionchamber[8];
     static int startID = 16999;
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
@@ -191,6 +194,15 @@ public class MetaTileEntities {
         RU_WIREMILL= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_wiremill"), RecipeMaps.WIREMILL_RECIPES, Textures.RU_WIREMILL,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
         RU_BENDER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_bender"), RecipeMaps.BENDER_RECIPES, Textures.RU_BENDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
         RU_CENTRIFUGE= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_centrifuge"), RecipeMaps.CENTRIFUGE_RECIPES, Textures.RU_CENTRIFUGE,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        for (int i = 0; i < HU_BURRING_BOXS.length; i++) {
+            String[] names = {"qian","qingtong","gang","yingang","ge","tai","wu","wugang"};
+            int[] color = {0x251945,0x815024,0x4F4F4E,0x87875C,0xA39393,0x896495,0x1D1D1D,0x3C3C61};
+            double[] efficiency = {0.5,0.75,0.7,1,0.85,0.85,1,0.9};
+            int[] output = {16,24,32,16,112,96,128,128};
+            HU_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId(names[i]+"_burring_box"),color[i],efficiency[i],output[i]));
+            HU_DENSE_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId("dense_"+names[i]+"_burring_box"),color[i],efficiency[i],output[i]*4));
+        }
+
         //人工分配 ID 17100
         for (int i = 0; i < 10; i++) {
             tierName = GTValues.VN[i].toLowerCase();

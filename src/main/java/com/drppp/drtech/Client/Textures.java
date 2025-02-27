@@ -53,6 +53,9 @@ public class Textures {
     public static OrientedOverlayRenderer RU_WIREMILL;
     public static OrientedOverlayRenderer RU_BENDER;
     public static OrientedOverlayRenderer RU_CENTRIFUGE;
+    public static OrientedOverlayRenderer HU_BASE_BURRING_BOX;
+    public static  SimpleOverlayRenderer HU_BURRING_BOX_SIDE_OVERLAY;
+    public static  SimpleOverlayRenderer HU_BURRING_BOX_SIDE_FULL_OVERLAY;
     public static OrientedOverlayRenderer FILTER_OVERLAY;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY;
     public static SimpleOverlayRenderer MULTIPART_WIRELESS_ENERGY_4x;
@@ -71,6 +74,7 @@ public class Textures {
     public static final TextureArea CHECK_MARK = TextureArea.fullImage("textures/gui/checkmark.png");
     public static final CentrifugeRender CENTRIFUGE_RENDER = new CentrifugeRender();
     public static final SimpleSidedCubeRenderer[] MACHINE_CASINGS = new SimpleSidedCubeRenderer[4];
+    public static final SimpleSidedCubeRenderer BASE_BURRING_BOX_TEXTURE = new SimpleSidedCubeRenderer("casings/drtmachine/base");
     public static void init()
     {
         MULTIPART_WIRELESS_ENERGY = new SimpleOverlayRenderer("wireless_hatch/overlay_front");
@@ -100,6 +104,9 @@ public class Textures {
         RU_WIREMILL = new OrientedOverlayRenderer("machines/ru_wiremill");
         RU_BENDER= new OrientedOverlayRenderer("machines/ru_bender");
         RU_CENTRIFUGE= new OrientedOverlayRenderer("machines/ru_centrifuge");
+        HU_BASE_BURRING_BOX= new OrientedOverlayRenderer("machines/hu_base_burring_box");
+        HU_BURRING_BOX_SIDE_OVERLAY = new SimpleOverlayRenderer("casings/hu_burring_box_side_overlay");
+        HU_BURRING_BOX_SIDE_FULL_OVERLAY = new SimpleOverlayRenderer("casings/hu_burring_box_side_full_overlay");
         FILTER_OVERLAY = new OrientedOverlayRenderer("machines/type_filter");
         MASS_GENERATION_CASING = new SimpleOverlayRenderer("casings/mass_generation_casing");
         ASEPTIC_MACHINE_CASING = new SimpleOverlayRenderer("casings/aseptic_machine_casing");
