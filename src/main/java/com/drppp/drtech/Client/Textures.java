@@ -53,6 +53,7 @@ public class Textures {
     public static OrientedOverlayRenderer RU_WIREMILL;
     public static OrientedOverlayRenderer RU_BENDER;
     public static OrientedOverlayRenderer RU_CENTRIFUGE;
+    public static OrientedOverlayRenderer RU_SPLITTER;
     public static OrientedOverlayRenderer HU_BASE_BURRING_BOX;
     public static  SimpleOverlayRenderer HU_BURRING_BOX_SIDE_OVERLAY;
     public static  SimpleOverlayRenderer HU_BURRING_BOX_SIDE_FULL_OVERLAY;
@@ -104,6 +105,7 @@ public class Textures {
         RU_WIREMILL = new OrientedOverlayRenderer("machines/ru_wiremill");
         RU_BENDER= new OrientedOverlayRenderer("machines/ru_bender");
         RU_CENTRIFUGE= new OrientedOverlayRenderer("machines/ru_centrifuge");
+        RU_SPLITTER= new OrientedOverlayRenderer("machines/ru_splitter");
         HU_BASE_BURRING_BOX= new OrientedOverlayRenderer("machines/hu_base_burring_box");
         HU_BURRING_BOX_SIDE_OVERLAY = new SimpleOverlayRenderer("casings/hu_burring_box_side_overlay");
         HU_BURRING_BOX_SIDE_FULL_OVERLAY = new SimpleOverlayRenderer("casings/hu_burring_box_side_full_overlay");

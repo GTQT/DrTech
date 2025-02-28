@@ -256,7 +256,7 @@ public class MetaTileEntityCombustionchamber extends MetaTileEntity {
                 if(GTUtility.getMetaTileEntity(getWorld(),this.getPos().offset(EnumFacing.UP)) instanceof MetaTileEntityHeatHatch)
                 {
                     var hatch = (MetaTileEntityHeatHatch)GTUtility.getMetaTileEntity(getWorld(),this.getPos().offset(EnumFacing.UP));
-                    hatch.addHeat(this.hu.getHeat()*2,10);
+                    hatch.addHeat(this.hu.getHeat(),1);
                 }
             }
         }

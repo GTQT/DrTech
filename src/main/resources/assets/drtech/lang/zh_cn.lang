@@ -273,6 +273,7 @@ drtech.machine.ru_hammer.name=旋转能锻造锤
 drtech.machine.ru_wiremill.name=旋转能线材轧机
 drtech.machine.ru_bender.name=旋转能卷板机
 drtech.machine.ru_centrifuge.name=旋转能离心机
+drtech.machine.ru_splitter.name=分轴器
 drtech.machine.qian_burring_box.name=固体燃烧室(铅)
 drtech.machine.qingtong_burring_box.name=固体燃烧室(青铜)
 drtech.machine.gang_burring_box.name=固体燃烧室(钢)

@@ -37,8 +37,12 @@ public class TesrStoneAxle extends TileEntitySpecialRenderer<TileEntityWoodAxle>
             GlStateManager.rotate(180, 0, 1, 0);
         } else if (facing == EnumFacing.WEST) {
             GlStateManager.rotate(90, 0, 1, 0);
+        }else if (facing == EnumFacing.UP) {
+            GlStateManager.rotate(90, 1, 0, 0);
+        }else if (facing == EnumFacing.DOWN) {
+            GlStateManager.rotate(270, 1, 0, 0);
         }
-        GlStateManager.scale(1.8F, 1.8F, 1.8F);
+        GlStateManager.scale(1.2F, 1.2F, 1.2F);
         float rotationSpeed = te.getRotationSpeed();
         float rotationAngle = (te.getRotationTicks() + partialTicks) * rotationSpeed;
         GlStateManager.rotate(rotationAngle % 360.0F, 0, 0, 1);

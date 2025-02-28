@@ -23,10 +23,10 @@ import javax.annotation.Nullable;
 
 public class BlockWoodAxle extends Block {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
-    private static final AxisAlignedBB hitboxEW = new AxisAlignedBB(0, 0, 0, 1.5, .5, .5).offset(0, 0.25, 0.25);
-    private static final AxisAlignedBB hitboxSN = new AxisAlignedBB(0, 0, 0, .5, .5, 1.5).offset(0.25, 0.25, 0);
+    private static final AxisAlignedBB hitboxEW = new AxisAlignedBB(0, 0, 0, 1, .5, .5).offset(0, 0.25, 0.25);
+    private static final AxisAlignedBB hitboxSN = new AxisAlignedBB(0, 0, 0, .5, .5, 1).offset(0.25, 0.25, 0);
     // 在类顶部添加垂直方向的AABB定义
-    private static final AxisAlignedBB hitboxUD = new AxisAlignedBB(0.25, 0, 0.25, 0.75, 1.5, 0.75).offset(0, -0.25, 0);
+    private static final AxisAlignedBB hitboxUD = new AxisAlignedBB(0.25, 0, 0.25, 0.75, 1, 0.75).offset(0, -0.25, 0);
 
     public BlockWoodAxle() {
         super(Material.ROCK);

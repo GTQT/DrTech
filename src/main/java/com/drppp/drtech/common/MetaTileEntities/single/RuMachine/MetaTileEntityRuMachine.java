@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.MetaTileEntities.muti.electric.RuMachine;
+package com.drppp.drtech.common.MetaTileEntities.single.RuMachine;
 
 import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
@@ -23,7 +23,6 @@ import gregtech.api.gui.resources.TextureArea;
 import gregtech.api.gui.widgets.*;
 import gregtech.api.items.itemhandlers.GTItemStackHandler;
 import gregtech.api.metatileentity.MetaTileEntity;
-import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.metatileentity.WorkableTieredMetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.recipes.RecipeMap;
@@ -34,7 +33,6 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import gregtech.client.utils.RenderUtil;
-import gregtech.common.ConfigHolder;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -48,7 +46,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -65,7 +62,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.IntSupplier;
 
 public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  implements IActiveOutputSide, IGhostSlotConfigurable {
 
@@ -598,6 +594,7 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
     }
 
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, boolean advanced) {
+        tooltip.add("可接受RU方向:"+getAcceptFacingString());
         tooltip.add(I18n.format("drtech.universal.tooltip.voltage_in", this.getTier(), GTValues.VNF[this.getTier()]));
         if (this.workable.getRecipeMap().getMaxFluidInputs() != 0) {
             tooltip.add(I18n.format("gregtech.universal.tooltip.fluid_storage_capacity", this.getTankScalingFunction().apply(this.getTier())));
@@ -609,7 +606,22 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         }
 
     }
-
+    private String getAcceptFacingString()
+    {
+        StringBuilder res= new StringBuilder();
+        for (var s: acceptFacing)
+        {
+            switch (s){
+                case UP -> res.append("上/");
+                case DOWN -> res.append("下/");
+                case LEFT -> res.append("左/");
+                case RIGHT -> res.append("右/");
+                case FRONT -> res.append("前/");
+                case BACK -> res.append("后/");
+            }
+        }
+        return res.toString();
+    }
     public boolean needsSneakToRotate() {
         return true;
     }

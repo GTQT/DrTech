@@ -6,6 +6,7 @@ import com.drppp.drtech.api.capability.IRotationEnergy;
 import com.drppp.drtech.api.capability.IRotationSpeed;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
 import com.drppp.drtech.common.Items.ItemsInit;
+import gregtech.api.util.GTUtility;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -82,7 +83,7 @@ public class TileEntityWoodAxle extends TileEntity implements ITickable, IRotati
         }
         if(!getWorld().isRemote)
         {
-            BlockPos oppositePos = pos.offset(facing.getOpposite()).offset(facing.getOpposite());
+            BlockPos oppositePos = pos.offset(facing.getOpposite());
             if (world.isBlockLoaded(oppositePos)) {
                 var tile =  world.getTileEntity(oppositePos);
                 if(tile!=null && tile.hasCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing))
@@ -90,6 +91,8 @@ public class TileEntityWoodAxle extends TileEntity implements ITickable, IRotati
                     this.ru = tile.getCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing);
                     if(tile instanceof IRotationSpeed)
                         this.setRotationSpeed(((IRotationSpeed)tile).getSpeed());
+                    else if(GTUtility.getMetaTileEntity(getWorld(),oppositePos) instanceof IRotationSpeed)
+                        this.setRotationSpeed(((IRotationSpeed)GTUtility.getMetaTileEntity(getWorld(),oppositePos)).getSpeed());
                     if(ru.getEnergyOutput()> DrtConfig.MaxRu)
                     {
                         getWorld().setBlockToAir(getPos());

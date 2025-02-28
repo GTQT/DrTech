@@ -1,6 +1,6 @@
 package com.drppp.drtech.Mixin.gregtech;
 
-import com.drppp.drtech.common.MetaTileEntities.muti.electric.RuMachine.MetaTileEntityRuMachine;
+import com.drppp.drtech.common.MetaTileEntities.single.RuMachine.MetaTileEntityRuMachine;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.TextFormattingUtil;
