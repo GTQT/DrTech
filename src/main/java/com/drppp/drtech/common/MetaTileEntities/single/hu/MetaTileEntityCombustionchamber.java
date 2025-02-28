@@ -23,6 +23,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import gregtech.client.utils.RenderUtil;
+import keqing.gtqtcore.common.metatileentities.multi.multiblockpart.MetaTileEntityHeatHatch;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLiving;
@@ -252,7 +253,11 @@ public class MetaTileEntityCombustionchamber extends MetaTileEntity {
                 {
                     clearOut();
                 }
-
+                if(GTUtility.getMetaTileEntity(getWorld(),this.getPos().offset(EnumFacing.UP)) instanceof MetaTileEntityHeatHatch)
+                {
+                    var hatch = (MetaTileEntityHeatHatch)GTUtility.getMetaTileEntity(getWorld(),this.getPos().offset(EnumFacing.UP));
+                    hatch.addHeat(this.hu.getHeat()*2,10);
+                }
             }
         }
     }
