@@ -1,5 +1,6 @@
 package com.drppp.drtech.common.Items;
 
+import com.drppp.drtech.Client.render.Items.RenderItemAdvancedRocket;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
@@ -79,6 +80,7 @@ public class ItemsInit {
     }
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
+        ITEM_ROCKET.setTileEntityItemStackRenderer(new RenderItemAdvancedRocket());
         registerItemModel(BlocksInit.TRANSPARENT_CASING1);
         registerItemModel(BlocksInit.COMMON_CASING);
         registerItemModel(BlocksInit.COMMON_CASING1);

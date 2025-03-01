@@ -13,7 +13,9 @@ public class SyncInit {
         // 第一个参数是数据包ID
         NETWORK.registerMessage(UpdateTileEntityPacketHandler.class, UpdateTileEntityPacket.class, 0, Side.SERVER);
         NETWORK_CLIENT.registerMessage(UpdateTileEntityPacketClinetHandler.class, UpdateTileEntityPacket.class, 1, Side.CLIENT);
-        ROCKET_NETWORK.registerMessage(PacketSyncDimension.Handler.class,PacketSyncDimension.class,2,Side.CLIENT);
         PRESSED_NETWORK.registerMessage(PacketJumpKey.Handler.class, PacketJumpKey.class, 3, Side.SERVER);
+    }
+    public static void ClieantInit() {
+        ROCKET_NETWORK.registerMessage(PacketSyncDimension.Handler.class,PacketSyncDimension.class,2,Side.CLIENT);
     }
 }

@@ -21,6 +21,7 @@ import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.util.GTHashMaps;
+import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiFluidHatch;
@@ -108,6 +109,11 @@ public class MetaTileentityItemAndFluidHatch  extends MetaTileEntityMultiblockNo
             }
         }
 
+    }
+
+    @Override
+    public void onRemoval() {
+        super.onRemoval();
     }
 
     public void removeFromMultiBlock(MultiblockControllerBase controllerBase) {

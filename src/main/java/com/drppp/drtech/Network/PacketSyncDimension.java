@@ -40,18 +40,20 @@ public class PacketSyncDimension implements IMessage {
         @Override
         public IMessage onMessage(PacketSyncDimension message, MessageContext ctx) {
             // 在客户端主线程执行
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                EntityPlayer player = Minecraft.getMinecraft().player;
-                if (player != null) {
-                    // 更新客户端玩家的维度和位置
-                    player.dimension = message.dimension;
-                    player.setPositionAndUpdate(
-                            message.pos.getX() + 0.5,
-                            message.pos.getY(),
-                            message.pos.getZ() + 0.5
-                    );
-                }
-            });
+            if (ctx.side.isClient()) {
+                Minecraft.getMinecraft().addScheduledTask(() -> {
+                    EntityPlayer player = Minecraft.getMinecraft().player;
+                    if (player != null) {
+                        // 更新客户端玩家的维度和位置
+                        player.dimension = message.dimension;
+                        player.setPositionAndUpdate(
+                                message.pos.getX() + 0.5,
+                                message.pos.getY(),
+                                message.pos.getZ() + 0.5
+                        );
+                    }
+                });
+            }
             return null; // 不需要返回消息
         }
     }

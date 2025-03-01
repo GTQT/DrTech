@@ -21,7 +21,6 @@ public class ItemAdvancedRocket extends Item{
         this.setTranslationKey("advanced_rocket");
         this.setRegistryName("advanced_rocket");
         this.setCreativeTab(DrTechMain.DrTechTab); // 设置创造模式标签
-        this.setTileEntityItemStackRenderer(new RenderItemAdvancedRocket());
     }
 
     @Override
