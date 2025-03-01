@@ -38,6 +38,7 @@ public abstract class MinxinRecipeMapMultiblockController extends MultiblockWith
     protected IMultipleTankHandler outputFluidInventory;
     @Shadow
     public  RecipeMap<?> recipeMap;
+
     public MinxinRecipeMapMultiblockController(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }

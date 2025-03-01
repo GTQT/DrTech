@@ -66,8 +66,6 @@ public class MetaTileentityItemAndFluidHatch  extends MetaTileEntityMultiblockNo
     }
     protected void initializeInventory() {
 
-
-
         FluidTank[] fluidsHandlers = new FluidTank[numSlots];
         List<FluidTank> tankslist = new ArrayList<>();
         for(int i = 0; i < fluidsHandlers.length; ++i) {
@@ -125,7 +123,6 @@ public class MetaTileentityItemAndFluidHatch  extends MetaTileEntityMultiblockNo
                 }
             }
         }
-
     }
     protected FluidTankList createImportFluidHandler() {
         return this.isExportHatch ? new FluidTankList(false) : (FluidTankList) this.FluidAndItemStore;

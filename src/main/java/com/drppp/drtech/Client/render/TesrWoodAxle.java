@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 @SideOnly(Side.CLIENT)
-public class TesrStoneAxle extends TileEntitySpecialRenderer<TileEntityWoodAxle> {
+public class TesrWoodAxle extends TileEntitySpecialRenderer<TileEntityWoodAxle> {
     public static final IModelCustom waterMill = AdvancedModelLoader.loadModel(new ResourceLocation(Tags.MODID, "models/obj/wood_axle.obj"));
     ResourceLocation texture = new ResourceLocation(Tags.MODID, "models/obj/water_wheel.png");
     private float rotationAngle = 0.0F;

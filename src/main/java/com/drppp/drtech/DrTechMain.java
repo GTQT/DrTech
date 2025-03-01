@@ -4,7 +4,7 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.Client.render.TesrStoneAxle;
+import com.drppp.drtech.Client.render.TesrWoodAxle;
 import com.drppp.drtech.Client.render.TesrWaterMill;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
@@ -121,7 +121,7 @@ public class DrTechMain {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWaterMill.class, new TesrWaterMill());
-            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWoodAxle.class, new TesrStoneAxle());
+            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWoodAxle.class, new TesrWoodAxle());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
