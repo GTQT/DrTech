@@ -11,6 +11,7 @@ import gregtech.api.GTValues;
 import gregtech.api.items.OreDictNames;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
+import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.unification.stack.UnificationEntry;
@@ -27,7 +28,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import static com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.BENEATH_TRANS;
+import static com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.*;
 import static gregicality.multiblocks.api.unification.GCYMMaterials.MolybdenumDisilicide;
 import static gregtech.api.GTValues.*;
 import static gregtech.api.GTValues.MV;
@@ -642,6 +643,12 @@ public class CraftingReceipe {
                 'S', new UnificationEntry(spring, Materials.Copper),
                 'P', OreDictNames.craftingPiston);
 
+        ModHandler.addShapedRecipe("ru_splitter", MetaTileEntities.RU_SPLITTER.getStackForm(),
+                "XPX", "PMP", "XPX",
+                'M', Blocks.BRICK_BLOCK,
+                'X', new UnificationEntry(ring, Materials.Iron),
+                'P', OreDictNames.craftingPiston);
+
         ModHandler.addShapedRecipe("ru_generator", MetaTileEntities.RU_GENERATOR.getStackForm(),
                 "PCP",
                 "RMR",
@@ -656,6 +663,27 @@ public class CraftingReceipe {
         ModHandler.removeRecipeByName("gregtech:dust_bronze");
         ModHandler.removeRecipeByName("gregtech:dust_brass");
         ModHandler.removeRecipeByName("gregtech:potin_dust");
+
+        Material[] materials =new Material[]{
+                Materials.Lead,Materials.Bronze,Materials.Steel,Materials.Invar,Materials.Chrome,Materials.Titanium,Materials.Tungsten,Materials.TungstenSteel};
+
+        for (int i = 0; i < HU_BURRING_BOXS.length; i++) {
+            // 基础燃烧室配方
+            ModHandler.addShapedRecipe(HU_BURRING_BOXS[i].getMetaName(),
+                    HU_BURRING_BOXS[i].getStackForm(),
+                    "PCP", "CMC", "PCP",
+                    'P', new UnificationEntry(plate, materials[i]),
+                    'C', new UnificationEntry(ring, materials[i]),
+                    'M', gregtech.common.metatileentities.MetaTileEntities.STEAM_BOILER_COAL_BRONZE.getStackForm()); // 机械方块
+
+            // 密集燃烧室配方（输出x4）
+            ModHandler.addShapedRecipe(HU_DENSE_BURRING_BOXS[i].getMetaName(),
+                    HU_DENSE_BURRING_BOXS[i].getStackForm(),
+                    "PCP", "CMC", "PCP",
+                    'P', new UnificationEntry(plateDense, materials[i]),
+                    'C', new UnificationEntry(ring, materials[i]),
+                    'M', gregtech.common.metatileentities.MetaTileEntities.STEAM_BOILER_COAL_STEEL.getStackForm()); // 机械方块
+        }
     }
     public static ItemStack getItemStack(String itemstr)
     {
