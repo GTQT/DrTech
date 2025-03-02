@@ -32,96 +32,80 @@ import java.util.List;
 public class TopCommonProvider implements IProbeInfoProvider {
     @Override
     public String getID() {
-        return Tags.MODID+":top_common_provider";
+        return Tags.MODID + ":top_common_provider";
     }
 
     @Override
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, EntityPlayer entityPlayer, World world, IBlockState iBlockState, IProbeHitData iProbeHitData) {
         boolean flag = false;
-        if (Loader.isModLoaded("baubles"))
-        {
+        if (Loader.isModLoaded("baubles")) {
 
             IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(entityPlayer);
             for (int i = 0; i < baubles.getSlots(); ++i) {
                 ItemStack stack = baubles.getStackInSlot(i);
-                if (stack.getItem()== DrMetaItems.TELEPATHIC_NECKLACE.getMetaItem() && stack.getMetadata()==DrMetaItems.TELEPATHIC_NECKLACE.getMetaValue()) {
-                    flag=true;
+                if (stack.getItem() == DrMetaItems.TELEPATHIC_NECKLACE.getMetaItem() && stack.getMetadata() == DrMetaItems.TELEPATHIC_NECKLACE.getMetaValue()) {
+                    flag = true;
                 }
             }
         }
-        if(world.getTileEntity(iProbeHitData.getPos())!=null && world.getTileEntity(iProbeHitData.getPos()) instanceof IRotationSpeed)
-        {
-            IRotationSpeed rs = (IRotationSpeed) world.getTileEntity(iProbeHitData.getPos());
-            iProbeInfo.text(TextFormatting.BOLD+"旋转动量:"+ TextFormatting.GREEN+rs.getEnergy().getEnergyOutput()+"/"+ DrtConfig.MaxRu +"RU");
-            iProbeInfo.text(TextFormatting.BOLD+"输出方向:"+TextFormatting.GREEN+rs.getFacing());
-            iProbeInfo.text(TextFormatting.BOLD+"旋转速度:"+TextFormatting.GREEN+rs.getSpeed());
+        if (world.getTileEntity(iProbeHitData.getPos()) != null && world.getTileEntity(iProbeHitData.getPos()) instanceof IRotationSpeed rs) {
+            iProbeInfo.text(TextFormatting.BOLD + "旋转动量:" + TextFormatting.GREEN + rs.getEnergy().getEnergyOutput() + "/" + DrtConfig.MaxRu + "RU");
+            iProbeInfo.text(TextFormatting.BOLD + "输出方向:" + TextFormatting.GREEN + rs.getFacing());
+            iProbeInfo.text(TextFormatting.BOLD + "旋转速度:" + TextFormatting.GREEN + rs.getSpeed());
         }
-        if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityCombustionchamber)
-        {
-            MetaTileEntityCombustionchamber s = (MetaTileEntityCombustionchamber) GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
-            ItemStack item  =s.getImportItems().getStackInSlot(0).copy();
-            ItemStack itemout  =s.getExportItems().getStackInSlot(0).copy();
-            iProbeInfo.text(TextFormatting.BOLD+"工作状态:"+ TextFormatting.GREEN+s.isActive);
-            iProbeInfo.text(TextFormatting.BOLD+"燃烧速度:"+ TextFormatting.GREEN+s.burnSpeed);
-            iProbeInfo.text(TextFormatting.BOLD+"燃烧热量:"+TextFormatting.GREEN+s.currentItemHasBurnedTime+"/"+s.currentItemBurnTime);
-            iProbeInfo.text(TextFormatting.BOLD+"HU输出:"+TextFormatting.GREEN+s.outPutHu);
-            iProbeInfo.text(TextFormatting.BOLD+"缓存物品:"+TextFormatting.GREEN+(item.isEmpty()?"无":item.getDisplayName()+"*"+item.getCount()));
-            iProbeInfo.text(TextFormatting.BOLD+"灰烬栏状态:"+TextFormatting.GREEN+(itemout.isEmpty()?"无":itemout.getCount()+"/64"));
+        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityCombustionchamber s) {
+            ItemStack item = s.getImportItems().getStackInSlot(0).copy();
+            ItemStack itemout = s.getExportItems().getStackInSlot(0).copy();
+            iProbeInfo.text(TextFormatting.BOLD + "工作状态:" + TextFormatting.GREEN + s.isActive);
+            iProbeInfo.text(TextFormatting.BOLD + "燃烧速度:" + TextFormatting.GREEN + s.burnSpeed);
+            iProbeInfo.text(TextFormatting.BOLD + "燃烧热量:" + TextFormatting.GREEN + s.currentItemHasBurnedTime + "/" + s.currentItemBurnTime);
+            iProbeInfo.text(TextFormatting.BOLD + "HU输出:" + TextFormatting.GREEN + s.outPutHu);
+            iProbeInfo.text(TextFormatting.BOLD + "缓存物品:" + TextFormatting.GREEN + (item.isEmpty() ? "无" : item.getDisplayName() + "*" + item.getCount()));
+            iProbeInfo.text(TextFormatting.BOLD + "灰烬栏状态:" + TextFormatting.GREEN + (itemout.isEmpty() ? "无" : itemout.getCount() + "/64"));
         }
-        if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityBaseWithControl)
-        {
-            MetaTileEntityBaseWithControl s = (MetaTileEntityBaseWithControl) GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
+        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityBaseWithControl s) {
             iProbeInfo.progress(s.getProgress(), s.getMaxProgress(), iProbeInfo.defaultProgressStyle()
                     .suffix(" / " + TextFormattingUtil.formatNumbers(s.getMaxProgress()) + " t")
                     .filledColor(0xFFEEE600)
                     .alternateFilledColor(0xFFEEE600)
                     .borderColor(0xFF555555).numberFormat(mcjty.theoneprobe.api.NumberFormat.COMMAS));
-            if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityMatrixSolver)
-            {
-                MetaTileEntityMatrixSolver ss= (MetaTileEntityMatrixSolver) GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
-                iProbeInfo.text("耗电:"+ss.EUT+"Eu/t");
+            if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityMatrixSolver ss) {
+                iProbeInfo.text("耗电:" + ss.EUT + "Eu/t");
                 iProbeInfo.text("产出信息:");
-                if(ss.isWorkingEnabled() && ss.run_recipe!=null)
-                {
-                    for (var item:ss.run_recipe.outputItems) {
-                        iProbeInfo.text(item.getDisplayName() +"*"+item.getCount());
+                if (ss.isWorkingEnabled() && ss.run_recipe != null) {
+                    for (var item : ss.run_recipe.outputItems) {
+                        iProbeInfo.text(item.getDisplayName() + "*" + item.getCount());
                     }
-                    for (var fluid:ss.run_recipe.outputFluids) {
-                        iProbeInfo.text(fluid.getLocalizedName() +"*"+fluid.amount);
+                    for (var fluid : ss.run_recipe.outputFluids) {
+                        iProbeInfo.text(fluid.getLocalizedName() + "*" + fluid.amount);
                     }
                 }
             }
         }
-        if(entityPlayer.isSneaking() || flag)
-        {
-            addProbeInfoWithGlassOrSneak(probeMode,iProbeInfo,entityPlayer,world,iBlockState,iProbeHitData);
+        if (entityPlayer.isSneaking() || flag) {
+            addProbeInfoWithGlassOrSneak(probeMode, iProbeInfo, entityPlayer, world, iBlockState, iProbeHitData);
         }
     }//MetaTileEntutyLargeBeeHive
+
     public void addProbeInfoWithGlassOrSneak(ProbeMode probeMode, IProbeInfo iProbeInfo, EntityPlayer entityPlayer, World world, IBlockState iBlockState, IProbeHitData iProbeHitData) {
-        if (GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntutyLargeBeeHive) {
-            var s = (MetaTileEntutyLargeBeeHive)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
-            if(s.isActive() && s.isWorkingEnabled())
-            {
+        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntutyLargeBeeHive s) {
+            if (s.isActive() && s.isWorkingEnabled()) {
 
                 List<String> list = new ArrayList<>();
                 List<Integer> listNum = new ArrayList<>();
-                for (var is:s.listdrops)
-                {
-                    if(!list.contains(is.getDisplayName()))
-                    {
+                for (var is : s.listdrops) {
+                    if (!list.contains(is.getDisplayName())) {
                         list.add(is.getDisplayName());
                         listNum.add(is.getCount());
-                    }
-                    else
-                    {
+                    } else {
                         int loca = list.indexOf(is.getDisplayName());
                         int num = listNum.remove(loca);
-                        listNum.add(loca,num+is.getCount());
+                        listNum.add(loca, num + is.getCount());
                     }
                 }
                 int maxprocess = s.maxProcess;
-               if( s.workType==1 && s.productType==1)
-                   maxprocess*=4;
+                if (s.workType == 1 && s.productType == 1)
+                    maxprocess *= 4;
                 iProbeInfo.progress(s.getProgress(), maxprocess, iProbeInfo.defaultProgressStyle()
                         .suffix(" / " + TextFormattingUtil.formatNumbers(maxprocess) + " %")
                         .filledColor(0xFFEEE600)
@@ -130,41 +114,35 @@ public class TopCommonProvider implements IProbeInfoProvider {
                 for (int i = 0; i < listNum.size(); i++) {
                     String item = list.get(i);
                     int num = listNum.get(i);
-                    iProbeInfo.text("产出物品:"+item +"*"+num);
+                    iProbeInfo.text("产出物品:" + item + "*" + num);
                 }
             }
-        }
-        else if(world.getTileEntity(iProbeHitData.getPos()) instanceof TileEntitySapBag)
-        {
-            ItemStackHandler inventory = ((TileEntitySapBag)(world.getTileEntity(iProbeHitData.getPos()))).inventory;
+        } else if (world.getTileEntity(iProbeHitData.getPos()) instanceof TileEntitySapBag) {
+            ItemStackHandler inventory = ((TileEntitySapBag) (world.getTileEntity(iProbeHitData.getPos()))).inventory;
             for (int i = 0; i < inventory.getSlots(); i++) {
-                ItemStack s  =inventory.getStackInSlot(i).copy();
-                iProbeInfo.text("贮存物品:"+ s.getDisplayName() +"*"+s.getCount());
+                ItemStack s = inventory.getStackInSlot(i).copy();
+                iProbeInfo.text("贮存物品:" + s.getDisplayName() + "*" + s.getCount());
             }
 
-        }else if(GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityIndustrialApiary)
-        {
-            var machine = (MetaTileEntityIndustrialApiary)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
-            iProbeInfo.text("耗电:"+machine.mEUt+"Eu/t");
-            iProbeInfo.text("温度:"+machine.getTemperature());
-            iProbeInfo.text("湿度:"+machine.getHumidity());
+        } else if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityIndustrialApiary machine) {
+            iProbeInfo.text("耗电:" + machine.mEUt + "Eu/t");
+            iProbeInfo.text("温度:" + machine.getTemperature());
+            iProbeInfo.text("湿度:" + machine.getHumidity());
             var list = machine.mOutputItems;
-            if(machine.isWorking())
+            if (machine.isWorking())
                 for (int i = 0; i < list.length; i++) {
-                    if(!list[i].isEmpty())
-                    {
+                    if (!list[i].isEmpty()) {
                         String item = list[i].getDisplayName();
                         int num = list[i].getCount();
-                        iProbeInfo.text("产出物品:"+item +"*"+num);
+                        iProbeInfo.text("产出物品:" + item + "*" + num);
                     }
                 }
-            if(!machine.hasErrors())
+            if (!machine.hasErrors())
                 iProbeInfo.text("没有任何错误,老铁!");
-            else
-            {
+            else {
                 iProbeInfo.text("错误列表:");
-                machine.mErrorStates.forEach(info->{
-                    iProbeInfo.text("{*"+info.getUnlocalizedDescription()+"*}");
+                machine.mErrorStates.forEach(info -> {
+                    iProbeInfo.text("{*" + info.getUnlocalizedDescription() + "*}");
                 });
             }
         }

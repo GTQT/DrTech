@@ -207,8 +207,8 @@ public class MetaTileEntities {
             int[] color = {0x251945,0x815024,0x4F4F4E,0x87875C,0xA39393,0x896495,0x1D1D1D,0x3C3C61};
             double[] efficiency = {0.5,0.75,0.7,1,0.85,0.85,1,0.9};
             int[] output = {16,24,32,16,112,96,128,128};
-            HU_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId(names[i]+"_burring_box"),color[i],efficiency[i],output[i]));
-            HU_DENSE_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId("dense_"+names[i]+"_burring_box"),color[i],efficiency[i],output[i]*4));
+            HU_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId(names[i]+"_burring_box"),color[i],efficiency[i],output[i],false));
+            HU_DENSE_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId("dense_"+names[i]+"_burring_box"),color[i],efficiency[i],output[i]*4,true));
         }
 
         //人工分配 ID 17100

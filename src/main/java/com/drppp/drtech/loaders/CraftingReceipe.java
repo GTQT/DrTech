@@ -10,6 +10,7 @@ import forestry.apiculture.blocks.BlockAlvearyType;
 import gregtech.api.GTValues;
 import gregtech.api.items.OreDictNames;
 import gregtech.api.recipes.ModHandler;
+import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
@@ -659,6 +660,13 @@ public class CraftingReceipe {
                 'C', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
                 'W', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
                 'P', new UnificationEntry(OrePrefix.gear, Materials.Bronze));
+
+        ModHandler.addShapedRecipe("treated_wood", OreDictUnifier.get(plate,TreatedWood),
+                " h",
+                " W",
+                'W', "plankTreatedWood");
+
+
 
         ModHandler.removeRecipeByName("gregtech:dust_bronze");
         ModHandler.removeRecipeByName("gregtech:dust_brass");
