@@ -104,7 +104,7 @@ public class MetaTileEntityRuSplitter extends MetaTileEntity implements IRotatio
             if(count!=0)
             {
                 ru_count.setRuEnergy(ru.getEnergyOutput()/count);
-                this.setSpeed(Math.max(1,getSpeed()/count));
+                this.setSpeed(Math.max(this.ru.getEnergyOutput()==0?0:1,getSpeed()/count));
             }
             else
                 ru_count.setRuEnergy(0);
