@@ -42,7 +42,7 @@ public class PacketSyncDimension implements IMessage {
             // 在客户端主线程执行
             if (ctx.side.isClient()) {
                 Minecraft.getMinecraft().addScheduledTask(() -> {
-                    EntityPlayer player = Minecraft.getMinecraft().player;
+                    EntityPlayer player = ctx.getServerHandler().player; //
                     if (player != null) {
                         // 更新客户端玩家的维度和位置
                         player.dimension = message.dimension;

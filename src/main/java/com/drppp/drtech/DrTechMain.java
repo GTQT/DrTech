@@ -171,7 +171,6 @@ public class DrTechMain {
     public void Clientinit(FMLInitializationEvent event) {
         DrtechEventHandler.Keybinds.registerKeybinds();
         SyncInit.init();
-        SyncInit.ClieantInit();
         if (Loader.isModLoaded("forestry")) {
             ItemCombs.ClientInit();
         }
