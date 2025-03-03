@@ -23,7 +23,6 @@ public class LiquidBurringInfo {
             Collection<Recipe> rc = map.getRecipeList();
             rc.forEach(LiquidBurringInfo::initFuelsDta);
         }
-        System.out.println("1111");
     }
 
     private static void initFuelsDta(Recipe recipe) {

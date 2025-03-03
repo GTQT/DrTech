@@ -78,12 +78,6 @@ public class RecipeLogicHU extends AbstractRecipeLogic {
     }
     @Override
     public int getMaxProgress() {
-        if(hu.getHeat()>this.recipeEUt)
-        {
-            int max = this.maxProgressTime;
-            double reductionRatio = ((double) hu.getHeat() - ((double)recipeEUt*2)) / ((double)DrtConfig.MaxRu - ((double)recipeEUt*2));
-            return Math.max(1,(int)(max - (max - max/2) * reductionRatio));
-        }
-        return super.getMaxProgress();
+        return this.maxProgressTime/2;
     }
 }

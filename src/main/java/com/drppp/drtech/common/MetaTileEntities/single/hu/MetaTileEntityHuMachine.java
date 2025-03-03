@@ -85,7 +85,6 @@ public class MetaTileEntityHuMachine extends WorkableTieredMetaTileEntity  imple
     protected final @Nullable IMachineParticleEffect tickingParticle;
     protected final @Nullable IMachineParticleEffect randomParticle;
     private IHeatEnergy hu;
-    //最后一个参数是接收能源的方向 目前只能水平接收  因为水车轴承只能横着放
     public MetaTileEntityHuMachine(ResourceLocation metaTileEntityId, RecipeMap<?> recipeMap, ICubeRenderer renderer, int tier, boolean hasFrontFacing, RuMachineAcceptFacing[] acceptFacing) {
         this(metaTileEntityId, recipeMap, renderer, tier, hasFrontFacing, GTUtility.defaultTankSizeFunction,acceptFacing);
     }

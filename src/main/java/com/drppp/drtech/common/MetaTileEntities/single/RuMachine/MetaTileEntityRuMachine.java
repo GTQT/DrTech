@@ -620,7 +620,7 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
                 case BACK -> res.append("后/");
             }
         }
-        return res.toString();
+        return res.toString().substring(0,res.length()-1);
     }
     public boolean needsSneakToRotate() {
         return true;

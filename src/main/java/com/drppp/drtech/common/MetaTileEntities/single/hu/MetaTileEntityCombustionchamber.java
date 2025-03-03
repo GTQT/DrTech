@@ -84,7 +84,7 @@ public class MetaTileEntityCombustionchamber extends MetaTileEntity {
         return isActive;
     }
 
-    protected void setActive(boolean active) {
+    public void setActive(boolean active) {
         if (this.isActive != active) {
             this.isActive = active;
             this.markDirty();
