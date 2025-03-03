@@ -30,6 +30,7 @@ import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
+import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.PollutionEffectHandler;
@@ -184,6 +185,7 @@ public class DrTechMain {
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
         GendustryRecipes.init();
+        LiquidBurringInfo.init();
     }
 
     @EventHandler

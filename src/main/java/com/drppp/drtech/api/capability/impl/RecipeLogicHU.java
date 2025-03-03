@@ -1,6 +1,7 @@
 package com.drppp.drtech.api.capability.impl;
 
 import com.drppp.drtech.DrtConfig;
+import com.drppp.drtech.api.capability.IHeatEnergy;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.AbstractRecipeLogic;
@@ -8,41 +9,41 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.recipes.RecipeMap;
 import org.jetbrains.annotations.NotNull;
 
-public class RecipeLogicRU  extends AbstractRecipeLogic {
+public class RecipeLogicHU extends AbstractRecipeLogic {
 
-    final IRotationEnergy ru;
-    public RecipeLogicRU(MetaTileEntity tileEntity, RecipeMap<?> recipeMap,IRotationEnergy ru) {
+    final IHeatEnergy hu;
+    public RecipeLogicHU(MetaTileEntity tileEntity, RecipeMap<?> recipeMap, IHeatEnergy hu) {
         super(tileEntity, recipeMap);
-        this.ru = ru;
+        this.hu = hu;
         this.hasPerfectOC=true;
     }
 
     @Override
     protected long getEnergyInputPerSecond() {
-        if(ru==null)
+        if(hu==null)
             return 0;
-        return ru.getEnergyOutput()/2;
+        return hu.getHeat()/2;
     }
 
     @Override
     protected long getEnergyStored() {
-        if(ru==null)
+        if(hu==null)
             return 0;
-        return ru.getEnergyOutput()/2;
+        return hu.getHeat()/2;
     }
 
     @Override
     protected long getEnergyCapacity() {
-        if(ru==null)
+        if(hu==null)
             return 0;
-        return ru.getEnergyOutput();
+        return hu.getHeat();
     }
 
     @Override
     protected boolean drawEnergy(int recipeEUt, boolean b) {
-        if(ru==null)
+        if(hu==null)
             return false;
-        if(ru.getEnergyOutput()/2>=recipeEUt)
+        if(getEnergyStored()>=recipeEUt)
             return true;
         return false;
     }
@@ -56,20 +57,16 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
     }
     @Override
     public long getMaxVoltage() {
-        return GTValues.V[1];
+        return GTValues.V[8];
     }
-
-    @Override
-    public void setParallelRecipesPerformed(int amount) {
-        super.setParallelRecipesPerformed(amount);
-    }
-
     @Override
     protected void updateRecipeProgress() {
         if (this.canRecipeProgress && this.drawEnergy(this.recipeEUt, true)) {
+            this.drawEnergy(this.recipeEUt, false);
             if (++this.progressTime > this.getMaxProgress()) {
                 this.completeRecipe();
             }
+
             if (this.hasNotEnoughEnergy && this.getEnergyInputPerSecond() >(long)this.recipeEUt) {
                 this.hasNotEnoughEnergy = false;
             }
@@ -81,10 +78,10 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
     }
     @Override
     public int getMaxProgress() {
-        if(ru.getEnergyOutput()>this.recipeEUt)
+        if(hu.getHeat()>this.recipeEUt)
         {
             int max = this.maxProgressTime;
-            double reductionRatio = ((double) ru.getEnergyOutput() - ((double)recipeEUt*2)) / ((double)DrtConfig.MaxRu - ((double)recipeEUt*2));
+            double reductionRatio = ((double) hu.getHeat() - ((double)recipeEUt*2)) / ((double)DrtConfig.MaxRu - ((double)recipeEUt*2));
             return Math.max(1,(int)(max - (max - max/2) * reductionRatio));
         }
         return super.getMaxProgress();

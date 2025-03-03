@@ -18,6 +18,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.*;
 import com.drppp.drtech.common.MetaTileEntities.single.*;
 import com.drppp.drtech.common.MetaTileEntities.single.RuMachine.MetaTileEntityRuSplitter;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.MetaTileEntityCombustionchamber;
+import com.drppp.drtech.common.MetaTileEntities.single.hu.MetaTileEntityCombustionchamberLiquid;
 import com.drppp.drtech.loaders.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
@@ -121,6 +122,8 @@ public class MetaTileEntities {
     public static MetaTileEntityRuSplitter RU_SPLITTER;
     public static MetaTileEntityCombustionchamber HU_BURRING_BOXS[] = new MetaTileEntityCombustionchamber[8];
     public static MetaTileEntityCombustionchamber HU_DENSE_BURRING_BOXS[] = new MetaTileEntityCombustionchamber[8];
+    public static MetaTileEntityCombustionchamberLiquid HU_BURRING_BOXS_LIQUID[] = new MetaTileEntityCombustionchamberLiquid[8];
+    public static MetaTileEntityCombustionchamberLiquid HU_DENSE_BURRING_BOXS_LIQUID[] = new MetaTileEntityCombustionchamberLiquid[8];
     static int startID = 16999;
 
     private static <F extends MetaTileEntity> F registerPartMetaTileEntity(int id, F mte) {
@@ -209,6 +212,8 @@ public class MetaTileEntities {
             int[] output = {16,24,32,16,112,96,128,128};
             HU_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId(names[i]+"_burring_box"),color[i],efficiency[i],output[i],false));
             HU_DENSE_BURRING_BOXS[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamber(getmyId("dense_"+names[i]+"_burring_box"),color[i],efficiency[i],output[i]*4,true));
+            HU_BURRING_BOXS_LIQUID[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamberLiquid(getmyId(names[i]+"_burring_box_liquid"),color[i],efficiency[i],(int)(output[i]*1.5),false));
+            HU_DENSE_BURRING_BOXS_LIQUID[i]= registerMetaTileEntity(getID(), new MetaTileEntityCombustionchamberLiquid(getmyId("dense_"+names[i]+"_burring_box_liquid"),color[i],efficiency[i],(int)(output[i]*4*1.5),true));
         }
 
         //人工分配 ID 17100

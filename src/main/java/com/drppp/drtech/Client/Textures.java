@@ -55,6 +55,7 @@ public class Textures {
     public static OrientedOverlayRenderer RU_CENTRIFUGE;
     public static OrientedOverlayRenderer RU_SPLITTER;
     public static OrientedOverlayRenderer HU_BASE_BURRING_BOX;
+    public static OrientedOverlayRenderer HU_BASE_BURRING_BOX_LIQUID;
     public static  SimpleOverlayRenderer HU_BURRING_BOX_SIDE_OVERLAY;
     public static  SimpleOverlayRenderer HU_BURRING_BOX_SIDE_FULL_OVERLAY;
     public static OrientedOverlayRenderer FILTER_OVERLAY;
@@ -107,6 +108,7 @@ public class Textures {
         RU_CENTRIFUGE= new OrientedOverlayRenderer("machines/ru_centrifuge");
         RU_SPLITTER= new OrientedOverlayRenderer("machines/ru_splitter");
         HU_BASE_BURRING_BOX= new OrientedOverlayRenderer("machines/hu_base_burring_box");
+        HU_BASE_BURRING_BOX_LIQUID= new OrientedOverlayRenderer("machines/hu_base_burring_box_liquid");
         HU_BURRING_BOX_SIDE_OVERLAY = new SimpleOverlayRenderer("casings/hu_burring_box_side_overlay");
         HU_BURRING_BOX_SIDE_FULL_OVERLAY = new SimpleOverlayRenderer("casings/hu_burring_box_side_full_overlay");
         FILTER_OVERLAY = new OrientedOverlayRenderer("machines/type_filter");
