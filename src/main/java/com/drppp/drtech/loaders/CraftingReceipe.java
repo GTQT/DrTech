@@ -691,6 +691,22 @@ public class CraftingReceipe {
                     'P', new UnificationEntry(plateDense, materials[i]),
                     'C', new UnificationEntry(ring, materials[i]),
                     'M', gregtech.common.metatileentities.MetaTileEntities.STEAM_BOILER_COAL_STEEL.getStackForm()); // 机械方块
+
+            // 基础燃烧室配方
+            ModHandler.addShapedRecipe(HU_BURRING_BOXS_LIQUID[i].getMetaName(),
+                    HU_BURRING_BOXS_LIQUID[i].getStackForm(),
+                    "PCP", "CMC", "PCP",
+                    'P', new UnificationEntry(plate, materials[i]),
+                    'C', new UnificationEntry(ring, materials[i]),
+                    'M', STEAM_BOILER_LAVA_BRONZE.getStackForm()); // 机械方块
+
+            // 密集燃烧室配方（输出x4）
+            ModHandler.addShapedRecipe(HU_DENSE_BURRING_BOXS_LIQUID[i].getMetaName(),
+                    HU_DENSE_BURRING_BOXS_LIQUID[i].getStackForm(),
+                    "PCP", "CMC", "PCP",
+                    'P', new UnificationEntry(plateDense, materials[i]),
+                    'C', new UnificationEntry(ring, materials[i]),
+                    'M', gregtech.common.metatileentities.MetaTileEntities.STEAM_BOILER_LAVA_STEEL.getStackForm()); // 机械方块
         }
     }
     public static ItemStack getItemStack(String itemstr)
