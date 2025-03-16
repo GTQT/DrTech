@@ -20,7 +20,6 @@ import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import com.drppp.drtech.command.CommandTeleportDimension;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.common.CommonProxy;
@@ -34,7 +33,6 @@ import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.PollutionEffectHandler;
-import com.drppp.drtech.common.event.RocketFuelHUD;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
 import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
@@ -170,13 +168,11 @@ public class DrTechMain {
     @SideOnly(Side.CLIENT)
     @EventHandler
     public void Clientinit(FMLInitializationEvent event) {
-        DrtechEventHandler.Keybinds.registerKeybinds();
         SyncInit.init();
         if (Loader.isModLoaded("forestry")) {
             ItemCombs.ClientInit();
         }
         drtMetaEntities.initRenderers();
-        MinecraftForge.EVENT_BUS.register(new RocketFuelHUD());
     }
 
     @EventHandler
@@ -190,7 +186,6 @@ public class DrTechMain {
 
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
-        event.registerServerCommand(new CommandTeleportDimension());
     }
 
     @Mod.EventHandler

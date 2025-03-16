@@ -1,6 +1,5 @@
 package com.drppp.drtech.common.Items;
 
-import com.drppp.drtech.Client.render.Items.RenderItemAdvancedRocket;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.render.LaserPipeRenderer;
@@ -46,7 +45,6 @@ public class ItemsInit {
     public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
     public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID,BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID,BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
-    public static  final Item ITEM_ROCKET = new ItemAdvancedRocket();
     public static void init(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
@@ -65,7 +63,6 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_SAP_BAG);
         event.getRegistry().register(ITEM_BLOCK_ADVANCED_CAULDRON);
         event.getRegistry().register(ITEM_BLOCK_TIME_TABLE);
-        event.getRegistry().register(ITEM_ROCKET);
         event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1,  VariantItemBlock::new));
@@ -80,7 +77,6 @@ public class ItemsInit {
     }
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
-        ITEM_ROCKET.setTileEntityItemStackRenderer(new RenderItemAdvancedRocket());
         registerItemModel(BlocksInit.TRANSPARENT_CASING1);
         registerItemModel(BlocksInit.COMMON_CASING);
         registerItemModel(BlocksInit.COMMON_CASING1);
@@ -95,7 +91,6 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(ITEM_ROCKET, 0, new ModelResourceLocation(ITEM_ROCKET.getRegistryName(), "inventory"));
         if(Loader.isModLoaded("forestry"))
         {
             ((com.drppp.drtech.intergations.Forestry.DrtCombItem) ItemCombs.ITEM_COMBS).registerModel(ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);

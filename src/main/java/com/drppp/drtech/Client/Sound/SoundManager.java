@@ -14,7 +14,6 @@ public class SoundManager {
     public static SoundEvent laser_bullet_shoot = new SoundEvent(new ResourceLocation(Tags.MODID, "laser_bullet_shoot"));
     public static SoundEvent lighter_place = new SoundEvent(new ResourceLocation(Tags.MODID, "lighter_place"));
     public static SoundEvent plasma_launch = new SoundEvent(new ResourceLocation(Tags.MODID, "plasma_launch"));
-    public static SoundEvent shuttle = new SoundEvent(new ResourceLocation(Tags.MODID, "shuttle"));
     //laser_bullet_shoot
     @SubscribeEvent
     public static void onSoundEvenrRegistration(RegistryEvent.Register<SoundEvent> event)
@@ -23,7 +22,6 @@ public class SoundManager {
         event.getRegistry().register(laser_bullet_shoot.setRegistryName("laser_bullet_shoot"));
         event.getRegistry().register(lighter_place.setRegistryName("lighter_place"));
         event.getRegistry().register(plasma_launch.setRegistryName("plasma_launch"));
-        event.getRegistry().register(shuttle.setRegistryName("shuttle"));
     }
 
 }

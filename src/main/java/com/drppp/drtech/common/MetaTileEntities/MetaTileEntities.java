@@ -103,7 +103,6 @@ public class MetaTileEntities {
     public static MetaTileEntityIndustrialCablePress INDUSTRIAL_CABLE_PRESS;
     public static MetaTileEntityIndustrialSieve INDUSTRIAL_SIEVE;
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
-    public static MetaTileEntityRocketLaunchPad ROCKET_LAUNCH_PAD;
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_256 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_1024 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
@@ -192,7 +191,7 @@ public class MetaTileEntities {
             getID();
             getID();
         }
-        ROCKET_LAUNCH_PAD = registerMetaTileEntity(getID(), new MetaTileEntityRocketLaunchPad(getmyId("rocket_launch_pad")));
+        getID();
         RU_GENERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuGenerator(getmyId("ru_generator")));
 
         RU_MACERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_macerator"), RecipeMaps.MACERATOR_RECIPES, Textures.RU_SHREDDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
