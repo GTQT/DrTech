@@ -56,7 +56,7 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
     }
     @Override
     public long getMaxVoltage() {
-        return GTValues.V[1];
+        return GTValues.V[8];
     }
 
     @Override

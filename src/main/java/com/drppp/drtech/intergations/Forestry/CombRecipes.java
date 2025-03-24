@@ -131,7 +131,7 @@ public class CombRecipes {
                 Voltage.ZPM);
         addCombProductProcess(GTCombType.INDIUM, new Material[] { Materials.Aluminium, Materials.Indium }, Voltage.ZPM);
         addCentrifugeToItemStack(GTCombType.INDIUM,new ItemStack[]{ OreDictUnifier.get(OrePrefix.dust,Materials.Aluminium),
-                OreDictUnifier.get(OrePrefix.dust,Materials.Indium) },new int[]{4000,500},Voltage.ZPM);
+                OreDictUnifier.get(OrePrefix.dust,Materials.Indium) },new int[]{4000,1500},Voltage.LUV);
         addCombProductProcess(DrtCombType.CRYOLITE, new Material[] { GTQTMaterials.Cryolite }, Voltage.MV);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_A, GTQTMaterials.Enzymesa.getFluid(500),Voltage.EV,60);
         addExtractorProcess(DrtCombType.PRIMITIVE_STRAIN_B, GTQTMaterials.Enzymesb.getFluid(500),Voltage.EV,60);

@@ -10,10 +10,7 @@ import com.drppp.drtech.api.capability.RuMachineAcceptFacing;
 import com.drppp.drtech.api.capability.impl.RecipeLogicRU;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
 import gregtech.api.GTValues;
-import gregtech.api.capability.GregtechDataCodes;
-import gregtech.api.capability.GregtechTileCapabilities;
-import gregtech.api.capability.IActiveOutputSide;
-import gregtech.api.capability.IGhostSlotConfigurable;
+import gregtech.api.capability.*;
 import gregtech.api.capability.impl.*;
 import gregtech.api.cover.Cover;
 import gregtech.api.gui.GuiTextures;
@@ -188,6 +185,11 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         if (this.isAutoOutputFluids() && this.outputFacingFluids != null) {
             Textures.FLUID_OUTPUT_OVERLAY.renderSided(this.outputFacingFluids, renderState, RenderUtil.adjustTrans(translation, this.outputFacingFluids, 2), pipeline);
         }
+
+    }
+
+    @Override
+    public void checkWeatherOrTerrainExplosion(float explosionPower, double additionalFireChance, IEnergyContainer energyContainer) {
 
     }
 

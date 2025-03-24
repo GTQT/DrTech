@@ -321,7 +321,7 @@ public class MetaTileEntityCombustionchamberLiquid extends MetaTileEntity {
         }
         return super.onRightClick(playerIn, hand, facing, hitResult);
     }
-    private boolean canActive()
+    public boolean canActive()
     {
         if(this.importFluids.getTankAt(0).getFluidAmount()==0)
             return false;

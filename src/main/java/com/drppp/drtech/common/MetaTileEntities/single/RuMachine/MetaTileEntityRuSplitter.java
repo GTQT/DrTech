@@ -9,6 +9,7 @@ import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import com.drppp.drtech.api.capability.IRotationSpeed;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityRuGenerator;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -96,6 +97,12 @@ public class MetaTileEntityRuSplitter extends MetaTileEntity implements IRotatio
                     continue;
                 var tl = getWorld().getTileEntity(getPos().offset(facing));
                 if(tl!=null && tl.hasCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing))
+                {
+                    list.add(facing);
+                    count++;
+                }
+                var mte = GTUtility.getMetaTileEntity(getWorld(),getPos().offset(facing));
+                if(mte!=null && mte instanceof MetaTileEntityRuGenerator)
                 {
                     list.add(facing);
                     count++;
