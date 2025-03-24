@@ -3,6 +3,9 @@ package com.drppp.drtech.common.MetaTileEntities.muti.mutipart;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.api.capability.DrtechCapabilities;
@@ -10,6 +13,7 @@ import gregtech.api.GTValues;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
+import gregtech.api.metatileentity.multiblock.AbilityInstances;
 import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.client.renderer.ICubeRenderer;
@@ -23,6 +27,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -89,9 +94,9 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
     }
 
     @Override
-    public void registerAbilities(List<IFluidTank> list) {
+    public void registerAbilities(@NotNull AbilityInstances abilityInstances) {
         if(tankHatch!=null)
-            list.add(tankHatch);
+            abilityInstances.add(tankHatch);
     }
 
     @Override
@@ -99,6 +104,11 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
         if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
             return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.tankHatch);
         return super.getCapability(capability, side);
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
     }
 
     private class YotTankHatch extends FluidTank {

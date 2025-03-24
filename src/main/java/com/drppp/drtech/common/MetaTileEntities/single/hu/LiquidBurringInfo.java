@@ -28,7 +28,7 @@ public class LiquidBurringInfo {
     private static void initFuelsDta(Recipe recipe) {
         if(recipe!=null)
         {
-            int eut = recipe.getEUt();
+            int eut =(int) recipe.getEUt();
             int time = recipe.getDuration();
             var fluid = recipe.getFluidInputs();
             for (var item : fluid)

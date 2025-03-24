@@ -3,6 +3,9 @@ package com.drppp.drtech.common.MetaTileEntities.single;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
@@ -11,7 +14,6 @@ import com.drppp.drtech.api.ItemHandler.OnlyUpgradeStackhandler;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.Utils.GT_ApiaryUpgrade;
 import com.drppp.drtech.api.Utils.ItemId;
-import com.drppp.drtech.api.modularui.MetaTileEntityModularui;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 import forestry.apiculture.ModuleApiculture;
@@ -25,6 +27,7 @@ import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.*;
 import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.metatileentity.TieredMetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
@@ -82,7 +85,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 
-public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui implements IWorkable ,
+public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity implements IWorkable ,
         IBeeHousing, IBeeHousingInventory, IErrorLogic, IBeeModifier, IBeeListener {
     protected final ICubeRenderer renderer;
     public int i=0;
@@ -107,7 +110,8 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     public int mSpeed = 0;
     public boolean mLockedSpeed = true;
     public boolean mAutoQueen = true;
-
+    public UUID uid= null;
+    public String name= null;
     private ItemStack usedQueen = null;
     private IBee usedQueenBee = null;
     private IEffectData[] effectData = new IEffectData[2];
@@ -237,6 +241,14 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
     @Override
     public void receiveCustomData(int dataId, @NotNull PacketBuffer buf) {
         super.receiveCustomData(dataId, buf);
+        if (dataId == 1919)
+        {
+            this.uid = buf.readUniqueId();
+        }
+        if(dataId==1920)
+        {
+            this.name = buf.readString(500);
+        }
         if (dataId == GregtechDataCodes.WORKABLE_ACTIVE) {
             isActive = buf.readBoolean();
             scheduleRenderUpdate();
@@ -652,6 +664,10 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             }
         }
         data.setTag("mOutputItems", nbtTagList);
+        if(uid!=null)
+            data.setUniqueId("PlayerUUID",uid);
+        if(name!=null)
+            data.setString("PlayerName",name);
         return data;
     }
 
@@ -684,8 +700,21 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
                 mOutputItems[slot] = new ItemStack(itemTag);
             }
         }
+        if(data.hasKey("PlayerUUIDMost"))
+            uid = data.getUniqueId("PlayerUUID");
+        if(data.hasKey("PlayerName"))
+            name = data.getString("PlayerName");
     }
-
+    public void setUUID(EntityPlayer player) {
+        this.uid = player.getUniqueID();
+        this.name = player.getName();
+        this.writeCustomData(1919, (b) -> {
+            b.writeUniqueId(this.uid);
+        });
+        this.writeCustomData(1920, (b) -> {
+            b.writeString(name);
+        });
+    }
     @Override
     public boolean isWorkingEnabled() {
         return this.isWorkingEnabled;
@@ -967,13 +996,7 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
         return this.getWorld().isRainingAt(getPos().add(0, 2, 0));
     }
 
-    @Nullable
-    @Override
-    public GameProfile getOwner() {
-        if(uid!=null)
-            return new GameProfile(uid,name);
-        return null;
-    }
+
 
     @Override
     public Vec3d getBeeFXCoordinates() {
@@ -1176,6 +1199,11 @@ public class MetaTileEntityIndustrialApiary extends MetaTileEntityModularui impl
             return null;
         }
     };
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
+    }
 
 
     public class GT_ApiaryModifier {

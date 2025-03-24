@@ -3,6 +3,9 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.store;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.Particle.DrtechLaserBeamParticle;
 import com.drppp.drtech.Tile.TileEntityConnector;
@@ -334,4 +337,8 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         GTParticleManager.INSTANCE.addEffect(new DrtechLaserBeamParticle(this,Spos,Epos,age));
     }
 
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
+    }
 }

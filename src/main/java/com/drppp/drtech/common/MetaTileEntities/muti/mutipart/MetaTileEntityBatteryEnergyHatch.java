@@ -3,6 +3,9 @@ package com.drppp.drtech.common.MetaTileEntities.muti.mutipart;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.drppp.drtech.api.capability.impl.BatteryEnergyContainerHandler;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import gregtech.api.GTValues;
@@ -15,6 +18,7 @@ import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.SlotWidget;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
+import gregtech.api.metatileentity.multiblock.AbilityInstances;
 import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
@@ -110,6 +114,11 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
 
     public MultiblockAbility<IEnergyContainer> getAbility() {
         return this.isExportHatch ? MultiblockAbility.OUTPUT_ENERGY : MultiblockAbility.INPUT_ENERGY;
+    }
+
+    @Override
+    public void registerAbilities(@NotNull AbilityInstances abilityInstances) {
+
     }
 
     public void registerAbilities(List<IEnergyContainer> abilityList) {
@@ -259,5 +268,10 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
                 return 1;
             }
         };
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
     }
 }

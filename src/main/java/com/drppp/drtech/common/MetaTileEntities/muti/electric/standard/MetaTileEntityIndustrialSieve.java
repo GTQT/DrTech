@@ -1,5 +1,8 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing1;
@@ -87,6 +90,11 @@ public class MetaTileEntityIndustrialSieve extends RecipeMapMultiblockController
         tooltip.add(I18n.format("drtech.machine.industrial_sieve.tooltip.4"));
     }
 
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
+    }
+
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {
         public SelfRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {
@@ -99,8 +107,8 @@ public class MetaTileEntityIndustrialSieve extends RecipeMapMultiblockController
         }
 
         @Override
-        protected boolean drawEnergy(int recipeEUt, boolean simulate) {
-            return super.drawEnergy((int) (recipeEUt * 0.75), simulate);
+        protected boolean drawEnergy(long recipeEUt, boolean simulate) {
+            return super.drawEnergy((long) (recipeEUt * 0.75), simulate);
         }
 
         @Override

@@ -37,12 +37,14 @@ public abstract class LighterBehaviourMixin {
             if(mte!=null && mte instanceof MetaTileEntityCombustionchamber)
             {
                 MetaTileEntityCombustionchamber mteg = (MetaTileEntityCombustionchamber) mte;
-                mteg.setActive(true);
+                if(!mteg.getImportItems().getStackInSlot(0).isEmpty() && mteg.getExportItems().getStackInSlot(0).getCount()<64 && side==mte.getFrontFacing())
+                    mteg.setActive(true);
                 cir.cancel();
-            }else if(mte!=null && mte instanceof MetaTileEntityCombustionchamberLiquid)
+            }else if(mte!=null && mte instanceof MetaTileEntityCombustionchamberLiquid && side==mte.getFrontFacing())
             {
                 MetaTileEntityCombustionchamberLiquid mteg = (MetaTileEntityCombustionchamberLiquid) mte;
-                mteg.setActive(true);
+                if(mteg.canActive())
+                    mteg.setActive(true);
                 cir.cancel();
             }
         }

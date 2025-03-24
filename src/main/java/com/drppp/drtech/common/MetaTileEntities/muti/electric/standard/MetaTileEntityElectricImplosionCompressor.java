@@ -1,5 +1,8 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -86,6 +89,11 @@ public class MetaTileEntityElectricImplosionCompressor extends RecipeMapMultiblo
     @Override
     public boolean hasMufflerMechanics() {
         return true;
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
     }
 
     protected class ImplosionCompressor extends MultiblockRecipeLogic {

@@ -40,7 +40,7 @@ public class RecipeLogicHU extends AbstractRecipeLogic {
     }
 
     @Override
-    protected boolean drawEnergy(int recipeEUt, boolean b) {
+    protected boolean drawEnergy(long recipeEUt, boolean b) {
         if(hu==null)
             return false;
         if(getEnergyStored()>=recipeEUt)

@@ -10,8 +10,6 @@
     "forestry.MixinModuleMachine",
     "gregtech.ElectricContainerInfoProviderMixin",
     "gregtech.LighterBehaviourMixin",
-    "gregtech.MinxinRecipeMapMultiblockController",
-    "gregtech.MultiblockRecipeLogicMixin",
     "gregtech.RecipeLogicInfoProviderMixin"
   ],
   "server": [],

@@ -1,5 +1,8 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.block.IHeatingCoilBlockStats;
@@ -135,6 +138,11 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
         this.leve = data.getInteger("CoinLevel");
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
     }
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

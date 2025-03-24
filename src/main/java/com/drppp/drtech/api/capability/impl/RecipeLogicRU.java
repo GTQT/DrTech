@@ -39,7 +39,7 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
     }
 
     @Override
-    protected boolean drawEnergy(int recipeEUt, boolean b) {
+    protected boolean drawEnergy(long recipeEUt, boolean b) {
         if(ru==null)
             return false;
         if(ru.getEnergyOutput()/2>=recipeEUt)
@@ -56,7 +56,7 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
     }
     @Override
     public long getMaxVoltage() {
-        return GTValues.V[1];
+        return GTValues.V[8];
     }
 
     @Override

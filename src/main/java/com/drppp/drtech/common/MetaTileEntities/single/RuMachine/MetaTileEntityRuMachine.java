@@ -4,16 +4,16 @@ import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import com.drppp.drtech.api.capability.RuMachineAcceptFacing;
 import com.drppp.drtech.api.capability.impl.RecipeLogicRU;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
 import gregtech.api.GTValues;
-import gregtech.api.capability.GregtechDataCodes;
-import gregtech.api.capability.GregtechTileCapabilities;
-import gregtech.api.capability.IActiveOutputSide;
-import gregtech.api.capability.IGhostSlotConfigurable;
+import gregtech.api.capability.*;
 import gregtech.api.capability.impl.*;
 import gregtech.api.cover.Cover;
 import gregtech.api.gui.GuiTextures;
@@ -188,6 +188,11 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         if (this.isAutoOutputFluids() && this.outputFacingFluids != null) {
             Textures.FLUID_OUTPUT_OVERLAY.renderSided(this.outputFacingFluids, renderState, RenderUtil.adjustTrans(translation, this.outputFacingFluids, 2), pipeline);
         }
+
+    }
+
+    @Override
+    public void checkWeatherOrTerrainExplosion(float explosionPower, double additionalFireChance, IEnergyContainer energyContainer) {
 
     }
 
@@ -631,5 +636,10 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
         tooltip.add(I18n.format("gregtech.tool_action.wrench.set_facing", new Object[0]));
         tooltip.add(I18n.format("gregtech.tool_action.soft_mallet.reset", new Object[0]));
         super.addToolUsages(stack, world, tooltip, advanced);
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
     }
 }

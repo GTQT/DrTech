@@ -358,27 +358,6 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(100)
                 .buildAndRegister();
-        for (int i = 0; i < 10; i++) {
-            ASSEMBLER_RECIPES.recipeBuilder()
-                    .fluidInputs(Polyethylene.getFluid(144))
-                    .input(gregtech.common.metatileentities.MetaTileEntities.ITEM_IMPORT_BUS[i])
-                    .input(gregtech.common.metatileentities.MetaTileEntities.FLUID_IMPORT_HATCH[i])
-                    .output(MetaTileEntities.ITEM_FLUID_IMPORT_HATCH[i])
-                    .circuitMeta(19)
-                    .EUt(16)
-                    .duration(100)
-                    .buildAndRegister();
-
-            ASSEMBLER_RECIPES.recipeBuilder()
-                    .fluidInputs(Polyethylene.getFluid(144))
-                    .input(gregtech.common.metatileentities.MetaTileEntities.ITEM_EXPORT_BUS[i])
-                    .input(gregtech.common.metatileentities.MetaTileEntities.FLUID_EXPORT_HATCH[i])
-                    .output(MetaTileEntities.ITEM_FLUID_EXPORT_HATCH[i])
-                    .circuitMeta(19)
-                    .EUt(16)
-                    .duration(100)
-                    .buildAndRegister();
-        }
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(plate, StainlessSteel, 2)
                 .input(plate, GTQTMaterials.Staballoy, 4)

@@ -1,5 +1,8 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
@@ -188,6 +191,11 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         long timeOfDay = world.getWorldTime() % 24000;
         // 白天时间从0到12000刻
         return timeOfDay < 12000;
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+        return null;
     }
 
     protected class SolarTowerRecipeLogic extends MultiblockRecipeLogic {
