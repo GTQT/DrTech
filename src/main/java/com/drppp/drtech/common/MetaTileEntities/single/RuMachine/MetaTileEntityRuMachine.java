@@ -6,7 +6,8 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import com.drppp.drtech.api.capability.RuMachineAcceptFacing;
@@ -639,7 +640,7 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
     }
 
     @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
         return null;
     }
 }

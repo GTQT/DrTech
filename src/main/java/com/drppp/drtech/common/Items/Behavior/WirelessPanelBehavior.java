@@ -1,5 +1,9 @@
 package com.drppp.drtech.common.Items.Behavior;
 
+import com.cleanroommc.modularui.factory.HandGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.api.WirelessNetwork.WirelessNetworkManager;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import gregtech.api.gui.GuiTextures;
@@ -89,5 +93,10 @@ public class WirelessPanelBehavior implements IItemBehaviour, ItemUIFactory {
                 lines.add(I18n.format("behavior.data_item.wireless_panel.data", id.toString()));
             }
         }
+    }
+
+    @Override
+    public ModularPanel buildUI(HandGuiData handGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings) {
+        return null;
     }
 }

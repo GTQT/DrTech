@@ -134,13 +134,6 @@ public class MachineReceipe {
                 .duration(100)
                 .EUt(7680)
                 .buildAndRegister();
-
-        EIMPLOSION_RECIPES.recipeBuilder()
-                .input(OrePrefix.dust, Carbon, 63)
-                .output(Items.DIAMOND)
-                .explosivesAmount(OreDictUnifier.get(OrePrefix.dust, Carbon))
-                .buildAndRegister();
-
         for (int i = 0; i < 4; i++) {
             DrtechUtils.addLogCreate(30, 100, 1, i);
         }

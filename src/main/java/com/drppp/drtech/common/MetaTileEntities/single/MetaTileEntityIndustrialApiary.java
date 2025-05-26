@@ -5,7 +5,10 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
@@ -273,6 +276,13 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
 //        {
 //            this.error = buf.readString(32700);
 //        }
+    }
+    @Nullable
+    @Override
+    public GameProfile getOwner() {
+        if(uid!=null)
+            return new GameProfile(uid,name);
+        return null;
     }
     @Override
     public void update() {
@@ -1200,8 +1210,9 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         }
     };
 
+
     @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings) {
         return null;
     }
 

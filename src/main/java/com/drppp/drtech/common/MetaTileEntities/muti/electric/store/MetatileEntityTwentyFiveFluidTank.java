@@ -5,7 +5,8 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.Client.Textures;
@@ -474,7 +475,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     }
 
     @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
         return null;
     }
 

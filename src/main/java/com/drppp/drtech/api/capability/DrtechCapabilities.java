@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DrtechCapabilities {
-    public static final MultiblockAbility<IFluidTank> YOT_HATCH = new MultiblockAbility("yot_hatch");
+    public static final MultiblockAbility<IFluidTank> YOT_HATCH = new MultiblockAbility("yot_hatch", IFluidTank.class);
 
     @CapabilityInject(INuclearDataShow.class)
     public static Capability<INuclearDataShow> CAPABILITY_NUCLEAR_DATA = null;

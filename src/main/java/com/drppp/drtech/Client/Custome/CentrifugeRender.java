@@ -7,6 +7,7 @@ import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Matrix4;
 import gregtech.api.GTValues;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.client.texture.IconRegistrar;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.BlockRenderLayer;
@@ -15,7 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class CentrifugeRender implements TextureUtils.IIconRegister {
+public class CentrifugeRender implements TextureUtils.IIconRegister, IconRegistrar {
     @SideOnly(Side.CLIENT)
     private TextureAtlasSprite baseBackgroundSprite;
     @SideOnly(Side.CLIENT)

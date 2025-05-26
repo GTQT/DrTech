@@ -68,7 +68,6 @@ public class MetaTileEntities {
     public static MetaTileEntityAdvancedProsscessArray ADVANCED_PROCESS_ARRAY;
     public static MetaTileEntityDeepGroundPump DEEP_GROUND_PUMP;
     public static MetaTileEntityDronePad DRONE_PAD;
-    public static MetaTileEntityElectricImplosionCompressor LARGE_LARGE;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
@@ -149,8 +148,7 @@ public class MetaTileEntities {
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
         BENEATH_TRANS = registerMetaTileEntity(getID(), new MetaTileEntityBeneathTrans(getmyId("beneath_trans")));
 
-        LARGE_LARGE = registerMetaTileEntity(getID(), new MetaTileEntityElectricImplosionCompressor(getmyId("electric_implosion_compressor")));
-        LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(), new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
+      LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(), new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
         getID();
         LOG_FACTORY = registerMetaTileEntity(getID(), new MetaTileEntityLogFactory(getmyId("log_factory")));
         MATRIX_SOLVER = registerMetaTileEntity(getID(), new MetaTileEntityMatrixSolver(getmyId("matrix_solver")));

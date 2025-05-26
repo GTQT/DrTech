@@ -2,7 +2,8 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -115,7 +116,7 @@ public class MetaTileEntityMobsKiller extends RecipeMapMultiblockController {
     }
 
     @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, GuiSyncManager guiSyncManager) {
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
         return null;
     }
 

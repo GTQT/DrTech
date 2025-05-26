@@ -7,7 +7,6 @@ import gregtech.api.metatileentity.MetaTileEntityHolder;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
-import gregtech.api.util.XSTR;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.metatileentities.MetaTileEntities;
 import gregtech.common.pipelike.cable.Insulation;
@@ -127,7 +126,7 @@ public abstract class StructRuins extends WorldGenerator {
                 rand1.nextLong();
             }
 
-            Random rand = new XSTR(rand1.nextLong());
+            Random rand = new Random();
             SecureRandom secureRandom = new SecureRandom();
 
             if (worldObj.getBlockState(pos).getBlock() == Blocks.AIR) {

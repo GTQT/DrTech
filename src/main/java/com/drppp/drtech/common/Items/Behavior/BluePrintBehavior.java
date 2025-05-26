@@ -1,6 +1,12 @@
 package com.drppp.drtech.common.Items.Behavior;
 
 
+import com.cleanroommc.modularui.factory.HandGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import gregtech.api.GregTechAPI;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
@@ -454,7 +460,7 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
                 TileEntity holder = world.getTileEntity(pos);
 
                 if (holder instanceof IGregTechTileEntity) {
-                    MetaTileEntity sampleMetaTileEntity = GregTechAPI.MTE_REGISTRY.getObjectById(machine.getItemDamage());
+                    MetaTileEntity sampleMetaTileEntity = GTUtility.getMetaTileEntity(machine);
                     if (sampleMetaTileEntity != null) {
                         MetaTileEntity metaTileEntity = ((IGregTechTileEntity) holder).setMetaTileEntity(sampleMetaTileEntity);
                         metaTileEntity.onPlacement();
@@ -503,5 +509,10 @@ public class BluePrintBehavior implements IItemBehaviour, ItemUIFactory {
             }
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+    }
+
+    @Override
+    public ModularPanel buildUI(HandGuiData handGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings) {
+        return null;
     }
 }

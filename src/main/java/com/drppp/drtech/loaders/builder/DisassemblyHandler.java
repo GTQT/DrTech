@@ -52,24 +52,31 @@ public class DisassemblyHandler {
     public static void buildDisassemblerRecipes() {
         Map<ResourceLocation, MetaTileEntity> mteMap = new HashMap<>();
         Map<MetaTileEntity, IRecipe> recipeMap = new HashMap<>();
-        GregTechAPI.MTE_REGISTRY.forEach(mte -> {
-            if ((mte instanceof EnergyContainerHandler.IEnergyChangeListener
-                    || mte instanceof MultiblockControllerBase
-                    || mte instanceof SteamMetaTileEntity
-            )
-                    && (!(mte instanceof MetaTileEntityHull))) {
-
-                if (!mteMap.containsKey(mte.metaTileEntityId))
-                    mteMap.put(mte.metaTileEntityId, mte);
-            }
+        GregTechAPI.mteManager.getRegistries().forEach(mter -> {
+            mter.getKeys().forEach(item->{
+                var mte = mter.getObject(item);
+                if ((mte instanceof EnergyContainerHandler.IEnergyChangeListener
+                        || mte instanceof MultiblockControllerBase
+                        || mte instanceof SteamMetaTileEntity
+                )
+                        && (!(mte instanceof MetaTileEntityHull))) {
+                    if (!mteMap.containsKey(mte.metaTileEntityId))
+                        mteMap.put(mte.metaTileEntityId, mte);
+                }
+            });
         });
         ForgeRegistries.RECIPES.forEach(iRecipe -> {
             MetaTileEntity mte;
             if ((mte = testAndGetMTE(iRecipe.getRecipeOutput())) != null) {
-                if (mteMap.containsKey(GregTechAPI.MTE_REGISTRY.getNameForObject(mte))) {
-                    if (iRecipe.getIngredients().size() != 1)
-                        recipeMap.put(mte, recipeMap.containsKey(mte) ? null : iRecipe);
-                }
+                GregTechAPI.mteManager.getRegistries().forEach(mter -> {
+                    mter.getKeys().forEach(item->{
+                        if (mteMap.containsKey(mter.getObject(item))) {
+                            if (iRecipe.getIngredients().size() != 1)
+                                recipeMap.put(mte, recipeMap.containsKey(mte) ? null : iRecipe);
+                        }
+                    });
+                });
+
             }
         });
 		//合成拆解 仅限GT MetileEntity

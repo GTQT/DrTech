@@ -3,7 +3,7 @@ package com.drppp.drtech.api.recipes.builder;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeBuilder;
 import gregtech.api.recipes.RecipeMap;
-import gregtech.api.recipes.recipeproperties.PrimitiveProperty;
+import gregtech.api.recipes.properties.impl.PrimitiveProperty;
 import gregtech.api.util.ValidationResult;
 
 public class NoEnergyRecipeBuilder extends RecipeBuilder<NoEnergyRecipeBuilder> {

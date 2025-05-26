@@ -40,7 +40,6 @@ import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
-import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
 import com.drppp.drtech.loaders.misc.GendustryRecipes;
 import gregtech.api.GregTechAPI;
@@ -131,7 +130,6 @@ public class DrTechMain {
 
     @SubscribeEvent
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-        OrePrefixRecipes.init();
     }
 
     @SubscribeEvent

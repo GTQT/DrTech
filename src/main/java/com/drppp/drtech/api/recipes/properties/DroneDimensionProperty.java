@@ -1,12 +1,14 @@
 package com.drppp.drtech.api.recipes.properties;
 
+import gregtech.api.recipes.properties.RecipeProperty;
 import gregtech.api.worldgen.config.WorldGenRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.Minecraft;
 
-import gregtech.api.recipes.recipeproperties.RecipeProperty;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.nbt.NBTBase;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -24,6 +26,16 @@ public class DroneDimensionProperty extends RecipeProperty<IntList> {
         if (INSTANCE == null)
             INSTANCE = new DroneDimensionProperty();
         return INSTANCE;
+    }
+
+    @Override
+    public @NotNull NBTBase serialize(@NotNull Object o) {
+        return null;
+    }
+
+    @Override
+    public @NotNull Object deserialize(@NotNull NBTBase nbtBase) {
+        return null;
     }
 
     @Override
