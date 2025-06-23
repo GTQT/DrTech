@@ -583,7 +583,7 @@ public class CraftingReceipe {
                 "DXD", "XMX", "PXP",
                 'M', Blocks.BRICK_BLOCK,
                 'X', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper),
-                'P', OreDictNames.craftingPiston,
+                'P', new UnificationEntry(gearSmall, Materials.Iron),
                 'D', new UnificationEntry(OrePrefix.gem, Materials.Diamond));
 
         ModHandler.addShapedRecipe("ru_mixer", MetaTileEntities.RU_MIXER.getStackForm(),
@@ -597,14 +597,14 @@ public class CraftingReceipe {
                 "XXX", "PMP", "XXX",
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
-                'P', OreDictNames.craftingPiston);
+                'P', new UnificationEntry(gearSmall, Materials.Iron));
 
         ModHandler.addShapedRecipe( "ru_extruder", MetaTileEntities.RU_EXTRUDER.getStackForm(),
                 "GPG", "SMS", "GXG",
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
                 'S', new UnificationEntry(screw, Materials.Tin),
-                'P', OreDictNames.craftingPiston,
+                'P', new UnificationEntry(gearSmall, Materials.Iron),
                 'G', new UnificationEntry(spring, Materials.Copper));
 
         ModHandler.addShapedRecipe( "ru_sifter", MetaTileEntities.RU_SIFTER.getStackForm(),
@@ -612,7 +612,7 @@ public class CraftingReceipe {
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
                 'S', new UnificationEntry(spring, Materials.Copper),
-                'P', OreDictNames.craftingPiston,
+                'P', new UnificationEntry(gearSmall, Materials.Iron),
                 'G', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper));
 
         ModHandler.addShapedRecipe("ru_hammer", MetaTileEntities.RU_HAMMER.getStackForm(),
@@ -620,21 +620,21 @@ public class CraftingReceipe {
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
                 'S', new UnificationEntry(spring, Materials.Copper),
-                'P', OreDictNames.craftingPiston,
+                'P', new UnificationEntry(gearSmall, Materials.Iron),
                 'G', new UnificationEntry(screw, Materials.Tin));
 
         ModHandler.addShapedRecipe( "ru_wiremill", MetaTileEntities.RU_WIREMILL.getStackForm(),
                 "XXX", "PMG", "XXX",
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(stick, Materials.Tin),
-                'P', OreDictNames.craftingPiston,
+                'P', new UnificationEntry(gearSmall, Materials.Iron),
                 'G', new UnificationEntry(screw, Materials.Iron));
 
         ModHandler.addShapedRecipe("ru_bender", MetaTileEntities.RU_BENDER.getStackForm(),
                 "XXX", "PMG", "XXX",
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
-                'P', OreDictNames.craftingPiston,
+                'P', new UnificationEntry(gearSmall, Materials.Iron),
                 'G', new UnificationEntry(ring, Materials.Iron));
 
         ModHandler.addShapedRecipe("ru_centrifuge", MetaTileEntities.RU_CENTRIFUGE.getStackForm(),
@@ -642,13 +642,13 @@ public class CraftingReceipe {
                 'M', Blocks.BRICK_BLOCK,
                 'X',  new UnificationEntry(plate, Materials.Iron),
                 'S', new UnificationEntry(spring, Materials.Copper),
-                'P', OreDictNames.craftingPiston);
+                'P', new UnificationEntry(gearSmall, Materials.Iron));
 
         ModHandler.addShapedRecipe("ru_splitter", MetaTileEntities.RU_SPLITTER.getStackForm(),
                 "XPX", "PMP", "XPX",
                 'M', Blocks.BRICK_BLOCK,
                 'X', new UnificationEntry(ring, Materials.Iron),
-                'P', OreDictNames.craftingPiston);
+                'P', new UnificationEntry(gearSmall, Materials.Iron));
 
         ModHandler.addShapedRecipe("ru_generator", MetaTileEntities.RU_GENERATOR.getStackForm(),
                 "PCP",

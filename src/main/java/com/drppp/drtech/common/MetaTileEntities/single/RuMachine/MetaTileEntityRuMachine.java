@@ -531,19 +531,6 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
                 .createUITemplate(var10001::getProgressPercent, this.importItems, this.exportItems, this.importFluids, this.exportFluids, yOffset)
                 .widget(new LabelWidget(5, 5, this.getMetaFullName()));
 
-        // 反射修改背景纹理
-        try {
-            Field backgroundField = ModularUI.Builder.class.getDeclaredField("background");
-            backgroundField.setAccessible(true);
-
-            IGuiTexture customBackground = GuiTextures.BACKGROUND_STEAM.get(
-                    true);
-            backgroundField.set(var10000, customBackground);
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to modify ModularUI background", e);
-        }
-
         ImageWidget var8 = (new ImageWidget(79, 42 + yOffset, 18, 18, GuiTextures.INDICATOR_NO_ENERGY)).setIgnoreColor(true);
         AbstractRecipeLogic var10002 = this.workable;
         Objects.requireNonNull(var10002);
