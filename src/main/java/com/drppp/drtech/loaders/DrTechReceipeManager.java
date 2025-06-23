@@ -4,7 +4,12 @@ import com.drppp.drtech.api.Utils.Mods;
 import com.drppp.drtech.intergations.HarvestcraftFishChain;
 import com.drppp.drtech.intergations.HarvestcraftLinkage;
 import com.drppp.drtech.loaders.chain.*;
-import com.drppp.drtech.loaders.misc.BinneRecipes;
+import com.drppp.drtech.loaders.recipes.chain.FluidStoreRecpie;
+import com.drppp.drtech.loaders.recipes.chain.LaserBending;
+import com.drppp.drtech.loaders.recipes.chain.MobsDropsRecipe;
+import com.drppp.drtech.loaders.recipes.chain.NuclearRecipe;
+import com.drppp.drtech.loaders.recipes.misc.BinneRecipes;
+import com.drppp.drtech.loaders.recipes.MachineReceipe;
 import net.minecraftforge.fml.common.Loader;
 
 public class DrTechReceipeManager {

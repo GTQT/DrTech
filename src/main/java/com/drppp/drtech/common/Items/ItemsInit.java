@@ -2,15 +2,11 @@ package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
-import com.drppp.drtech.Client.render.LaserPipeRenderer;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemRedStoneCropSeed;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import gregtech.api.block.VariantItemBlock;
-import gregtech.client.model.SimpleStateMapper;
-import gregtech.common.pipelike.laser.BlockLaserPipe;
-import gregtech.common.pipelike.laser.ItemBlockLaserPipe;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -29,24 +25,24 @@ import java.util.function.Function;
 import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
-    public static  final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new  ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID,"gravitational_anomaly");
-    public static  final Item ITEM_BLOCK_WATER_MILL = new  ItemBlock(BlocksInit.BLOCK_WATER_MILL).setRegistryName(Tags.MODID,"water_mill");
-    public static  final Item ITEM_BLOCK_WOOD_AXLE = new  ItemBlock(BlocksInit.BLOCK_WOOD_AXLE).setRegistryName(Tags.MODID,"wood_axle");
-    public static  final Item ITEM_CONNECTOR1 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR1).setRegistryName(Tags.MODID,"connector_1");
-    public static  final Item ITEM_CONNECTOR2 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID,"connector_2");
-    public static  final Item ITEM_CONNECTOR3 = new  ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID,"connector_3");
-    public static  final Item ITEM_BLOCK_GOLDEN_SEA = new  ItemBlock(BlocksInit.BLOCK_GOLDEN_SEA).setRegistryName(Tags.MODID,"golden_sea");
-    public static  final Item ITEM_BLOCK_PEACEFUL_TABLE = new  ItemBlock(BlocksInit.BLOCK_PEACEFUL_TABLE).setRegistryName(Tags.MODID,"peaceful_table");
-    public static  final Item ITEM_BLOCK_STORAGE_PAIL = new  ItemBlock(BlocksInit.BLOCK_STORAGE_PAIL).setRegistryName(Tags.MODID,BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName().getPath());
-    public static  final Item ITEM_BLOCK_WASTE_DIRT = new  ItemBlock(BlocksInit.BLOCK_WASTE_DIRT).setRegistryName(Tags.MODID,BlocksInit.BLOCK_WASTE_DIRT.getRegistryName().getPath());
-    public static final  Item ITEM_BLOCK_SAP_BAG =  new  ItemBlock(BlocksInit.BLOCK_SAP_BAG).setRegistryName(Tags.MODID,BlocksInit.BLOCK_SAP_BAG.getRegistryName().getPath());
-    public static  final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
-    public static  final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
-    public static  final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
-    public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID,BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
-    public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID,BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
-    public static void init(RegistryEvent.Register<Item> event)
-    {
+    public static final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID, "gravitational_anomaly");
+    public static final Item ITEM_BLOCK_WATER_MILL = new ItemBlock(BlocksInit.BLOCK_WATER_MILL).setRegistryName(Tags.MODID, "water_mill");
+    public static final Item ITEM_BLOCK_WOOD_AXLE = new ItemBlock(BlocksInit.BLOCK_WOOD_AXLE).setRegistryName(Tags.MODID, "wood_axle");
+    public static final Item ITEM_CONNECTOR1 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR1).setRegistryName(Tags.MODID, "connector_1");
+    public static final Item ITEM_CONNECTOR2 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID, "connector_2");
+    public static final Item ITEM_CONNECTOR3 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID, "connector_3");
+    public static final Item ITEM_BLOCK_GOLDEN_SEA = new ItemBlock(BlocksInit.BLOCK_GOLDEN_SEA).setRegistryName(Tags.MODID, "golden_sea");
+    public static final Item ITEM_BLOCK_PEACEFUL_TABLE = new ItemBlock(BlocksInit.BLOCK_PEACEFUL_TABLE).setRegistryName(Tags.MODID, "peaceful_table");
+    public static final Item ITEM_BLOCK_STORAGE_PAIL = new ItemBlock(BlocksInit.BLOCK_STORAGE_PAIL).setRegistryName(Tags.MODID, BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName().getPath());
+    public static final Item ITEM_BLOCK_WASTE_DIRT = new ItemBlock(BlocksInit.BLOCK_WASTE_DIRT).setRegistryName(Tags.MODID, BlocksInit.BLOCK_WASTE_DIRT.getRegistryName().getPath());
+    public static final Item ITEM_BLOCK_SAP_BAG = new ItemBlock(BlocksInit.BLOCK_SAP_BAG).setRegistryName(Tags.MODID, BlocksInit.BLOCK_SAP_BAG.getRegistryName().getPath());
+    public static final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
+    public static final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
+    public static final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
+    public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID, BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
+    public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID, BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
+
+    public static void init(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
         event.getRegistry().register(ITEM_BLOCK_WATER_MILL);
         event.getRegistry().register(ITEM_BLOCK_WOOD_AXLE);
@@ -63,18 +59,17 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_SAP_BAG);
         event.getRegistry().register(ITEM_BLOCK_ADVANCED_CAULDRON);
         event.getRegistry().register(ITEM_BLOCK_TIME_TABLE);
-        event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1,  VariantItemBlock::new));
-        event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING,  VariantItemBlock::new));
-        event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1,  VariantItemBlock::new));
-        event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK,  VariantItemBlock::new));
-        event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK,  VariantItemBlock::new));
-        event.getRegistry().register(new ItemBlockLaserPipe(BlocksInit.MY_LASER_PIPE).setRegistryName(BlocksInit.MY_LASER_PIPE.getRegistryName()));
-        if(Loader.isModLoaded("forestry"))
-        {
+        event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK, VariantItemBlock::new));
+        if (Loader.isModLoaded("forestry")) {
             event.getRegistry().register(ItemCombs.ITEM_COMBS);
             event.getRegistry().register(ItemCombs.ITEM_DROPS);
         }
     }
+
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
         registerItemModel(BlocksInit.TRANSPARENT_CASING1);
@@ -82,22 +77,17 @@ public class ItemsInit {
         registerItemModel(BlocksInit.COMMON_CASING1);
         registerItemModel(BlocksInit.YOT_TANK);
         registerItemModel(BlocksInit.TFFT_TANK);
-            BlockLaserPipe pipe = BlocksInit.MY_LASER_PIPE;
-            ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(pipe), (stack) -> {
-                return LaserPipeRenderer.INSTANCE.getModelLocation();
-            });
-        var normalStateMapper = new SimpleStateMapper(LaserPipeRenderer.INSTANCE.getModelLocation());
-            ModelLoader.setCustomStateMapper(pipe, normalStateMapper);
+
         ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
-        if(Loader.isModLoaded("forestry"))
-        {
+        if (Loader.isModLoaded("forestry")) {
             ((com.drppp.drtech.intergations.Forestry.DrtCombItem) ItemCombs.ITEM_COMBS).registerModel(ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);
             ((com.drppp.drtech.intergations.Forestry.DrtDropItem) ItemCombs.ITEM_DROPS).registerModel(ItemCombs.ITEM_DROPS, forestry.api.core.ForestryAPI.modelManager);
         }
 
     }
+
     @SideOnly(Side.CLIENT)
     private static void registerItemModel(@Nonnull Block block) {
         for (IBlockState state : block.getBlockState().getValidStates()) {
@@ -107,6 +97,7 @@ public class ItemsInit {
                             statePropertiesToString(state.getProperties())));
         }
     }
+
     private static <T extends Block> ItemBlock createItemBlock(@Nonnull T block, Function<T, ItemBlock> producer) {
         ItemBlock itemBlock = producer.apply(block);
         itemBlock.setRegistryName(Objects.requireNonNull(block.getRegistryName()));

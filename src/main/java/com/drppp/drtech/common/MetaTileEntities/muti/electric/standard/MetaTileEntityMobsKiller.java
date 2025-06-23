@@ -1,9 +1,6 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -46,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.drppp.drtech.loaders.DrtechReceipes.MOB_KILLER;
+import static com.drppp.drtech.loaders.recipes.DrtechReceipes.MOB_KILLER;
 import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.TI_BORON_SILICATE_GLASS;
 
 
@@ -115,10 +112,6 @@ public class MetaTileEntityMobsKiller extends RecipeMapMultiblockController {
         textList.add(new TextComponentTranslation("", ""));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
 
     protected class MobKillerLogic extends MultiblockRecipeLogic {
 

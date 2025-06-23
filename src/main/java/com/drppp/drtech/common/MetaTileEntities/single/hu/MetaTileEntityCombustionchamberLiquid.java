@@ -5,19 +5,15 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.ColourMultiplier;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IHeatEnergy;
 import com.drppp.drtech.api.capability.impl.HeatEnergyHandler;
-import com.drppp.drtech.loaders.CraftingReceipe;
+import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.impl.FluidTankList;
 import gregtech.api.gui.ModularUI;
-import gregtech.api.items.itemhandlers.GTItemStackHandler;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.unification.material.Materials;
@@ -29,7 +25,6 @@ import gregtech.client.renderer.texture.cube.SimpleSidedCubeRenderer;
 import keqing.gtqtcore.common.metatileentities.multi.multiblockpart.MetaTileEntityHeatHatch;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -37,18 +32,15 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -345,10 +337,7 @@ public class MetaTileEntityCombustionchamberLiquid extends MetaTileEntity {
         return super.getCapability(capability, side);
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
+    
 
     private class FliterFluidTank extends  FluidTank{
 

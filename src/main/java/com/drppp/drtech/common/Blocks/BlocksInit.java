@@ -2,12 +2,9 @@ package com.drppp.drtech.common.Blocks;
 
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Blocks.MetaBlocks.*;
-import com.drppp.drtech.common.Blocks.Pipe.BlockMyLaserPipe;
-import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.Utils.Datas;
-import gregtech.common.pipelike.laser.LaserPipeType;
+import com.drppp.drtech.common.Blocks.MetaBlocks.*;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -28,17 +25,16 @@ public class BlocksInit {
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
-    public static final BlockStoragePail BLOCK_STORAGE_PAIL = new BlockStoragePail("compress",1);
+    public static final BlockStoragePail BLOCK_STORAGE_PAIL = new BlockStoragePail("compress", 1);
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
     public static final MetaCasing1 COMMON_CASING1 = new MetaCasing1();
     public static final BlockYotTankPart YOT_TANK = new BlockYotTankPart();
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
-    public static final BlockMyLaserPipe MY_LASER_PIPE = new BlockMyLaserPipe(LaserPipeType.values()[0]);
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
     public static final BlockTimeTable BLOCK_TIME_TABLE = new BlockTimeTable();
-    public  static void init(RegistryEvent.Register<Block> event)
-    {
+
+    public static void init(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
         GameRegistry.registerTileEntity(TileEntityGravitationalAnomaly.class, new ResourceLocation(Tags.MODID, "gravitational_anomaly"));
         event.getRegistry().register(BLOCK_WATER_MILL);
@@ -67,10 +63,6 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityAdvancedCauldron.class, new ResourceLocation(Tags.MODID, "advanced_cauldron"));
         event.getRegistry().register(BLOCK_TIME_TABLE);
         GameRegistry.registerTileEntity(TileEntityTimeTable.class, new ResourceLocation(Tags.MODID, "time_table"));
-        MY_LASER_PIPE.setRegistryName("my_laser_pipe_normal");
-        MY_LASER_PIPE.setTranslationKey("my_laser_pipe_normal");
-        MY_LASER_PIPE.setCreativeTab(DrTechMain.DrTechTab);
-        event.getRegistry().register(MY_LASER_PIPE);
         Datas.init();
     }
 
@@ -82,7 +74,7 @@ public class BlocksInit {
         double x = x0 + radius.x * Math.sin(phi) * Math.cos(theta);
         double y = y0 + radius.y * Math.sin(phi) * Math.sin(theta);
         double z = z0 + radius.z * Math.cos(phi);
-        return new Vector3f((float)x, (float)y, (float)z);
+        return new Vector3f((float) x, (float) y, (float) z);
     }
 
 }

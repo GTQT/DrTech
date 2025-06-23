@@ -4,21 +4,19 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.Client.render.TesrWoodAxle;
 import com.drppp.drtech.Client.render.TesrWaterMill;
-import com.drppp.drtech.Client.render.LaserPipeRenderer;
+import com.drppp.drtech.Client.render.TesrWoodAxle;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
-import com.drppp.drtech.Tile.TileEntityWoodAxle;
-import com.drppp.drtech.Tile.TileEntityWaterMill;
 import com.drppp.drtech.Tile.TileEntityTimeTable;
+import com.drppp.drtech.Tile.TileEntityWaterMill;
+import com.drppp.drtech.Tile.TileEntityWoodAxle;
 import com.drppp.drtech.World.DrtDimensionType.DrtDimType;
 import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
-import com.drppp.drtech.api.WirelessNetwork.GlobalEnergyWorldSavedData;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -26,22 +24,21 @@ import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
-import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
-import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
+import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
+import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.MaterialTemperatureUtil;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
-import com.drppp.drtech.common.event.PollutionEffectHandler;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
 import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
 import com.drppp.drtech.intergations.top.TopInit;
-import com.drppp.drtech.loaders.CraftingReceipe;
+import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
-import com.drppp.drtech.loaders.builder.DisassemblyHandler;
-import com.drppp.drtech.loaders.misc.GendustryRecipes;
+import com.drppp.drtech.loaders.recipes.builder.DisassemblyHandler;
+import com.drppp.drtech.loaders.recipes.misc.GendustryRecipes;
 import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import net.minecraft.block.Block;
@@ -71,8 +68,11 @@ import software.bernie.geckolib3.GeckoLib;
 import static com.drppp.drtech.Tags.MODID;
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
-@Mod(modid = MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "required:genetics@[2.5.1.203,);")
+@Mod(modid = MODID, version = Tags.VERSION, name = Tags.MODNAME,
+        acceptedMinecraftVersions = "[1.12.2]",
+        dependencies = "required:genetics@[2.5.1.203,);" +
+                "required-after:gregtech@[2.9.0-beta,);"
+)
 public class DrTechMain {
     public static final Logger LOGGER = LogManager.getLogger(MODID);
     public static CreativeTabs DrTechTab;
@@ -90,7 +90,7 @@ public class DrTechMain {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        DrTechTab = new MyCreativeTabs("mytab");
+        DrTechTab = new DrTechCreativeTabs("mytab");
         DrMetaItems.MetaItemsInit();
         FuelRodInit();
         DrtechCapInit.init();
@@ -104,6 +104,7 @@ public class DrTechMain {
         if (Loader.isModLoaded("forestry")) {
             ItemCombs.init();
         }
+        DrTechMetaTileEntities.initialization();
     }
 
     @EventHandler
@@ -125,7 +126,6 @@ public class DrTechMain {
             throw new RuntimeException(e);
         }
         TextureUtils.addIconRegister(Textures::register);
-        LaserPipeRenderer.INSTANCE.preInit();
     }
 
     @SubscribeEvent
@@ -146,13 +146,10 @@ public class DrTechMain {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        MetaTileEntities.Init();
         CraftingReceipe.load();
         DrTechReceipeManager.init();
         SyncInit.init();
         TopInit.init();
-        MinecraftForge.EVENT_BUS.register(new GlobalEnergyWorldSavedData());
-        MinecraftForge.EVENT_BUS.register(new PollutionEffectHandler());
         StructUtil.init();
         DRTAlleleBeeSpecies.setupAlleles();
         CombRecipes.initDRTCombs();
@@ -191,5 +188,4 @@ public class DrTechMain {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
     }
-
 }

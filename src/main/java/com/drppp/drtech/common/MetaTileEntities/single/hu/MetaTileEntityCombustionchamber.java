@@ -5,15 +5,12 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.ColourMultiplier;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IHeatEnergy;
 import com.drppp.drtech.api.capability.impl.HeatEnergyHandler;
-import com.drppp.drtech.loaders.CraftingReceipe;
+import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.items.itemhandlers.GTItemStackHandler;
@@ -319,8 +316,5 @@ public class MetaTileEntityCombustionchamber extends MetaTileEntity {
         return super.getCapability(capability, side);
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
+    
 }

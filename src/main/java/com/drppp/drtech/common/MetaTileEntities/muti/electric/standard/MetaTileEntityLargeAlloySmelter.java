@@ -1,9 +1,6 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.block.IHeatingCoilBlockStats;
@@ -40,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.LARGE_ALLOY_SMELTER;
+import static com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities.LARGE_ALLOY_SMELTER;
 import static gregtech.api.util.RelativeDirection.*;
 
 public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockController {
@@ -141,10 +138,6 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
         this.leve = data.getInteger("CoinLevel");
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {
         public SelfRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {

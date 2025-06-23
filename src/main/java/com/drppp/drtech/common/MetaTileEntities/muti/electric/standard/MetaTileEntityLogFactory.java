@@ -1,13 +1,10 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.loaders.DrtechReceipes;
+import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -78,10 +75,6 @@ public class MetaTileEntityLogFactory extends RecipeMapMultiblockController {
 
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
 
     protected class LogFactoryRecipeLogic extends MultiblockRecipeLogic {
         public LogFactoryRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {

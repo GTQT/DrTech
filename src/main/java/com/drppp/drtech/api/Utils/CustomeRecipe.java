@@ -1,10 +1,9 @@
 package com.drppp.drtech.api.Utils;
 
-import com.drppp.drtech.loaders.builder.DisassemblyHandler;
+import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
+import com.drppp.drtech.loaders.recipes.builder.DisassemblyHandler;
 
 import gregicality.multiblocks.common.metatileentities.GCYMMetaTileEntities;
-import gregtech.api.GTValues;
-import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.IMultipleTankHandler;
 import gregtech.api.items.toolitem.ItemGTTool;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -24,7 +23,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -596,11 +594,10 @@ public class CustomeRecipe {
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_POLARIZER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CUTTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_ELECTROLYZER.getStackForm());
-        CAN_DO_WORK_MACHINES.add(com.drppp.drtech.common.MetaTileEntities.MetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm());
+        CAN_DO_WORK_MACHINES.add(DrTechMetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ADV_ARC_FURNACE.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.LARGE_ROASTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ELECTROBATH.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.INDUSTRIAL_MACERATOR.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.BIO_CENTRIFUGE.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.FROTH_FLOTATION_TANK.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.VACUUM_DRYING_FURNACE.getStackForm());

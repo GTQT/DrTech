@@ -3,17 +3,12 @@ package com.drppp.drtech.common.MetaTileEntities.muti.mutipart;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.api.capability.impl.BatteryEnergyContainerHandler;
-import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
+import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
 import gregtech.api.capability.IEnergyContainer;
-import gregtech.api.capability.impl.EnergyContainerHandler;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.SlotWidget;
@@ -38,14 +33,13 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockPart implements IMultiblockAbilityPart<IEnergyContainer> {
+public class MetaTileEntityBatteryEnergyHatch extends MetaTileEntityMultiblockPart implements IMultiblockAbilityPart<IEnergyContainer> {
     protected final boolean isExportHatch;
     protected final int amperage;
     protected final IEnergyContainer energyContainer;
@@ -56,12 +50,12 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
         this.isExportHatch = isExportHatch;
         this.amperage = amperage;
         if (isExportHatch) {
-            this.energyContainer = BatteryEnergyContainerHandler.emitterContainer(this, GTValues.V[tier] * 64L * (long)amperage, GTValues.V[tier], (long)amperage);
-            ((BatteryEnergyContainerHandler)this.energyContainer).setSideOutputCondition((s) -> {
+            this.energyContainer = BatteryEnergyContainerHandler.emitterContainer(this, GTValues.V[tier] * 64L * (long) amperage, GTValues.V[tier], amperage);
+            ((BatteryEnergyContainerHandler) this.energyContainer).setSideOutputCondition((s) -> {
                 return s == this.getFrontFacing();
             });
         } else {
-            this.energyContainer = BatteryEnergyContainerHandler.receiverContainer(this, GTValues.V[tier] * 16L * (long)amperage, GTValues.V[tier], (long)amperage);
+            this.energyContainer = BatteryEnergyContainerHandler.receiverContainer(this, GTValues.V[tier] * 16L * (long) amperage, GTValues.V[tier], amperage);
         }
 
     }
@@ -80,18 +74,19 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
 
     public void update() {
         super.update();
-        this.checkWeatherOrTerrainExplosion((float)this.getTier(), (double)(this.getTier() * 10), this.energyContainer);
+        this.checkWeatherOrTerrainExplosion((float) this.getTier(), this.getTier() * 10, this.energyContainer);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
-        ((ItemStackHandler)itemInventory).deserializeNBT(data.getCompoundTag("selfItemInventory"));
+        ((ItemStackHandler) itemInventory).deserializeNBT(data.getCompoundTag("selfItemInventory"));
     }
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
-        data.setTag("selfItemInventory",((ItemStackHandler)itemInventory).serializeNBT());
+        data.setTag("selfItemInventory", ((ItemStackHandler) itemInventory).serializeNBT());
         return data;
     }
 
@@ -152,16 +147,13 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
     @Override
     public void onRemoval() {
         super.onRemoval();
-        if(!getWorld().isRemote )
-        {
-            if(itemInventory.getSlots()>0)
-            {
+        if (!getWorld().isRemote) {
+            if (itemInventory.getSlots() > 0) {
                 for (int i = 0; i < itemInventory.getSlots(); i++) {
                     var pos = getPos();
-                    if(!itemInventory.getStackInSlot(i).isEmpty())
-                    {
-                        getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,itemInventory.getStackInSlot(i)));
-                        itemInventory.extractItem(i,1,false);
+                    if (!itemInventory.getStackInSlot(i).isEmpty()) {
+                        getWorld().spawnEntity(new EntityItem(getWorld(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, itemInventory.getStackInSlot(i)));
+                        itemInventory.extractItem(i, 1, false);
                     }
 
                 }
@@ -179,35 +171,35 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
         String tierName = GTValues.VNF[this.getTier()];
         this.addDescriptorTooltip(stack, world, tooltip, advanced);
         if (this.isExportHatch) {
-            tooltip.add(I18n.format("gregtech.universal.tooltip.voltage_out", new Object[]{this.energyContainer.getOutputVoltage(), tierName}));
-            tooltip.add(I18n.format("gregtech.universal.tooltip.amperage_out_till", new Object[]{this.energyContainer.getOutputAmperage()}));
+            tooltip.add(I18n.format("gregtech.universal.tooltip.voltage_out", this.energyContainer.getOutputVoltage(), tierName));
+            tooltip.add(I18n.format("gregtech.universal.tooltip.amperage_out_till", this.energyContainer.getOutputAmperage()));
         } else {
-            tooltip.add(I18n.format("gregtech.universal.tooltip.voltage_in", new Object[]{this.energyContainer.getInputVoltage(), tierName}));
-            tooltip.add(I18n.format("gregtech.universal.tooltip.amperage_in_till", new Object[]{this.energyContainer.getInputAmperage()}));
+            tooltip.add(I18n.format("gregtech.universal.tooltip.voltage_in", this.energyContainer.getInputVoltage(), tierName));
+            tooltip.add(I18n.format("gregtech.universal.tooltip.amperage_in_till", this.energyContainer.getInputAmperage()));
         }
 
-        tooltip.add(I18n.format("gregtech.universal.tooltip.energy_storage_capacity", new Object[]{this.energyContainer.getEnergyCapacity()}));
-        tooltip.add(I18n.format("gregtech.universal.enabled", new Object[0]));
+        tooltip.add(I18n.format("gregtech.universal.tooltip.energy_storage_capacity", this.energyContainer.getEnergyCapacity()));
+        tooltip.add(I18n.format("gregtech.universal.enabled"));
     }
 
     protected void addDescriptorTooltip(ItemStack stack, @Nullable World world, List<String> tooltip, boolean advanced) {
         if (this.isExportHatch) {
             if (this.amperage > 2) {
-                tooltip.add(I18n.format("gregtech.machine.energy_hatch.output_hi_amp.tooltip", new Object[0]));
+                tooltip.add(I18n.format("gregtech.machine.energy_hatch.output_hi_amp.tooltip"));
             } else {
-                tooltip.add(I18n.format("gregtech.machine.energy_hatch.output.tooltip", new Object[0]));
+                tooltip.add(I18n.format("gregtech.machine.energy_hatch.output.tooltip"));
             }
         } else if (this.amperage > 2) {
-            tooltip.add(I18n.format("gregtech.machine.energy_hatch.input_hi_amp.tooltip", new Object[0]));
+            tooltip.add(I18n.format("gregtech.machine.energy_hatch.input_hi_amp.tooltip"));
         } else {
-            tooltip.add(I18n.format("gregtech.machine.energy_hatch.input.tooltip", new Object[0]));
+            tooltip.add(I18n.format("gregtech.machine.energy_hatch.input.tooltip"));
         }
 
     }
 
     public void addToolUsages(ItemStack stack, @Nullable World world, List<String> tooltip, boolean advanced) {
-        tooltip.add(I18n.format("gregtech.tool_action.screwdriver.access_covers", new Object[0]));
-        tooltip.add(I18n.format("gregtech.tool_action.wrench.set_facing", new Object[0]));
+        tooltip.add(I18n.format("gregtech.tool_action.screwdriver.access_covers"));
+        tooltip.add(I18n.format("gregtech.tool_action.wrench.set_facing"));
         super.addToolUsages(stack, world, tooltip, advanced);
     }
 
@@ -215,29 +207,23 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
         return this.isExportHatch;
     }
 
+    @Override
     public void getSubItems(CreativeTabs creativeTab, NonNullList<ItemStack> subItems) {
-        if (this == MetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[0]) {
-            MetaTileEntityBatteryEnergyHatch[] var3 = MetaTileEntities.BATTERY_INPUT_ENERGY_HATCH;
-            int var4 = var3.length;
-
-            int var5;
-            MetaTileEntityBatteryEnergyHatch hatch;
-            for (var5 = 0; var5 < var4; ++var5) {
-                hatch = var3[var5];
-                if (hatch != null) {
-                    subItems.add(hatch.getStackForm());
-                }
+        if (this == DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[0]) {
+            for (MetaTileEntityBatteryEnergyHatch hatch : DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH) {
+                if (hatch != null) subItems.add(hatch.getStackForm());
             }
-
-//            var3 = MetaTileEntities.BATTERY_OUTPUT_ENERGY_HATCH;
-//            var4 = var3.length;
-//
-//            for (var5 = 0; var5 < var4; ++var5) {
-//                hatch = var3[var5];
-//                if (hatch != null) {
-//                    subItems.add(hatch.getStackForm());
-//                }
-//            }
+            for (MetaTileEntityBatteryEnergyHatch hatch : DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_4A) {
+                if (hatch != null) subItems.add(hatch.getStackForm());
+            }
+            for (MetaTileEntityBatteryEnergyHatch hatch : DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_16A) {
+                if (hatch != null) subItems.add(hatch.getStackForm());
+            }
+            for (MetaTileEntityBatteryEnergyHatch hatch : DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_64A) {
+                if (hatch != null) subItems.add(hatch.getStackForm());
+            }
+        } else if (this.getClass() != MetaTileEntityBatteryEnergyHatch.class) {
+            super.getSubItems(creativeTab, subItems);
         }
     }
 
@@ -249,6 +235,7 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
         }
 
     }
+
     protected ItemStackHandler createImportItemHandler() {
         return new ItemStackHandler(4) {
 
@@ -271,8 +258,5 @@ public class MetaTileEntityBatteryEnergyHatch  extends MetaTileEntityMultiblockP
         };
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
+
 }

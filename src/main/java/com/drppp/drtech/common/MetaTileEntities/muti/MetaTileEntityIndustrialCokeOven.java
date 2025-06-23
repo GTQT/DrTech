@@ -6,9 +6,6 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.FluidTankList;
@@ -34,7 +31,6 @@ import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.metatileentities.MetaTileEntities;
-import gregtech.common.metatileentities.multi.MetaTileEntityCokeOven;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -60,13 +56,15 @@ public class MetaTileEntityIndustrialCokeOven extends RecipeMapPrimitiveMultiblo
         this.exportFluids = new FluidTankList(false, makeFluidTanks(this.recipeMapWorkable.getRecipeMap().getMaxFluidOutputs(), true));
         this.recipeMapWorkable = new IndustrialRecipeLogic(this, RecipeMaps.COKE_OVEN_RECIPES);
     }
+
     private List<FluidTank> makeFluidTanks(int length, boolean isExport) {
         List<FluidTank> fluidTankList = new ArrayList(length);
-        for(int i = 0; i < length; ++i) {
+        for (int i = 0; i < length; ++i) {
             fluidTankList.add(new NotifiableFluidTank(256000, this, isExport));
         }
         return fluidTankList;
     }
+
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity tileEntity) {
         return new MetaTileEntityIndustrialCokeOven(metaTileEntityId);
@@ -174,28 +172,23 @@ public class MetaTileEntityIndustrialCokeOven extends RecipeMapPrimitiveMultiblo
         }
         return super.onRightClick(playerIn, hand, facing, hitResult);
     }
-
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings) {
-        return null;
-    }
-
-    private class IndustrialRecipeLogic  extends  PrimitiveRecipeLogic
-    {
+    private class IndustrialRecipeLogic extends PrimitiveRecipeLogic {
 
         public IndustrialRecipeLogic(RecipeMapPrimitiveMultiblockController tileEntity, RecipeMap<?> recipeMap) {
             super(tileEntity, recipeMap);
             this.setParallelLimit(32);
 
         }
+
         public long getMaxVoltage() {
             return 32L;
         }
+
         @Override
         protected void outputRecipeOutputs() {
             GTTransferUtils.addItemsToItemHandler(this.getOutputInventory(), false, this.itemOutputs);
             for (int i = 0; i < this.fluidOutputs.size(); i++) {
-                this.fluidOutputs.get(i).amount = this.fluidOutputs.get(i).amount*2;
+                this.fluidOutputs.get(i).amount = this.fluidOutputs.get(i).amount * 2;
             }
             GTTransferUtils.addFluidsToFluidHandler(this.getOutputTank(), false, this.fluidOutputs);
         }

@@ -9,8 +9,7 @@
     "forestry.MixinModuleCore",
     "forestry.MixinModuleMachine",
     "gregtech.ElectricContainerInfoProviderMixin",
-    "gregtech.LighterBehaviourMixin",
-    "gregtech.RecipeLogicInfoProviderMixin"
+    "gregtech.LighterBehaviourMixin"
   ],
   "server": [],
   "client":[]

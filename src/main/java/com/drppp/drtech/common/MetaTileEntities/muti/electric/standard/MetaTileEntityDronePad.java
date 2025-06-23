@@ -1,9 +1,6 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
@@ -25,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
-import static com.drppp.drtech.loaders.DrtechReceipes.DRONE_PAD;
+import static com.drppp.drtech.loaders.recipes.DrtechReceipes.DRONE_PAD;
 
 public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
 
@@ -141,8 +138,5 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         return false;
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
+
 }

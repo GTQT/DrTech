@@ -6,7 +6,7 @@ import keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import static com.drppp.drtech.loaders.DrtechReceipes.LOG_CREATE;
+import static com.drppp.drtech.loaders.recipes.DrtechReceipes.LOG_CREATE;
 import static gregtech.api.unification.material.Materials.Helium;
 import static gregtech.api.unification.material.Materials.SodiumPotassium;
 

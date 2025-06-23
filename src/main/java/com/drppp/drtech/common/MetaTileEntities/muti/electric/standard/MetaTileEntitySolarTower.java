@@ -1,15 +1,12 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.loaders.DrtechReceipes;
+import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -194,10 +191,6 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         return timeOfDay < 12000;
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
-        return null;
-    }
 
     protected class SolarTowerRecipeLogic extends MultiblockRecipeLogic {
 

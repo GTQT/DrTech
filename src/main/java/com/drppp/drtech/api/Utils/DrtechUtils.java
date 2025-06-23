@@ -22,7 +22,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.drppp.drtech.loaders.DrtechReceipes.LOG_CREATE;
+import static com.drppp.drtech.loaders.recipes.DrtechReceipes.LOG_CREATE;
 import static gregtech.api.GregTechAPI.materialManager;
 
 public class DrtechUtils {

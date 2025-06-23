@@ -17,15 +17,18 @@ public class JustEnoughItemsModule extends IntegrationSubmodule implements IModP
     public static IGuiHelper guiHelper;
     @Override
     public void registerCategories( IRecipeCategoryRegistration registry) {
-        guiHelper = registry.getJeiHelpers().getGuiHelper();
-        registry.addRecipeCategories(new CanDoWorkMachineJeiCategory(registry.getJeiHelpers().getGuiHelper()));
+        //guiHelper = registry.getJeiHelpers().getGuiHelper();
+        //registry.addRecipeCategories(new CanDoWorkMachineJeiCategory(registry.getJeiHelpers().getGuiHelper()));
     }
     @Override
     public void register(IModRegistry registry) {
+        /*
         var uid = Tags.MODID+":CanDoWorkMachines";
         List<CanDoWorkMachineJei> Machines = new ArrayList<>();
         Machines.add(new CanDoWorkMachineJei());
         registry.addRecipes(Machines,uid);
+
+         */
     }
 
 }

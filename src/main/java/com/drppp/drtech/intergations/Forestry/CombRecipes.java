@@ -1,7 +1,7 @@
 package com.drppp.drtech.intergations.Forestry;
 
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
-import com.drppp.drtech.loaders.DrtechReceipes;
+import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.recipes.RecipeBuilder;
@@ -14,7 +14,6 @@ import gregtech.api.unification.material.properties.OreProperty;
 import gregtech.api.unification.material.properties.PropertyKey;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.util.GTUtility;
-import gregtech.common.items.MetaItems;
 import gregtech.integration.forestry.bees.GTCombType;
 import gregtech.integration.forestry.bees.GTDropItem;
 import keqing.gtqtcore.api.unification.GTQTMaterials;

@@ -63,6 +63,17 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem TOOL_BOX;
     public static MetaItem<?>.MetaValueItem MATRIX_GEMS;
 
+    //  Fluid Cores
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T1;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T2;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T3;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T4;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T5;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T6;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T7;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T8;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T9;
+    public static MetaItem<?>.MetaValueItem FLUID_CORE_T10;
     public static void MetaItemsInit() {
         MetaItems1 metaItem = new MetaItems1();
         metaItem.setRegistryName("meta_items_mymod");
