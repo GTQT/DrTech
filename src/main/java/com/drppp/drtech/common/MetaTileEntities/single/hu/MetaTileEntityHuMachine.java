@@ -4,6 +4,10 @@ import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IHeatEnergy;
 import com.drppp.drtech.api.capability.IRotationEnergy;
@@ -633,5 +637,10 @@ public class MetaTileEntityHuMachine extends WorkableTieredMetaTileEntity  imple
         tooltip.add(I18n.format("gregtech.tool_action.wrench.set_facing", new Object[0]));
         tooltip.add(I18n.format("gregtech.tool_action.soft_mallet.reset", new Object[0]));
         super.addToolUsages(stack, world, tooltip, advanced);
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
+        return null;
     }
 }

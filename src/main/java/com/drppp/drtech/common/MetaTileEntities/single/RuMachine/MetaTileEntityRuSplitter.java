@@ -4,11 +4,16 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.ColourMultiplier;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IRotationEnergy;
 import com.drppp.drtech.api.capability.IRotationSpeed;
 import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityRuGenerator;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -96,6 +101,12 @@ public class MetaTileEntityRuSplitter extends MetaTileEntity implements IRotatio
                     continue;
                 var tl = getWorld().getTileEntity(getPos().offset(facing));
                 if(tl!=null && tl.hasCapability(DrtechCommonCapabilities.CAPABILITY_ROTATION_ENERGY,facing))
+                {
+                    list.add(facing);
+                    count++;
+                }
+                var mte = GTUtility.getMetaTileEntity(getWorld(),getPos().offset(facing));
+                if(mte!=null && mte instanceof MetaTileEntityRuGenerator)
                 {
                     list.add(facing);
                     count++;
@@ -189,5 +200,10 @@ public class MetaTileEntityRuSplitter extends MetaTileEntity implements IRotatio
     @Override
     public EnumFacing getFacing() {
         return getFrontFacing();
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
+        return null;
     }
 }

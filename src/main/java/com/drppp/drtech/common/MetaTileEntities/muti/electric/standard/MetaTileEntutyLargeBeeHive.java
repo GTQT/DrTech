@@ -3,6 +3,12 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.api.ItemHandler.SingleItemStackHandler;
 import forestry.api.apiculture.*;
 import forestry.apiculture.ModuleApiculture;
@@ -390,6 +396,11 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
 
     public double getVoltageTierExact() {
         return Math.log((double) this.energyContainer.getEnergyCapacity() / 8d) / 1.3862943611199 + 1e-8d;
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
+        return null;
     }
 
     private static class BeeSimulator {

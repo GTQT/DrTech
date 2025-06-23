@@ -135,13 +135,6 @@ public class CraftingReceipe {
                 'W', Blocks.GOLD_BLOCK,
                 'S', new UnificationEntry(OrePrefix.plate,Materials.Gold)
         );
-        ModHandler.addShapedRecipe(true, "electric_implosion_compressor", MetaTileEntities.LARGE_LARGE.getStackForm(),
-                new Object[]{"PCP", "FSF", "PCP", 'C',
-                        new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
-                        'S', gregtech.common.metatileentities.MetaTileEntities.IMPLOSION_COMPRESSOR.getStackForm(),
-                        'P', MetaItems.ELECTRIC_PISTON_EV.getStackForm(),
-                        'F', MetaItems.FIELD_GENERATOR_EV.getStackForm()});
-
         if (Loader.isModLoaded("baubles"))
         {
             ModHandler.addShapedRecipe("electric_flight_ring", DrMetaItems.FLY_RING.getStackForm(),

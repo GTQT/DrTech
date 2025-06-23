@@ -4,6 +4,10 @@ import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.WirelessNetwork.WirelessNetworkManager;
 import com.drppp.drtech.api.capability.impl.EnergyContainerWireless;
@@ -16,6 +20,7 @@ import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.AdvancedTextWidget;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
+import gregtech.api.metatileentity.multiblock.AbilityInstances;
 import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
@@ -31,6 +36,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -123,11 +129,12 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
     public MultiblockAbility<IEnergyContainer> getAbility() {
         return isExport ? MultiblockAbility.OUTPUT_ENERGY : MultiblockAbility.INPUT_ENERGY;
     }
-    
+
     @Override
-    public void registerAbilities(List<IEnergyContainer> list) {
-        list.add(energyContainer);
+    public void registerAbilities(@NotNull AbilityInstances abilityInstances) {
+        abilityInstances.add(energyContainer);
     }
+    
     public void setUUID(UUID uuid) {
         this.ownerUuid = uuid;
         this.energyContainer.ownerUuid= uuid;
@@ -164,5 +171,10 @@ public class MetaTileEntityWirelessEnergyHatch extends MetaTileEntityMultiblockP
 
     public void addInformation(ItemStack stack, World player, List<String> tooltip, boolean advanced) {
         tooltip.add(I18n.format(this.isExport ? "drtech.machine.wireless.export.tooltip" : "drtech.machine.wireless.import.tooltip", new Object[0]));
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
+        return null;
     }
 }

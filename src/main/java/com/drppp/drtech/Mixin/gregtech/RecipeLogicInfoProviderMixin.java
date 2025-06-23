@@ -33,7 +33,7 @@ public abstract class RecipeLogicInfoProviderMixin {
     {
         if (capability.isWorking() && capability instanceof RecipeLogicRU) {
 
-            int EUt = capability.getInfoProviderEUt();
+            int EUt = (int)capability.getInfoProviderEUt();
             int absEUt = Math.abs(EUt);
             String text = null;
             if (text == null) {

@@ -3,7 +3,10 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.google.common.collect.Lists;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -151,35 +154,21 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
 
     protected void initializeAbilities() {
         var im_item = this.getAbilities(MultiblockAbility.IMPORT_ITEMS);
-        var im_itemCC = this.getAbilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID);
         List<IItemHandlerModifiable> itemlist = new ArrayList<>();
         itemlist.addAll(im_item);
-        itemlist.addAll(im_itemCC);
         this.inputInventory = new ItemHandlerList(itemlist);
         var im_fluid = this.getAbilities(MultiblockAbility.IMPORT_FLUIDS);
         List<IFluidTank> tanks = new ArrayList<>();
         tanks.addAll(im_fluid);
-        if (!im_itemCC.isEmpty()) {
-            for (int i = 0; i < im_itemCC.size(); i++) {
-                tanks.addAll(im_itemCC.get(i).getFluidTanks());
-            }
-        }
         this.inputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), tanks);
 
         var ex_item = this.getAbilities(MultiblockAbility.EXPORT_ITEMS);
-        var ex_itemCC = this.getAbilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID);
         List<IItemHandlerModifiable> ex_itemlist = new ArrayList<>();
         ex_itemlist.addAll(ex_item);
-        ex_itemlist.addAll(ex_itemCC);
         this.outputInventory = new ItemHandlerList(ex_itemlist);
         var ex_fluid = this.getAbilities(MultiblockAbility.EXPORT_FLUIDS);
         List<IFluidTank> extanks = new ArrayList<>();
         extanks.addAll(ex_fluid);
-        if (!ex_itemCC.isEmpty()) {
-            for (int i = 0; i < ex_itemCC.size(); i++) {
-                extanks.addAll(ex_itemCC.get(i).getFluidTanks());
-            }
-        }
         this.outputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), extanks);
         this.energyContainer = new EnergyContainerList(this.getAbilities(MultiblockAbility.INPUT_ENERGY));
         this.outEnergyContainer = new EnergyContainerList(this.getAbilities(MultiblockAbility.OUTPUT_ENERGY));
@@ -266,5 +255,10 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
             return false;
         this.energyContainer.changeEnergy(-energy);
         return true;
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings) {
+        return null;
     }
 }

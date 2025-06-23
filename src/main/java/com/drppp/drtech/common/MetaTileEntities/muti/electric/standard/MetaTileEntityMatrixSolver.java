@@ -4,7 +4,6 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.api.Muti.DrtMultiblockAbility;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.Utils.RecipeMerger;
 import com.drppp.drtech.common.Blocks.BlocksInit;
@@ -154,8 +153,6 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
                 .where(' ', any())
                 .where('A', states(BlocksInit.COMMON_CASING1.getStateFromMeta(7)).setMinGlobalLimited(578)
                         .or(autoAbilities(true, true))
-                        .or(abilities(DrtMultiblockAbility.EXPORT_ITEM_FLUID).setMaxGlobalLimited(16))
-                        .or(abilities(DrtMultiblockAbility.IMPORT_ITEM_FLUID).setMaxGlobalLimited(16))
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
                         .or(abilities(MultiblockAbility.INPUT_LASER).setMaxGlobalLimited(1))
                         .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMaxGlobalLimited(16))

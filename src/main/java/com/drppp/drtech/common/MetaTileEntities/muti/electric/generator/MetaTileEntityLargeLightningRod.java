@@ -14,7 +14,6 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.unification.material.Materials;
-import gregtech.api.util.XSTR;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
@@ -35,11 +34,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Random;
 
 public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithControl {
     long MAX_ENERGY_STORE = 5000000000L;
     long energy_store = 0;
-
     public MetaTileEntityLargeLightningRod(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -96,7 +95,7 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
         if(!getWorld().isRemote )
         {
             World aWorld = this.getWorld();
-            XSTR aXSTR = new XSTR();
+            Random aXSTR = new Random();
             if(outEnergyContainer.getEnergyStored()<outEnergyContainer.getEnergyCapacity())
             {
                 long change = this.outEnergyContainer.addEnergy(Math.min(energy_store, GTValues.V[GTValues.ZPM])*512);

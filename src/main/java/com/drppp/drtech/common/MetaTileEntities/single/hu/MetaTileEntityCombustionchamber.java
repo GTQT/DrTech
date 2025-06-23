@@ -5,6 +5,10 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.ColourMultiplier;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.api.capability.DrtechCommonCapabilities;
 import com.drppp.drtech.api.capability.IHeatEnergy;
@@ -313,5 +317,10 @@ public class MetaTileEntityCombustionchamber extends MetaTileEntity {
         if (capability == DrtechCommonCapabilities.CAPABILITY_HEAT_ENERGY && side == EnumFacing.UP)
             return DrtechCommonCapabilities.CAPABILITY_HEAT_ENERGY.cast(hu);
         return super.getCapability(capability, side);
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData posGuiData, PanelSyncManager panelSyncManager, UISettings uiSettings){
+        return null;
     }
 }

@@ -30,6 +30,7 @@ import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.MetaTileEntities;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
+import com.drppp.drtech.common.MetaTileEntities.single.hu.MaterialTemperatureUtil;
 import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.PollutionEffectHandler;
@@ -39,7 +40,6 @@ import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
-import com.drppp.drtech.loaders.OrePrefixRecipes;
 import com.drppp.drtech.loaders.builder.DisassemblyHandler;
 import com.drppp.drtech.loaders.misc.GendustryRecipes;
 import gregtech.api.GregTechAPI;
@@ -130,7 +130,6 @@ public class DrTechMain {
 
     @SubscribeEvent
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-        OrePrefixRecipes.init();
     }
 
     @SubscribeEvent
@@ -182,6 +181,7 @@ public class DrTechMain {
         DrtBeeDefinition.initBees();
         GendustryRecipes.init();
         LiquidBurringInfo.init();
+        MaterialTemperatureUtil.init();
     }
 
     @EventHandler

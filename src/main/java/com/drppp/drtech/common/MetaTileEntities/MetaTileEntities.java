@@ -64,13 +64,10 @@ public class MetaTileEntities {
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_INPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityWirelessEnergyHatch[] WIRELESS_OUTPUT_ENERGY_HATCH_1048576A = new MetaTileEntityWirelessEnergyHatch[15];
     public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH = new MetaTileEntityBatteryEnergyHatch[15];
-    public static final MetaTileentityItemAndFluidHatch[] ITEM_FLUID_IMPORT_HATCH = new MetaTileentityItemAndFluidHatch[15];
-    public static final MetaTileentityItemAndFluidHatch[] ITEM_FLUID_EXPORT_HATCH = new MetaTileentityItemAndFluidHatch[15];
     public static AnnihilationGenerator ANNIHILATION_GENERATOR;
     public static MetaTileEntityAdvancedProsscessArray ADVANCED_PROCESS_ARRAY;
     public static MetaTileEntityDeepGroundPump DEEP_GROUND_PUMP;
     public static MetaTileEntityDronePad DRONE_PAD;
-    public static MetaTileEntityElectricImplosionCompressor LARGE_LARGE;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
@@ -151,8 +148,7 @@ public class MetaTileEntities {
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
         BENEATH_TRANS = registerMetaTileEntity(getID(), new MetaTileEntityBeneathTrans(getmyId("beneath_trans")));
 
-        LARGE_LARGE = registerMetaTileEntity(getID(), new MetaTileEntityElectricImplosionCompressor(getmyId("electric_implosion_compressor")));
-        LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(), new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
+      LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(), new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
         getID();
         LOG_FACTORY = registerMetaTileEntity(getID(), new MetaTileEntityLogFactory(getmyId("log_factory")));
         MATRIX_SOLVER = registerMetaTileEntity(getID(), new MetaTileEntityMatrixSolver(getmyId("matrix_solver")));
@@ -194,15 +190,15 @@ public class MetaTileEntities {
         getID();
         RU_GENERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuGenerator(getmyId("ru_generator")));
 
-        RU_MACERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_macerator"), RecipeMaps.MACERATOR_RECIPES, Textures.RU_SHREDDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
-        RU_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_mixer"), RecipeMaps.MIXER_RECIPES, Textures.RU_MIXER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.DOWN}));
-        RU_SIFTER = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_sifter"), RecipeMaps.SIFTER_RECIPES, Textures.RU_SIFTER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
-        RU_COMPRESSOR= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_compressor"), RecipeMaps.COMPRESSOR_RECIPES, Textures.RU_COMPRESSOR,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.BACK}));
-        RU_EXTRUDER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_extruder"), RecipeMaps.EXTRACTOR_RECIPES, Textures.RU_EXTRUDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
-        RU_HAMMER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_hammer"), RecipeMaps.FORGE_HAMMER_RECIPES, Textures.RU_HAMMER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.BACK}));
-        RU_WIREMILL= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_wiremill"), RecipeMaps.WIREMILL_RECIPES, Textures.RU_WIREMILL,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
-        RU_BENDER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_bender"), RecipeMaps.BENDER_RECIPES, Textures.RU_BENDER,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
-        RU_CENTRIFUGE= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_centrifuge"), RecipeMaps.CENTRIFUGE_RECIPES, Textures.RU_CENTRIFUGE,1,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.DOWN}));
+        RU_MACERATOR = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_macerator"), RecipeMaps.MACERATOR_RECIPES, Textures.RU_SHREDDER,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_mixer"), RecipeMaps.MIXER_RECIPES, Textures.RU_MIXER,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.DOWN}));
+        RU_SIFTER = registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_sifter"), RecipeMaps.SIFTER_RECIPES, Textures.RU_SIFTER,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_COMPRESSOR= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_compressor"), RecipeMaps.COMPRESSOR_RECIPES, Textures.RU_COMPRESSOR,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.BACK}));
+        RU_EXTRUDER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_extruder"), RecipeMaps.EXTRACTOR_RECIPES, Textures.RU_EXTRUDER,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_HAMMER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_hammer"), RecipeMaps.FORGE_HAMMER_RECIPES, Textures.RU_HAMMER,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.BACK}));
+        RU_WIREMILL= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_wiremill"), RecipeMaps.WIREMILL_RECIPES, Textures.RU_WIREMILL,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_BENDER= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_bender"), RecipeMaps.BENDER_RECIPES, Textures.RU_BENDER,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.LEFT,RuMachineAcceptFacing.RIGHT}));
+        RU_CENTRIFUGE= registerMetaTileEntity(getID(), new MetaTileEntityRuMachine(getmyId("ru_centrifuge"), RecipeMaps.CENTRIFUGE_RECIPES, Textures.RU_CENTRIFUGE,8,true,new RuMachineAcceptFacing[]{RuMachineAcceptFacing.DOWN}));
         RU_SPLITTER= registerMetaTileEntity(getID(), new MetaTileEntityRuSplitter(getmyId("ru_splitter")));
         for (int i = 0; i < HU_BURRING_BOXS.length; i++) {
             String[] names = {"qian","qingtong","gang","yingang","ge","tai","wu","wugang"};
@@ -271,15 +267,7 @@ public class MetaTileEntities {
             String tier = VN[i].toLowerCase();
             BATTERY_INPUT_ENERGY_HATCH[i] = registerMetaTileEntity(17680 + i, new MetaTileEntityBatteryEnergyHatch(getmyId("battery_energy_hatch.input." + tier), i, 2, false));
         }
-        for (int i = 0; i < 15; i++) {
-            String tier = VN[i].toLowerCase();
-            ITEM_FLUID_IMPORT_HATCH[i] = registerMetaTileEntity(17695 + i, new MetaTileentityItemAndFluidHatch(getmyId("item_and_fluid_import_hatch_" + tier), i, false));
-            MultiblockAbility.REGISTRY.get(MultiblockAbility.IMPORT_ITEMS).add(ITEM_FLUID_IMPORT_HATCH[i]);
-            MultiblockAbility.REGISTRY.get(MultiblockAbility.IMPORT_FLUIDS).add(ITEM_FLUID_IMPORT_HATCH[i]);
-            ITEM_FLUID_EXPORT_HATCH[i] = registerMetaTileEntity(17710 + i, new MetaTileentityItemAndFluidHatch(getmyId("item_and_fluid_export_hatch_" + tier), i, true));
-            MultiblockAbility.REGISTRY.get(MultiblockAbility.EXPORT_ITEMS).add(ITEM_FLUID_EXPORT_HATCH[i]);
-            MultiblockAbility.REGISTRY.get(MultiblockAbility.EXPORT_FLUIDS).add(ITEM_FLUID_EXPORT_HATCH[i]);
-        }
+
     }
 
 
