@@ -30,10 +30,7 @@ public class LaserBending {
                     .circuitMeta(1)
                     .output(LASER_BENDING_256[i])
                     .duration(300).EUt(VA[IV]).buildAndRegister();
-        }
-        for (int i = 0; i < 9; i++)
-        {
-            if(HULL[IV+i]==null)return;
+
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -44,10 +41,7 @@ public class LaserBending {
                     .circuitMeta(1)
                     .output(LASER_BENDING_1024[i])
                     .duration(300).EUt(VA[LuV]).buildAndRegister();
-        }
-        for (int i = 0; i < 9; i++)
-        {
-            if(HULL[IV+i]==null)return;
+
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -58,10 +52,7 @@ public class LaserBending {
                     .circuitMeta(1)
                     .output(LASER_BENDING_4096[i])
                     .duration(300).EUt(VA[ZPM]).buildAndRegister();
-        }
-        for (int i = 0; i < 9; i++)
-        {
-            if(HULL[IV+i]==null)return;
+
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -72,10 +63,7 @@ public class LaserBending {
                     .circuitMeta(1)
                     .output(LASER_BENDING_16384[i])
                     .duration(300).EUt(VA[UV]).buildAndRegister();
-        }
-        for (int i = 0; i < 9; i++)
-        {
-            if(HULL[IV+i]==null)return;
+
             ASSEMBLER_RECIPES.recipeBuilder()
                     .input(HULL[IV+i])
                     .input(lens, Diamond)
@@ -86,6 +74,28 @@ public class LaserBending {
                     .circuitMeta(1)
                     .output(LASER_BENDING_65536[i])
                     .duration(300).EUt(VA[UHV]).buildAndRegister();
+
+            ASSEMBLER_RECIPES.recipeBuilder()
+                    .input(HULL[IV+i])
+                    .input(lens, Diamond)
+                    .input(emitters[i],16)
+                    .input(sendors[i],16)
+                    .input(pumps[i],16)
+                    .input(cableGtHex, Platinum, 4)
+                    .circuitMeta(1)
+                    .output(LASER_BENDING_262144[i])
+                    .duration(300).EUt(VA[UEV]).buildAndRegister();
+
+            ASSEMBLER_RECIPES.recipeBuilder()
+                    .input(HULL[IV+i])
+                    .input(lens, Diamond)
+                    .input(emitters[i],16)
+                    .input(sendors[i],16)
+                    .input(pumps[i],16)
+                    .input(cableGtHex, Platinum, 4)
+                    .circuitMeta(1)
+                    .output(LASER_BENDING_1048576[i])
+                    .duration(300).EUt(VA[UIV]).buildAndRegister();
         }
     }
 }

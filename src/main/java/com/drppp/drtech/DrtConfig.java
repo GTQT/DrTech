@@ -5,10 +5,6 @@ import net.minecraftforge.common.config.Config;
 @Config(modid = Tags.MODID)
 public class DrtConfig {
 
-    @Config.LangKey("enable_rocket_ditch")
-    @Config.Comment("开启火箭迫降")
-    @Config.RequiresMcRestart
-    public static boolean EnableRocketDitch = true;
     @Config.LangKey("enable_disassembly")
     @Config.Comment("开启拆解机")
     @Config.RequiresMcRestart

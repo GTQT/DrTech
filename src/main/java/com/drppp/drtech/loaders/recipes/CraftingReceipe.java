@@ -203,6 +203,21 @@ public class CraftingReceipe {
                     DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[i].getStackForm(),
                     gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH[i].getStackForm(),
                     gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
+
+            ModHandler.addShapelessRecipe("huancun_energy_hatch_4a" + i,
+                    DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_4A[i].getStackForm(),
+                    gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH_4A[i].getStackForm(),
+                    gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
+
+            ModHandler.addShapelessRecipe("huancun_energy_hatch_16a" + i,
+                    DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_16A[i].getStackForm(),
+                    gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH_16A[i].getStackForm(),
+                    gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
+
+            ModHandler.addShapelessRecipe("huancun_energy_hatch_64a" + i,
+                    DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_64A[i].getStackForm(),
+                    gregtech.common.metatileentities.MetaTileEntities.SUBSTATION_ENERGY_INPUT_HATCH[i].getStackForm(),
+                    gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
         }
     }
 
