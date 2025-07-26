@@ -5,7 +5,6 @@ import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.RuMachineAcceptFacing;
-import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearReactor;
@@ -64,7 +63,6 @@ public class DrTechMetaTileEntities {
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
     public static MetaTileEntityTypeFilter TYPE_FILTER;
-    public static MetaTileEntityIndustrialCokeOven INDUSTRIAL_COKE_OVEN;
     public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
     public static MetaTileEntityCombProcess COMB_PROVESS;
     public static MetaTileEntityIndustrialMixer INDUSTRIAL_MIXER;
@@ -181,7 +179,7 @@ public class DrTechMetaTileEntities {
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller1"), 1));
         CONCRETE_BACK_FILLER2 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller2"), 2));
         TYPE_FILTER = registerMetaTileEntity(getID(), new MetaTileEntityTypeFilter(getDrId("type_filter")));
-        INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCokeOven(getDrId("industrial_coke_oven")));
+        startID++;
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(), new MetaTileEntityLargeLightningRod(getDrId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(), new MetaTileEntityCombProcess(getDrId("comb_process")));
 
