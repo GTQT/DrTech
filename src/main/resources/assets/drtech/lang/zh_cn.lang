@@ -330,6 +330,11 @@ gregtech.material.bedrock=基岩
 #§c淡红 §d淡紫 §e淡黄
 #
 #§f白色
+drtech.machine.cbg.tooltip.1=§5一台使用内燃机燃料、燃气轮机燃料或火箭燃料以进行发电的§6超级发电机
+drtech.machine.cbg.tooltip.2=§5需要液氧充当助燃剂进行燃烧
+drtech.machine.cbg.tooltip.3=§5在机器运行时，每经过20tick检测一次输入仓内存留的燃料和助燃剂,§4并清空所有流体
+drtech.machine.cbg.tooltip.4=§5将其全部消耗后将产生的能量均摊至接下来的20tick作为该时段的平均输出功率
+drtech.machine.cbg.tooltip.4=§5支持激光仓
 drtech.machine.annihilation_generator.tooltip.1=§c根据物质量分阶段发电(400为一段)
 drtech.machine.annihilation_generator.tooltip.2=§c随时间递增发电A数目 每个阶段有最大发电A数 跨阶段后电流会恢复成1
 drtech.machine.annihilation_generator.tooltip.3=§c根据线圈等级会有额外效率加成
@@ -488,6 +493,7 @@ drtech.hu.generator.info.5=§6正面右键交互存储物品和打火
 drtech.hu.generator.info.6=§6灰烬存满后会停机
 drtech.hu.generator.info.7=§b配方: §f可燃燃料(内燃机、燃气轮机燃料)
 drtech.multiblock.cbg.out=§b发电功率:%s
+drtech.multiblock.cbg.rate=§b燃料/助燃剂比例:%s
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

@@ -197,7 +197,16 @@ public class CraftingReceipe {
                 'W', Blocks.IRON_BARS,
                 'F', gregtech.common.metatileentities.MetaTileEntities.HULL[0].getStackForm()
         );
-
+        ModHandler.addShapedRecipe("common_burn_generator", COMMON_BURN_GENERATOR.getStackForm(),
+                "WDW",
+                        "ABC",
+                        "WDW",
+                'D', getItemStack("gregtech:boiler_firebox_casing",2),
+                'W', getItemStack("gregtech:meta_plate_dense",113),
+                'A', getItemStack("gregtech:mte",1011),
+                'B', getItemStack("gregtech:mte",1008),
+                'C', getItemStack("gtqtcore:mte",60)
+        );
         for (int i = 0; i < 10; i++) {
             ModHandler.addShapelessRecipe("huancun_energy_hatch" + i,
                     DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[i].getStackForm(),
