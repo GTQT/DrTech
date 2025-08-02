@@ -114,6 +114,11 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
     }
 
     @Override
+    protected void addDisplayText(List<ITextComponent> textList) {
+        super.addDisplayText(textList);
+    }
+
+    @Override
     protected void updateFormedValid() {
 
     }
@@ -250,6 +255,12 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
         if (this.energyContainer.getEnergyStored() < energy)
             return false;
         this.energyContainer.changeEnergy(-energy);
+        return true;
+    }
+    public boolean addEnergy(long energy) {
+        if (this.outEnergyContainer == null)
+            return false;
+        this.outEnergyContainer.addEnergy(energy);
         return true;
     }
 }

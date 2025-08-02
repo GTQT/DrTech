@@ -253,17 +253,7 @@ public class MachineReceipe {
                         .duration(1200)
                         .EUt(VA[IV]))
                 .duration(800).EUt(VA[ZPM]).buildAndRegister();
-        ASSEMBLER_RECIPES.recipeBuilder()
-                .input(gregtech.common.metatileentities.MetaTileEntities.HULL[LV])
-                .input(MetaItems.EMITTER_LV, 4)
-                .input(MetaBlocks.OPTICAL_PIPES[0])
-                .fluidInputs(TinAlloy.getFluid(1440))
-                .circuitMeta(24)
-                .output(DrTechMetaTileEntities.PASSTHROUGH_COMPUTER)
-                .cleanroom(CleanroomType.CLEANROOM)
-                .EUt(120)
-                .duration(300)
-                .buildAndRegister();
+
 
         ASSEMBLY_LINE_RECIPES.recipeBuilder()
                 .input(GTQTMetaTileEntities.LIGHTNING_ROD[2], 4)

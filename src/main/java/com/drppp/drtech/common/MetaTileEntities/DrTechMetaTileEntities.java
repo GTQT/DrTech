@@ -6,6 +6,7 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.RuMachineAcceptFacing;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.CommonBurnGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.NuclearReactor;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
@@ -14,7 +15,6 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEnti
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityBatteryEnergyHatch;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileeneityPassthroughHatchComputationHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.*;
 import com.drppp.drtech.common.MetaTileEntities.single.RuMachine.MetaTileEntityRuMachine;
 import com.drppp.drtech.common.MetaTileEntities.single.RuMachine.MetaTileEntityRuSplitter;
@@ -58,7 +58,6 @@ public class DrTechMetaTileEntities {
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
-    public static MetaTileeneityPassthroughHatchComputationHatch PASSTHROUGH_COMPUTER;
     public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
@@ -70,6 +69,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityIndustrialCablePress INDUSTRIAL_CABLE_PRESS;
     public static MetaTileEntityIndustrialSieve INDUSTRIAL_SIEVE;
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
+    public static CommonBurnGenerator COMMON_BURN_GENERATOR;
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_256 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_1024 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
@@ -173,8 +173,6 @@ public class DrTechMetaTileEntities {
         TRANS_TOWER = registerMetaTileEntity(getID(), new MetaTileEntityEnergyTransTower(getDrId("trans_tower")));
         YOT_HARCH = registerMetaTileEntity(getID(), new MetaTileEntityYotHatch(getDrId("yot_hatch")));
         YOUT_TANK = registerMetaTileEntity(getID(), new MetaTileEntityYotTank(getDrId("yot_tank")));
-
-        PASSTHROUGH_COMPUTER = registerMetaTileEntity(getID(), new MetaTileeneityPassthroughHatchComputationHatch(getDrId("passthrough_computationhatch")));
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialApiary(getDrId("industrial_apiary"), Textures.INDUSTRIAL_APIARY));
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller1"), 1));
         CONCRETE_BACK_FILLER2 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller2"), 2));
@@ -182,6 +180,7 @@ public class DrTechMetaTileEntities {
         startID++;
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(), new MetaTileEntityLargeLightningRod(getDrId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(), new MetaTileEntityCombProcess(getDrId("comb_process")));
+        COMMON_BURN_GENERATOR = registerMetaTileEntity(getID(), new CommonBurnGenerator(getDrId("common_burn_generator")));
 
         if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {
             INDUSTRIAL_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialMixer(getDrId("industrial_mixer")));

@@ -1,0 +1,174 @@
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.generator;
+
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityBaseWithControl;
+import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
+import gregtech.api.capability.IEnergyContainer;
+import gregtech.api.capability.impl.EnergyContainerList;
+import gregtech.api.fluids.store.FluidStorageKeys;
+import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
+import gregtech.api.metatileentity.multiblock.IMultiblockPart;
+import gregtech.api.metatileentity.multiblock.MultiblockAbility;
+import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
+import gregtech.api.pattern.BlockPattern;
+import gregtech.api.pattern.FactoryBlockPattern;
+import gregtech.api.util.KeyUtil;
+import gregtech.client.renderer.ICubeRenderer;
+import gregtech.client.renderer.texture.Textures;
+import gregtech.common.blocks.BlockMetalCasing;
+import gregtech.common.blocks.MetaBlocks;
+import keqing.gtqtcore.common.block.GTQTMetaBlocks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static gregtech.api.unification.material.Materials.Oxygen;
+import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.FORCE_FIELD_CONSTRAINED_GLASS;
+
+public class CommonBurnGenerator extends MetaTileEntityBaseWithControl {
+    private long OutEut=0;
+    public CommonBurnGenerator(ResourceLocation metaTileEntityId) {
+        super(metaTileEntityId);
+        this.maxProcess=20;
+        this.process=0;
+    }
+
+    @Override
+    public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
+        return new CommonBurnGenerator(this.metaTileEntityId);
+    }
+
+    @Override
+    protected @NotNull BlockPattern createStructurePattern() {
+        return FactoryBlockPattern.start()
+                .aisle("AAAAA", "AAAAA", "AAAAA", "AAAAA", "AAAAA", "AAAAA")
+                .aisle("AAAAA", "AAAAA", "A###A", "A###A", "A###A", "AAAAA")
+                .aisle("AAAAA", "AAAAA", "A###A", "A###A", "A###A", "AAAAA")
+                .aisle("AAAAA", "AAAAA", "A###A", "A###A", "A###A", "AAAAA")
+                .aisle("AASAA", "AAAAA", "AAAAA", "AAAAA", "AAAAA", "AAAAA")
+                .where('S', selfPredicate())
+                .where('T', states(getCasingState()))
+                .where('B', states(getGlassesState()))
+                .where('X', heatingCoils())
+                .where('A',
+                        abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)
+                                .or(abilities(MultiblockAbility.OUTPUT_ENERGY).setMaxGlobalLimited(1))
+                                .or(abilities(MultiblockAbility.OUTPUT_LASER).setMaxGlobalLimited(1))
+                                .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1))
+                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMinGlobalLimited(1))
+                                .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMaxGlobalLimited(1))
+                                .or(states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE)))
+                )
+                .where('#', any())
+                .build();
+    }
+
+    protected IBlockState getCasingState() {
+        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.GRAVITATION_FIELD_CASING);
+    }
+
+    protected IBlockState getGlassesState() {
+        return GTQTMetaBlocks.blockMultiblockGlass1.getState(FORCE_FIELD_CONSTRAINED_GLASS);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
+        return Textures.STABLE_TITANIUM_CASING;
+    }
+
+    @Override
+    protected void initializeAbilities() {
+        super.initializeAbilities();
+        List<IEnergyContainer> energyContainer = new ArrayList(this.getAbilities(MultiblockAbility.OUTPUT_ENERGY));
+        energyContainer.addAll(this.getAbilities(MultiblockAbility.OUTPUT_LASER));
+        this.energyContainer = new EnergyContainerList(energyContainer);
+    }
+
+    @Override
+    protected void configureDisplayText(MultiblockUIBuilder builder) {
+        super.configureDisplayText(builder);
+        builder.setWorkingStatus(this.isWorkingEnabled(), this.isActive()).setWorkingStatusKeys("gregtech.multiblock.idling", "gregtech.multiblock.work_paused", "gregtech.multiblock.running").addEnergyUsageLine(this.energyContainer).addCustom((keyManager, syncer) -> {
+            if (this.isStructureFormed()) {
+                    long out = syncer.syncLong(this.OutEut);
+                    IKey amountInfo = KeyUtil.number(TextFormatting.BLUE, out, " EU/t");
+                    keyManager.add(KeyUtil.lang("drtech.multiblock.cbg.out", new Object[]{amountInfo}));
+            }
+        }).addProgressLine(getProgress(), getMaxProgress()).addWorkingStatusLine();
+    }
+
+    private void clearInputTanks()
+    {
+        for (var slot : this.inputFluidInventory.getFluidTanks()) {
+            if (slot.getFluidAmount() > 0) {
+                slot.drain(slot.getFluid(),true);
+            }
+        }
+    }
+    @Override
+    protected void updateFormedValid() {
+        if(!getWorld().isRemote && this.isWorkingEnabled())
+        {
+            if(!isActive()) setActive(true);
+            if(this.process++>=getMaxProgress())
+            {
+                this.process=0;
+                long fuel=0;
+                long fuel_eut=0;
+                long rocket_fuel=0;
+                long rocket_fuel_eut=0;
+                long oxygen=0;
+                this.OutEut=0;
+                //天才第一步 获取输入仓所有的可燃流体 和助燃剂
+                if(this.inputFluidInventory==null)
+                    return;
+                for (var slot : this.inputFluidInventory.getFluidTanks())
+                {
+                    if(slot.getFluidAmount()>0)
+                    {
+                        if(LiquidBurringInfo.ContainsFuel(slot.getFluid()))
+                        {
+                            fuel += slot.getFluidAmount();
+                            fuel_eut += (long) LiquidBurringInfo.getMlHu(slot.getFluid()) * slot.getFluidAmount();
+                        } else if (LiquidBurringInfo.ContainsRocketFuel(slot.getFluid())) {
+                            rocket_fuel += slot.getFluidAmount();
+                            rocket_fuel_eut += (long) LiquidBurringInfo.getRocketMlHu(slot.getFluid()) * slot.getFluidAmount();
+                        }else if(slot.getFluid().isFluidEqual(Oxygen.getFluid(FluidStorageKeys.LIQUID, 1000)))
+                        {
+                            oxygen += slot.getFluidAmount();
+                        }
+                    }
+                }
+                //第三步计算 流体助燃剂比例
+                if(oxygen!=0)
+                {
+
+                    double rate = (double) (fuel + rocket_fuel) /(oxygen);
+                    var fuel_rate = 1.6f* Math.pow(Math.E,-0.04*rate);
+                    var rocket_fuel_rate = 1.7f* Math.pow(Math.E,-0.005*rate);
+                    //第四步 计算每Tick产出EU 扣除所有流体开始产出
+                    this.OutEut = (long)((double) fuel_eut / 20 * fuel_rate) + (long)((double) rocket_fuel_eut / 20 * rocket_fuel_rate);
+                    clearInputTanks();
+                }
+                else
+                {
+                    this.OutEut =0;
+                }
+            }
+            addEnergy(OutEut);
+        }
+
+    }
+}

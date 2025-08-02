@@ -84,7 +84,7 @@ public class CraftingReceipe {
                 "WAW", "AFA", "SSS",
                 'W', MetaItems.ROBOT_ARM_HV,
                 'A', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
-                'F', new ItemStack(MetaBlocks.MACHINE, 1, 988),
+                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[3].getStackForm(),
                 'S', Items.DIAMOND_SWORD
         );
 
@@ -92,28 +92,28 @@ public class CraftingReceipe {
                 "WAW", "DSD", "WAW",
                 'W', new UnificationEntry(OrePrefix.plateDouble, Materials.Copper),
                 'D', new UnificationEntry(OrePrefix.plateDouble, Materials.Silver),
-                'S', new ItemStack(MetaBlocks.MACHINE, 1, 986),
+                'S', gregtech.common.metatileentities.MetaTileEntities.HULL[1].getStackForm(),
                 'A', new UnificationEntry(circuit, MarkerMaterials.Tier.LV)
         );
 
         ModHandler.addShapedRecipe("connector_1", new ItemStack(BlocksInit.BLOCK_CONNECTOR1),
                 "WAW", "WSW", "WAW",
                 'W', new UnificationEntry(OrePrefix.plate, Materials.Lead),
-                'S', new ItemStack(MetaBlocks.MACHINE, 1, 986),
+                'S', gregtech.common.metatileentities.MetaTileEntities.HULL[1].getStackForm(),
                 'A', new UnificationEntry(OrePrefix.plate, Materials.Polyethylene)
         );
 
         ModHandler.addShapedRecipe("connector_2", new ItemStack(BlocksInit.BLOCK_CONNECTOR2),
                 "WAW", "WSW", "WAW",
                 'W', new UnificationEntry(OrePrefix.plate, Materials.Aluminium),
-                'S', new ItemStack(MetaBlocks.MACHINE, 1, 987),
+                'S', gregtech.common.metatileentities.MetaTileEntities.HULL[2].getStackForm(),
                 'A', new UnificationEntry(OrePrefix.plate, Materials.Polyethylene)
         );
 
         ModHandler.addShapedRecipe("connector_3", new ItemStack(BlocksInit.BLOCK_CONNECTOR3),
                 "WAW", "WSW", "WAW",
                 'W', new UnificationEntry(OrePrefix.plate, Materials.Electrum),
-                'S', new ItemStack(MetaBlocks.MACHINE, 1, 988),
+                'S', gregtech.common.metatileentities.MetaTileEntities.HULL[3].getStackForm(),
                 'A', new UnificationEntry(OrePrefix.plate, Materials.Polyethylene)
         );
 

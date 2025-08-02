@@ -272,7 +272,7 @@ drtech.machine.industrial_roller_press.name=工业辊压机
 drtech.machine.industrial_cable_press.name=工业线材轧机
 drtech.machine.industrial_sieve.name=工业筛选机
 drtech.machine.industrial_centrifuge.name=工业离心机
-drtech.machine.rocket_launch_pad.name=火箭发射平台
+drtech.machine.common_burn_generator.name=通用化学能引擎
 drtech.machine.ru_generator.name=旋转能发电机
 drtech.machine.ru_macerator.name=旋转能粉碎机
 drtech.machine.ru_mixer.name=旋转能搅拌机
@@ -487,6 +487,7 @@ drtech.hu.generator.info.4=§6需要正面为空气才能工作
 drtech.hu.generator.info.5=§6正面右键交互存储物品和打火
 drtech.hu.generator.info.6=§6灰烬存满后会停机
 drtech.hu.generator.info.7=§b配方: §f可燃燃料(内燃机、燃气轮机燃料)
+drtech.multiblock.cbg.out=§b发电功率:%s
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

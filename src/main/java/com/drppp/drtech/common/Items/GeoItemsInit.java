@@ -27,9 +27,6 @@ public class GeoItemsInit {
     }
     @SideOnly(Side.CLIENT)
     public static void onModelRegistry() {
-        //ModelLoader.setCustomModelResourceLocation(GEO_ITEM_1, 0, new ModelResourceLocation(Tags.MODID + ":windrotor", "inventory"));
 
-
-        //GEO_ITEM_1.setTileEntityItemStackRenderer(new GeoItemRender());
     }
 }

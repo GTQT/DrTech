@@ -3,6 +3,9 @@ package com.drppp.drtech.common.MetaTileEntities.single.hu;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.recipes.RecipeMaps;
+import keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps;
+import keqing.gtqtcore.loaders.recipes.GTQTRecipes;
+import keqing.gtqtcore.loaders.recipes.GTQTRecipesManager;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -13,6 +16,7 @@ import java.util.*;
 public class LiquidBurringInfo {
 
     public static List<LiquidAndHu> listFuel = new ArrayList<>();
+    public static List<LiquidAndHu> listRocketFuel = new ArrayList<>();
     public static void init()
     {
         Collection<RecipeMap> Recipes = new ArrayList<>();
@@ -21,22 +25,40 @@ public class LiquidBurringInfo {
         for(RecipeMap map:Recipes)
         {
             Collection<Recipe> rc = map.getRecipeList();
-            rc.forEach(LiquidBurringInfo::initFuelsDta);
+            rc.forEach(x->LiquidBurringInfo.initFuelsDta(x,false));
         }
+        GTQTcoreRecipeMaps.ROCKET_RECIPES.getRecipeList().forEach(x->LiquidBurringInfo.initFuelsDta(x,true));
     }
 
-    private static void initFuelsDta(Recipe recipe) {
+    private static void initFuelsDta(Recipe recipe,boolean rocket) {
         if(recipe!=null)
         {
-            int eut =(int) recipe.getEUt();
-            int time = recipe.getDuration();
-            var fluid = recipe.getFluidInputs();
-            for (var item : fluid)
+            if(!rocket)
             {
-                if(!ContainsFuel(item.getInputFluidStack()))
+                int eut =(int) recipe.getEUt();
+                int time = recipe.getDuration();
+                var fluid = recipe.getFluidInputs();
+                for (var item : fluid)
                 {
-                    int amount = item.getAmount();
-                    LiquidBurringInfo.listFuel.add(new LiquidBurringInfo.LiquidAndHu(item.getInputFluidStack(),eut*time/amount));
+                    if(!ContainsFuel(item.getInputFluidStack()))
+                    {
+                        int amount = item.getAmount();
+                        LiquidBurringInfo.listFuel.add(new LiquidBurringInfo.LiquidAndHu(item.getInputFluidStack(),eut*time/amount));
+                    }
+                }
+            }
+            else
+            {
+                int eut =(int) recipe.getEUt();
+                int time = recipe.getDuration();
+                var fluid = recipe.getFluidInputs();
+                for (var item : fluid)
+                {
+                    if(!ContainsFuel(item.getInputFluidStack()))
+                    {
+                        int amount = item.getAmount();
+                        LiquidBurringInfo.listRocketFuel.add(new LiquidBurringInfo.LiquidAndHu(item.getInputFluidStack(),eut*time/amount));
+                    }
                 }
             }
         }
@@ -47,6 +69,15 @@ public class LiquidBurringInfo {
         for (int i = 0; i < listFuel.size(); i++)
         {
             if(listFuel.get(i).fuel.isFluidEqual(source))
+                return true;
+        }
+        return false;
+    }
+    public static boolean ContainsRocketFuel(FluidStack source)
+    {
+        for (int i = 0; i < listRocketFuel.size(); i++)
+        {
+            if(listRocketFuel.get(i).fuel.isFluidEqual(source))
                 return true;
         }
         return false;
@@ -70,6 +101,15 @@ public class LiquidBurringInfo {
         }
         return -1;
     }
+    public static int getRocketMlHu(FluidStack fuel)
+    {
+        for (var s: LiquidBurringInfo.listRocketFuel)
+        {
+            if(s.fuel.equals(fuel))
+                return s.mlHu;
+        }
+        return -1;
+    }
     private static class LiquidAndHu{
         public LiquidAndHu(FluidStack fuel, int mlHu) {
             this.fuel = fuel;
@@ -78,6 +118,5 @@ public class LiquidBurringInfo {
 
         public FluidStack fuel;
         public int mlHu;
-
     }
 }

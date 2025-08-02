@@ -83,6 +83,11 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     private int emitHeat=0;
 
     @Override
+    public boolean usesMui2() {
+        return false;
+    }
+
+    @Override
     public int getHeat() {
         return this.heat;
     }
@@ -863,7 +868,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
 
     @Override
     public ModularUI getModularUI(EntityPlayer entityPlayer) {
-        return super.getModularUI(entityPlayer);
+        return this.createUI(entityPlayer);
     }
 
     @Override

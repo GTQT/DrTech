@@ -29,7 +29,6 @@ import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.MaterialTemperatureUtil;
-import com.drppp.drtech.common.covers.DrtCoverReg;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
@@ -84,7 +83,7 @@ public class DrTechMain {
 
     @SubscribeEvent
     public static void registerCoverBehavior(GregTechAPI.RegisterEvent<CoverDefinition> event) {
-        DrtCoverReg.init();
+
     }
 
     @EventHandler
