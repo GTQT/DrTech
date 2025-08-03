@@ -172,7 +172,7 @@ public class DrTechMain {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        if (DrtConfig.MachineSwitch.EnableDisassembly)
+        if (DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         DrtBeeDefinition.initBees();
         GendustryRecipes.init();

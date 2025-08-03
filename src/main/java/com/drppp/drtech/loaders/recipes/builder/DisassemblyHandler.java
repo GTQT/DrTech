@@ -70,9 +70,12 @@ public class DisassemblyHandler {
             if ((mte = testAndGetMTE(iRecipe.getRecipeOutput())) != null) {
                 GregTechAPI.mteManager.getRegistries().forEach(mter -> {
                     mter.getKeys().forEach(item->{
-                        if (mteMap.containsKey(mter.getObject(item))) {
+                        if (mteMap.containsKey(item)) {
                             if (iRecipe.getIngredients().size() != 1)
-                                recipeMap.put(mte, recipeMap.containsKey(mte) ? null : iRecipe);
+                                if(!recipeMap.containsKey(mte))
+                                {
+                                    recipeMap.put(mte,  iRecipe);
+                                }
                         }
                     });
                 });
