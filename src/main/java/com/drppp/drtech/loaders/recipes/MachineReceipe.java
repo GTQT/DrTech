@@ -14,6 +14,7 @@ import forestry.apiculture.blocks.BlockAlvearyType;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.unification.material.MarkerMaterials;
+import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.BlockMetalCasing;
@@ -348,6 +349,31 @@ public class MachineReceipe {
                 .outputs(new ItemStack(BlocksInit.COMMON_CASING1, 1, 6))
                 .circuitMeta(1)
                 .EUt(16)
+                .duration(100)
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(CraftingReceipe.getItemStack("item('gregtech:meta_item_1', 717)"))
+                .input(dust, Thulium, 8)
+                .output(DrMetaItems.NUCLEAR_BATTERY_LV)
+                .circuitMeta(24)
+                .EUt(24)
+                .duration(100)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(CraftingReceipe.getItemStack("item('gregtech:meta_item_1', 718)"))
+                .input(dust, Thulium, 32)
+                .output(DrMetaItems.NUCLEAR_BATTERY_MV)
+                .circuitMeta(24)
+                .EUt(60)
+                .duration(100)
+                .buildAndRegister();
+        ASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(CraftingReceipe.getItemStack("item('gregtech:meta_item_1', 719)"))
+                .input(dust, Thulium, 64)
+                .output(DrMetaItems.NUCLEAR_BATTERY_HV)
+                .circuitMeta(24)
+                .EUt(420)
                 .duration(100)
                 .buildAndRegister();
     }

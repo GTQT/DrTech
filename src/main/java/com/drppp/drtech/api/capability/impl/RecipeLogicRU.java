@@ -46,14 +46,16 @@ public class RecipeLogicRU  extends AbstractRecipeLogic {
             return true;
         return false;
     }
-    protected boolean hasEnoughPower(int @NotNull [] resultOverclock) {
-        int recipeEUt = resultOverclock[0];
+    @Override
+    protected boolean hasEnoughPower(long eut, int duration) {
+        long recipeEUt = eut;
         if (recipeEUt >= 0) {
-            return this.getEnergyStored() >= (long)recipeEUt;
+            return this.getEnergyStored() >= recipeEUt;
         } else {
-            return this.getEnergyStored() - (long)recipeEUt <= this.getEnergyCapacity();
+            return this.getEnergyStored() - recipeEUt <= this.getEnergyCapacity();
         }
     }
+
     @Override
     public long getMaxVoltage() {
         return GTValues.V[8];
