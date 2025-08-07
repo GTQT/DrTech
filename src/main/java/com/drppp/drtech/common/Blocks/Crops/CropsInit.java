@@ -9,11 +9,13 @@ public class CropsInit {
     public static final DtrechCommonCrop REDSTONE_CROP = new DtrechCommonCrop("red_stone", ItemsInit.ITEM_RED_STONE_SEED, Items.REDSTONE);
     public static final DtrechCommonCrop LAPIS_CROP = new DtrechCommonCrop("lapis", ItemsInit.ITEM_LAPIS_SEED, Items.DYE);
     public static final DtrechCommonCrop FLU_CROP = new DtrechCommonCrop("flu", ItemsInit.ITEM_FLU_SEED, Items.GLOWSTONE_DUST);
+    public static final DtrechCommonCrop XJC_CROP = new DtrechCommonCrop("xjc", ItemsInit.ITEM_XJC_SEED, Items.AIR);
 
     public static void init(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().register(REDSTONE_CROP);
         event.getRegistry().register(LAPIS_CROP);
         event.getRegistry().register(FLU_CROP);
+        event.getRegistry().register(XJC_CROP);
     }
 }

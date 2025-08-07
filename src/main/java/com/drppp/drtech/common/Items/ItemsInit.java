@@ -5,6 +5,7 @@ import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemRedStoneCropSeed;
+import com.drppp.drtech.common.Items.ItemCropSeed.ItemXjcCropSeed;
 import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import gregtech.api.block.VariantItemBlock;
 import net.minecraft.block.Block;
@@ -39,6 +40,7 @@ public class ItemsInit {
     public static final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
     public static final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
     public static final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
+    public static final Item ITEM_XJC_SEED = new ItemXjcCropSeed("xjc_seed");
     public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID, BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID, BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
 
@@ -49,6 +51,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_RED_STONE_SEED);
         event.getRegistry().register(ITEM_LAPIS_SEED);
         event.getRegistry().register(ITEM_FLU_SEED);
+        event.getRegistry().register(ITEM_XJC_SEED);
         event.getRegistry().register(ITEM_CONNECTOR1);
         event.getRegistry().register(ITEM_CONNECTOR2);
         event.getRegistry().register(ITEM_CONNECTOR3);
@@ -81,6 +84,7 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_XJC_SEED, 0, new ModelResourceLocation(ITEM_XJC_SEED.getRegistryName(), "inventory"));
         if (Loader.isModLoaded("forestry")) {
             ((com.drppp.drtech.intergations.Forestry.DrtCombItem) ItemCombs.ITEM_COMBS).registerModel(ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);
             ((com.drppp.drtech.intergations.Forestry.DrtDropItem) ItemCombs.ITEM_DROPS).registerModel(ItemCombs.ITEM_DROPS, forestry.api.core.ForestryAPI.modelManager);

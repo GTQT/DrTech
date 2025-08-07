@@ -62,6 +62,9 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem UPGRADE_T;
     public static MetaItem<?>.MetaValueItem TOOL_BOX;
     public static MetaItem<?>.MetaValueItem MATRIX_GEMS;
+    public static MetaItem<?>.MetaValueItem XJC;
+    public static MetaItem<?>.MetaValueItem INULIN;
+    public static MetaItem<?>.MetaValueItem NATURAL_RUBBER;
 
     //  Fluid Cores
     public static MetaItem<?>.MetaValueItem FLUID_CORE_T1;

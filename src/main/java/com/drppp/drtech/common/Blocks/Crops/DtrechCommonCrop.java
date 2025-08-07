@@ -3,6 +3,7 @@ package com.drppp.drtech.common.Blocks.Crops;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
@@ -42,7 +43,7 @@ public class DtrechCommonCrop extends BlockCrops {
 
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
     {
-        return COMMON_AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
+        return COMMON_AABB[state.getValue(this.getAgeProperty()).intValue()];
     }
 
     @Override
@@ -63,6 +64,22 @@ public class DtrechCommonCrop extends BlockCrops {
                     int meta  =rand.nextInt(15);
                     drops.add(new ItemStack(Items.DYE,1,meta==3?1:meta));
                 }
+            }
+        }else if(this.getSeed() == ItemsInit.ITEM_XJC_SEED)
+        {
+            int age = this.getAge(state);
+            Random rand = world instanceof World ? ((World) world).rand : new Random();
+            ItemStack seed= new ItemStack(this.ItemSeed);
+            if (age >= this.getMaxAge()) {
+                if (!seed.isEmpty()) {
+                    drops.add(seed.copy());
+                    if (rand.nextInt(9) == 0) {
+                        drops.add(seed.copy());
+                    }
+                }
+                ItemStack crops = DrMetaItems.XJC.getStackForm();
+                crops.setCount(rand.nextInt(5));
+               drops.add(crops);
             }
         }
         else

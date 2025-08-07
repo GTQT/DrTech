@@ -20,6 +20,8 @@ import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
+import keqing.gtqtcore.GTQTCore;
+import keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps;
 import keqing.gtqtcore.api.unification.GTQTMaterials;
 import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
@@ -354,7 +356,7 @@ public class MachineReceipe {
 
         ASSEMBLER_RECIPES.recipeBuilder()
                 .inputs(CraftingReceipe.getItemStack("item('gregtech:meta_item_1', 717)"))
-                .input(dust, Thulium, 8)
+                .input(dust, Thorium, 8)
                 .output(DrMetaItems.NUCLEAR_BATTERY_LV)
                 .circuitMeta(24)
                 .EUt(24)
@@ -362,7 +364,7 @@ public class MachineReceipe {
                 .buildAndRegister();
         ASSEMBLER_RECIPES.recipeBuilder()
                 .inputs(CraftingReceipe.getItemStack("item('gregtech:meta_item_1', 718)"))
-                .input(dust, Thulium, 32)
+                .input(dust, Thorium, 32)
                 .output(DrMetaItems.NUCLEAR_BATTERY_MV)
                 .circuitMeta(24)
                 .EUt(60)
@@ -370,10 +372,31 @@ public class MachineReceipe {
                 .buildAndRegister();
         ASSEMBLER_RECIPES.recipeBuilder()
                 .inputs(CraftingReceipe.getItemStack("item('gregtech:meta_item_1', 719)"))
-                .input(dust, Thulium, 64)
+                .input(dust, Thorium, 64)
                 .output(DrMetaItems.NUCLEAR_BATTERY_HV)
                 .circuitMeta(24)
                 .EUt(420)
+                .duration(100)
+                .buildAndRegister();
+        GTQTcoreRecipeMaps.FLUID_EXTRACTOR_RECIPES.recipeBuilder()
+                .input(DrMetaItems.XJC,16)
+                .output(DrMetaItems.NATURAL_RUBBER,1)
+                .output(DrMetaItems.INULIN,8)
+                .EUt(80)
+                .duration(100)
+                .buildAndRegister();
+        ALLOY_SMELTER_RECIPES.recipeBuilder()
+                .input(DrMetaItems.NATURAL_RUBBER,1)
+                .input(dust,Carbon,2)
+                .output(ingot,Rubber,1)
+                .EUt(80)
+                .duration(100)
+                .buildAndRegister();
+        FERMENTING_RECIPES.recipeBuilder()
+                .input(DrMetaItems.INULIN,4)
+                .fluidInput(Water.getFluid(),1000)
+                .fluidOutputs(Ethanol.getFluid(750))
+                .EUt(8)
                 .duration(100)
                 .buildAndRegister();
     }

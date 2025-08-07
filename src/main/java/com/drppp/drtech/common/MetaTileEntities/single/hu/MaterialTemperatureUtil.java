@@ -17,6 +17,7 @@ public class MaterialTemperatureUtil {
             put(OrePrefix.ingot,1f);
             put(OrePrefix.gear,1f);
             put(OrePrefix.gearSmall,1f);
+            put(OrePrefix.dust,1f);
         }
     };
     public static void init()

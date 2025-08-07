@@ -1,13 +1,23 @@
 package com.drppp.drtech.common.event;
 
 import com.drppp.drtech.World.Biome.BiomeHandler;
+import com.drppp.drtech.common.Items.ItemsInit;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.Random;
 
 public class PollutionEffectHandler {
 
@@ -30,6 +40,19 @@ public class PollutionEffectHandler {
                     // 给玩家施加中毒效果
                     player.addPotionEffect(new PotionEffect(MobEffects.POISON, 100)); // 持续时间(游戏刻)和效果等级可以根据需要进行调整
                 }
+            }
+        }
+    }
+    @SubscribeEvent
+    public void onGrassBroken(BlockEvent.HarvestDropsEvent event) {
+        World world = event.getWorld();
+        IBlockState state = event.getState();
+        Block block = state.getBlock();
+        if (block == Blocks.TALLGRASS) {
+            Random rand = world.rand;
+            if (rand.nextFloat() < 0.1F) {
+                ItemStack seedStack = new ItemStack(ItemsInit.ITEM_XJC_SEED, 1);
+                event.getDrops().add(seedStack);
             }
         }
     }

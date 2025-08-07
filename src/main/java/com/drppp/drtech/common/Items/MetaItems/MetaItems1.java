@@ -349,6 +349,9 @@ public class MetaItems1 extends StandardMetaItem {
                             lines.add(I18n.format("metaitem.upgrade.tool_box.2"));
                         }));
         DrMetaItems.MATRIX_GEMS = this.addItem(61, "matrix_gem").addComponents(new MatrixGemsBehavior()).setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.XJC = this.addItem(62, "xjc").setMaxStackSize(64);
+        DrMetaItems.INULIN = this.addItem(63, "inulin").setMaxStackSize(64);
+        DrMetaItems.NATURAL_RUBBER = this.addItem(64, "natural_rubber").setMaxStackSize(64);
 
 
         /* --------------------------------------------------------------------- Fluid Cores ---------------------------------------------------------------------- */

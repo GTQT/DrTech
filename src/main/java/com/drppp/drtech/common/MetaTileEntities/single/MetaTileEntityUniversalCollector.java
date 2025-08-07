@@ -95,6 +95,12 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity imple
     protected void renderOverlays(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         this.renderer.renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), isActive(), isWorkingEnabled());
     }
+
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
+
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
         ModularUI.Builder builder;
