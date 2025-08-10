@@ -6,6 +6,9 @@ import com.drppp.drtech.Tags;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockCrops;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,41 +18,58 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.drppp.drtech.loaders.recipes.DrtechReceipes.LOG_CREATE;
 import static gregtech.api.GregTechAPI.materialManager;
 
 public class DrtechUtils {
-    public static  List<Material> listMater = new ArrayList<>();
-    public static  Integer baseTime = 700;
+    public static Map<Item, IBlockState> ItemCrops = new HashMap();
     @Nonnull
     public static ResourceLocation getRL(@Nonnull String path) {
         return new ResourceLocation(Tags.MODID, path);
     }
 
-    public static void initList()
+    public static void initCropsList()
     {
-        var ms = materialManager.getRegisteredMaterials();
-        for (var s:ms)
-        {
-            if(s != Materials.UUMatter)
-                listMater.add(s);
+        for (Block block : GameRegistry.findRegistry(Block.class).getValues()) {
+            if (block instanceof BlockCrops) {
+                BlockCrops crop = (BlockCrops)block;
+                var seed = getSeedFromCropReflection(crop);
+                if(seed != null);
+                {
+                    ItemCrops.put(seed,crop.withAge(crop.getMaxAge()));
+                }
+            }
         }
     }
-    public static String getName(MetaItem.MetaValueItem is) {
-        return is.getStackForm().getDisplayName();
-    }
-    public static String getName(Material mater)
-    {
-        return mater.getLocalizedName();
-    }
+    public static Item getSeedFromCropReflection(BlockCrops crop) {
+        try {
+            // 1. 获取 BlockCrops 的 Class 对象
+            Class<?> cropClass = BlockCrops.class;
 
+            // 2. 获取 getSeed() 方法（protected 方法，需要用 getDeclaredMethod）
+            Method getSeedMethod = cropClass.getDeclaredMethod("getSeed");
+
+            // 3. 设置可访问（绕过 protected 限制）
+            getSeedMethod.setAccessible(true);
+
+            // 4. 调用方法并返回种子
+            return (Item) getSeedMethod.invoke(crop);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // 反射失败
+        }
+    }
     public static void addLogCreate(int EUt, int tick, int outNum, int meta)
     {
         LOG_CREATE.recipeBuilder()

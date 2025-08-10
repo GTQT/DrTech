@@ -17,6 +17,7 @@ import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
+import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -30,6 +31,7 @@ import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.MaterialTemperatureUtil;
 import com.drppp.drtech.common.drtMetaEntities;
+import com.drppp.drtech.common.event.CommonHandler;
 import com.drppp.drtech.intergations.Forestry.CombRecipes;
 import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
 import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
@@ -104,6 +106,7 @@ public class DrTechMain {
             ItemCombs.init();
         }
         DrTechMetaTileEntities.initialization();
+        MinecraftForge.EVENT_BUS.register(new CommonHandler());
     }
 
     @EventHandler
@@ -178,6 +181,7 @@ public class DrTechMain {
         GendustryRecipes.init();
         LiquidBurringInfo.init();
         MaterialTemperatureUtil.init();
+        DrtechUtils.initCropsList();
     }
 
     @EventHandler

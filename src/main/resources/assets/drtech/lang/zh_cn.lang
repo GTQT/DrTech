@@ -277,6 +277,7 @@ drtech.machine.industrial_cable_press.name=工业线材轧机
 drtech.machine.industrial_sieve.name=工业筛选机
 drtech.machine.industrial_centrifuge.name=工业离心机
 drtech.machine.common_burn_generator.name=通用化学能引擎
+drtech.machine.crops_simulate_machine.name=作物模拟宇宙
 drtech.machine.ru_generator.name=旋转能发电机
 drtech.machine.ru_macerator.name=旋转能粉碎机
 drtech.machine.ru_mixer.name=旋转能搅拌机
@@ -498,6 +499,7 @@ drtech.hu.generator.info.6=§6灰烬存满后会停机
 drtech.hu.generator.info.7=§b配方: §f可燃燃料(内燃机、燃气轮机燃料)
 drtech.multiblock.cbg.out=§b发电功率:%s
 drtech.multiblock.cbg.rate=§b燃料/助燃剂比例:%s
+drtech.multiblock.crops.seed=§b种子信息:%s
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐

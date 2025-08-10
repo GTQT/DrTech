@@ -7,7 +7,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.MobEffects;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Random;
 
-public class PollutionEffectHandler {
+public class CommonHandler {
 
     @SubscribeEvent
     public void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
@@ -48,7 +47,7 @@ public class PollutionEffectHandler {
         World world = event.getWorld();
         IBlockState state = event.getState();
         Block block = state.getBlock();
-        if (block == Blocks.TALLGRASS) {
+        if ((block == Blocks.TALLGRASS || block == Blocks.GRASS) && !world.isRemote) {
             Random rand = world.rand;
             if (rand.nextFloat() < 0.1F) {
                 ItemStack seedStack = new ItemStack(ItemsInit.ITEM_XJC_SEED, 1);

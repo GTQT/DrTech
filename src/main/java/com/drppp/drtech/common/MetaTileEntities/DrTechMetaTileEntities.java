@@ -70,6 +70,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityIndustrialSieve INDUSTRIAL_SIEVE;
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
     public static CommonBurnGenerator COMMON_BURN_GENERATOR;
+    public static MetaTileentityCropsSimulateMachine CROPS_SIMULATE;
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_256 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_1024 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
@@ -181,6 +182,7 @@ public class DrTechMetaTileEntities {
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(), new MetaTileEntityLargeLightningRod(getDrId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(), new MetaTileEntityCombProcess(getDrId("comb_process")));
         COMMON_BURN_GENERATOR = registerMetaTileEntity(getID(), new CommonBurnGenerator(getDrId("common_burn_generator")));
+        CROPS_SIMULATE = registerMetaTileEntity(getID(), new MetaTileentityCropsSimulateMachine(getDrId("crops_simulate_machine")));
 
         if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {
             INDUSTRIAL_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialMixer(getDrId("industrial_mixer")));
