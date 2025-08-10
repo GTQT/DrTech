@@ -57,7 +57,10 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity metaTileEntityHolder) {
         return new MetaTileEntityLargeMolecularRecombination(this.metaTileEntityId);
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start()

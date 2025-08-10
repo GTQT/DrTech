@@ -48,6 +48,10 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
         return new MetaTileEntityLargeLightningRod(this.metaTileEntityId);
     }
     @Override
+    public boolean usesMui2() {
+        return false;
+    }
+    @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start()
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )

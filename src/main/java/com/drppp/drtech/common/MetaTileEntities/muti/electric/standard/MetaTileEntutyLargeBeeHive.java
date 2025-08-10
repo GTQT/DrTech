@@ -85,7 +85,10 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         return null;
     }
 
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     @Override
     public void invalidateStructure() {
         super.invalidateStructure();

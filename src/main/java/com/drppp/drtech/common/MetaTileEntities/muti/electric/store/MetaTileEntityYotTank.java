@@ -92,7 +92,10 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     public boolean isWorkingEnabled() {
         return this.isWorkingEnabled;
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     @Override
     public void setWorkingEnabled(boolean b) {
         this.isWorkingEnabled = b;

@@ -66,7 +66,10 @@ public class MetaTileEntityMobsKiller extends RecipeMapMultiblockController {
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity metaTileEntityHolder) {
         return new MetaTileEntityMobsKiller(this.metaTileEntityId);
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start()

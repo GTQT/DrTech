@@ -48,7 +48,10 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         super(metaTileEntityId, DrtechReceipes.SOLAR_TOWER);
         this.recipeMapWorkable = new SolarTowerRecipeLogic(this);
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start(RIGHT, FRONT, UP)

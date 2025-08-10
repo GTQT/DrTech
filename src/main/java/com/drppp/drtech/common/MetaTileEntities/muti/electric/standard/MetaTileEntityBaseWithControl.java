@@ -152,7 +152,10 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
         super.invalidateStructure();
         this.resetTileAbilities();
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     protected void initializeAbilities() {
         var im_item = this.getAbilities(MultiblockAbility.IMPORT_ITEMS);
         List<IItemHandlerModifiable> itemlist = new ArrayList<>();

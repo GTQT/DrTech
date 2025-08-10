@@ -98,6 +98,11 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     }
 
     @Override
+    public boolean usesMui2() {
+        return false;
+    }
+
+    @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
         if (capability == GregtechTileCapabilities.CAPABILITY_CONTROLLABLE) {
             return GregtechTileCapabilities.CAPABILITY_CONTROLLABLE.cast(this);

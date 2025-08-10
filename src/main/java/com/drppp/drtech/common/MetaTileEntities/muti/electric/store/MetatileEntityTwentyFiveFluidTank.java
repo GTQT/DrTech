@@ -97,6 +97,10 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         }
     }
     @Override
+    public boolean usesMui2() {
+        return false;
+    }
+    @Override
     public boolean isActive() {
         return super.isActive() && this.isActive;
     }

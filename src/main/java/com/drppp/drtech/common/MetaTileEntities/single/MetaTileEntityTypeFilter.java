@@ -77,7 +77,10 @@ public class MetaTileEntityTypeFilter extends MetaTileEntity {
     protected void renderOverlays(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         this.renderer.render(renderState, translation, pipeline);
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
         super.addInformation(stack, world, tooltip, advanced);

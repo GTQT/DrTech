@@ -174,7 +174,10 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
                 .where('#', any())
                 .build();
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     protected IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.GRAVITATION_FIELD_CASING);
     }

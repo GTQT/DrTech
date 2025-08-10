@@ -62,7 +62,10 @@ public class MetaTileEntityDeepGroundPump extends MetaTileEntityBaseWithControl 
                 .setTooltipText("减少单位水换热"));
         return group;
     }
-
+    @Override
+    public boolean usesMui2() {
+        return false;
+    }
     private void incrementThreshold(Widget.ClickData clickData) {
         this.thresholdPercentage = MathHelper.clamp(thresholdPercentage + 1, 1, 10);
     }
