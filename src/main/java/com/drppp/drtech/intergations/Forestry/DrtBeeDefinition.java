@@ -88,7 +88,7 @@ public enum DrtBeeDefinition implements IBeeDefinition {
             dis -> {
                 IBeeMutationBuilder mutation = dis.registerMutation(DrtBeeDefinition.WITHER, GTBeeDefinition.ASH, 5);
                 mutation.restrictTemperature(EnumTemperature.HOT);
-                mutation.requireResource("blockTricalciumPhosphate");
+                mutation.addMutationCondition(new MaterialMutationCondition(NetherStar));
             }
     ),
     MUTAGENIC_AGENT(DRTBranchDefinition.DRT_RAREMETAL, "mutagenic_agent", true, 0xa39f00, 0x1fff5b,

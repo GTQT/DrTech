@@ -667,15 +667,15 @@ public class CraftingReceipe {
                 "BCB",
                 "ABA",
                 'C', new UnificationEntry(screw, Iron),
-                'A', new UnificationEntry(frameGt, TreatedWood),
-                'B', new UnificationEntry(plate, TreatedWood)
+                'A', new UnificationEntry(frameGt, Wood),
+                'B', "plankWood"
 
         );
         ModHandler.addShapedRecipe("wood_axle", new ItemStack(BlocksInit.BLOCK_WOOD_AXLE),
                 "AAA", "BCB", "AAA",
                 'C', new UnificationEntry(stick, Iron),
                 'B', new UnificationEntry(screw, Iron),
-                'A', new UnificationEntry(plate, TreatedWood)
+                'A', "plankWood"
         );
 
 
