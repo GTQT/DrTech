@@ -38,9 +38,6 @@ plugins {
 
 def out = services.get(StyledTextOutputFactory).create('an-output')
 
-
-// Project properties
-
 // Required properties: we don't know how to handle these being missing gracefully
 checkPropertyExists("modName")
 checkPropertyExists("modId")

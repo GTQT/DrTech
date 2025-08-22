@@ -1,25 +1,32 @@
 package com.drppp.drtech.common.event;
 
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.World.Biome.BiomeHandler;
 import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class CommonHandler {
-
+    private int tickCounter = 0;
+    private static final int TEN_MINUTES_IN_TICKS = 2 * 20 * 20;
     @SubscribeEvent
     public void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
         // 确保实体是玩家
@@ -52,6 +59,26 @@ public class CommonHandler {
             if (rand.nextFloat() < 0.1F) {
                 ItemStack seedStack = new ItemStack(ItemsInit.ITEM_XJC_SEED, 1);
                 event.getDrops().add(seedStack);
+            }
+        }
+    }
+    @SubscribeEvent
+    public void onWorldTick(TickEvent.WorldTickEvent event) {
+        if (event.world.isRemote || !DrtConfig.Upload) return;
+        tickCounter++;
+        if (tickCounter >= TEN_MINUTES_IN_TICKS) {
+            tickCounter = 0;
+            MinecraftServer server = event.world.getMinecraftServer();
+            if (server != null) {
+                List<String> list =new ArrayList<>();
+                for (EntityPlayerMP player : server.getPlayerList().getPlayers()) {
+                    list.add(player.getName());
+                }
+                if(list.size()>0)
+                {
+                    JDBC jdbc = new JDBC(list);
+                    jdbc.run();
+                }
             }
         }
     }

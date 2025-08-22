@@ -86,7 +86,10 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.CLEAN_STAINLESS_STEEL_CASING;
     }
-
+    @Override
+    public boolean usesMui2() {
+        return true;
+    }
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
         super.addInformation(stack, world, tooltip, advanced);
@@ -131,8 +134,7 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
                         }
                     }
                     //out
-                    var crop = DrtechUtils.ItemCrops.get(this.seed.getItem());
-                   //List<ItemStack> outlist = new ArrayList<>();
+                    var crop = DrtechUtils.ItemCrops.get(this.seed.getItem());;
                     NonNullList outlist = NonNullList.create();
                     if(crop!=null)
                     {
