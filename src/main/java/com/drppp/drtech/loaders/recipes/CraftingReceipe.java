@@ -204,8 +204,8 @@ public class CraftingReceipe {
                 'D', getItemStack("gregtech:boiler_firebox_casing",2),
                 'W', getItemStack("gregtech:meta_plate_dense",113),
                 'A', getItemStack("gregtech:mte",1011),
-                'B', getItemStack("gregtech:mte",1008),
-                'C', getItemStack("gtqtcore:mte",60)
+                'B', getItemStack("gregtech:mte",1007),
+                'C', getItemStack("gtqtcore:mte",8)
         );
         for (int i = 0; i < 10; i++) {
             ModHandler.addShapelessRecipe("huancun_energy_hatch" + i,
