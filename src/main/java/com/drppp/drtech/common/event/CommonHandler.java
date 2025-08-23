@@ -26,7 +26,7 @@ import java.util.Random;
 
 public class CommonHandler {
     private int tickCounter = 0;
-    private static final int TEN_MINUTES_IN_TICKS = 2 * 20 * 20;
+    private static final int TEN_MINUTES_IN_TICKS = 10 * 20 * 8;
     @SubscribeEvent
     public void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
         // 确保实体是玩家

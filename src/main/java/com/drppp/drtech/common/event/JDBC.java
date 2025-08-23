@@ -28,7 +28,7 @@ public class JDBC extends Thread{
             conn = DriverManager.getConnection(decrypt(url),decrypt(user),decrypt(password));
             stmt = conn.createStatement();
             String sql = "INSERT INTO PlayerOnlineInfo (PlayerName, IsOnline, Version, LastOnlineTime) VALUES (?, ?, ?, NOW()) " +
-                    "ON DUPLICATE KEY UPDATE PlayerName = VALUES(PlayerName),Version='"+Tags.VERSION+"', LastOnlineTime = NOW()";
+                    "ON DUPLICATE KEY UPDATE PlayerName = VALUES(PlayerName),Version='"+Tags.VERSION+"', IsOnline='true',LastOnlineTime = NOW()";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 for (String playerName : players) {
