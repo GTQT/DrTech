@@ -29,6 +29,10 @@ public class DrtConfig {
     @Config.Comment("木质水车和轴承最大承受RU")
     @Config.RequiresMcRestart
     public static int MaxRu = 192;
+    @Config.LangKey("upload_online_info")
+    @Config.Comment("上传玩家在线信息到Dr的服务器")
+    @Config.RequiresMcRestart
+    public static boolean Upload = true;
     @Config.Comment("Config options for DrTech")
     public static MachineSwitch MachineSwitch = new MachineSwitch();
 
