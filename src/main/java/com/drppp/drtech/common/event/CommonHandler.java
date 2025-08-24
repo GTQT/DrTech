@@ -26,7 +26,6 @@ import java.util.Random;
 
 public class CommonHandler {
     private int tickCounter = 0;
-    private static final int TEN_MINUTES_IN_TICKS = 10 * 20 * 8;
     @SubscribeEvent
     public void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
         // 确保实体是玩家
@@ -59,26 +58,6 @@ public class CommonHandler {
             if (rand.nextFloat() < 0.1F) {
                 ItemStack seedStack = new ItemStack(ItemsInit.ITEM_XJC_SEED, 1);
                 event.getDrops().add(seedStack);
-            }
-        }
-    }
-    @SubscribeEvent
-    public void onWorldTick(TickEvent.WorldTickEvent event) {
-        if (event.world.isRemote || !DrtConfig.Upload) return;
-        tickCounter++;
-        if (tickCounter >= TEN_MINUTES_IN_TICKS) {
-            tickCounter = 0;
-            MinecraftServer server = event.world.getMinecraftServer();
-            if (server != null) {
-                List<String> list =new ArrayList<>();
-                for (EntityPlayerMP player : server.getPlayerList().getPlayers()) {
-                    list.add(player.getName());
-                }
-                if(list.size()>0)
-                {
-                    JDBC jdbc = new JDBC(list);
-                    jdbc.run();
-                }
             }
         }
     }

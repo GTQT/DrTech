@@ -68,7 +68,6 @@ import software.bernie.geckolib3.GeckoLib;
 
 import static com.drppp.drtech.Tags.MODID;
 import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
-import static com.drppp.drtech.common.event.JDBC.JDBC_DRIVER;
 
 @Mod(modid = MODID, version = Tags.VERSION, name = Tags.MODNAME,
         acceptedMinecraftVersions = "[1.12.2]",
@@ -107,11 +106,7 @@ public class DrTechMain {
             ItemCombs.init();
         }
         DrTechMetaTileEntities.initialization();
-        try {
-            Class.forName(JDBC_DRIVER);
-        } catch (ClassNotFoundException e) {
 
-        }
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
     }
 
