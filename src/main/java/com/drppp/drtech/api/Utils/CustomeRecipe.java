@@ -596,7 +596,6 @@ public class CustomeRecipe {
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_ELECTROLYZER.getStackForm());
         CAN_DO_WORK_MACHINES.add(DrTechMetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ADV_ARC_FURNACE.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.LARGE_ROASTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ELECTROBATH.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.BIO_CENTRIFUGE.getStackForm());
         CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.FROTH_FLOTATION_TANK.getStackForm());
