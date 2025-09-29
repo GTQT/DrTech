@@ -378,7 +378,7 @@ public class MachineReceipe {
                 .EUt(420)
                 .duration(100)
                 .buildAndRegister();
-        GTQTcoreRecipeMaps.FLUID_EXTRACTOR_RECIPES.recipeBuilder()
+        EXTRACTOR_RECIPES.recipeBuilder()
                 .input(DrMetaItems.XJC,16)
                 .output(DrMetaItems.NATURAL_RUBBER,1)
                 .output(DrMetaItems.INULIN,8)
