@@ -350,8 +350,15 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                                 if(new Random().nextInt(10-reflectAmount)!=1)
                                     ca.setDurability(ca.getDurability()-1);
                             }else ca.setDurability(ca.getDurability()-1);
-
                             FuelRodOperation(i,ca);
+                            if(ca.getDurability()<=0)
+                            {
+                                ItemStack outstack = ca.outItem().copy();
+                                List<ItemStack> outlist = new ArrayList<>();
+                                outlist.add(outstack);
+                                inventory.extractItem(i,1,false);
+                                inventory.insertItem(i, outstack,false);
+                            }
                         }
                         //散热片
                     }else if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
