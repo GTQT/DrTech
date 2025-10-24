@@ -1,5 +1,6 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.generator;
 
+import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
@@ -42,6 +43,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -68,8 +70,8 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     protected IItemHandlerModifiable outputInventory;
     protected IMultipleTankHandler inputFluidInventory;
     protected IMultipleTankHandler outputFluidInventory;
-    private final SingleItemStackHandler inventory = new SingleItemStackHandler(81);
-    private final SingleItemStackHandler upgradeInventory = new SingleItemStackHandler(5);
+    private final SingleItemStackHandler inventory = new SingleItemStackHandler(81,true);
+    private final SingleItemStackHandler upgradeInventory = new SingleItemStackHandler(5,false);
     private int tick=0,heat=0,outputEnergy=0;
     private int realout=0;
     private final int MaxHeat = 10000;
@@ -174,6 +176,15 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
             scheduleRenderUpdate();
         }
     }
+
+    @Override
+    public boolean onHardHammerClick(EntityPlayer playerIn, EnumHand hand, EnumFacing facing, CuboidRayTraceResult hitResult) {
+        if (!this.getWorld().isRemote){
+            lockInventoryContent();
+        }
+        return super.onHardHammerClick(playerIn, hand, facing, hitResult);
+    }
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
@@ -184,7 +195,32 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
         data.setInteger("Heat",this.heat);
         return data;
     }
-
+    public void lockInventoryContent()
+    {
+        inventory.lockCap=true;
+        for (int i = 0; i < inventory.getSlots(); i++) {
+            if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null))
+            {
+                inventory.slotCaps[i]=DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD;
+            }
+            else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
+            {
+                inventory.slotCaps[i]=DrtechCommonCapabilities.CAPABILITY_HEAT_VENT;
+            }else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER,null))
+            {
+                inventory.slotCaps[i]=DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER;
+            }else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR,null))
+            {
+                inventory.slotCaps[i]=DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR;
+            }else if(inventory.getStackInSlot(i).hasCapability(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL,null))
+            {
+                inventory.slotCaps[i]=DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL;
+            }else
+            {
+                inventory.slotCaps[i]=null;
+            }
+        }
+    }
     @Override
     protected void updateFormedValid() {
         if(!getWorld().isRemote)
@@ -302,11 +338,9 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                     if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null) && this.isWorkingEnabled())
                     {
                         //检测热量 判断是否需要停机
-                        if(stopUpgrade && this.heat>8900)
+                        if(stopUpgrade && this.heat>9000)
                         {
                             this.outputEnergy=0;
-                            if(this.heat>=10000)
-                                this.heat=9999;
                             this.setWorkingEnabled(false);
                         }
                         var ca = stack.getCapability(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD,null);
@@ -316,8 +350,15 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                                 if(new Random().nextInt(10-reflectAmount)!=1)
                                     ca.setDurability(ca.getDurability()-1);
                             }else ca.setDurability(ca.getDurability()-1);
-
                             FuelRodOperation(i,ca);
+                            if(ca.getDurability()<=0)
+                            {
+                                ItemStack outstack = ca.outItem().copy();
+                                List<ItemStack> outlist = new ArrayList<>();
+                                outlist.add(outstack);
+                                inventory.extractItem(i,1,false);
+                                inventory.insertItem(i, outstack,false);
+                            }
                         }
                         //散热片
                     }else if(stack.hasCapability(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT,null))
@@ -368,7 +409,7 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
                     this.setWorkingEnabled(false);
                 }else
                 {
-                    if(this.heat<8900 && this.energyContainer.getEnergyStored()<=this.energyContainer.getEnergyCapacity()/2)
+                    if(this.heat<9000 && this.energyContainer.getEnergyStored()<=this.energyContainer.getEnergyCapacity()/2)
                         this.setWorkingEnabled(true);
                 }
             }
@@ -876,9 +917,9 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
         super.invalidateStructure();
         this.energyContainer =  new EnergyContainerList(new ArrayList());
         this.inputInventory = new GTItemStackHandler(this, 0);
-        this.inputFluidInventory = new FluidTankList(true, new IFluidTank[0]);
+        this.inputFluidInventory = new FluidTankList(true);
         this.outputInventory = new GTItemStackHandler(this, 0);
-        this.outputFluidInventory = new FluidTankList(true, new IFluidTank[0]);
+        this.outputFluidInventory = new FluidTankList(true);
     }
 
     @SideOnly(Side.CLIENT)

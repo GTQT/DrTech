@@ -55,7 +55,7 @@ import static gregtech.api.util.RelativeDirection.*;
 import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.TI_BORON_SILICATE_GLASS;
 
 public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
-    private final SingleItemStackHandler inventory = new SingleItemStackHandler(1024);
+    private final SingleItemStackHandler inventory = new SingleItemStackHandler(1024,false);
     public int productType = 0;
     public int workType = 0;
     public List<ItemStack> listdrops = new ArrayList<>();
