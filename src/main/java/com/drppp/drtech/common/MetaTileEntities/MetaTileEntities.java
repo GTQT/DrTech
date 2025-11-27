@@ -5,7 +5,6 @@ import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.RuMachineAcceptFacing;
-import com.drppp.drtech.common.MetaTileEntities.muti.MetaTileEntityIndustrialCokeOven;
 import com.drppp.drtech.common.MetaTileEntities.single.RuMachine.MetaTileEntityRuMachine;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
@@ -19,7 +18,7 @@ import com.drppp.drtech.common.MetaTileEntities.single.*;
 import com.drppp.drtech.common.MetaTileEntities.single.RuMachine.MetaTileEntityRuSplitter;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.MetaTileEntityCombustionchamber;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.MetaTileEntityCombustionchamberLiquid;
-import com.drppp.drtech.loaders.DrtechReceipes;
+import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -35,9 +34,7 @@ import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTile
 import static gregtech.common.metatileentities.MetaTileEntities.registerSimpleMetaTileEntity;
 
 public class MetaTileEntities {
-    public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH = new MetaTileEntityBatteryEnergyHatch[15];
     public static AnnihilationGenerator ANNIHILATION_GENERATOR;
-    public static MetaTileEntityAdvancedProsscessArray ADVANCED_PROCESS_ARRAY;
     public static MetaTileEntityDeepGroundPump DEEP_GROUND_PUMP;
     public static MetaTileEntityDronePad DRONE_PAD;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
@@ -55,16 +52,12 @@ public class MetaTileEntities {
     public static MetaTileEntityYotHatch YOT_HARCH;
     public static MetaTileEntityYotTank YOUT_TANK;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
-    public static MetaTileEntityBeneathTrans BENEATH_TRANS;
     public static NuclearReactor NUCLEAR_GENERATOR;
     public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
-    public static MetaTileeneityPassthroughHatchComputationHatch PASSTHROUGH_COMPUTER;
     public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
-    public static MetaTileEntityTypeFilter TYPE_FILTER;
-    public static MetaTileEntityIndustrialCokeOven INDUSTRIAL_COKE_OVEN;
     public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
     public static MetaTileEntityCombProcess COMB_PROVESS;
     public static MetaTileEntityIndustrialMixer INDUSTRIAL_MIXER;
@@ -111,14 +104,12 @@ public class MetaTileEntities {
                 Math.min(LASER_OUTPUT_HATCH_16384.length - 1, GTValues.UHV - GTValues.IV);
 
         //Common ID 17000
-        ADVANCED_PROCESS_ARRAY = registerMetaTileEntity(getID(), new MetaTileEntityAdvancedProsscessArray(getmyId("advanced_process_array"), 1));
         ANNIHILATION_GENERATOR = registerMetaTileEntity(getID(), new AnnihilationGenerator(getmyId("annihilation_generator")));
         DEEP_GROUND_PUMP = registerMetaTileEntity(getID(), new MetaTileEntityDeepGroundPump(getmyId("deep_ground_pump")));
         DRONE_PAD = registerMetaTileEntity(getID(), new MetaTileEntityDronePad(getmyId("drone_pad")));
         INFINITE_FLUID_DRILLING_RIG = registerMetaTileEntity(getID(), new MetaTileEntityInfiniteFluidDrill(getmyId("fluid_drilling_rig.iv"), 6));
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getmyId("large_alloy_smelter")));
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getmyId("large_bee_hive")));
-        BENEATH_TRANS = registerMetaTileEntity(getID(), new MetaTileEntityBeneathTrans(getmyId("beneath_trans")));
 
       LARGE_MOLECULAR_RECOMBINATION = registerMetaTileEntity(getID(), new MetaTileEntityLargeMolecularRecombination(getmyId("molecular_recombination")));
         getID();
@@ -138,12 +129,9 @@ public class MetaTileEntities {
         } else {
             getID();
         }
-        PASSTHROUGH_COMPUTER = registerMetaTileEntity(getID(), new MetaTileeneityPassthroughHatchComputationHatch(getmyId("passthrough_computationhatch")));
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialApiary(getmyId("industrial_apiary"), Textures.INDUSTRIAL_APIARY));
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller1"), 1));
         CONCRETE_BACK_FILLER2 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getmyId("concrete_backfiller2"), 2));
-        TYPE_FILTER = registerMetaTileEntity(getID(), new MetaTileEntityTypeFilter(getmyId("type_filter")));
-        INDUSTRIAL_COKE_OVEN = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCokeOven(getmyId("industrial_coke_oven")));
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(), new MetaTileEntityLargeLightningRod(getmyId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(), new MetaTileEntityCombProcess(getmyId("comb_process")));
         if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {
@@ -208,10 +196,7 @@ public class MetaTileEntities {
             LASER_BENDING_16384[i] = registerMetaTileEntity(17660 + i, new MetaTileEntityLaserPipeBending(getmyId("laser_bending_16384." + GTValues.VN[GTValues.IV + i]), GTValues.IV + i, 16384));
             LASER_BENDING_65536[i] = registerMetaTileEntity(17670 + i, new MetaTileEntityLaserPipeBending(getmyId("laser_bending_65536." + GTValues.VN[GTValues.IV + i]), GTValues.IV + i, 65536));
         }
-        for (int i = 0; i < 15; i++) {
-            String tier = VN[i].toLowerCase();
-            BATTERY_INPUT_ENERGY_HATCH[i] = registerMetaTileEntity(17680 + i, new MetaTileEntityBatteryEnergyHatch(getmyId("battery_energy_hatch.input." + tier), i, 2, false));
-        }
+
 
     }
 
