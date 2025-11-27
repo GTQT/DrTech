@@ -116,8 +116,15 @@ public class MetaItems1 extends StandardMetaItem {
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .addComponents(ElectricStatsNuclear.createBattery(32000000, GTValues.HV, true))
                 .setMaxStackSize(1);
+<<<<<<< Updated upstream
 
         DrMetaItems.HAND_PUMP = this.addItem(26, "hand_pump")
+=======
+        DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL = this.addItem(25,"wireless_network_control_panel")
+                .setCreativeTabs(DrTechMain.DrTechTab)
+                .setMaxStackSize(1);
+        DrMetaItems.HAND_PUMP = this.addItem(26,"hand_pump")
+>>>>>>> Stashed changes
                 .addComponents(new HandPumpBehavior())
                 .addComponents(new FilteredFluidStats(128000, 2600, true, true, false, false, true))
                 .setCreativeTabs(DrTechMain.DrTechTab)

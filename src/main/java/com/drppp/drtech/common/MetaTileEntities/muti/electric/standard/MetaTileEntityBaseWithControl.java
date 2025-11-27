@@ -3,6 +3,10 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.google.common.collect.Lists;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -265,5 +269,10 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
             return false;
         this.outEnergyContainer.addEnergy(energy);
         return true;
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
+        return null;
     }
 }

@@ -1,6 +1,10 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
@@ -76,6 +80,11 @@ public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
     @Override
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
+        return null;
     }
 
 

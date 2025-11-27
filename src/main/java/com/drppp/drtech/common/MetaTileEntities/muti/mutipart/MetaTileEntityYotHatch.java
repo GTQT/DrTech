@@ -4,6 +4,10 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.api.capability.DrtechCapabilities;
@@ -104,7 +108,11 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
         return super.getCapability(capability, side);
     }
 
-    
+    @Override
+    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
+        return null;
+    }
+
 
     private class YotTankHatch extends FluidTank {
         private final MetaTileEntityYotTank yotTank;

@@ -3,6 +3,10 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing1;
@@ -92,6 +96,11 @@ public class MetaTileEntityIndustrialCentrifuge extends RecipeMapMultiblockContr
         tooltip.add(I18n.format("drtech.machine.industrial_centrifuge.tooltip.2"));
         tooltip.add(I18n.format("drtech.machine.industrial_centrifuge.tooltip.3"));
         tooltip.add(I18n.format("drtech.machine.industrial_centrifuge.tooltip.4"));
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
+        return null;
     }
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

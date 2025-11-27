@@ -549,30 +549,6 @@ drtech.machine.duplicator.uiv.name=Epic Duplicator III
 drtech.machine.duplicator.uxv.name=Epic Duplicator IV
 drtech.machine.duplicator.opv.name=Legendary Duplicator
 
-drtech.machine.wireless_energy_hatch.receiver.lv.name=Wireless Energy Input Port (§7LV§r)
-drtech.machine.wireless_energy_hatch.receiver.mv.name=Wireless Energy Input Port (§bMV§r)
-drtech.machine.wireless_energy_hatch.receiver.hv.name=Wireless Energy Input Port (§6HV§r)
-drtech.machine.wireless_energy_hatch.receiver.ev.name=Wireless Energy Input Port (§5EV§r)
-drtech.machine.wireless_energy_hatch.receiver.iv.name=Wireless Energy Input Port (§1IV§r)
-drtech.machine.wireless_energy_hatch.receiver.luv.name=Wireless Energy Input Port (§dLuV§r)
-drtech.machine.wireless_energy_hatch.receiver.zpm.name=Wireless Energy Input Port (§cZPM§r)
-drtech.machine.wireless_energy_hatch.receiver.uv.name=Wireless Energy Input Port (§3UV§r)
-drtech.machine.wireless_energy_hatch.receiver.uhv.name=Wireless Energy Input Port (§4UHV§r)
-drtech.machine.wireless_energy_hatch.receiver.uev.name=Wireless Energy Input Port (§4UEV§r)
-drtech.machine.wireless_energy_hatch.receiver.uiv.name=Wireless Energy Input Port (§4UIV§r)
-
-drtech.machine.wireless_energy_hatch.transmitter.lv.name=Wireless Energy Output Port (§7LV§r)
-drtech.machine.wireless_energy_hatch.transmitter.mv.name=Wireless Energy Output Port (§bMV§r)
-drtech.machine.wireless_energy_hatch.transmitter.hv.name=Wireless Energy Output Port (§6HV§r)
-drtech.machine.wireless_energy_hatch.transmitter.ev.name=Wireless Energy Output Port (§5EV§r)
-drtech.machine.wireless_energy_hatch.transmitter.iv.name=Wireless Energy Output Port (§1IV§r)
-drtech.machine.wireless_energy_hatch.transmitter.luv.name=Wireless Energy Output Port (§dLuV§r)
-drtech.machine.wireless_energy_hatch.transmitter.zpm.name=Wireless Energy Output Port (§cZPM§r)
-drtech.machine.wireless_energy_hatch.transmitter.uv.name=Wireless Energy Output Port (§3UV§r)
-drtech.machine.wireless_energy_hatch.transmitter.uhv.name=Wireless Energy Output Port (§4UHV§r)
-drtech.machine.wireless_energy_hatch.transmitter.uev.name=Wireless Energy Output Port (§4UEV§r)
-drtech.machine.wireless_energy_hatch.transmitter.uiv.name=Wireless Energy Output Port (§4UIV§r)
-
 #Collector
 drtech.machine.universal_collector.ulv.name=Simple Universal Collector
 drtech.machine.universal_collector.lv.name=Basic Universal Collector
@@ -605,6 +581,10 @@ drtech.machine.disassembly.uiv.name=Epic Disassembler III
 drtech.machine.disassembly.uxv.name=Epic Disassembler IV
 drtech.machine.disassembly.opv.name=Legendary Disassembler
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 drtech.machine.laser_bending_256.iv.name=256A Laser Bender (§1IV§r)
 drtech.machine.laser_bending_256.luv.name=256A Laser Bender (§dLuV§r)
 drtech.machine.laser_bending_256.zpm.name=256A Laser Bender (§cZPM§r)

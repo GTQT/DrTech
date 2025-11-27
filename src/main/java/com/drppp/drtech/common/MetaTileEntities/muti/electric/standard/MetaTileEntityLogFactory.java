@@ -1,6 +1,10 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
@@ -73,6 +77,11 @@ public class MetaTileEntityLogFactory extends RecipeMapMultiblockController {
         tooltip.add(I18n.format("drtech.machine.logcreate.tip.2"));
         tooltip.add(I18n.format("drtech.machine.logcreate.tip.3"));
 
+    }
+
+    @Override
+    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
+        return null;
     }
 
 

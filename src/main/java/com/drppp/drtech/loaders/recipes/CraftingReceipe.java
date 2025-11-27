@@ -191,12 +191,7 @@ public class CraftingReceipe {
                 'X', Blocks.CHEST, 'C', MetaItems.ELECTRIC_PISTON_LV);
         ModHandler.addShapelessRecipe("advanced_cauldron", new ItemStack(ItemsInit.ITEM_BLOCK_ADVANCED_CAULDRON), Items.CAULDRON);
 
-        ModHandler.addShapedRecipe("type_filter", DrTechMetaTileEntities.TYPE_FILTER.getStackForm(),
-                "WBW", "WFW", "WWW",
-                'B', ToolItems.WRENCH,
-                'W', Blocks.IRON_BARS,
-                'F', gregtech.common.metatileentities.MetaTileEntities.HULL[0].getStackForm()
-        );
+
         ModHandler.addShapedRecipe("common_burn_generator", COMMON_BURN_GENERATOR.getStackForm(),
                 "WDW",
                         "ABC",
@@ -207,27 +202,7 @@ public class CraftingReceipe {
                 'B', getItemStack("gregtech:mte",1007),
                 'C', getItemStack("gtqtcore:mte",8)
         );
-        for (int i = 0; i < 10; i++) {
-            ModHandler.addShapelessRecipe("huancun_energy_hatch" + i,
-                    DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
 
-            ModHandler.addShapelessRecipe("huancun_energy_hatch_4a" + i,
-                    DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_4A[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH_4A[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
-
-            ModHandler.addShapelessRecipe("huancun_energy_hatch_16a" + i,
-                    DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_16A[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.ENERGY_INPUT_HATCH_16A[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
-
-            ModHandler.addShapelessRecipe("huancun_energy_hatch_64a" + i,
-                    DrTechMetaTileEntities.BATTERY_INPUT_ENERGY_HATCH_64A[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.SUBSTATION_ENERGY_INPUT_HATCH[i].getStackForm(),
-                    gregtech.common.metatileentities.MetaTileEntities.BATTERY_BUFFER[0][i].getStackForm());
-        }
     }
 
     private static void multiblock() {

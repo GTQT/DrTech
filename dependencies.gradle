@@ -23,8 +23,8 @@
  */
 dependencies {
     api("com.cleanroommc:groovyscript:1.2.0-hotfix1") { transitive = false }
-    api("com.cleanroommc:modularui:2.5.0-rc4") { transitive = false }
-    implementation rfg.deobf("curse.maven:gregtech-meowmelmuku-1262727:6995560")
+    api("com.cleanroommc:modularui:3.0.4") { transitive = false }
+    implementation rfg.deobf(files("libs/gregtech-MeowmelMuku-1.12.2-2.9.0-190.jar"))
     implementation rfg.deobf(files("libs/!mixinbooter-8.9.jar"))
 
     implementation rfg.deobf(files("libs/CodeChickenLib-1.12.2-3.2.3.358-universal.jar"))

@@ -13,7 +13,6 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityEnergyTransTower;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
-import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityBatteryEnergyHatch;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.*;
 import com.drppp.drtech.common.MetaTileEntities.single.RuMachine.MetaTileEntityRuMachine;
@@ -28,15 +27,10 @@ import gregtech.api.util.GTUtility;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import static gregtech.api.GTValues.VN;
 import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntity;
 import static gregtech.common.metatileentities.MetaTileEntities.registerSimpleMetaTileEntity;
 
 public class DrTechMetaTileEntities {
-    public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH = new MetaTileEntityBatteryEnergyHatch[15];
-    public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH_4A = new MetaTileEntityBatteryEnergyHatch[15];
-    public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH_16A = new MetaTileEntityBatteryEnergyHatch[15];
-    public static final MetaTileEntityBatteryEnergyHatch[] BATTERY_INPUT_ENERGY_HATCH_64A = new MetaTileEntityBatteryEnergyHatch[15];
 
     public static AnnihilationGenerator ANNIHILATION_GENERATOR;
     public static MetaTileEntityDeepGroundPump DEEP_GROUND_PUMP;
@@ -61,7 +55,6 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
-    public static MetaTileEntityTypeFilter TYPE_FILTER;
     public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
     public static MetaTileEntityCombProcess COMB_PROVESS;
     public static MetaTileEntityIndustrialMixer INDUSTRIAL_MIXER;
@@ -147,13 +140,7 @@ public class DrTechMetaTileEntities {
             LASER_BENDING_1048576[i] = registerMetaTileEntity(190 + i, new MetaTileEntityLaserPipeBending(getDrId("laser_bending_1048576." + GTValues.VN[GTValues.IV + i]), GTValues.IV + i, 1048576));
         }
 
-        for (int i = 0; i < 15; i++) {
-            String tier = VN[i].toLowerCase();
-            BATTERY_INPUT_ENERGY_HATCH[i] = registerMetaTileEntity(200 + i, new MetaTileEntityBatteryEnergyHatch(getDrId("battery_energy_hatch.input." + tier), i, 2, false));
-            BATTERY_INPUT_ENERGY_HATCH_4A[i]= registerMetaTileEntity(215 + i, new MetaTileEntityBatteryEnergyHatch(getDrId("battery_energy_hatch.input_4a." + tier), i, 4, false));
-            BATTERY_INPUT_ENERGY_HATCH_16A[i]= registerMetaTileEntity(230 + i, new MetaTileEntityBatteryEnergyHatch(getDrId("battery_energy_hatch.input_16a." + tier), i, 16, false));
-            BATTERY_INPUT_ENERGY_HATCH_64A[i]= registerMetaTileEntity(245 + i, new MetaTileEntityBatteryEnergyHatch(getDrId("battery_energy_hatch.input_64a." + tier), i, 64, false));
-        }
+
 
         //Common ID
         startID=500;
@@ -177,7 +164,6 @@ public class DrTechMetaTileEntities {
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialApiary(getDrId("industrial_apiary"), Textures.INDUSTRIAL_APIARY));
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller1"), 1));
         CONCRETE_BACK_FILLER2 = registerMetaTileEntity(getID(), new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller2"), 2));
-        TYPE_FILTER = registerMetaTileEntity(getID(), new MetaTileEntityTypeFilter(getDrId("type_filter")));
         startID++;
         LARGE_LIGHTING_ROD = registerMetaTileEntity(getID(), new MetaTileEntityLargeLightningRod(getDrId("large_lighting_rod")));
         COMB_PROVESS = registerMetaTileEntity(getID(), new MetaTileEntityCombProcess(getDrId("comb_process")));

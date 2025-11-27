@@ -17,7 +17,10 @@ import com.drppp.drtech.World.WordStruct.StructUtil;
 import com.drppp.drtech.World.WorldRegisterHandler;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
+<<<<<<< Updated upstream
 import com.drppp.drtech.api.Utils.DrtechUtils;
+=======
+>>>>>>> Stashed changes
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
@@ -145,6 +148,10 @@ public class DrTechMain {
         DrTechReceipeManager.init();
         SyncInit.init();
         TopInit.init();
+<<<<<<< Updated upstream
+=======
+        MinecraftForge.EVENT_BUS.register(new PollutionEffectHandler());
+>>>>>>> Stashed changes
         StructUtil.init();
         CustomeRecipe.InitCanDoWorkMachines();
 
