@@ -5,23 +5,18 @@ import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
-import com.drppp.drtech.intergations.Forestry.ForestryLinkage;
 import com.drppp.drtech.intergations.GTFOLinkage;
 import com.drppp.drtech.intergations.GtqtCoreLinkage;
 import com.drppp.drtech.intergations.HarvestcraftLinkage;
 import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.blocks.BlockAlvearyType;
 import gregtech.api.GTValues;
-import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.unification.material.MarkerMaterials;
-import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
-import keqing.gtqtcore.GTQTCore;
-import keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps;
 import keqing.gtqtcore.api.unification.GTQTMaterials;
 import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
@@ -171,9 +166,6 @@ public class MachineReceipe {
         }
         if (Loader.isModLoaded(HarvestcraftLinkage.CRAFT_ID)) {
             HarvestcraftLinkage.MachineRecipeInit();
-        }
-        if (Loader.isModLoaded("forestry")) {
-            ForestryLinkage.MachineRecipeInit();
         }
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.frameGt, Wood)

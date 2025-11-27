@@ -34,7 +34,7 @@ public class MetaItems1 extends StandardMetaItem {
                 .addComponents(new TooltipBehavior((lines) -> {
                             lines.add(I18n.format("metaitem.weight.tooltip.1"));
                         })
-                );
+                ).addComponents(BluePrintBehavior.INSTANCE);
         DrMetaItems.ENERGY_ELEMENT_2 = this.addItem(1, "energy_element_2").setMaxStackSize(64).setCreativeTabs(DrTechMain.DrTechTab)
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.weight.tooltip.2"));

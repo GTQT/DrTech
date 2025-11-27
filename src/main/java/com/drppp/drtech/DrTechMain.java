@@ -26,15 +26,11 @@ import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
-import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
 import com.drppp.drtech.common.MetaTileEntities.single.hu.MaterialTemperatureUtil;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
-import com.drppp.drtech.intergations.Forestry.CombRecipes;
-import com.drppp.drtech.intergations.Forestry.DRTAlleleBeeSpecies;
-import com.drppp.drtech.intergations.Forestry.DrtBeeDefinition;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
@@ -50,7 +46,6 @@ import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -102,9 +97,6 @@ public class DrTechMain {
         DrtDimType.init();
         WorldRegisterHandler.init();
         DrtToolItems.init();
-        if (Loader.isModLoaded("forestry")) {
-            ItemCombs.init();
-        }
         DrTechMetaTileEntities.initialization();
 
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
@@ -154,8 +146,6 @@ public class DrTechMain {
         SyncInit.init();
         TopInit.init();
         StructUtil.init();
-        DRTAlleleBeeSpecies.setupAlleles();
-        CombRecipes.initDRTCombs();
         CustomeRecipe.InitCanDoWorkMachines();
 
         if (FMLLaunchHandler.side() == Side.CLIENT) {
@@ -168,9 +158,6 @@ public class DrTechMain {
     @EventHandler
     public void Clientinit(FMLInitializationEvent event) {
         SyncInit.init();
-        if (Loader.isModLoaded("forestry")) {
-            ItemCombs.ClientInit();
-        }
         drtMetaEntities.initRenderers();
     }
 
@@ -178,7 +165,6 @@ public class DrTechMain {
     public void postInit(FMLPostInitializationEvent event) {
         if (DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
-        DrtBeeDefinition.initBees();
         GendustryRecipes.init();
         LiquidBurringInfo.init();
         MaterialTemperatureUtil.init();

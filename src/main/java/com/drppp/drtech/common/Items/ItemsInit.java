@@ -6,7 +6,6 @@ import com.drppp.drtech.common.Items.ItemCropSeed.ItemFluStoneCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemLapisCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemRedStoneCropSeed;
 import com.drppp.drtech.common.Items.ItemCropSeed.ItemXjcCropSeed;
-import com.drppp.drtech.common.Items.MetaItems.ItemCombs;
 import gregtech.api.block.VariantItemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -15,7 +14,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -67,10 +65,6 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK, VariantItemBlock::new));
-        if (Loader.isModLoaded("forestry")) {
-            event.getRegistry().register(ItemCombs.ITEM_COMBS);
-            event.getRegistry().register(ItemCombs.ITEM_DROPS);
-        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -85,10 +79,6 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_XJC_SEED, 0, new ModelResourceLocation(ITEM_XJC_SEED.getRegistryName(), "inventory"));
-        if (Loader.isModLoaded("forestry")) {
-            ((com.drppp.drtech.intergations.Forestry.DrtCombItem) ItemCombs.ITEM_COMBS).registerModel(ItemCombs.ITEM_COMBS, forestry.api.core.ForestryAPI.modelManager);
-            ((com.drppp.drtech.intergations.Forestry.DrtDropItem) ItemCombs.ITEM_DROPS).registerModel(ItemCombs.ITEM_DROPS, forestry.api.core.ForestryAPI.modelManager);
-        }
 
     }
 
