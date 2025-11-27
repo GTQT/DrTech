@@ -2,6 +2,7 @@ package com.drppp.drtech.intergations;
 
 import com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor;
 import gregtech.api.fluids.store.FluidStorageKeys;
+import gregtech.api.recipes.RecipeMaps;
 import keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,21 +23,21 @@ public class GtqtCoreLinkage {
                 .duration(100)
                 .buildAndRegister();
 
-        GTQTcoreRecipeMaps.FLUID_CANNER_RECIPES.recipeBuilder()
+        RecipeMaps.CANNER_RECIPES.recipeBuilder()
                 .input(MetaItemsReactor.COOLANT_NULL_CELL_1)
                 .fluidInputs(Helium.getFluid(FluidStorageKeys.LIQUID, 1000))
                 .output(MetaItemsReactor.HE_COOLANT_CELL_60K)
                 .EUt(1)
                 .duration(10)
                 .buildAndRegister();
-        GTQTcoreRecipeMaps.FLUID_CANNER_RECIPES.recipeBuilder()
+        RecipeMaps.CANNER_RECIPES.recipeBuilder()
                 .input(MetaItemsReactor.COOLANT_NULL_CELL_2)
                 .fluidInputs(Helium.getFluid(FluidStorageKeys.LIQUID, 3000))
                 .output(MetaItemsReactor.HE_COOLANT_CELL_180K)
                 .EUt(1)
                 .duration(30)
                 .buildAndRegister();
-        GTQTcoreRecipeMaps.FLUID_CANNER_RECIPES.recipeBuilder()
+        RecipeMaps.CANNER_RECIPES.recipeBuilder()
                 .input(MetaItemsReactor.COOLANT_NULL_CELL_3)
                 .fluidInputs(Helium.getFluid(FluidStorageKeys.LIQUID, 6000))
                 .output(MetaItemsReactor.HE_COOLANT_CELL_360K)
@@ -44,21 +45,21 @@ public class GtqtCoreLinkage {
                 .duration(60)
                 .buildAndRegister();
 
-        GTQTcoreRecipeMaps.FLUID_CANNER_RECIPES.recipeBuilder()
+        RecipeMaps.CANNER_RECIPES.recipeBuilder()
                 .input(MetaItemsReactor.COOLANT_NULL_CELL_1)
                 .fluidInputs(SodiumPotassium.getFluid(FluidStorageKeys.LIQUID, 1000))
                 .output(MetaItemsReactor.NAK_COOLANT_CELL_60K)
                 .EUt(1)
                 .duration(10)
                 .buildAndRegister();
-        GTQTcoreRecipeMaps.FLUID_CANNER_RECIPES.recipeBuilder()
+        RecipeMaps.CANNER_RECIPES.recipeBuilder()
                 .input(MetaItemsReactor.COOLANT_NULL_CELL_2)
                 .fluidInputs(SodiumPotassium.getFluid(FluidStorageKeys.LIQUID, 3000))
                 .output(MetaItemsReactor.NAK_COOLANT_CELL_180K)
                 .EUt(1)
                 .duration(30)
                 .buildAndRegister();
-        GTQTcoreRecipeMaps.FLUID_CANNER_RECIPES.recipeBuilder()
+        RecipeMaps.CANNER_RECIPES.recipeBuilder()
                 .input(MetaItemsReactor.COOLANT_NULL_CELL_3)
                 .fluidInputs(SodiumPotassium.getFluid(FluidStorageKeys.LIQUID, 6000))
                 .output(MetaItemsReactor.NAK_COOLANT_CELL_360K)
