@@ -73,7 +73,7 @@ public class GendustryRecipes {
                 'C', new UnificationEntry(gearSmall,Osmiridium),
                 'D', CraftingReceipe.getItemStack("<gregtech:gt.comb:57>"),
                 'E', new UnificationEntry(circuit, MarkerMaterials.Tier.LuV),
-                'F', ELECTRIC_MOTOR_LuV
+                'F', ELECTRIC_MOTOR_IV
         );
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(circuit, MarkerMaterials.Tier.IV,1)
@@ -104,7 +104,7 @@ public class GendustryRecipes {
                 'C', CraftingReceipe.getItemStack("<gregtech:meta_item_1:701>"),
                 'D', CraftingReceipe.getItemStack("<gregtech:meta_item_1:98>"),
                 'E', new UnificationEntry(rotor, Osmiridium),
-                'F', ELECTRIC_MOTOR_LuV
+                'F', ELECTRIC_MOTOR_IV
         );
 
         ASSEMBLER_RECIPES.recipeBuilder()
@@ -118,7 +118,7 @@ public class GendustryRecipes {
                 .buildAndRegister();
 
         ASSEMBLER_RECIPES.recipeBuilder()
-                .input(ROBOT_ARM_LuV,4)
+                .input(ROBOT_ARM_IV,4)
                 .inputs(CraftingReceipe.getItemStack("<gregtech:metal_casing:2>", 4L))
                 .inputs(CraftingReceipe.getItemStack("<extrabees:alveary:5>", 4L))
                 .inputs(CraftingReceipe.getItemStack("<extrabees:alveary:4>", 2L))
@@ -135,7 +135,7 @@ public class GendustryRecipes {
                 "ADA",
                 "BEB",
                 "CFC",
-                'A', ROBOT_ARM_LuV,
+                'A', ROBOT_ARM_IV,
                 'B', chacao,
                 'C', chilun,
                 'D', chilun,
@@ -169,7 +169,7 @@ public class GendustryRecipes {
                 "BEB",
                 "CFC",
                 'A', chilun,
-                'B', ELECTRIC_MOTOR_LuV,
+                'B', ELECTRIC_MOTOR_IV,
                 'C', chilun,
                 'D', Blocks.FURNACE,
                 'E', bujian,
@@ -180,7 +180,7 @@ public class GendustryRecipes {
                 "BEB",
                 "CFC",
                 'A', jiyin,
-                'B', ELECTRIC_PISTON_LUV,
+                'B', ELECTRIC_PISTON_IV,
                 'C', chilun,
                 'D', chacao,
                 'E', bujian,
@@ -190,7 +190,7 @@ public class GendustryRecipes {
                 "ADA",
                 "BEB",
                 "CFC",
-                'A', ROBOT_ARM_LuV,
+                'A', ROBOT_ARM_IV,
                 'B', nengliang,
                 'C', chilun,
                 'D', jiyin,
