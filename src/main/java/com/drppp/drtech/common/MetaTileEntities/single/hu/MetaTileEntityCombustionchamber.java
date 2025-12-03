@@ -321,8 +321,5 @@ public class MetaTileEntityCombustionchamber extends MetaTileEntity {
     }
 
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 }

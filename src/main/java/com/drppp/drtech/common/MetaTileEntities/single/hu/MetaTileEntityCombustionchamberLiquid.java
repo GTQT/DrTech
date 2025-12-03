@@ -341,10 +341,7 @@ public class MetaTileEntityCombustionchamberLiquid extends MetaTileEntity {
         return super.getCapability(capability, side);
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     private class FliterFluidTank extends  FluidTank{

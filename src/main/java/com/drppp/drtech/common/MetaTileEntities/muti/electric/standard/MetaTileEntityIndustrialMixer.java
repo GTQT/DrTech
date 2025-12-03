@@ -95,10 +95,7 @@ public class MetaTileEntityIndustrialMixer extends RecipeMapMultiblockController
         tooltip.add(I18n.format("drtech.machine.industrial_mixer.tooltip.3"));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

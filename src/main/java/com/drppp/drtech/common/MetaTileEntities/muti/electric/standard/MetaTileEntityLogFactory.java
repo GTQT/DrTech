@@ -79,10 +79,7 @@ public class MetaTileEntityLogFactory extends RecipeMapMultiblockController {
 
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class LogFactoryRecipeLogic extends MultiblockRecipeLogic {

@@ -271,8 +271,5 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
         return true;
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 }

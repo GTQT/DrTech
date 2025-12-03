@@ -1208,10 +1208,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         }
     };
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
     public class GT_ApiaryModifier {
 

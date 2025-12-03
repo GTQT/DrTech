@@ -398,10 +398,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         return Math.log((double) this.energyContainer.getEnergyCapacity() / 8d) / 1.3862943611199 + 1e-8d;
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     private static class BeeSimulator {

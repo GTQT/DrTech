@@ -378,9 +378,6 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
         return new AxisAlignedBB(getPos(), getPos().add(5, 10, 5));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 }
 

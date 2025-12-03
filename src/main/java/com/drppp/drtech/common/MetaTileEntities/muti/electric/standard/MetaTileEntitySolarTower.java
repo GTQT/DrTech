@@ -198,10 +198,7 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         return timeOfDay < 12000;
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class SolarTowerRecipeLogic extends MultiblockRecipeLogic {

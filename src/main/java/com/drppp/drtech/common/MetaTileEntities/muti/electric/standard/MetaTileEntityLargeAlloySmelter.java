@@ -142,10 +142,7 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
         this.leve = data.getInteger("CoinLevel");
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

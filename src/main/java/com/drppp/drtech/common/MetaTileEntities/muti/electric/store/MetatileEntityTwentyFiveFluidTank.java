@@ -479,10 +479,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         return 0;
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     private static class TfftPartMatchWrapper {

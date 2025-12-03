@@ -91,10 +91,7 @@ public class MetaTileEntityIndustrialRollerPress extends MultiMapMultiblockContr
         tooltip.add(I18n.format("drtech.machine.industrial_roller_press.tooltip.3"));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

@@ -345,8 +345,5 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     }
 
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 }

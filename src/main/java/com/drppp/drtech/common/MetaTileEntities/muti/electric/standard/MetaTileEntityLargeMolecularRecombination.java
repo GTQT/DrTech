@@ -112,10 +112,7 @@ public class MetaTileEntityLargeMolecularRecombination extends RecipeMapMultiblo
         tooltip.add(TooltipHelper.RAINBOW_SLOW + I18n.format("gregtech.machine.perfect_oc"));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class LargeMoecularRecombinationLogic extends MultiblockRecipeLogic {

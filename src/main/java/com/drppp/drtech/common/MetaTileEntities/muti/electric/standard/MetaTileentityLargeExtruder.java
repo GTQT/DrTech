@@ -89,10 +89,7 @@ public class MetaTileentityLargeExtruder extends RecipeMapMultiblockController {
         tooltip.add(I18n.format("drtech.machine.large_extruder.tooltip.3"));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

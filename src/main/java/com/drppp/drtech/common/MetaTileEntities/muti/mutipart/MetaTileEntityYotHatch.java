@@ -108,10 +108,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
         return super.getCapability(capability, side);
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     private class YotTankHatch extends FluidTank {

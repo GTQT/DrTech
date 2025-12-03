@@ -92,10 +92,7 @@ public class MetaTileEntityIndustrialCablePress extends RecipeMapMultiblockContr
         tooltip.add(I18n.format("drtech.machine.industrial_cable_press.tooltip.4"));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

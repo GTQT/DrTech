@@ -98,10 +98,7 @@ public class MetaTileEntityIndustrialCentrifuge extends RecipeMapMultiblockContr
         tooltip.add(I18n.format("drtech.machine.industrial_centrifuge.tooltip.4"));
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {
         public SelfRecipeLogic(RecipeMapMultiblockController tileEntity, boolean hasPerfectOC) {

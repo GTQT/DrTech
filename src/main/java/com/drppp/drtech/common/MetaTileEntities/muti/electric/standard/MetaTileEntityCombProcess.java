@@ -82,10 +82,7 @@ public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
         super.readFromNBT(data);
     }
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 
 
     protected class SelfRecipeLogic extends MultiblockRecipeLogic {

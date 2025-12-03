@@ -143,8 +143,5 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     }
 
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 }

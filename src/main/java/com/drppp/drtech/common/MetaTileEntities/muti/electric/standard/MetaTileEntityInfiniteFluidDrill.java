@@ -390,8 +390,5 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
     }
 
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 }

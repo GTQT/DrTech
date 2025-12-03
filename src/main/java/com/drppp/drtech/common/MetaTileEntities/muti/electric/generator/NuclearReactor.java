@@ -994,8 +994,4 @@ public class NuclearReactor extends MultiblockWithDisplayBase implements IDataIn
     }
 
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
 }

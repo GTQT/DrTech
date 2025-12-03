@@ -628,8 +628,5 @@ public class MetaTileEntityRuMachine extends WorkableTieredMetaTileEntity  imple
     }
 
 
-    @Override
-    public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return null;
-    }
+    
 }
