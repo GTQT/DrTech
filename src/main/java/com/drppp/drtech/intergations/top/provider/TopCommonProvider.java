@@ -55,27 +55,6 @@ public class TopCommonProvider implements IProbeInfoProvider {
             iProbeInfo.text(TextFormatting.BOLD + "输出方向:" + TextFormatting.GREEN + rs.getFacing());
             iProbeInfo.text(TextFormatting.BOLD + "旋转速度:" + TextFormatting.GREEN + rs.getSpeed());
         }
-        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityCombustionchamber s) {
-            ItemStack item = s.getImportItems().getStackInSlot(0).copy();
-            ItemStack itemout = s.getExportItems().getStackInSlot(0).copy();
-            iProbeInfo.text(TextFormatting.BOLD + "工作状态:" + TextFormatting.GREEN + s.isActive);
-            iProbeInfo.text(TextFormatting.BOLD + "燃烧速度:" + TextFormatting.GREEN + s.burnSpeed);
-            iProbeInfo.text(TextFormatting.BOLD + "燃烧热量:" + TextFormatting.GREEN + s.currentItemHasBurnedTime + "/" + s.currentItemBurnTime);
-            iProbeInfo.text(TextFormatting.BOLD + "HU输出:" + TextFormatting.GREEN + s.outPutHu);
-            iProbeInfo.text(TextFormatting.BOLD + "缓存物品:" + TextFormatting.GREEN + (item.isEmpty() ? "无" : item.getDisplayName() + "*" + item.getCount()));
-            iProbeInfo.text(TextFormatting.BOLD + "灰烬栏状态:" + TextFormatting.GREEN + (itemout.isEmpty() ? "无" : itemout.getCount() + "/64"));
-        }
-        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityCombustionchamberLiquid s) {
-            var fludi = s.getImportFluids().getTankAt(0).getFluid();
-            var itemout = s.getExportFluids().getTankAt(0).getFluid();
-
-            iProbeInfo.text(TextFormatting.BOLD + "工作状态:" + TextFormatting.GREEN + s.isActive);
-            iProbeInfo.text(TextFormatting.BOLD + "燃烧速度:" + TextFormatting.GREEN + s.burnSpeed);
-            iProbeInfo.text(TextFormatting.BOLD + "燃烧热量:" + TextFormatting.GREEN + s.currentItemHasBurnedTime + "/" + s.currentItemBurnTime);
-            iProbeInfo.text(TextFormatting.BOLD + "HU输出:" + TextFormatting.GREEN + s.outPutHu);
-            iProbeInfo.text(TextFormatting.BOLD + "缓存流体:" + TextFormatting.GREEN + (fludi==null ? "无" : fludi.getLocalizedName() + "*" + fludi.amount +"/1000"));
-            iProbeInfo.text(TextFormatting.BOLD + "输出流体:" + TextFormatting.GREEN + (itemout==null ? "无" : itemout.getLocalizedName() + "*" + itemout.amount+"/1000"));
-        }
         if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityBaseWithControl s) {
             iProbeInfo.progress(s.getProgress(), s.getMaxProgress(), iProbeInfo.defaultProgressStyle()
                     .suffix(" / " + TextFormattingUtil.formatNumbers(s.getMaxProgress()) + " t")
