@@ -48,6 +48,7 @@ public class BinneRecipes {
                 'G', GeneticsItems.DNADye.get(1),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
+
         ModHandler.addShapedRecipe("genepool", LaboratoryMachine.Genepool.get(1),
                 "GFG",
                 "XCX",
@@ -58,6 +59,7 @@ public class BinneRecipes {
                 'G', CraftingReceipe.getItemStack("gregtech:machine", 1611),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
+
         ModHandler.addShapedRecipe("acclimatizer", LaboratoryMachine.Acclimatiser.get(1),
                 "GFG",
                 "XCX",
@@ -89,6 +91,7 @@ public class BinneRecipes {
                 'G', CraftingReceipe.getItemStack("genetics:misc", 7),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
+
         ModHandler.addShapedRecipe("sequencer", GeneticMachine.Sequencer.get(1),
                 "GFG",
                 "XCX",
@@ -99,6 +102,7 @@ public class BinneRecipes {
                 'G', CraftingReceipe.getItemStack("genetics:misc", 2),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
+
         ModHandler.addShapedRecipe("inoculator", CraftingReceipe.getItemStack("<genetics:adv_machine>"),
                 "GFG",
                 "XCX",
@@ -120,6 +124,7 @@ public class BinneRecipes {
                 'G',  new UnificationEntry(plate,Diamond),
                 'P', ELECTRIC_MOTOR_HV,
                 'A', new UnificationEntry(gearSmall,Diamond));
+
         ModHandler.addShapedRecipe("lab_machine", LaboratoryMachine.LabMachine.get(1),
                 "IGI",
                         "GCG",
@@ -127,6 +132,7 @@ public class BinneRecipes {
                 'C', GeneticsItems.LaboratoryCasing.get(1),
                 'I', Blocks.GLASS_PANE,
                 'G', new UnificationEntry(plate,StainlessSteel));
+
         //物品
         //laboratory casing id 0
          ASSEMBLER_RECIPES.recipeBuilder()

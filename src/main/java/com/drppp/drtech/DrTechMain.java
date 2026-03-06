@@ -23,17 +23,16 @@ import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
-import com.drppp.drtech.common.MetaTileEntities.single.hu.LiquidBurringInfo;
-import com.drppp.drtech.common.MetaTileEntities.single.hu.MaterialTemperatureUtil;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
 import com.drppp.drtech.loaders.recipes.builder.DisassemblyHandler;
-import com.drppp.drtech.loaders.recipes.misc.GendustryRecipes;
 import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
+import gregtech.api.metatileentity.registry.MTEManager;
+import gregtech.api.unification.material.event.MaterialRegistryEvent;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -49,21 +48,19 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import software.bernie.geckolib3.GeckoLib;
 
 import static com.drppp.drtech.Tags.MODID;
-import static com.drppp.drtech.common.Items.MetaItems.MetaItemsReactor.FuelRodInit;
 
 @Mod(modid = MODID, version = Tags.VERSION, name = Tags.MODNAME,
         acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "required:genetics@[2.5.1.203,);" +
-                "required-after:gregtech@[2.9.0-beta,);"
+        dependencies = "required-after:gregtech@[2.9.0-beta,);"
 )
 public class DrTechMain {
     public static final Logger LOGGER = LogManager.getLogger(MODID);
@@ -84,9 +81,7 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(this);
         DrTechTab = new DrTechCreativeTabs("mytab");
         DrMetaItems.MetaItemsInit();
-        FuelRodInit();
         DrtechCapInit.init();
-        GeckoLib.initialize();
         Textures.init();
         drtMetaEntities.init();
         TileEntityUIFactory.INSTANCE.init();
@@ -95,6 +90,17 @@ public class DrTechMain {
 
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void registerMTERegistry(MTEManager.MTERegistryEvent event) {
+        GregTechAPI.mteManager.createRegistry(Tags.MODID);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void createMaterialRegistry(MaterialRegistryEvent event) {
+        GregTechAPI.materialManager.createRegistry(Tags.MODID);
+    }
+
 
     @EventHandler
     @SideOnly(Side.CLIENT)
@@ -157,9 +163,6 @@ public class DrTechMain {
     public void postInit(FMLPostInitializationEvent event) {
         if (DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
-        GendustryRecipes.init();
-        LiquidBurringInfo.init();
-        MaterialTemperatureUtil.init();
     }
 
     @EventHandler

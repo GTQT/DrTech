@@ -31,9 +31,9 @@ import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
+import gregtech.common.blocks.BlockGlassCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
-import keqing.gtqtcore.common.block.GTQTMetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -56,7 +56,6 @@ import java.util.List;
 
 import static forestry.api.apiculture.BeeManager.beeRoot;
 import static gregtech.api.util.RelativeDirection.*;
-import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.TI_BORON_SILICATE_GLASS;
 
 public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
     private final SingleItemStackHandler inventory = new SingleItemStackHandler(1024,false);
@@ -215,7 +214,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
     }
 
     protected IBlockState getGlassessCasingState() {
-        return GTQTMetaBlocks.blockMultiblockGlass1.getState(TI_BORON_SILICATE_GLASS);
+        return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
 
     @Override

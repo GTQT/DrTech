@@ -22,31 +22,27 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-    api("com.cleanroommc:groovyscript:1.2.0-hotfix1") { transitive = false }
-    api("com.cleanroommc:modularui:3.0.4") { transitive = false }
-    implementation rfg.deobf(files("libs/gregtech-MeowmelMuku-1.12.2-2.9.0-190.jar"))
-    implementation rfg.deobf(files("libs/!mixinbooter-8.9.jar"))
+    // Published dependencies
+    api("com.cleanroommc:modularui:3.0.7") { transitive = false }
 
-    implementation rfg.deobf(files("libs/CodeChickenLib-1.12.2-3.2.3.358-universal.jar"))
-
-    implementation rfg.deobf(files("libs/Baubles-1.12-1.5.2.jar"))
+    implementation rfg.deobf(files("libs/gregtech-gtqt-1.12.2-2.9.0-190.jar"))
+    implementation rfg.deobf(files("libs/ae2fc-2.7.10-unofficial.jar"))
+    implementation rfg.deobf(files("libs/appliedenergistics2-v1.0.5-gtqt.jar"))
+    implementation rfg.deobf(files("libs/GregicalityMultiblocks-gtqt-1.9.0.jar"))
     implementation rfg.deobf(files("libs/geckolib-forge-1.12.2-3.0.31.jar"))
-    implementation rfg.deobf(files("libs/gendustry-1.6.5.8-mc1.12.2.jar"))
-    compileOnlyApi rfg.deobf("curse.maven:baubles-227083:2518667")
-    implementation rfg.deobf("curse.maven:forestry-59751:2684780")
-    implementation rfg.deobf("curse.maven:pams-harvestcraft-221857:2904825")
-    implementation rfg.deobf("curse.maven:Binnie's Mods-223525:2916129")
-    implementation rfg.deobf("curse.maven:BdLib-70496:4675629")
-    implementation rfg.deobf("curse.maven:applecore-224472:2969118")
-    implementation rfg.deobf(files("libs/CTM-MC1.12.2-1.0.2.31.jar"))
-    implementation rfg.deobf(files("libs/ae2-uel-v0.56.6.jar"))
-    implementation rfg.deobf(files("libs/Fluid Craft for AE2-2.6.6-r.jar"))
-    implementation rfg.deobf(files("libs/jei_1.12.2-4.16.1.1003.jar"))
-    implementation rfg.deobf(files("libs/theoneprobe-1.12-1.4.28.jar"))
-    implementation rfg.deobf("curse.maven:supercritical-gtqt-1192819:6921817")
-    implementation rfg.deobf("curse.maven:gt-steam-tech-1074800:6947589")
-    implementation rfg.deobf("curse.maven:gregicalit-multiblocks-meowmelmuku-1263292:6995559")
 
-    implementation rfg.deobf("curse.maven:gtqtcore-1076580:6995562")
-    implementation rfg.deobf("curse.maven:gregtechfoodoption-meowmel-1316532:6947557")
+    api rfg.deobf("curse.maven:ctm-267602:2915363") // CTM 1.0.2.31
+    implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848") // CCL 3.2.3.358
+    implementation rfg.deobf("curse.maven:had-enough-items-557549:7515497")
+    implementation rfg.deobf('curse.maven:top-245211:2667280') // TOP 1.4.28
+    implementation rfg.deobf("curse.maven:mixin-booter-419286:7049694")
+    implementation "curse.maven:crafttweaker-239197:6929088"
+
+    compileOnly rfg.deobf("curse.maven:galacticraft-564236:6364107")
+    compileOnlyApi rfg.deobf("curse.maven:baubles-227083:2518667")
+
+    implementation rfg.deobf("curse.maven:BdLib-70496:4675629")
+    implementation rfg.deobf("curse.maven:forestry-59751:2684780")
+    implementation rfg.deobf("curse.maven:Binnie's Mods-223525:2916129")
+    implementation rfg.deobf("curse.maven:gendustry-70492:2516215")
 }

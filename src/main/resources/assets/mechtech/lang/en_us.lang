@@ -1,0 +1,95 @@
+metaitem.data_stick.tooltip.blockpos=Position: X: %d, Y: %d, Z: %d, Dim: %d
+
+metaitem.wireless_receiver.name=Wireless Receiver Cover
+
+mechtech.key.tesla_coil.mode_switch=Tesla coil attack mode
+mechtech.key.auto_feeder.mode_switch=Auto Feeder mode
+
+mechtech.tesla_coil.attack_mode_switch=Attack mode: %s
+mechtech.tesla_coil.attack_mode_switch.monsters=Monsters
+mechtech.tesla_coil.attack_mode_switch.animals=Animals
+mechtech.tesla_coil.attack_mode_switch.animals_and_monsters=Animals & Monsters
+
+mechtech.auto_feeder.mode=Auto Feeder: %s
+
+mechtech.universal.tooltip.item_storage_accept=Accepts:
+mechtech.universal.tooltip.item_storage_reject=Rejects:
+
+mechtech.machine.tesla_tower.name=Tesla Tower
+mechtech.machine.armor_workbench.name=Armor Workbench
+mechtech.machine.armor_workbench.tooltip=Can be used to modify Modular Armor
+
+mechtech.modular_workbench.error1=Module %s is required
+mechtech.modular_workbench.error2=Incompatible with %s
+mechtech.modular_workbench.error3=This is not a Module
+mechtech.modular_workbench.error4=Can't insert more of this module
+mechtech.modular_workbench.error5=Invalid armor piece
+
+mechtech.multiblock.tesla_tower.range=Range: %s
+mechtech.multiblock.tesla_tower.voltage=Voltage: %d
+mechtech.multiblock.tesla_tower.receivers=Receivers: %d
+mechtech.multiblock.tesla_tower.fail=Emitting failed at:
+mechtech.multiblock.tesla_tower.scan=Scan
+mechtech.multiblock.tesla_tower.amps=Amps: %d
+mechtech.multiblock.tesla_tower.loss=Loss: %d
+mechtech.multiblock.tesla_tower.damage=Dmg: %d
+mechtech.multiblock.tesla_tower.description=The Tesla Tower can transmit power wireless.
+mechtech.multiblock.tesla_tower.current_mode=Current Mode: %s
+mechtech.multiblock.tesla_tower.mode.wireless_energy=Wireless Energy
+mechtech.multiblock.tesla_tower.mode.defense=Defense
+mechtech.tesla_tower.ui.mode.tooltip=§bWireless Energy Mode/n§rThe tower transmits wireless power to machines within range. The further the machine is away, the more energy is lost. It can hurt entities if they are too close./n§bDefense Mode/n§rThe tower will aggressively attack any mob in range. It wont transmit power wireless.
+
+
+mechtech.jei_category.torus_block=Tesla Tower Torus Blocks
+
+mechtech.recipe.torus_block.dmg=Damage modifier: %d
+mechtech.recipe.torus_block.range=Range modifier: %d
+mechtech.recipe.torus_block.amps=Amperage per Block: %d
+
+mechtech.modules.armor_plating.name=%s Armor Plating
+mechtech.modules.night_vision.name=Night Vision
+mechtech.modules.solar_gen.1.name=Solar Gen I
+mechtech.modules.solar_gen.2.name=Solar Gen II
+mechtech.modules.solar_gen.3.name=Solar Gen III
+mechtech.modules.jetpack.name=Thruster Jetpack
+mechtech.modules.advanced_jetpack.name=Advanced Thruster Jetpack
+mechtech.modules.shock_absorber.name=Shock Absorber
+mechtech.modules.insulator.name=Thick Insulator
+mechtech.modules.binoculars.name=Binoculars
+mechtech.modules.auto_feeder.name=Auto Feeder
+mechtech.modules.tesla_coil.name=Tesla Coil
+mechtech.modules.oxygen_mask.name=Oxygen Mask
+mechtech.modules.wireless_cover.name=Wireless Receiver
+
+mechtech.modules.armor_plating.tooltip.1=§rDurability: §a%d/%d
+mechtech.modules.armor_plating.tooltip.2=§rArmor: §a%d
+mechtech.modules.armor_plating.tooltip.3=§rToughness: §a%d
+mechtech.modules.armor_plating.tooltip.unsneak=§aHold Shift
+mechtech.modules.armor_plating.tooltip.sneak=Armor Platings can be used to strengthen the defense of a Modular Armor, but the efficiency gets worse the more platings you use in one armor piece.
+mechtech.modules.binoculars.zoom.enable=Zoom enabled
+mechtech.modules.binoculars.zoom.disable=Zoom disabled
+
+metaitem.modular_helmet.name=Modular Helmet
+metaitem.modular_chestplate.name=Modular Chestplate
+metaitem.modular_leggings.name=Modular Leggings
+metaitem.modular_boots.name=Modular Boots
+metaitem.modular_armor.tooltip.unsneak=§aHold Shift
+metaitem.modular_armor.tooltip.sneak=Modular Armor does nothing on it's own and never breaks. It can be modified with various modules inside the Armor Workbench. Some modules require energy. Those also needs batteries.
+metaitem.shock_absorber.name=Shock Absorber
+metaitem.shock_absorber.tooltip=Absorbs 90% fall damage and reduces knock back (does not stack)
+metaitem.binoculars.name=Binoculars
+metaitem.binoculars.tooltip=Hold right mouse button to zoom when held in hand.
+metaitem.thick_insulator.name=Thick Insulator
+metaitem.auto_feeder.name=Auto Feeder
+metaitem.auto_feeder.tooltip=Automatically feeds the first food item it finds from the player inventory. Don't worry it wont waste any food.
+metaitem.tesla_coil.name=Tesla Coil
+metaitem.tesla_coil.tooltip=Attacks nearby mobs by using electricity and charges items in the inventory. Can be equipped to the head and chest.
+metaitem.oxygen_mask.name=Oxygen Mask
+metaitem.oxygen_mask.tooltip=Allows the user to breath oxygen under water
+
+metaitem.modular_armor.no_battery=§4Insert Batteries!
+metaitem.modular_armor.installed_modules=§bInstalled Modules: §7(%d/%d)
+metaitem.modular_armor.no_modules=§cNo Modules installed
+metaitem.modular_armor.max_fluid=§3Max fluid cell size: %s
+
+mechtech.modular_armor.usable=§3Can be used as a module in the Modular Armor

@@ -34,7 +34,8 @@ import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.renderer.ICubeRenderer;
-import keqing.gtqtcore.common.block.GTQTMetaBlocks;
+import gregtech.common.blocks.BlockGlassCasing;
+import gregtech.common.blocks.MetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -59,7 +60,6 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
-import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.TI_BORON_SILICATE_GLASS;
 
 public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements IControllable, IProgressBarMultiblock {
     private static final String NBT_FLUID_BANK = "EnergyBank";
@@ -280,7 +280,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     }
 
     protected IBlockState getGlassState() {
-        return GTQTMetaBlocks.blockMultiblockGlass1.getState(TI_BORON_SILICATE_GLASS);
+        return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.FUSION_GLASS);
     }
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {

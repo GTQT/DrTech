@@ -3,7 +3,6 @@ package com.drppp.drtech.common.Blocks;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityTimeTable;
-import keqing.gtqtcore.common.items.GTQTMetaItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -56,6 +55,7 @@ public class BlockTimeTable extends Block {
     }
 
 
+    /*
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if(!worldIn.isRemote)
@@ -83,5 +83,7 @@ public class BlockTimeTable extends Block {
         }
         return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
+
+     */
 
 }

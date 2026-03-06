@@ -1,7 +1,7 @@
 package com.drppp.drtech.Client;
 
 import com.drppp.drtech.Tile.TileEntityTimeTable;
-import keqing.gtqtcore.common.items.GTQTMetaItems;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -31,7 +31,8 @@ public class TesrTimeTable extends TileEntitySpecialRenderer<TileEntityTimeTable
         GlStateManager.rotate(rotationAngle, 0.0f, 1.0f, 0.0f); // 绕Y轴旋转
 
         // 创建EntityItem以渲染
-        EntityItem items = new EntityItem(te.getWorld(), te.getPos().getX() + 0.5, te.getPos().getY() + 1.2 + animationOffset, te.getPos().getZ() + 0.5, new ItemStack(GTQTMetaItems.TIME_BOTTLE.getMetaItem(), 1, GTQTMetaItems.TIME_BOTTLE.metaValue));
+        EntityItem items = new EntityItem(te.getWorld(), te.getPos().getX() + 0.5, te.getPos().getY() + 1.2 + animationOffset, te.getPos().getZ() + 0.5,
+                new ItemStack(Items.APPLE));
         items.hoverStart = 0;
 
         // 渲染物品

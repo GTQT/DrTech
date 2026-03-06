@@ -17,9 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static keqing.gtqtcore.api.utils.GTQTUtil.getItemById;
-import static keqing.gtqtcore.api.utils.GTQTUtil.getMetaItemById;
-
 public enum Mods {
 
     Forestry("forestry"),
@@ -47,44 +44,6 @@ public enum Mods {
         return this.ID;
     }
 
-    @NotNull
-    public ItemStack getItemByID(String name) {
-        return getItemById(this.ID, name);
-    }
-
-    @NotNull
-    public ItemStack getItemByID(String name, int amount) {
-        return getItemById(this.ID, name, amount);
-    }
-
-    @NotNull
-    public ItemStack getItemByID(String name, NBTTagCompound nbt) {
-        return getItemById(this.ID, name, nbt);
-    }
-
-    @NotNull
-    public ItemStack getItemByID(String name, int amount, NBTTagCompound nbt) {
-        return getItemById(this.ID, name, amount, nbt);
-    }
-
-    @NotNull
-    public ItemStack getMetaItemByID(String name, int meta) {
-        return getMetaItemById(this.ID, name, meta);
-    }
-
-    @NotNull
-    public ItemStack getMetaItemByID(String name, int meta, int amount) {
-        return getMetaItemById(this.ID, name, meta, amount);
-    }
-
-    @NotNull
-    public ItemStack getMetaItemByID(String name, int meta, NBTTagCompound nbt) {
-        return getMetaItemById(this.ID, name, meta, nbt);
-    }
-
-    public ItemStack getMetaItemByID(String name, int meta, int amount, NBTTagCompound nbt) {
-        return getMetaItemById(this.ID, name, meta, amount, nbt);
-    }
 
     /**
      * Check if Mod with given {@link #ID} is loaded.

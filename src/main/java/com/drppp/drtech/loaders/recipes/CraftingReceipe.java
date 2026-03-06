@@ -5,19 +5,14 @@ import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
-import forestry.apiculture.ModuleApiculture;
-import forestry.apiculture.blocks.BlockAlvearyType;
-import gregtech.api.GTValues;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
-import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.api.unification.stack.UnificationEntry;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import gregtech.common.items.ToolItems;
-import keqing.gtqtcore.api.unification.GTQTMaterials;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -40,7 +35,6 @@ import static gregtech.loaders.recipe.CraftingComponent.*;
 
 public class CraftingReceipe {
     public static void load() {
-        ruMachine();
         updateChip();
         multiblock();
 
@@ -192,30 +186,10 @@ public class CraftingReceipe {
         ModHandler.addShapelessRecipe("advanced_cauldron", new ItemStack(ItemsInit.ITEM_BLOCK_ADVANCED_CAULDRON), Items.CAULDRON);
 
 
-        ModHandler.addShapedRecipe("common_burn_generator", COMMON_BURN_GENERATOR.getStackForm(),
-                "WDW",
-                        "ABC",
-                        "WDW",
-                'D', getItemStack("gregtech:boiler_firebox_casing",2),
-                'W', getItemStack("gregtech:meta_plate_dense",113),
-                'A', getItemStack("gregtech:mte",1011),
-                'B', getItemStack("gregtech:mte",1007),
-                'C', getItemStack("gtqtcore:mte",8)
-        );
-
     }
 
     private static void multiblock() {
-        ModHandler.addShapedRecipe("industrial_apiary", DrTechMetaTileEntities.INDUSTRIAL_APIARY.getStackForm(),
-                "KBK",
-                "JSJ",
-                "RRR",
-                'S', getItemStack("forestry:sturdy_machine", 0),
-                'J', MetaItems.ROBOT_ARM_HV,
-                'K', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN),
-                'R', getItemStack("extrabees:alveary", 3),
-                'B', getItemStack("forestry:chipsets", 1)
-        );
+
 
         ModHandler.addShapedRecipe(true, "large_alloy_smelter", DrTechMetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm(),
                 "ADA", "WSW", "WWW",
@@ -243,15 +217,7 @@ public class CraftingReceipe {
                     'O', new UnificationEntry(spring, MolybdenumDisilicide),
                     'W', new UnificationEntry(cableGtSingle, Platinum));
 
-            ModHandler.addShapedRecipe("large_mixer_drt", DrTechMetaTileEntities.INDUSTRIAL_MIXER.getStackForm(),
-                    "ACA",
-                    "BSB",
-                    "ACA",
-                    'S', MIXER[IV].getStackForm(),
-                    'C', new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
-                    'A', new UnificationEntry(plate, GTQTMaterials.Staballoy),
-                    'B', new UnificationEntry(plate, GTQTMaterials.ZirconiumCarbide)
-            );
+
 
             ModHandler.addShapedRecipe("larger_roller_press", DrTechMetaTileEntities.INDUSTRIAL_ROLLER_PRESS.getStackForm(),
                     "ACA",
@@ -273,27 +239,7 @@ public class CraftingReceipe {
                     'B', gregtech.common.metatileentities.MetaTileEntities.HULL[IV].getStackForm()
 
             );
-            ModHandler.addShapedRecipe("larger_sieve_drt", DrTechMetaTileEntities.INDUSTRIAL_SIEVE.getStackForm(),
-                    "ACA",
-                    "BSB",
-                    "ACA",
-                    'S', SIFTER[GTValues.HV].getStackForm(),
-                    'C', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
-                    'A', new UnificationEntry(plate, GTQTMaterials.EglinSteel),
-                    'B', new UnificationEntry(cableGtQuadruple, Gold)
 
-            );
-            ModHandler.addShapedRecipe("larger_centrifuge_drt", DrTechMetaTileEntities.INDUSTRIAL_CENTRIFUGE.getStackForm(),
-                    "ACA",
-                    "BSB",
-                    "DCD",
-                    'S', CENTRIFUGE[GTValues.EV].getStackForm(),
-                    'A', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
-                    'B', new UnificationEntry(plate, GTQTMaterials.Inconel792),
-                    'C', gregtech.common.metatileentities.MetaTileEntities.HULL[EV].getStackForm(),
-                    'D', new UnificationEntry(plate, GTQTMaterials.MaragingSteel250)
-
-            );
         }
     }
 
@@ -554,143 +500,7 @@ public class CraftingReceipe {
         );
     }
 
-    private static void ruMachine() {
-        ModHandler.addShapedRecipe("ru_macerator", DrTechMetaTileEntities.RU_MACERATOR.getStackForm(),
-                "DXD", "XMX", "PXP",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper),
-                'P', new UnificationEntry(gearSmall, Materials.Iron),
-                'D', new UnificationEntry(OrePrefix.gem, Materials.Diamond));
 
-        ModHandler.addShapedRecipe("ru_mixer", DrTechMetaTileEntities.RU_MIXER.getStackForm(),
-                "AGA", "BCB", "AGA",
-                'C', Blocks.BRICK_BLOCK,
-                'G', new UnificationEntry(rotor, Iron),
-                'B', new UnificationEntry(screw, Iron),
-                'A', new UnificationEntry(plate, Copper));
-
-        ModHandler.addShapedRecipe("ru_compressor", DrTechMetaTileEntities.RU_COMPRESSOR.getStackForm(),
-                "XXX", "PMP", "XXX",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(plate, Materials.Iron),
-                'P', new UnificationEntry(gearSmall, Materials.Iron));
-
-        ModHandler.addShapedRecipe("ru_extruder", DrTechMetaTileEntities.RU_EXTRUDER.getStackForm(),
-                "GPG", "SMS", "GXG",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(plate, Materials.Iron),
-                'S', new UnificationEntry(screw, Materials.Tin),
-                'P', new UnificationEntry(gearSmall, Materials.Iron),
-                'G', new UnificationEntry(spring, Materials.Copper));
-
-        ModHandler.addShapedRecipe("ru_sifter", DrTechMetaTileEntities.RU_SIFTER.getStackForm(),
-                "GPG", "SMS", "GXG",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(plate, Materials.Iron),
-                'S', new UnificationEntry(spring, Materials.Copper),
-                'P', new UnificationEntry(gearSmall, Materials.Iron),
-                'G', new UnificationEntry(OrePrefix.pipeSmallFluid, Materials.Copper));
-
-        ModHandler.addShapedRecipe("ru_hammer", DrTechMetaTileEntities.RU_HAMMER.getStackForm(),
-                "GPG", "SMS", "GXG",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(plate, Materials.Iron),
-                'S', new UnificationEntry(spring, Materials.Copper),
-                'P', new UnificationEntry(gearSmall, Materials.Iron),
-                'G', new UnificationEntry(screw, Materials.Tin));
-
-        ModHandler.addShapedRecipe("ru_wiremill", DrTechMetaTileEntities.RU_WIREMILL.getStackForm(),
-                "XXX", "PMG", "XXX",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(stick, Materials.Tin),
-                'P', new UnificationEntry(gearSmall, Materials.Iron),
-                'G', new UnificationEntry(screw, Materials.Iron));
-
-        ModHandler.addShapedRecipe("ru_bender", DrTechMetaTileEntities.RU_BENDER.getStackForm(),
-                "XXX", "PMG", "XXX",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(plate, Materials.Iron),
-                'P', new UnificationEntry(gearSmall, Materials.Iron),
-                'G', new UnificationEntry(ring, Materials.Iron));
-
-        ModHandler.addShapedRecipe("ru_centrifuge", DrTechMetaTileEntities.RU_CENTRIFUGE.getStackForm(),
-                "XSX", "PMP", "XSX",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(plate, Materials.Iron),
-                'S', new UnificationEntry(spring, Materials.Copper),
-                'P', new UnificationEntry(gearSmall, Materials.Iron));
-
-        ModHandler.addShapedRecipe("ru_splitter", DrTechMetaTileEntities.RU_SPLITTER.getStackForm(),
-                "XPX", "PMP", "XPX",
-                'M', Blocks.BRICK_BLOCK,
-                'X', new UnificationEntry(ring, Materials.Iron),
-                'P', new UnificationEntry(gearSmall, Materials.Iron));
-
-        ModHandler.addShapedRecipe("ru_generator", DrTechMetaTileEntities.RU_GENERATOR.getStackForm(),
-                "PCP",
-                "RMR",
-                "EWE",
-                'M', gregtech.common.metatileentities.MetaTileEntities.HULL[GTValues.LV].getStackForm(),
-                'E', MetaItems.ELECTRIC_MOTOR_LV,
-                'R', new UnificationEntry(gear, Tin),
-                'C', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
-                'W', new UnificationEntry(OrePrefix.cableGtSingle, Tin),
-                'P', new UnificationEntry(OrePrefix.gear, Materials.Bronze));
-
-        ModHandler.addShapedRecipe("water_mill", new ItemStack(BlocksInit.BLOCK_WATER_MILL),
-                "ABA",
-                "BCB",
-                "ABA",
-                'C', new UnificationEntry(screw, Iron),
-                'A', new UnificationEntry(frameGt, Wood),
-                'B', "plankWood"
-
-        );
-        ModHandler.addShapedRecipe("wood_axle", new ItemStack(BlocksInit.BLOCK_WOOD_AXLE),
-                "AAA", "BCB", "AAA",
-                'C', new UnificationEntry(stick, Iron),
-                'B', new UnificationEntry(screw, Iron),
-                'A', "plankWood"
-        );
-
-
-        Material[] materials = new Material[]{
-                Materials.Lead, Materials.Bronze, Materials.Steel, Materials.Invar, Materials.Chrome, Materials.Titanium, Materials.Tungsten, Materials.TungstenSteel};
-
-        for (int i = 0; i < HU_BURRING_BOXS.length; i++) {
-            // 基础燃烧室配方
-            ModHandler.addShapedRecipe(HU_BURRING_BOXS[i].getMetaName(),
-                    HU_BURRING_BOXS[i].getStackForm(),
-                    "PCP", "CMC", "PCP",
-                    'P', new UnificationEntry(plate, materials[i]),
-                    'C', new UnificationEntry(ring, materials[i]),
-                    'M', gregtech.common.metatileentities.MetaTileEntities.STEAM_BOILER_COAL_BRONZE.getStackForm()); // 机械方块
-
-            // 密集燃烧室配方（输出x4）
-            ModHandler.addShapedRecipe(HU_DENSE_BURRING_BOXS[i].getMetaName(),
-                    HU_DENSE_BURRING_BOXS[i].getStackForm(),
-                    "PCP", "CMC", "PCP",
-                    'P', new UnificationEntry(plateDense, materials[i]),
-                    'C', new UnificationEntry(ring, materials[i]),
-                    'M', gregtech.common.metatileentities.MetaTileEntities.STEAM_BOILER_COAL_STEEL.getStackForm()); // 机械方块
-
-            // 基础燃烧室配方
-            ModHandler.addShapedRecipe(HU_BURRING_BOXS_LIQUID[i].getMetaName(),
-                    HU_BURRING_BOXS_LIQUID[i].getStackForm(),
-                    "PCP", "CMC", "PCP",
-                    'P', new UnificationEntry(plate, materials[i]),
-                    'C', new UnificationEntry(ring, materials[i]),
-                    'M', STEAM_BOILER_LAVA_BRONZE.getStackForm()); // 机械方块
-
-            // 密集燃烧室配方（输出x4）
-            ModHandler.addShapedRecipe(HU_DENSE_BURRING_BOXS_LIQUID[i].getMetaName(),
-                    HU_DENSE_BURRING_BOXS_LIQUID[i].getStackForm(),
-                    "PCP", "CMC", "PCP",
-                    'P', new UnificationEntry(plateDense, materials[i]),
-                    'C', new UnificationEntry(ring, materials[i]),
-                    'M', gregtech.common.metatileentities.MetaTileEntities.STEAM_BOILER_LAVA_STEEL.getStackForm()); // 机械方块
-        }
-    }
 
     public static ItemStack getItemStack(String itemstr) {
         return getItemStack(itemstr, 0);

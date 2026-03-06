@@ -20,7 +20,6 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem TACTICAL_LASER_SUBMACHINE_GUN;
     public static MetaItem<?>.MetaValueItem ELECTRIC_PLASMA_GUN;
     public static MetaItem<?>.MetaValueItem ADVANCED_TACHINO_DISRUPTOR;
-    public static MetaItem<?>.MetaValueItem NULL_FUEL_ROD;
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_LV;
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_MV;
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_HV;

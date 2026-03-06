@@ -1,10 +1,6 @@
 package com.drppp.drtech.intergations.jei;
 
 import com.drppp.drtech.api.Utils.CustomeRecipe;
-import gregicality.multiblocks.common.metatileentities.GCYMMetaTileEntities;
-import gregtech.api.GTValues;
-import gregtech.common.metatileentities.MetaTileEntities;
-import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;

@@ -23,10 +23,7 @@ import static gregtech.api.unification.ore.OrePrefix.pipeNormalFluid;
 import static gregtech.common.blocks.BlockHermeticCasing.HermeticCasingsType.*;
 import static gregtech.common.blocks.MetaBlocks.HERMETIC_CASING;
 import static gregtech.common.items.MetaItems.*;
-import static gregtech.common.items.MetaItems.ELECTRIC_PUMP_UXV;
-import static gregtech.common.metatileentities.MetaTileEntities.QUANTUM_TANK;
-import static keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps.PRECISE_ASSEMBLER_RECIPES;
-import static keqing.gtqtcore.api.unification.GTQTMaterials.*;
+
 
 public class FluidStoreRecpie {
     public static void init()
@@ -181,6 +178,7 @@ public class FluidStoreRecpie {
                 .cleanroom(CleanroomType.CLEANROOM)
                 .buildAndRegister();
 
+        /*
         //  T6
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(frameGt, Orichalcum)
@@ -282,7 +280,7 @@ public class FluidStoreRecpie {
                 .EUt(VA[IV])
                 .duration(200)
                 .buildAndRegister();
-
+/*
         //  T3
         PRECISE_ASSEMBLER_RECIPES.recipeBuilder()
                 .input(FLUID_CORE_T2)

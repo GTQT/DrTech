@@ -24,7 +24,7 @@ import gregtech.api.recipes.RecipeMap;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
-import keqing.gtqtcore.common.block.GTQTMetaBlocks;
+import gregtech.common.blocks.MetaBlocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -160,7 +160,7 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(16))
                         .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMaxGlobalLimited(16))
                 )
-                .where('B', states(GTQTMetaBlocks.blocksResearchSystem.getStateFromMeta(0)))
+                .where('B', states(MetaBlocks.METAL_CASING.getStateFromMeta(0)))
                 .where('D', states(BlocksInit.COMMON_CASING.getStateFromMeta(3)))
                 .where('C', states(BlocksInit.TRANSPARENT_CASING1.getStateFromMeta(2))
                 )

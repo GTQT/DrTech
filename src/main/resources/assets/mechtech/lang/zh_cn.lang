@@ -1,0 +1,94 @@
+metaitem.data_stick.tooltip.blockpos=坐标：X: %d, Y: %d, Z: %d, 维度: %d
+
+metaitem.wireless_receiver.name=无线接收覆盖板
+
+mechtech.key.tesla_coil.mode_switch=特斯拉线圈攻击模式
+mechtech.key.auto_feeder.mode_switch=自动进食器模式
+
+mechtech.tesla_coil.attack_mode_switch=攻击模式：%s
+mechtech.tesla_coil.attack_mode_switch.monsters=怪物
+mechtech.tesla_coil.attack_mode_switch.animals=动物
+mechtech.tesla_coil.attack_mode_switch.animals_and_monsters=动物与怪物
+
+mechtech.auto_feeder.mode=自动进食器：%s
+
+mechtech.universal.tooltip.item_storage_accept=接受：
+mechtech.universal.tooltip.item_storage_reject=拒绝：
+
+mechtech.machine.tesla_tower.name=特斯拉塔
+mechtech.machine.armor_workbench.name=护甲工作台
+mechtech.machine.armor_workbench.tooltip=可用于改装模块化护甲
+
+mechtech.modular_workbench.error1=需要模块 %s
+mechtech.modular_workbench.error2=与 %s 不兼容
+mechtech.modular_workbench.error3=这不是一个模块
+mechtech.modular_workbench.error4=无法安装更多此模块
+mechtech.modular_workbench.error5=无效的护甲部件
+
+mechtech.multiblock.tesla_tower.range=范围：%s
+mechtech.multiblock.tesla_tower.voltage=电压：%d
+mechtech.multiblock.tesla_tower.receivers=接收器：%d
+mechtech.multiblock.tesla_tower.fail=发射失败于：
+mechtech.multiblock.tesla_tower.scan=扫描
+mechtech.multiblock.tesla_tower.amps=电流：%d
+mechtech.multiblock.tesla_tower.loss=损耗：%d
+mechtech.multiblock.tesla_tower.damage=伤害：%d
+mechtech.multiblock.tesla_tower.description=特斯拉塔可以无线传输能量。
+mechtech.multiblock.tesla_tower.current_mode=当前模式：%s
+mechtech.multiblock.tesla_tower.mode.wireless_energy=无线能量
+mechtech.multiblock.tesla_tower.mode.defense=防御
+mechtech.tesla_tower.ui.mode.tooltip=§b无线能量模式/n§r向范围内的机器无线传输能量。机器距离越远，能量损耗越大。如果实体离得太近，也会受到伤害。/n§b防御模式/n§r塔会主动攻击范围内的任何生物。不会进行无线能量传输。
+
+mechtech.jei_category.torus_block=特斯拉塔环面方块
+
+mechtech.recipe.torus_block.dmg=伤害修正：%d
+mechtech.recipe.torus_block.range=范围修正：%d
+mechtech.recipe.torus_block.amps=每方块电流：%d
+
+mechtech.modules.armor_plating.name=%s 护甲板
+mechtech.modules.night_vision.name=夜视仪
+mechtech.modules.solar_gen.1.name=太阳能发电机 I
+mechtech.modules.solar_gen.2.name=太阳能发电机 II
+mechtech.modules.solar_gen.3.name=太阳能发电机 III
+mechtech.modules.jetpack.name=推进器喷气背包
+mechtech.modules.advanced_jetpack.name=高级推进器喷气背包
+mechtech.modules.shock_absorber.name=减震器
+mechtech.modules.insulator.name=厚绝缘层
+mechtech.modules.binoculars.name=望远镜
+mechtech.modules.auto_feeder.name=自动进食器
+mechtech.modules.tesla_coil.name=特斯拉线圈
+mechtech.modules.oxygen_mask.name=氧气面罩
+mechtech.modules.wireless_cover.name=无线接收器
+
+mechtech.modules.armor_plating.tooltip.1=§r耐久度：§a%d/%d
+mechtech.modules.armor_plating.tooltip.2=§r护甲值：§a%d
+mechtech.modules.armor_plating.tooltip.3=§r韧性：§a%d
+mechtech.modules.armor_plating.tooltip.unsneak=§a按住 Shift
+mechtech.modules.armor_plating.tooltip.sneak=护甲板可用于增强模块化护甲的防御力，但在同一件护甲上使用的板越多，效率就越低。
+mechtech.modules.binoculars.zoom.enable=变焦已启用
+mechtech.modules.binoculars.zoom.disable=变焦已禁用
+
+metaitem.modular_helmet.name=模块化头盔
+metaitem.modular_chestplate.name=模块化胸甲
+metaitem.modular_leggings.name=模块化护腿
+metaitem.modular_boots.name=模块化靴子
+metaitem.modular_armor.tooltip.unsneak=§a按住 Shift
+metaitem.modular_armor.tooltip.sneak=模块化护甲本身没有功能且不会损坏。可以在护甲工作台中使用各种模块进行改装。部分模块需要能量，这些模块还需要电池。
+metaitem.shock_absorber.name=减震器
+metaitem.shock_absorber.tooltip=吸收90%的摔落伤害并减少击退（效果不叠加）
+metaitem.binoculars.name=望远镜
+metaitem.binoculars.tooltip=手持时按住鼠标右键可拉近视野。
+metaitem.thick_insulator.name=厚绝缘层
+metaitem.auto_feeder.name=自动进食器
+metaitem.auto_feeder.tooltip=自动从玩家物品栏中寻找并食用第一种食物。放心，不会浪费食物。
+metaitem.tesla_coil.name=特斯拉线圈
+metaitem.tesla_coil.tooltip=通过电力攻击附近的生物，并为物品栏中的物品充电。可以装备在头部和胸部。
+metaitem.oxygen_mask.name=氧气面罩
+metaitem.oxygen_mask.tooltip=允许玩家在水下呼吸氧气
+
+metaitem.modular_armor.no_battery=§4请插入电池！
+metaitem.modular_armor.installed_modules=§b已安装模块：§7(%d/%d)
+metaitem.modular_armor.no_modules=§c未安装模块
+metaitem.modular_armor.max_fluid=§3最大流体单元容量：%s
+
+mechtech.modular_armor.usable=§3可用作模块化护甲的模块

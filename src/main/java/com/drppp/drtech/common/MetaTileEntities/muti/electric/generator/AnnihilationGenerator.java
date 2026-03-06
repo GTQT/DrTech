@@ -39,7 +39,6 @@ import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.integration.jei.basic.GTOreInfo;
-import keqing.gtqtcore.common.block.GTQTMetaBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -67,7 +66,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.FORCE_FIELD_CONSTRAINED_GLASS;
+import static gregtech.common.blocks.BlockGlassCasing.CasingType.FUSION_GLASS;
 
 public class AnnihilationGenerator extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable, IFastRenderMetaTileEntity {
     private final AnnihilationGeneratorLogic logic;
@@ -184,7 +183,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
     }
 
     protected IBlockState getGlassesState() {
-        return GTQTMetaBlocks.blockMultiblockGlass1.getState(FORCE_FIELD_CONSTRAINED_GLASS);
+        return MetaBlocks.TRANSPARENT_CASING.getState(FUSION_GLASS);
     }
 
     @SideOnly(Side.CLIENT)

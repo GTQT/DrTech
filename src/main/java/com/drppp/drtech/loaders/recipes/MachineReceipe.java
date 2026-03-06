@@ -5,11 +5,7 @@ import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
-import com.drppp.drtech.intergations.GTFOLinkage;
-import com.drppp.drtech.intergations.GtqtCoreLinkage;
-import com.drppp.drtech.intergations.HarvestcraftLinkage;
-import forestry.apiculture.ModuleApiculture;
-import forestry.apiculture.blocks.BlockAlvearyType;
+
 import gregtech.api.GTValues;
 import gregtech.api.unification.material.MarkerMaterials;
 import gregtech.api.unification.ore.OrePrefix;
@@ -17,8 +13,6 @@ import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
-import keqing.gtqtcore.api.unification.GTQTMaterials;
-import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -158,15 +152,6 @@ public class MachineReceipe {
                 .EUt(7680)
                 .duration(652)
                 .buildAndRegister();
-        if (Loader.isModLoaded(GtqtCoreLinkage.GTQTCORE_ID)) {
-            GtqtCoreLinkage.MachineRecipeInit();
-        }
-        if (Loader.isModLoaded(GTFOLinkage.GTFO_ID)) {
-            GTFOLinkage.MachineRecipeInit();
-        }
-        if (Loader.isModLoaded(HarvestcraftLinkage.CRAFT_ID)) {
-            HarvestcraftLinkage.MachineRecipeInit();
-        }
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.frameGt, Wood)
                 .input(OrePrefix.pipeTinyFluid, Steel, 2)
@@ -231,6 +216,7 @@ public class MachineReceipe {
                 .EUt(30)
                 .duration(200)
                 .buildAndRegister();
+        /*
         ASSEMBLY_LINE_RECIPES.recipeBuilder()
                 .inputs(MetaBlocks.MACHINE_CASING.getItemVariant(BlockMachineCasing.MachineCasingType.ZPM))
                 .input(circuit, MarkerMaterials.Tier.ZPM, 64)
@@ -268,17 +254,8 @@ public class MachineReceipe {
                 .EUt(GTValues.VA[ZPM])
                 .duration(600)
                 .buildAndRegister();
+*/
 
-        ASSEMBLER_RECIPES.recipeBuilder()
-                .input(DrTechMetaTileEntities.INDUSTRIAL_APIARY, 4)
-                .input(circuit, MarkerMaterials.Tier.HV, 16)
-                .input(MetaItems.ROBOT_ARM_HV, 16)
-                .input(plate, StainlessSteel, 64)
-                .fluidInputs(SolderingAlloy.getFluid(1440))
-                .outputs(DrTechMetaTileEntities.COMB_PROVESS.getStackForm())
-                .EUt(GTValues.VA[HV])
-                .duration(600)
-                .buildAndRegister();
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.plate, Polyethylene)
                 .input(cableGtSingle, Copper, 4)
@@ -287,6 +264,8 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(100)
                 .buildAndRegister();
+
+        /*
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(plate, StainlessSteel, 2)
                 .input(plate, GTQTMaterials.Staballoy, 4)
@@ -296,7 +275,7 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(100)
                 .buildAndRegister();
-
+*/
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(stickLong, RoseGold, 2)
                 .input(plate, Titanium, 4)
@@ -317,7 +296,7 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(100)
                 .buildAndRegister();
-
+/*
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(wireFine, Steel, 5)
                 .input(frameGt, GTQTMaterials.EglinSteel, 4)
@@ -345,7 +324,7 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(100)
                 .buildAndRegister();
-
+*/
         ASSEMBLER_RECIPES.recipeBuilder()
                 .inputs(CraftingReceipe.getItemStack("item('gregtech:meta_item_1', 717)"))
                 .input(dust, Thorium, 8)

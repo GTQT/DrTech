@@ -16,7 +16,6 @@ import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.electric.MetaTileEntityHull;
 import gtqt.common.items.GTQTMetaItems;
-import keqing.gtqtcore.api.recipes.GTQTcoreRecipeMaps;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.item.crafting.IRecipe;
@@ -87,7 +86,7 @@ public class DisassemblyHandler {
         //RecipeMap拆解 不拆出流体
         Collection<RecipeMap> Recipes = new ArrayList<>();
         Recipes.add(RecipeMaps.ASSEMBLER_RECIPES);
-        Recipes.add(GTQTcoreRecipeMaps.COMPONENT_ASSEMBLER_RECIPES);
+        //Recipes.add(GTQTcoreRecipeMaps.COMPONENT_ASSEMBLER_RECIPES);
         for(RecipeMap map:Recipes)
         {
             Collection<Recipe> rc = map.getRecipeList();

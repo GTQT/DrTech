@@ -12,7 +12,6 @@ import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.MetaTileEntities;
-import keqing.gtqtcore.common.metatileentities.GTQTMetaTileEntities;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
@@ -595,12 +594,5 @@ public class CustomeRecipe {
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_CUTTER.getStackForm());
         CAN_DO_WORK_MACHINES.add(GCYMMetaTileEntities.LARGE_ELECTROLYZER.getStackForm());
         CAN_DO_WORK_MACHINES.add(DrTechMetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ADV_ARC_FURNACE.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.ELECTROBATH.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.BIO_CENTRIFUGE.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.FROTH_FLOTATION_TANK.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.VACUUM_DRYING_FURNACE.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.STEPPER.getStackForm());
-        CAN_DO_WORK_MACHINES.add(GTQTMetaTileEntities.LASER_ENGRAVING.getStackForm());
     }
 }

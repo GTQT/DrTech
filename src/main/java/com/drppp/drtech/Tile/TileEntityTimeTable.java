@@ -1,6 +1,4 @@
 package com.drppp.drtech.Tile;
-
-import keqing.gtqtcore.common.items.GTQTMetaItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -14,6 +12,7 @@ public class TileEntityTimeTable extends TileEntity implements ITickable {
     public TileEntityTimeTable(){
 
     }
+    /*
     @Override
     public void update() {
         if(!getWorld().isRemote && ++tick>20)
@@ -37,7 +36,7 @@ public class TileEntityTimeTable extends TileEntity implements ITickable {
             }
         }
     }
-
+*/
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
@@ -55,4 +54,8 @@ public class TileEntityTimeTable extends TileEntity implements ITickable {
     }
 
 
+    @Override
+    public void update() {
+
+    }
 }

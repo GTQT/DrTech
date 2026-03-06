@@ -1,6 +1,0 @@
-{
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "drtech:items/metaitems/u_mox_fuel_rod_4x"
-  }
-}

@@ -33,8 +33,7 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.ENERGY_ELEMENT_1 = this.addItem(0, "energy_element_1").setMaxStackSize(64).setCreativeTabs(DrTechMain.DrTechTab)
                 .addComponents(new TooltipBehavior((lines) -> {
                             lines.add(I18n.format("metaitem.weight.tooltip.1"));
-                        })
-                ).addComponents(BluePrintBehavior.INSTANCE);
+                }));
         DrMetaItems.ENERGY_ELEMENT_2 = this.addItem(1, "energy_element_2").setMaxStackSize(64).setCreativeTabs(DrTechMain.DrTechTab)
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.weight.tooltip.2"));
@@ -101,9 +100,7 @@ public class MetaItems1 extends StandardMetaItem {
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .setMaxStackSize(1)
                 .addComponents(ElectricStats.createElectricItem(51200000, GTValues.IV));
-        DrMetaItems.NULL_FUEL_ROD = this.addItem(20, "null_fuel_rod")
-                .setCreativeTabs(DrTechMain.DrTechTab)
-                .setMaxStackSize(64);
+
         DrMetaItems.NUCLEAR_BATTERY_LV = this.addItem(21, "nuclear_battery_lv")
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .addComponents(ElectricStatsNuclear.createBattery(1200000, GTValues.LV, true))

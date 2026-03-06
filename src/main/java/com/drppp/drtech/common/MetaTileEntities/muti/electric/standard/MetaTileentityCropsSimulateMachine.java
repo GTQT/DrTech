@@ -18,7 +18,7 @@ import gregtech.api.util.KeyUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.*;
-import keqing.gtqtcore.common.block.GTQTMetaBlocks;
+
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -39,7 +39,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static keqing.gtqtcore.common.block.blocks.BlockMultiblockGlass1.CasingType.SILICATE_GLASS;
 
 public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithControl {
     private ItemStack seed = new ItemStack(Items.AIR);
@@ -79,7 +78,7 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
                 .build();
     }
     protected IBlockState getGlassesState() {
-        return GTQTMetaBlocks.blockMultiblockGlass1.getState(SILICATE_GLASS);
+        return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
     @SideOnly(Side.CLIENT)
     @Override
