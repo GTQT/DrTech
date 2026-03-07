@@ -74,7 +74,7 @@ public class DrTechMetaTileEntities {
         //人工分配 ID
         for (int i = 0; i < 10; i++) {
             String tierName = GTValues.VN[i].toLowerCase();
-            UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(100 + i, new MetaTileEntityUniversalCollector(getDrId("universal_collector." + tierName), i + 1, gregtech.client.renderer.texture.Textures.GAS_COLLECTOR_OVERLAY));
+            UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(100 + i, new MetaTileEntityUniversalCollector(getDrId("universal_collector." + tierName), i + 1));
         }
 
         registerSimpleMetaTileEntity(DISASSEMBLY, 110, "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);

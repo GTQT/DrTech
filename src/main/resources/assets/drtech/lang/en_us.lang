@@ -565,6 +565,10 @@ drtech.machine.universal_collector.uiv.name=Epic Universal Collector III
 drtech.machine.universal_collector.uxv.name=Epic Universal Collector IV
 drtech.machine.universal_collector.opv.name=Legendary Universal Collector
 
+gregtech.machine.universal_collector.tooltip=通用设备收集器
+gregtech.machine.universal_collector.gui.range=范围：%d
+gregtech.machine.universal_collector.tooltip.range=最大收集范围：%d格
+
 #Disassembly
 drtech.machine.disassembly.ulv.name=Simple Disassembler
 drtech.machine.disassembly.lv.name=Basic Disassembler
@@ -581,10 +585,6 @@ drtech.machine.disassembly.uiv.name=Epic Disassembler III
 drtech.machine.disassembly.uxv.name=Epic Disassembler IV
 drtech.machine.disassembly.opv.name=Legendary Disassembler
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 drtech.machine.laser_bending_256.iv.name=256A Laser Bender (§1IV§r)
 drtech.machine.laser_bending_256.luv.name=256A Laser Bender (§dLuV§r)
 drtech.machine.laser_bending_256.zpm.name=256A Laser Bender (§cZPM§r)

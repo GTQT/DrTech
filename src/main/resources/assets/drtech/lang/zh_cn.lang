@@ -522,8 +522,6 @@ drtech.machine.laser_hatch.target_16384a.uxv.name=16384安§eUXV§r激光靶仓
 drtech.machine.laser_hatch.target_16384a.opv.name=16384§9OpV§r激光靶仓
 drtech.machine.laser_hatch.target_16384a.max.name=16384安§c§lMAX§r激光靶仓
 
-
-
 #收集器
 drtech.machine.universal_collector.ulv.name=简易通用收集器
 drtech.machine.universal_collector.lv.name=基础通用收集器
@@ -539,6 +537,10 @@ drtech.machine.universal_collector.uev.name=史诗通用收集器 II
 drtech.machine.universal_collector.uiv.name=史诗通用收集器 III
 drtech.machine.universal_collector.uxv.name=史诗通用收集器 IV
 drtech.machine.universal_collector.opv.name=传奇通用收集器
+
+gregtech.machine.universal_collector.tooltip=通用设备收集器
+gregtech.machine.universal_collector.gui.range=范围：%d
+gregtech.machine.universal_collector.tooltip.range=最大收集范围：%d格
 #拆解
 drtech.machine.disassembly.ulv.name=简易拆解机
 drtech.machine.disassembly.lv.name=基础拆解机
