@@ -33,7 +33,7 @@ public class DrTechMetaTileEntities {
 
     public static MetaTileEntityLogFactory LOG_FACTORY;
     public static MetaTileEntityMatrixSolver MATRIX_SOLVER;
-    public static MetaTileEntityMobsKiller MOB_KILLER;
+    public static MetaTileEntityExtremeExterminationChamber MOB_KILLER;
     public static MetaTileEntitySolarTower SOLAR_TOWER;
     public static MetatileEntityTwentyFiveFluidTank TFFT;
     public static MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
@@ -102,7 +102,7 @@ public class DrTechMetaTileEntities {
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getDrId("large_bee_hive")));
         LOG_FACTORY = registerMetaTileEntity(getID(), new MetaTileEntityLogFactory(getDrId("log_factory")));
         MATRIX_SOLVER = registerMetaTileEntity(getID(), new MetaTileEntityMatrixSolver(getDrId("matrix_solver")));
-        MOB_KILLER = registerMetaTileEntity(getID(), new MetaTileEntityMobsKiller(getDrId("mob_killer")));
+        MOB_KILLER = registerMetaTileEntity(getID(), new MetaTileEntityExtremeExterminationChamber(getDrId("mob_killer")));
 
         SOLAR_TOWER = registerMetaTileEntity(getID(), new MetaTileEntitySolarTower(getDrId("solar_tower")));
         TFFT = registerMetaTileEntity(getID(), new MetatileEntityTwentyFiveFluidTank(getDrId("tfft_tank")));

@@ -45,4 +45,7 @@ dependencies {
     implementation rfg.deobf("curse.maven:forestry-59751:2684780")
     implementation rfg.deobf("curse.maven:Binnie's Mods-223525:2916129")
     implementation rfg.deobf("curse.maven:gendustry-70492:2516215")
+
+    implementation "curse.maven:enderio-64578:4674244"
+    implementation "curse.maven:endercore-231868:4671384"
 }

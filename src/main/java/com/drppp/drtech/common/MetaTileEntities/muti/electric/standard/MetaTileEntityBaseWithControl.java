@@ -3,10 +3,6 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.google.common.collect.Lists;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
@@ -29,7 +25,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -156,30 +151,29 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
         super.invalidateStructure();
         this.resetTileAbilities();
     }
+
     @Override
     public boolean usesMui2() {
         return false;
     }
-    protected void initializeAbilities() {
-        var im_item = this.getAbilities(MultiblockAbility.IMPORT_ITEMS);
-        List<IItemHandlerModifiable> itemlist = new ArrayList<>();
-        itemlist.addAll(im_item);
-        this.inputInventory = new ItemHandlerList(itemlist);
-        var im_fluid = this.getAbilities(MultiblockAbility.IMPORT_FLUIDS);
-        List<IFluidTank> tanks = new ArrayList<>();
-        tanks.addAll(im_fluid);
-        this.inputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), tanks);
 
-        var ex_item = this.getAbilities(MultiblockAbility.EXPORT_ITEMS);
-        List<IItemHandlerModifiable> ex_itemlist = new ArrayList<>();
-        ex_itemlist.addAll(ex_item);
-        this.outputInventory = new ItemHandlerList(ex_itemlist);
-        var ex_fluid = this.getAbilities(MultiblockAbility.EXPORT_FLUIDS);
-        List<IFluidTank> extanks = new ArrayList<>();
-        extanks.addAll(ex_fluid);
-        this.outputFluidInventory = new FluidTankList(this.allowSameFluidFillForOutputs(), extanks);
-        this.energyContainer = new EnergyContainerList(this.getAbilities(MultiblockAbility.INPUT_ENERGY));
-        this.outEnergyContainer = new EnergyContainerList(this.getAbilities(MultiblockAbility.OUTPUT_ENERGY));
+    protected void initializeAbilities() {
+        this.inputInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
+        this.inputFluidInventory = new FluidTankList(allowSameFluidFillForOutputs(),
+                getAbilities(MultiblockAbility.IMPORT_FLUIDS));
+        this.outputInventory = new ItemHandlerList(getAbilities(MultiblockAbility.EXPORT_ITEMS));
+        this.outputFluidInventory = new FluidTankList(allowSameFluidFillForOutputs(),
+                getAbilities(MultiblockAbility.EXPORT_FLUIDS));
+
+        List<IEnergyContainer> inputEnergy = new ArrayList<>(getAbilities(MultiblockAbility.INPUT_ENERGY));
+        inputEnergy.addAll(getAbilities(MultiblockAbility.SUBSTATION_INPUT_ENERGY));
+        inputEnergy.addAll(getAbilities(MultiblockAbility.INPUT_LASER));
+        energyContainer = new EnergyContainerList(inputEnergy);
+
+        List<IEnergyContainer> outputEnergy = new ArrayList<>(getAbilities(MultiblockAbility.OUTPUT_ENERGY));
+        outputEnergy.addAll(getAbilities(MultiblockAbility.SUBSTATION_OUTPUT_ENERGY));
+        outputEnergy.addAll(getAbilities(MultiblockAbility.OUTPUT_LASER));
+        outEnergyContainer = new EnergyContainerList(outputEnergy);
     }
 
     private void resetTileAbilities() {
@@ -264,6 +258,7 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
         this.energyContainer.changeEnergy(-energy);
         return true;
     }
+
     public boolean addEnergy(long energy) {
         if (this.outEnergyContainer == null)
             return false;
@@ -271,5 +266,5 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
         return true;
     }
 
-    
+
 }
