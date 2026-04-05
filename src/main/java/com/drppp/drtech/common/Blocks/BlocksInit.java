@@ -4,6 +4,7 @@ package com.drppp.drtech.common.Blocks;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.Utils.Datas;
+import com.drppp.drtech.common.Blocks.Crops.BlockCropStick;
 import com.drppp.drtech.common.Blocks.MetaBlocks.*;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -33,6 +34,7 @@ public class BlocksInit {
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
     public static final BlockTimeTable BLOCK_TIME_TABLE = new BlockTimeTable();
+    public static BlockCropStick CROP_STICK=new BlockCropStick();
 
     public static void init(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
@@ -63,6 +65,8 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityAdvancedCauldron.class, new ResourceLocation(Tags.MODID, "advanced_cauldron"));
         event.getRegistry().register(BLOCK_TIME_TABLE);
         GameRegistry.registerTileEntity(TileEntityTimeTable.class, new ResourceLocation(Tags.MODID, "time_table"));
+        event.getRegistry().register(CROP_STICK);
+        GameRegistry.registerTileEntity(TileCropStick.class, Tags.MODID + ":crop_stick");
         Datas.init();
     }
 

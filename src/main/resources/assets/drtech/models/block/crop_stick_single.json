@@ -1,0 +1,101 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "stick": "drtech:blocks/crop_stick/crop_stick",
+    "particle": "drtech:blocks/crop_stick/crop_stick"
+  },
+  "elements": [
+    {
+      "__comment": "左前竖杆",
+      "from": [2, 0, 2],
+      "to": [3, 13, 3],
+      "faces": {
+        "north": {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "south": {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "east":  {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "west":  {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "up":    {"uv": [2, 2, 3, 3],  "texture": "#stick"}
+      }
+    },
+    {
+      "__comment": "右前竖杆",
+      "from": [13, 0, 2],
+      "to": [14, 13, 3],
+      "faces": {
+        "north": {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "south": {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "east":  {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "west":  {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "up":    {"uv": [13, 2, 14, 3],  "texture": "#stick"}
+      }
+    },
+    {
+      "__comment": "左后竖杆",
+      "from": [2, 0, 13],
+      "to": [3, 13, 14],
+      "faces": {
+        "north": {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "south": {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "east":  {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "west":  {"uv": [2, 3, 3, 16], "texture": "#stick"},
+        "up":    {"uv": [2, 13, 3, 14], "texture": "#stick"}
+      }
+    },
+    {
+      "__comment": "右后竖杆",
+      "from": [13, 0, 13],
+      "to": [14, 13, 14],
+      "faces": {
+        "north": {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "south": {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "east":  {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "west":  {"uv": [13, 3, 14, 16], "texture": "#stick"},
+        "up":    {"uv": [13, 13, 14, 14], "texture": "#stick"}
+      }
+    },
+    {
+      "__comment": "前横杆",
+      "from": [2, 10, 2],
+      "to": [14, 11, 3],
+      "faces": {
+        "north": {"uv": [2, 5, 14, 6], "texture": "#stick"},
+        "south": {"uv": [2, 5, 14, 6], "texture": "#stick"},
+        "up":    {"uv": [2, 2, 14, 3], "texture": "#stick"},
+        "down":  {"uv": [2, 2, 14, 3], "texture": "#stick"}
+      }
+    },
+    {
+      "__comment": "后横杆",
+      "from": [2, 10, 13],
+      "to": [14, 11, 14],
+      "faces": {
+        "north": {"uv": [2, 5, 14, 6], "texture": "#stick"},
+        "south": {"uv": [2, 5, 14, 6], "texture": "#stick"},
+        "up":    {"uv": [2, 13, 14, 14], "texture": "#stick"},
+        "down":  {"uv": [2, 13, 14, 14], "texture": "#stick"}
+      }
+    },
+    {
+      "__comment": "左横杆",
+      "from": [2, 10, 3],
+      "to": [3, 11, 13],
+      "faces": {
+        "east":  {"uv": [3, 5, 13, 6], "texture": "#stick"},
+        "west":  {"uv": [3, 5, 13, 6], "texture": "#stick"},
+        "up":    {"uv": [2, 3, 3, 13], "texture": "#stick"},
+        "down":  {"uv": [2, 3, 3, 13], "texture": "#stick"}
+      }
+    },
+    {
+      "__comment": "右横杆",
+      "from": [13, 10, 3],
+      "to": [14, 11, 13],
+      "faces": {
+        "east":  {"uv": [3, 5, 13, 6], "texture": "#stick"},
+        "west":  {"uv": [3, 5, 13, 6], "texture": "#stick"},
+        "up":    {"uv": [13, 3, 14, 13], "texture": "#stick"},
+        "down":  {"uv": [13, 3, 14, 13], "texture": "#stick"}
+      }
+    }
+  ]
+}

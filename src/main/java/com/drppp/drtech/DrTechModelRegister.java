@@ -14,7 +14,6 @@ import com.drppp.drtech.common.Entity.EntityGunBullet;
 import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
 import com.drppp.drtech.common.Entity.EntityTachyonBullet;
-import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
@@ -62,7 +61,7 @@ public final class DrTechModelRegister {
         ItemsInit.ITEM_BLOCK_WATER_MILL.setTileEntityItemStackRenderer(new RenderItemWaterMill());
         ItemsInit.ITEM_BLOCK_WOOD_AXLE.setTileEntityItemStackRenderer(new RenderItemStoneAxle());
         ItemsInit.registerItemModels();
-        GeoItemsInit.onModelRegistry();
+
     }
 
     @SideOnly(Side.CLIENT)

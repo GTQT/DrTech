@@ -2,24 +2,24 @@ package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.Client.CropStickTESR;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Client.render.TesrWaterMill;
 import com.drppp.drtech.Client.render.TesrWoodAxle;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Network.SyncInit;
-import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
-import com.drppp.drtech.Tile.TileEntityTimeTable;
-import com.drppp.drtech.Tile.TileEntityWaterMill;
-import com.drppp.drtech.Tile.TileEntityWoodAxle;
+import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.Crops.BlockCropStick;
+import com.drppp.drtech.common.Blocks.Crops.CropInitHandler;
+import com.drppp.drtech.common.Blocks.Crops.CropRegistry;
 import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.Items.DrtToolItems;
-import com.drppp.drtech.common.Items.GeoItemsInit;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
@@ -87,8 +87,9 @@ public class DrTechMain {
         TileEntityUIFactory.INSTANCE.init();
         DrtToolItems.init();
         DrTechMetaTileEntities.initialization();
-
+        CropInitHandler.preInit();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
+        CropInitHandler.init();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -117,6 +118,7 @@ public class DrTechMain {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWaterMill.class, new TesrWaterMill());
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWoodAxle.class, new TesrWoodAxle());
+            ClientRegistry.bindTileEntitySpecialRenderer(TileCropStick.class, new CropStickTESR());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -130,7 +132,6 @@ public class DrTechMain {
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
         ItemsInit.init(event);
-        GeoItemsInit.init(event);
     }
 
     @SubscribeEvent
@@ -149,7 +150,6 @@ public class DrTechMain {
         if (FMLLaunchHandler.side() == Side.CLIENT) {
             OBJLoader.INSTANCE.addDomain(MODID);
         }
-
     }
 
     @SideOnly(Side.CLIENT)
