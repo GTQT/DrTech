@@ -2,6 +2,7 @@ package com.drppp.drtech.Client;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileCropStick;
+import com.drppp.drtech.common.Blocks.Crops.CropRenderType;
 import com.drppp.drtech.common.Blocks.Crops.CropType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -17,13 +18,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 /**
- * 作物架TESR渲染器
+ * 作物架TESR - 根据CropRenderType渲染植物
  *
- * 渲染逻辑:
- * 1. 作物架框架由blockstate模型处理(单层/双层)
- * 2. 此TESR只负责渲染植物部分
- * 3. 贴图路径: textures/blocks/crop/作物名/stage_N.png
- * 4. 植物渲染为两个十字交叉的面(类似原版小麦)
+ * CROSS模式: 两个45度对角面 (原版小麦风格)
+ *   \  /
+ *    \/
+ *    /\
+ *   /  \
+ *
+ * HASH模式: 四个面沿方块四边排列 (原版甘蔗/地狱疣风格)
+ *   +--+
+ *   |  |
+ *   +--+
  */
 @SideOnly(Side.CLIENT)
 public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
@@ -33,113 +39,148 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
                        float partialTicks, int destroyStage, float alpha) {
         if (!te.hasCrop()) return;
 
-        String cropId = te.getCropId();
-        int stage = te.getGrowthStage();
         CropType type = te.getCropType();
         if (type == null) return;
 
-        // 限制stage范围
+        int stage = Math.min(te.getGrowthStage(), type.getMaxGrowthStage());
+
+        // 获取贴图
+        String texPath = Tags.MODID + ":blocks/crop/" + te.getCropId() + "/stage_" + stage;
+        TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(texPath);
+
+        TextureAtlasSprite missing = Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
+        if (sprite == missing) {
+            // fallback到stage_0
+            texPath = Tags.MODID + ":blocks/crop/" + te.getCropId() + "/stage_0";
+            sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(texPath);
+            if (sprite == missing) return;
+        }
+
+        // 植物高度
         int maxStage = type.getMaxGrowthStage();
-        if (stage > maxStage) stage = maxStage;
+        float plantHeight = maxStage > 0 ? (0.2f + 0.75f * ((float) stage / maxStage)) : 0.5f;
 
-        // 获取贴图: drtech:blocks/crop/作物名/stage_N
-        String texturePath = Tags.MODID + ":blocks/crop/" + cropId + "/stage_" + stage;
-        TextureAtlasSprite sprite = Minecraft.getMinecraft()
-                .getTextureMapBlocks().getAtlasSprite(texturePath);
+        // 光照
+        int combinedLight = te.getWorld().getCombinedLight(te.getPos().up(), 0);
+        int sky = (combinedLight >> 16) & 0xFFFF;
+        int block = combinedLight & 0xFFFF;
 
-        // 如果找不到，尝试用stage 0
-        if (sprite == null || sprite == Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite()) {
-            texturePath = Tags.MODID + ":blocks/crop/" + cropId + "/stage_0";
-            sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(texturePath);
-        }
-
-        // 仍找不到，跳过渲染
-        if (sprite == null || sprite == Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite()) {
-            return;
-        }
-
-        // 计算植物高度 (随生长阶段变化)
-        float plantHeight;
-        if (maxStage > 0) {
-            plantHeight = 0.2f + 0.75f * ((float) stage / maxStage);
-        } else {
-            plantHeight = 0.5f;
-        }
-
-        // 绘制
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, z);
-
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        // 设置光照
-        int light = te.getWorld().getCombinedLight(te.getPos().up(), 0);
-        int skyLight = light >> 16 & 0xFFFF;
-        int blockLight = light & 0xFFFF;
-
-        Tessellator tess = Tessellator.getInstance();
-        BufferBuilder buf = tess.getBuffer();
-
+        // UV
         float u0 = sprite.getMinU();
         float u1 = sprite.getMaxU();
         float v0 = sprite.getMinV();
         float v1 = sprite.getMaxV();
+        // 根据植物高度裁剪UV顶部
+        float vCrop = v0 + (1.0f - plantHeight) * (v1 - v0);
 
-        // 调整UV: 只显示植物高度对应的部分
-        float vOffset = (1.0f - plantHeight) * (v1 - v0);
-        float vStart = v0 + vOffset;
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        GlStateManager.disableLighting();
 
-        // 绘制两个十字交叉面
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buf = tess.getBuffer();
         buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 
-        // 面1: 沿对角线 (NW-SE)
-        drawCrossPlane(buf, 0.5f, 0, 0.5f, plantHeight, 0.5f,
-                u0, u1, vStart, v1, skyLight, blockLight, 0);
+        CropRenderType renderType = type.getRenderType();
 
-        // 面2: 沿对角线 (NE-SW) 旋转90度
-        drawCrossPlane(buf, 0.5f, 0, 0.5f, plantHeight, 0.5f,
-                u0, u1, vStart, v1, skyLight, blockLight, 90);
+        if (renderType == CropRenderType.HASH) {
+            drawHash(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
+        } else {
+            drawCross(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
+        }
 
         tess.draw();
 
         GlStateManager.enableLighting();
-        GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
 
     /**
-     * 绘制一个十字面(正反两面)
+     * CROSS模式 - 两个45°对角面
      */
-    private void drawCrossPlane(BufferBuilder buf,
-                                 float cx, float cy, float cz,
-                                 float height, float halfWidth,
-                                 float u0, float u1, float v0, float v1,
-                                 int skyLight, int blockLight,
-                                 float rotationDeg) {
-        // 计算旋转后的偏移
-        double rad = Math.toRadians(rotationDeg);
-        float dx = (float) (Math.cos(rad) * halfWidth);
-        float dz = (float) (Math.sin(rad) * halfWidth);
+    private void drawCross(BufferBuilder buf, float h,
+                           float u0, float u1, float v0, float v1,
+                           int sky, int block) {
+        // 面1: 从(0.15, 0, 0.15)到(0.85, h, 0.85)
+        quad(buf, 0.15f, 0, 0.15f, 0.85f, h, 0.85f, u0, u1, v0, v1, sky, block);
+        // 面1反面
+        quad(buf, 0.85f, 0, 0.85f, 0.15f, h, 0.15f, u0, u1, v0, v1, sky, block);
+        // 面2: 从(0.85, 0, 0.15)到(0.15, h, 0.85)
+        quad(buf, 0.85f, 0, 0.15f, 0.15f, h, 0.85f, u0, u1, v0, v1, sky, block);
+        // 面2反面
+        quad(buf, 0.15f, 0, 0.85f, 0.85f, h, 0.15f, u0, u1, v0, v1, sky, block);
+    }
 
-        float x0 = cx - dx;
-        float z0 = cz - dz;
-        float x1 = cx + dx;
-        float z1 = cz + dz;
+    /**
+     * HASH模式 - 四个面沿方块四边排列
+     * 类似 #字型，从上方看:
+     *
+     *   ----  (北面, z=0.25)
+     *  |    |
+     *  |    | (西面x=0.25, 东面x=0.75)
+     *  |    |
+     *   ----  (南面, z=0.75)
+     */
+    private void drawHash(BufferBuilder buf, float h,
+                          float u0, float u1, float v0, float v1,
+                          int sky, int block) {
+        float inset = 0.25f;
+        float outer = 1.0f - inset;
 
-        // 正面
-        buf.pos(x0, cy, z0).tex(u0, v1).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
-        buf.pos(x0, cy + height, z0).tex(u0, v0).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
-        buf.pos(x1, cy + height, z1).tex(u1, v0).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
-        buf.pos(x1, cy, z1).tex(u1, v1).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
+        // 北面 (沿X轴, z=inset) 正反
+        quadFlat(buf, 0, 0, inset, 1, h, inset, u0, u1, v0, v1, sky, block, 'z');
+        quadFlat(buf, 1, 0, inset, 0, h, inset, u0, u1, v0, v1, sky, block, 'z');
+        // 南面 (沿X轴, z=outer) 正反
+        quadFlat(buf, 0, 0, outer, 1, h, outer, u0, u1, v0, v1, sky, block, 'z');
+        quadFlat(buf, 1, 0, outer, 0, h, outer, u0, u1, v0, v1, sky, block, 'z');
+        // 西面 (沿Z轴, x=inset) 正反
+        quadFlat(buf, inset, 0, 0, inset, h, 1, u0, u1, v0, v1, sky, block, 'x');
+        quadFlat(buf, inset, 0, 1, inset, h, 0, u0, u1, v0, v1, sky, block, 'x');
+        // 东面 (沿Z轴, x=outer) 正反
+        quadFlat(buf, outer, 0, 0, outer, h, 1, u0, u1, v0, v1, sky, block, 'x');
+        quadFlat(buf, outer, 0, 1, outer, h, 0, u0, u1, v0, v1, sky, block, 'x');
+    }
 
-        // 反面
-        buf.pos(x1, cy, z1).tex(u1, v1).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
-        buf.pos(x1, cy + height, z1).tex(u1, v0).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
-        buf.pos(x0, cy + height, z0).tex(u0, v0).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
-        buf.pos(x0, cy, z0).tex(u0, v1).lightmap(skyLight, blockLight).color(255, 255, 255, 255).endVertex();
+    /**
+     * 绘制一个对角四边形(CROSS用)
+     * 从(x0,y0,z0)底部到(x1,y1,z1)顶部
+     */
+    private void quad(BufferBuilder buf,
+                      float x0, float y0, float z0,
+                      float x1, float y1, float z1,
+                      float u0, float u1, float v0, float v1,
+                      int sky, int block) {
+        buf.pos(x0, y0, z0).tex(u0, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+        buf.pos(x0, y1, z0).tex(u0, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+        buf.pos(x1, y1, z1).tex(u1, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+        buf.pos(x1, y0, z1).tex(u1, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+    }
+
+    /**
+     * 绘制一个平行于某轴的四边形(HASH用)
+     * axis='z': 面朝南北(沿X轴展开)
+     * axis='x': 面朝东西(沿Z轴展开)
+     */
+    private void quadFlat(BufferBuilder buf,
+                          float x0, float y0, float z0,
+                          float x1, float y1, float z1,
+                          float u0, float u1, float v0, float v1,
+                          int sky, int block, char axis) {
+        if (axis == 'z') {
+            // 沿X轴展开, Z固定
+            float z = z0;
+            buf.pos(x0, y0, z).tex(u0, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+            buf.pos(x0, y1, z).tex(u0, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+            buf.pos(x1, y1, z).tex(u1, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+            buf.pos(x1, y0, z).tex(u1, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+        } else {
+            // 沿Z轴展开, X固定
+            float x = x0;
+            buf.pos(x, y0, z0).tex(u0, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+            buf.pos(x, y1, z0).tex(u0, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+            buf.pos(x, y1, z1).tex(u1, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+            buf.pos(x, y0, z1).tex(u1, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+        }
     }
 }

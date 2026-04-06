@@ -8,10 +8,10 @@ import java.util.Random;
  * 作物三维属性: Growth(生长速度), Gain(产量), Resistance(抗性)
  * 范围1-31
  */
+
 public class CropStats {
     public static final int MIN_STAT = 1;
     public static final int MAX_STAT = 31;
-    public static final int WEED_THRESHOLD = 24;
 
     private int growth;
     private int gain;
@@ -23,52 +23,57 @@ public class CropStats {
         this.resistance = clamp(resistance);
     }
 
-    public CropStats() {
-        this(1, 1, 1);
-    }
+    public CropStats() { this(1, 1, 1); }
 
-    // ==================== 属性遗传 ====================
-
-    public static CropStats inherit(CropStats parentA, CropStats parentB, Random rand) {
-        int g = inheritStat(parentA.growth, parentB.growth, rand);
-        int ga = inheritStat(parentA.gain, parentB.gain, rand);
-        int r = inheritStat(parentA.resistance, parentB.resistance, rand);
-        return new CropStats(g, ga, r);
-    }
-
-    public static CropStats inheritMultiple(CropStats[] parents, Random rand) {
+    /**
+     * 多亲本属性遗传: 所有参与杂交的亲本取算术平均 ±2
+     */
+    public static CropStats inheritFrom(CropStats[] parents, Random rand) {
         int totalG = 0, totalGa = 0, totalR = 0;
         for (CropStats p : parents) {
             totalG += p.growth;
             totalGa += p.gain;
             totalR += p.resistance;
         }
-        int count = parents.length;
-        int g = clamp(totalG / count + rand.nextInt(3) - 1);
-        int ga = clamp(totalGa / count + rand.nextInt(3) - 1);
-        int r = clamp(totalR / count + rand.nextInt(3) - 1);
+        int n = parents.length;
+        int g = clamp(totalG / n + rand.nextInt(5) - 2);
+        int ga = clamp(totalGa / n + rand.nextInt(5) - 2);
+        int r = clamp(totalR / n + rand.nextInt(5) - 2);
         return new CropStats(g, ga, r);
     }
 
-    private static int inheritStat(int a, int b, Random rand) {
-        int base = (a + b) / 2;
-        int variance = rand.nextInt(5) - 2;
-        if (Math.abs(variance) == 2 && rand.nextInt(3) != 0) {
-            variance = variance > 0 ? 1 : -1;
+    /**
+     * 计算本生长轮的进度增量: random(0~3) + growth属性
+     */
+    public int rollGrowthIncrement(Random rand) {
+        return rand.nextInt(4) + growth;
+    }
+
+    /**
+     * 计算杂交参与概率(%)
+     * 基础20%, gr>10则25%, gr>16则30%
+     * re>16时每超1点扣5%
+     */
+    public int getCrossBreedChance() {
+        int chance;
+        if (growth > 16) chance = 30;
+        else if (growth > 10) chance = 25;
+        else chance = 20;
+
+        if (resistance > 16) {
+            chance -= (resistance - 16) * 5;
         }
-        return clamp(base + variance);
+        return Math.max(5, chance);
     }
 
-    // ==================== 杂草判定 ====================
-
-    public boolean hasWeedRisk(Random rand) {
-        if (growth <= WEED_THRESHOLD) return false;
-        int riskFactor = growth - resistance;
-        return rand.nextInt(32) < riskFactor;
-    }
-
-    public float getGrowthRateMultiplier() {
-        return 0.5f + (growth / (float) MAX_STAT) * 1.5f;
+    /**
+     * 抵抗杂草: re越高越能抵抗，但无法完全阻止
+     * 返回true表示本次抵抗成功
+     */
+    public boolean tryResistWeed(Random rand) {
+        // 抵抗率 = re * 3%, 最高90%
+        int resistChance = Math.min(90, resistance * 3);
+        return rand.nextInt(100) < resistChance;
     }
 
     public int getYieldBonus(Random rand) {
@@ -77,11 +82,11 @@ public class CropStats {
         return bonus;
     }
 
-    public boolean resistWeedSpread(Random rand) {
-        return rand.nextInt(MAX_STAT) < resistance;
+    public float getGrowthRateMultiplier() {
+        return 0.5f + (growth / (float) MAX_STAT) * 1.5f;
     }
 
-    // ==================== NBT持久化 ====================
+    // ==================== NBT ====================
 
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         nbt.setInteger("statGrowth", growth);
@@ -92,28 +97,18 @@ public class CropStats {
 
     public static CropStats readFromNBT(NBTTagCompound nbt) {
         return new CropStats(
-            nbt.getInteger("statGrowth"),
-            nbt.getInteger("statGain"),
-            nbt.getInteger("statResistance")
-        );
+                nbt.getInteger("statGrowth"),
+                nbt.getInteger("statGain"),
+                nbt.getInteger("statResistance"));
     }
-
-    // ==================== Getter/Setter ====================
 
     public int getGrowth() { return growth; }
     public int getGain() { return gain; }
     public int getResistance() { return resistance; }
 
-    public void setGrowth(int growth) { this.growth = clamp(growth); }
-    public void setGain(int gain) { this.gain = clamp(gain); }
-    public void setResistance(int resistance) { this.resistance = clamp(resistance); }
-
-    private static int clamp(int value) {
-        return Math.max(MIN_STAT, Math.min(MAX_STAT, value));
-    }
+    private static int clamp(int v) { return Math.max(MIN_STAT, Math.min(MAX_STAT, v)); }
 
     @Override
-    public String toString() {
-        return String.format("Gr:%d Ga:%d Re:%d", growth, gain, resistance);
-    }
+    public String toString() { return String.format("Gr:%d Ga:%d Re:%d", growth, gain, resistance); }
 }
+

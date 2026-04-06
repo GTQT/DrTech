@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
+
 /**
  * 种子袋物品
  *
@@ -128,10 +129,6 @@ public class ItemCropSeed extends Item {
         tooltip.add(TextFormatting.BLUE + "Resistance: " + stats.getResistance() +
                 TextFormatting.GRAY + " (抗性)");
 
-        if (stats.getGrowth() >= CropStats.WEED_THRESHOLD) {
-            tooltip.add("");
-            tooltip.add(TextFormatting.DARK_RED + "⚠ Growth过高，有杂草化风险!");
-        }
     }
 
     /**

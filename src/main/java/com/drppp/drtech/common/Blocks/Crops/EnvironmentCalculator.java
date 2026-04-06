@@ -86,7 +86,7 @@ public class EnvironmentCalculator {
     }
 
     public static String getBlockBelowId(World world, BlockPos cropPos) {
-        IBlockState state = world.getBlockState(cropPos.down());
+        IBlockState state = world.getBlockState(cropPos.down().down());
         return state.getBlock().getRegistryName().toString();
     }
 
