@@ -40,13 +40,6 @@ public class CraftingReceipe {
 
         GameRegistry.addSmelting(new ItemStack(Items.ROTTEN_FLESH), new ItemStack(Items.LEATHER), 0.1F);
 
-        ModHandler.addShapedRecipe("log_factory", DrTechMetaTileEntities.LOG_FACTORY.getStackForm(),
-                "WMW", "EFE", "WMW",
-                'W', MetaItems.FIELD_GENERATOR_IV,
-                'E', new UnificationEntry(OrePrefix.plate, Materials.Iridium),
-                'F', new ItemStack(BlocksInit.COMMON_CASING, 1, 2),
-                'M', MetaItems.CONVEYOR_MODULE_IV);
-
         ModHandler.addShapedRecipe("drone_pad", DrTechMetaTileEntities.DRONE_PAD.getStackForm(),
                 "WMW", "EFE", "WMW",
                 'W', MetaItems.ELECTRIC_PISTON_EV,

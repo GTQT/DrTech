@@ -202,14 +202,33 @@ public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBas
 
         if (processTicks < totalProcessTicks) {
             energyContainer.changeEnergy(-BASE_ENERGY_CONSUMPTION);
-            if (processTicks % 5 == 0)
-                currentMob.attackEntityFrom(DamageSource.GENERIC, 1);
+
+            // ── 新增: 每秒消耗武器1点耐久 ──
+            if (processTicks % 20 == 0) {
+                consumeWeaponDurability();
+            }
 
             processTicks++;
             return;
         }
 
         finishProcessing();
+    }
+
+    private void consumeWeaponDurability() {
+        for (int i = 0; i < getInputInventory().getSlots(); i++) {
+            ItemStack weapon = getInputInventory().getStackInSlot(i);
+            if (weapon.isEmpty()) continue;
+            if (weapon.getItem() instanceof ItemSword || weapon.getItem() instanceof ItemTool) {
+                // 尝试消耗1点耐久 (返回true表示物品已损坏)
+                if (weapon.attemptDamageItem(1, getWorld().rand, null)) {
+                    // 耐久耗尽，清空该槽位
+                    getInputInventory().setStackInSlot(i, ItemStack.EMPTY);
+                }
+                // 只消耗第一个找到的武器，避免多扣
+                return;
+            }
+        }
     }
 
     private boolean spawnMobInstance(EntityLiving template) {
