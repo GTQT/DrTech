@@ -8,10 +8,10 @@ import java.util.Random;
  * 作物三维属性: Growth(生长速度), Gain(产量), Resistance(抗性)
  * 范围1-31
  */
-
 public class CropStats {
     public static final int MIN_STAT = 1;
     public static final int MAX_STAT = 31;
+    public static final int WEED_THRESHOLD = 24;
 
     private int growth;
     private int gain;
@@ -111,4 +111,3 @@ public class CropStats {
     @Override
     public String toString() { return String.format("Gr:%d Ga:%d Re:%d", growth, gain, resistance); }
 }
-

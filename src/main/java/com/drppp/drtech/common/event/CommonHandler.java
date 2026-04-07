@@ -26,15 +26,6 @@ public class CommonHandler {
 
     @SubscribeEvent
     public void onGrassBroken(BlockEvent.HarvestDropsEvent event) {
-        World world = event.getWorld();
-        IBlockState state = event.getState();
-        Block block = state.getBlock();
-        if ((block == Blocks.TALLGRASS || block == Blocks.GRASS) && !world.isRemote) {
-            Random rand = world.rand;
-            if (rand.nextFloat() < 0.1F) {
-                ItemStack seedStack = new ItemStack(ItemsInit.ITEM_XJC_SEED, 1);
-                event.getDrops().add(seedStack);
-            }
-        }
+
     }
 }

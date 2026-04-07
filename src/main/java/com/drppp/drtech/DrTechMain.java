@@ -14,10 +14,7 @@ import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.Blocks.BlocksInit;
-import com.drppp.drtech.common.Blocks.Crops.BlockCropStick;
 import com.drppp.drtech.common.Blocks.Crops.CropInitHandler;
-import com.drppp.drtech.common.Blocks.Crops.CropRegistry;
-import com.drppp.drtech.common.Blocks.Crops.CropsInit;
 import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.ItemsInit;
@@ -137,7 +134,6 @@ public class DrTechMain {
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         BlocksInit.init(event);
-        CropsInit.init(event);
     }
 
     @EventHandler

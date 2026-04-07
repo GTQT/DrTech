@@ -2,10 +2,6 @@ package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
-import com.drppp.drtech.common.Items.ItemSeed.ItemFluStoneCropSeed;
-import com.drppp.drtech.common.Items.ItemSeed.ItemLapisCropSeed;
-import com.drppp.drtech.common.Items.ItemSeed.ItemRedStoneCropSeed;
-import com.drppp.drtech.common.Items.ItemSeed.ItemXjcCropSeed;
 import gregtech.api.block.VariantItemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -36,10 +32,6 @@ public class ItemsInit {
     public static final Item ITEM_BLOCK_STORAGE_PAIL = new ItemBlock(BlocksInit.BLOCK_STORAGE_PAIL).setRegistryName(Tags.MODID, BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_WASTE_DIRT = new ItemBlock(BlocksInit.BLOCK_WASTE_DIRT).setRegistryName(Tags.MODID, BlocksInit.BLOCK_WASTE_DIRT.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_SAP_BAG = new ItemBlock(BlocksInit.BLOCK_SAP_BAG).setRegistryName(Tags.MODID, BlocksInit.BLOCK_SAP_BAG.getRegistryName().getPath());
-    public static final Item ITEM_RED_STONE_SEED = new ItemRedStoneCropSeed("red_stone_seed");
-    public static final Item ITEM_LAPIS_SEED = new ItemLapisCropSeed("lapis_seed");
-    public static final Item ITEM_FLU_SEED = new ItemFluStoneCropSeed("flu_seed");
-    public static final Item ITEM_XJC_SEED = new ItemXjcCropSeed("xjc_seed");
     public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID, BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID, BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
     public static ItemCropSeed CROP_SEED=new ItemCropSeed();
@@ -48,10 +40,6 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
         event.getRegistry().register(ITEM_BLOCK_WATER_MILL);
         event.getRegistry().register(ITEM_BLOCK_WOOD_AXLE);
-        event.getRegistry().register(ITEM_RED_STONE_SEED);
-        event.getRegistry().register(ITEM_LAPIS_SEED);
-        event.getRegistry().register(ITEM_FLU_SEED);
-        event.getRegistry().register(ITEM_XJC_SEED);
         event.getRegistry().register(ITEM_CONNECTOR1);
         event.getRegistry().register(ITEM_CONNECTOR2);
         event.getRegistry().register(ITEM_CONNECTOR3);
@@ -80,10 +68,6 @@ public class ItemsInit {
         registerItemModel(BlocksInit.YOT_TANK);
         registerItemModel(BlocksInit.TFFT_TANK);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(ITEM_RED_STONE_SEED, 0, new ModelResourceLocation(ITEM_RED_STONE_SEED.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(ITEM_LAPIS_SEED, 0, new ModelResourceLocation(ITEM_LAPIS_SEED.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(ITEM_FLU_SEED, 0, new ModelResourceLocation(ITEM_FLU_SEED.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(ITEM_XJC_SEED, 0, new ModelResourceLocation(ITEM_XJC_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(CROP_SEED, 0, new ModelResourceLocation(CROP_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(CROP_ANALYZER, 0, new ModelResourceLocation(CROP_ANALYZER.getRegistryName(), "inventory"));
     }

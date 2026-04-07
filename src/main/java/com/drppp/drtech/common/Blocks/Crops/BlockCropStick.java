@@ -72,10 +72,14 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         VANILLA_SEED_MAP.put(Items.BEETROOT_SEEDS, "beetroot");
         VANILLA_SEED_MAP.put(Items.NETHER_WART, "nether_wart_crop");
         VANILLA_SEED_MAP.put(Items.REEDS, "reed");
+        VANILLA_SEED_MAP.put(Items.CHORUS_FRUIT, "chorus_crop");
         VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.YELLOW_FLOWER), "dandelion");
         VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.RED_FLOWER), "rose");
         VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.SAPLING), "bonsai");
         VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.CACTUS), "cactus");
+        VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.BROWN_MUSHROOM), "brown_mushroom");
+        VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.RED_MUSHROOM), "red_mushroom");
+        VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.WATERLILY), "lotus_leaf");
     }
 
     public static void registerVanillaSeed(Item item, String cropId) {
@@ -87,7 +91,6 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
                                     EntityPlayer player, EnumHand hand,
                                     EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (world.isRemote) return true;
-
         TileEntity te = world.getTileEntity(pos);
         if (!(te instanceof TileCropStick)) return false;
         TileCropStick tile = (TileCropStick) te;
@@ -105,14 +108,12 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
             if (!tile.hasCrop() && !tile.isDoubleCropStick()) {
                 tile.setDoubleCropStick(true);
                 if (!player.isCreative()) held.shrink(1);
-                player.sendMessage(new TextComponentString(TextFormatting.YELLOW + "已进入杂交模式"));
                 return true;
             }
             return false;
         }
         if (held.isEmpty()) {
             if (tile.hasCrop() && tile.isMature()) return doHarvest(world, pos, tile, player);
-            if (player.isSneaking()) { showInfo(tile, player); return true; }
         }
         return false;
     }
@@ -137,35 +138,20 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         return true;
     }
 
+    /**
+     * 收获 - 使用TileCropStick的新getHarvestDrops()方法
+     */
     private boolean doHarvest(World world, BlockPos pos, TileCropStick tile, EntityPlayer player) {
         CropType type = tile.getCropType();
         if (type == null) return false;
-        for (ItemStack drop : type.getDrops()) {
-            ItemStack copy = drop.copy();
-            copy.setCount(copy.getCount() + tile.getStats().getYieldBonus(world.rand));
-            spawnAsEntity(world, pos.up(), copy);
-        }
-        tile.harvest();
-        player.sendMessage(new TextComponentString(TextFormatting.GREEN + "收获了 " + type.getDisplayName() + "!"));
-        return true;
-    }
 
-    private void showInfo(TileCropStick tile, EntityPlayer player) {
-        if (!tile.hasCrop()) {
-            player.sendMessage(new TextComponentString(TextFormatting.GRAY + (tile.isDoubleCropStick() ? "杂交模式 - 等待成熟作物..." : "空的作物架")));
-            return;
+        List<ItemStack> drops = tile.getHarvestDrops();
+        for (ItemStack drop : drops) {
+            spawnAsEntity(world, pos.up(), drop);
         }
-        CropType type = tile.getCropType();
-        CropStats s = tile.getStats();
-        String name = type != null ? type.getDisplayName() : tile.getCropId();
-        int tier = type != null ? type.getTier() : 0;
-        int max = type != null ? type.getMaxGrowthStage() : 0;
-        player.sendMessage(new TextComponentString(TextFormatting.GOLD + "=== 作物信息 ==="));
-        player.sendMessage(new TextComponentString(TextFormatting.GREEN + "类型: " + TextFormatting.WHITE + name + TextFormatting.GRAY + " (Tier " + tier + ")"));
-        player.sendMessage(new TextComponentString(TextFormatting.GREEN + "阶段: " + TextFormatting.WHITE + tile.getGrowthStage() + "/" + max + TextFormatting.GRAY + " (进度:" + tile.getGrowthProgress() + ")"));
-        player.sendMessage(new TextComponentString(TextFormatting.RED + "Gr:" + s.getGrowth() + " " + TextFormatting.YELLOW + "Ga:" + s.getGain() + " " + TextFormatting.BLUE + "Re:" + s.getResistance()));
-        player.sendMessage(new TextComponentString(TextFormatting.AQUA + "杂交率: " + s.getCrossBreedChance() + "%"));
-        if (tile.isWeedPlant()) player.sendMessage(new TextComponentString(TextFormatting.DARK_RED + "⚠ 杂草!"));
+
+        tile.harvest();
+        return true;
     }
 
     @Override
@@ -182,14 +168,13 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         super.breakBlock(world, pos, state);
     }
 
-    @Override
-    public List<ItemStack> getDrops(IBlockAccess w, BlockPos p, IBlockState s, int f) {
+    @Override public List<ItemStack> getDrops(IBlockAccess w, BlockPos p, IBlockState s, int f) {
         List<ItemStack> d = new ArrayList<>(); d.add(new ItemStack(this)); return d;
     }
 
     @Override public boolean canPlaceBlockAt(World w, BlockPos p) {
         Block b = w.getBlockState(p.down()).getBlock();
-        return b == Blocks.FARMLAND || b == Blocks.DIRT || b == Blocks.GRASS ;
+        return b == Blocks.FARMLAND || b == Blocks.DIRT || b == Blocks.GRASS || b == Blocks.SOUL_SAND;
     }
 
     @Override public void neighborChanged(IBlockState s, World w, BlockPos p, Block b, BlockPos f) {
@@ -197,7 +182,6 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
     }
 
     @Override public void randomTick(World w, BlockPos p, IBlockState s, Random r) {}
-
     @Override protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, DOUBLE, HAS_CROP, RENDER_STAGE); }
 
     @Override public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
