@@ -97,6 +97,43 @@ public class CrossBreedingRegistry {
         // === Tier 8 → Tier 9 ===
         register("dahlia", "aurelia", "green_diamond", 1);
         register("dahlia", "dahlia", "green_diamond", 1);
+
+        // === 追加作物杂交路线 ===
+        // 仙人掌(T2): 甘蔗系
+        register("reed", "melon", "cactus", 5);
+        register("reed", "pumpkin", "cactus", 4);
+
+        // 皮革叶(T3): 亚麻+可可
+        register("flax", "blackthorn", "leatherleaf", 4);
+        register("flax", "cocoa", "leatherleaf", 3);
+
+        // 碳化疣(T5): 地狱疣+黑荆棘(墨色+下界)
+        register("nether_wart_crop", "blackthorn", "carbon_wart", 3);
+        register("nether_wart_crop", "stickreed", "carbon_wart", 2);
+
+        // 烈焰花(T6): 地狱疣+闪光草(下界+光)
+        register("nether_wart_crop", "shining", "blazeflower", 2);
+        register("nether_wart_crop", "ferru", "blazeflower", 2);
+
+        // 末影花(T6): 奇妙花+闪光草(神秘+光)
+        register("wonderflower", "shining", "enderflower", 2);
+        register("wonderflower", "nether_wart_crop", "enderflower", 2);
+
+        // 爆炸草(T6): 碳化疣+铁叶草(火药=硫磺+金属感)
+        register("carbon_wart", "ferru", "explosivegrass", 2);
+        register("carbon_wart", "redwheat", "explosivegrass", 2);
+
+        // 哭泣花(T7): 烈焰花+末影花(下界高级)
+        register("blazeflower", "enderflower", "tearflower", 1);
+        register("blazeflower", "aurelia", "tearflower", 1);
+
+        // 晶化叶(T7): 金叶草+铁叶草(金属结晶)
+        register("aurelia", "ferru", "prismaleaf", 1);
+        register("aurelia", "redwheat", "prismaleaf", 1);
+
+        // 星之疣(T10): 哭泣花+绿金刚(最终boss级)
+        register("tearflower", "green_diamond", "starwart", 1);
+        register("tearflower", "dahlia", "starwart", 1);
     }
 
     public static class CrossRecipe {

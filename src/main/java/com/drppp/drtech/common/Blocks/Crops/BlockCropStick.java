@@ -72,9 +72,10 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         VANILLA_SEED_MAP.put(Items.BEETROOT_SEEDS, "beetroot");
         VANILLA_SEED_MAP.put(Items.NETHER_WART, "nether_wart_crop");
         VANILLA_SEED_MAP.put(Items.REEDS, "reed");
-        // 花卉种子: 通过花本身种植
         VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.YELLOW_FLOWER), "dandelion");
         VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.RED_FLOWER), "rose");
+        VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.SAPLING), "bonsai");
+        VANILLA_SEED_MAP.put(Item.getItemFromBlock(Blocks.CACTUS), "cactus");
     }
 
     public static void registerVanillaSeed(Item item, String cropId) {

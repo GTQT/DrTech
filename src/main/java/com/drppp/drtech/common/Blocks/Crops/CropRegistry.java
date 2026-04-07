@@ -171,7 +171,72 @@ public class CropRegistry {
                 .addDrop(new ItemStack(Items.EMERALD))
                 .requiredBlocks("minecraft:emerald_block").lightRequirement(12)
                 .renderType(CropRenderType.HASH).build());
+// ==================== 追加: 盆栽树 Tier 1 ====================
+        register(new CropType.Builder("bonsai").displayName("盆栽树").tier(1)
+                .maxGrowthStage(5).harvestStage(5).stageRequirement(16)
+                .addDrop(new ItemStack(Blocks.LOG, 4))
+                .addDrop(new ItemStack(Blocks.SAPLING, 1))
+                .addDrop(new ItemStack(Items.APPLE, 1))
+                .renderType(CropRenderType.CROSS).build());
 
+        // ==================== 追加: 仙人掌 Tier 2 ====================
+        register(new CropType.Builder("cactus").displayName("仙人掌").tier(2)
+                .maxGrowthStage(4).harvestStage(4).stageRequirement(22)
+                .addDrop(new ItemStack(Blocks.CACTUS, 2))
+                .renderType(CropRenderType.HASH).build());
+
+        // ==================== 追加: 皮革叶 Tier 3 ====================
+        register(new CropType.Builder("leatherleaf").displayName("皮革叶").tier(3)
+                .maxGrowthStage(5).harvestStage(5).stageRequirement(24)
+                .addDrop(new ItemStack(Items.LEATHER, 2))
+                .renderType(CropRenderType.CROSS).build());
+
+        // ==================== 追加: 碳化疣 Tier 5 ====================
+        register(new CropType.Builder("carbon_wart").displayName("碳化疣").tier(5)
+                .maxGrowthStage(5).harvestStage(5).stageRequirement(28)
+                .addDrop(new ItemStack(Items.COAL, 2))
+                .lightRequirement(0)
+                .renderType(CropRenderType.HASH).build());
+
+        // ==================== 追加: Tier 6 ====================
+        register(new CropType.Builder("blazeflower").displayName("烈焰花").tier(6)
+                .maxGrowthStage(5).harvestStage(5).stageRequirement(32)
+                .addDrop(new ItemStack(Items.BLAZE_POWDER, 2))
+                .lightRequirement(12)
+                .renderType(CropRenderType.CROSS).build());
+
+        register(new CropType.Builder("enderflower").displayName("末影花").tier(6)
+                .maxGrowthStage(5).harvestStage(5).stageRequirement(32)
+                .addDrop(new ItemStack(Items.ENDER_PEARL))
+                .lightRequirement(0)
+                .renderType(CropRenderType.CROSS).build());
+
+        register(new CropType.Builder("explosivegrass").displayName("爆炸草").tier(6)
+                .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
+                .addDrop(new ItemStack(Items.GUNPOWDER, 3))
+                .renderType(CropRenderType.HASH).build());
+
+        // ==================== 追加: Tier 7 ====================
+        register(new CropType.Builder("tearflower").displayName("哭泣花").tier(7)
+                .maxGrowthStage(6).harvestStage(6).stageRequirement(36)
+                .addDrop(new ItemStack(Items.GHAST_TEAR))
+                .lightRequirement(0)
+                .renderType(CropRenderType.CROSS).build());
+
+        register(new CropType.Builder("prismaleaf").displayName("晶化叶").tier(7)
+                .maxGrowthStage(6).harvestStage(6).stageRequirement(36)
+                .addDrop(new ItemStack(Items.PRISMARINE_SHARD, 2))
+                .addDrop(new ItemStack(Items.PRISMARINE_CRYSTALS, 1))
+                .waterRequirement(0.5f)
+                .renderType(CropRenderType.HASH).build());
+
+        // ==================== 追加: 星之疣 Tier 10 ====================
+        register(new CropType.Builder("starwart").displayName("星之疣").tier(10)
+                .maxGrowthStage(7).harvestStage(7).stageRequirement(50)
+                .addDrop(new ItemStack(Items.SKULL, 1, 1)) // 凋零骷髅头 meta=1
+                .requiredBlocks("minecraft:nether_star_block") // 需信标基座或自定义方块
+                .lightRequirement(0)
+                .renderType(CropRenderType.HASH).build());
         // ==================== 杂草 ====================
         register(new CropType.Builder("weed").displayName("杂草").tier(0)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(12)
