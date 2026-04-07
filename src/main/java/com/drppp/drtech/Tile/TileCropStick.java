@@ -37,16 +37,10 @@ public class TileCropStick extends TileEntity implements ITickable {
      * → 只修改字段+markDirty → 不触发任何方块更新 → 不会让WorldAccelerator重新扫描
      */
     private boolean pendingSync = false;
-
-
-    long cacheTime = 0;
-
+    
     @Override
     public void update() {
         if (world == null || world.isRemote) return;
-
-        if(world.getWorldTime() == cacheTime)return;
-        cacheTime = world.getWorldTime();
 
         // === 每个tick开头: 处理挂起的同步 ===
         // 此时是正常游戏tick流程, 不在WorldAccelerator递归路径中
