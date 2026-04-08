@@ -17,14 +17,14 @@ public class CropType {
     private final int maxGrowthStage;
     private final int harvestStage;
     private final int stageRequirement;
-    private final List<ItemStack> drops;           // 固定掉落
-    private final List<ChanceDrop> chanceDrops;    // 概率掉落
-    private final String lootTable;                // 战利品表ID (null=不使用)
+    private final List<ItemStack> drops;           // 固定掉落(可后续追加)
+    private final List<ChanceDrop> chanceDrops;    // 概率掉落(可后续追加)
+    private final String lootTable;
     private final String[] requiredBlocks;
     private final float lightRequirement;
     private final float waterRequirement;
     private final CropRenderType renderType;
-    private final boolean canBeBreedResult;        // 是否允许作为杂交产物
+    private final boolean canBeBreedResult;
 
     private CropType(Builder builder) {
         this.id = builder.id;
@@ -33,14 +33,34 @@ public class CropType {
         this.maxGrowthStage = builder.maxGrowthStage;
         this.harvestStage = builder.harvestStage;
         this.stageRequirement = builder.stageRequirement;
-        this.drops = builder.drops;
-        this.chanceDrops = builder.chanceDrops;
+        this.drops = new ArrayList<>(builder.drops);          // 可变副本
+        this.chanceDrops = new ArrayList<>(builder.chanceDrops); // 可变副本
         this.lootTable = builder.lootTable;
         this.requiredBlocks = builder.requiredBlocks;
         this.lightRequirement = builder.lightRequirement;
         this.waterRequirement = builder.waterRequirement;
         this.renderType = builder.renderType;
         this.canBeBreedResult = builder.canBeBreedResult;
+    }
+
+    // ==================== 后续追加掉落物(init阶段使用) ====================
+
+    /**
+     * 注册后追加固定掉落物。
+     * 用于init阶段添加依赖其他mod的物品(如GTCEU MetaItems)。
+     * preInit阶段这些物品可能还未初始化。
+     */
+    public CropType addDropLate(ItemStack item) {
+        this.drops.add(item);
+        return this;
+    }
+
+    /**
+     * 注册后追加概率掉落物。
+     */
+    public CropType addChanceDropLate(ItemStack item, float chance) {
+        this.chanceDrops.add(new ChanceDrop(item, chance));
+        return this;
     }
 
     // ==================== 掉落计算 ====================
@@ -83,12 +103,14 @@ public class CropType {
     public CropRenderType getRenderType() { return renderType; }
     public boolean canBeBreedResult() { return canBeBreedResult; }
 
-    public boolean canGrowAt(float light, float humidity, String blockBelow) {
+    public boolean canGrowAt(float light, float humidity, List<String> blocksBelowIds) {
         if (light < lightRequirement) return false;
         if (humidity < waterRequirement) return false;
         if (requiredBlocks != null && requiredBlocks.length > 0) {
             for (String req : requiredBlocks) {
-                if (req.equals(blockBelow)) return true;
+                for (String actual : blocksBelowIds) {
+                    if (actual.equals(req)) return true;
+                }
             }
             return false;
         }

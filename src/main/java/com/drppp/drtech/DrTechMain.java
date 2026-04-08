@@ -22,6 +22,7 @@ import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
+import com.drppp.drtech.intergations.gtfo.TileCropFarmerMode;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
@@ -30,6 +31,7 @@ import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import gregtech.api.metatileentity.registry.MTEManager;
 import gregtech.api.unification.material.event.MaterialRegistryEvent;
+import gregtechfoodoption.machines.farmer.FarmerModeRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -86,7 +88,7 @@ public class DrTechMain {
         DrTechMetaTileEntities.initialization();
         CropInitHandler.preInit();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
-        CropInitHandler.init();
+
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -146,6 +148,7 @@ public class DrTechMain {
         if (FMLLaunchHandler.side() == Side.CLIENT) {
             OBJLoader.INSTANCE.addDomain(MODID);
         }
+        CropInitHandler.init();
     }
 
     @SideOnly(Side.CLIENT)
@@ -159,6 +162,7 @@ public class DrTechMain {
     public void postInit(FMLPostInitializationEvent event) {
         if (DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
+        FarmerModeRegistry.registerFarmerMode(new TileCropFarmerMode());
     }
 
     @EventHandler

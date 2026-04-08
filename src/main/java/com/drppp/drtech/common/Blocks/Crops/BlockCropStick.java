@@ -50,7 +50,7 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
     private static final AxisAlignedBB CROP_AABB = new AxisAlignedBB(0.0625,0,0.0625,0.9375,0.9375,0.9375);
     private static final AxisAlignedBB STICK_AABB = new AxisAlignedBB(0.125,0,0.125,0.875,0.75,0.875);
 
-    private static final Map<Item, String> VANILLA_SEED_MAP = new HashMap<>();
+    public static final Map<Item, String> VANILLA_SEED_MAP = new HashMap<>();
 
     public BlockCropStick() {
         super(Material.PLANTS);

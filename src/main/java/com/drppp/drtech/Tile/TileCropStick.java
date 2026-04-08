@@ -56,8 +56,8 @@ public class TileCropStick extends TileEntity implements ITickable {
 
         float light = EnvironmentCalculator.calcLight(world, pos);
         float humidity = EnvironmentCalculator.calcHumidity(world, pos);
-        String blockBelow = EnvironmentCalculator.getBlockBelowId(world, pos);
-        if (!type.canGrowAt(light * 15, humidity, blockBelow)) return;
+        List<String> blocksBelowIds = EnvironmentCalculator.getBlocksBelowIds(world, pos);
+        if (!type.canGrowAt(light * 15, humidity, blocksBelowIds)) return;
 
         float envScore = EnvironmentCalculator.calcEnvironmentScore(world, pos);
         int baseIncr = stats.rollGrowthIncrement(world.rand);

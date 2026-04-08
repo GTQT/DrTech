@@ -7,7 +7,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,9 +87,35 @@ public class EnvironmentCalculator {
         return Math.min(1.0f, nutrient);
     }
 
-    public static String getBlockBelowId(World world, BlockPos cropPos) {
-        IBlockState state = world.getBlockState(cropPos.down().down());
-        return state.getBlock().getRegistryName().toString();
+    /**
+     * 获取作物架下方1~2格的所有方块ID(含meta)
+     * 返回列表, canGrowAt中遍历匹配
+     */
+    public static List<String> getBlocksBelowIds(World world, BlockPos cropPos) {
+        List<String> result = new ArrayList<>();
+        for (int depth = 1; depth <= 2; depth++) {
+            IBlockState state = world.getBlockState(cropPos.down(depth));
+            Block block = state.getBlock();
+            int meta = block.getMetaFromState(state);
+            // 带meta: "gregtech:meta_block_compressed_3:7"
+            result.add(block.getRegistryName().toString() + ":" + meta);
+            // 不带meta: "minecraft:iron_block"
+            result.add(block.getRegistryName().toString());
+        }
+        return result;
+    }
+
+    /**
+     * 检查blockBelow是否匹配requiredBlock
+     * 支持两种格式:
+     *   "modid:name:meta" 精确匹配(含meta)
+     *   "modid:name" 只匹配方块不管meta
+     */
+    public static boolean matchesBlock(String actual, String required) {
+        if (actual.equals(required)) return true;
+        // actual是 "mod:name:meta", required是 "mod:name" -> 去掉meta比较
+        String actualNoMeta = actual.substring(0, actual.lastIndexOf(':'));
+        return actualNoMeta.equals(required);
     }
 
     public static float calcEnvironmentScore(World world, BlockPos cropPos) {

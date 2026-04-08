@@ -43,7 +43,7 @@ public class ItemCropSeed extends Item {
         setTranslationKey(Tags.MODID + ".crop_seed");
         setRegistryName(Tags.MODID, "crop_seed");
         setMaxStackSize(64);
-        setCreativeTab(CreativeTabs.MISC);
+        setCreativeTab(DrTechMain.DrTechTab);
         setHasSubtypes(true);
         INSTANCE = this;
     }
