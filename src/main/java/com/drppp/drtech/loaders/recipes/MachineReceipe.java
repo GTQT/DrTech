@@ -8,6 +8,7 @@ import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 
 import gregtech.api.GTValues;
 import gregtech.api.unification.material.MarkerMaterials;
+import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.common.blocks.BlockMachineCasing;
 import gregtech.common.blocks.BlockMetalCasing;
@@ -369,6 +370,30 @@ public class MachineReceipe {
                 .fluidOutputs(Ethanol.getFluid(750))
                 .EUt(8)
                 .duration(100)
+                .buildAndRegister();
+        EXTRACTOR_RECIPES.recipeBuilder()
+                .input(DrMetaItems.RAPESEED_FLOWER)
+                .fluidOutputs(SeedOil.getFluid(500))
+                .EUt(7)
+                .duration(32)
+                .buildAndRegister();
+        EXTRACTOR_RECIPES.recipeBuilder()
+                .input(DrMetaItems.SNAPDRAGON)
+                .fluidOutputs(SeedOil.getFluid(500))
+                .EUt(7)
+                .duration(32)
+                .buildAndRegister();
+        EXTRACTOR_RECIPES.recipeBuilder()
+                .input(DrMetaItems.XJC,2)
+                .output(DrMetaItems.NATURAL_RUBBER)
+                .EUt(7)
+                .duration(32)
+                .buildAndRegister();
+        MACERATOR_RECIPES.recipeBuilder()
+                .input(DrMetaItems.XJC,1)
+                .output(DrMetaItems.INULIN,16)
+                .EUt(7)
+                .duration(32)
                 .buildAndRegister();
     }
 

@@ -24,8 +24,6 @@ import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
 
 public class ItemsInit {
     public static final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID, "gravitational_anomaly");
-    public static final Item ITEM_BLOCK_WATER_MILL = new ItemBlock(BlocksInit.BLOCK_WATER_MILL).setRegistryName(Tags.MODID, "water_mill");
-    public static final Item ITEM_BLOCK_WOOD_AXLE = new ItemBlock(BlocksInit.BLOCK_WOOD_AXLE).setRegistryName(Tags.MODID, "wood_axle");
     public static final Item ITEM_CONNECTOR1 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR1).setRegistryName(Tags.MODID, "connector_1");
     public static final Item ITEM_CONNECTOR2 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID, "connector_2");
     public static final Item ITEM_CONNECTOR3 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID, "connector_3");
@@ -43,8 +41,6 @@ public class ItemsInit {
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY=new ItemSoarXpBerry();
     public static void init(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
-        event.getRegistry().register(ITEM_BLOCK_WATER_MILL);
-        event.getRegistry().register(ITEM_BLOCK_WOOD_AXLE);
         event.getRegistry().register(ITEM_CONNECTOR1);
         event.getRegistry().register(ITEM_CONNECTOR2);
         event.getRegistry().register(ITEM_CONNECTOR3);

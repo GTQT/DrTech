@@ -82,6 +82,5 @@ public final class DrMetaItems {
     public static void MetaItemsInit() {
         MetaItems1 metaItem = new MetaItems1();
         metaItem.setRegistryName("meta_items_mymod");
-
     }
 }

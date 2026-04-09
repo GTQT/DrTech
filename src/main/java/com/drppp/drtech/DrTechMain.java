@@ -5,8 +5,6 @@ import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.CropStickTESR;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.Client.render.TesrWaterMill;
-import com.drppp.drtech.Client.render.TesrWoodAxle;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.*;
@@ -115,8 +113,6 @@ public class DrTechMain {
         try {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
-            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWaterMill.class, new TesrWaterMill());
-            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWoodAxle.class, new TesrWoodAxle());
             ClientRegistry.bindTileEntitySpecialRenderer(TileCropStick.class, new CropStickTESR());
         } catch (Exception e) {
             throw new RuntimeException(e);

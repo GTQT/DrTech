@@ -95,17 +95,36 @@ public class CropRegistry {
         CropRegistry.get("tin_leaf").addDropLate(Materials.Tin.getItemForm(OrePrefix.nugget,2));
         CropRegistry.get("copper_leaf").addDropLate(Materials.Copper.getItemForm(OrePrefix.nugget,2));
         CropRegistry.get("titanium_leaf").addDropLate(Materials.Titanium.getItemForm(OrePrefix.nugget,2));
-        CropRegistry.get("mica_grass").addDropLate(Materials.Mica.getItemForm(OrePrefix.nugget,3));
-        CropRegistry.get("arid_lotus").addDropLate(Materials.Borax.getItemForm(OrePrefix.nugget,3));
+        //silver_leaf  aluminum_leaf  zinc_leaf  nickel_leaf  thunder_grass  manganese_leaf
+        CropRegistry.get("silver_leaf").addDropLate(Materials.Silver.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("aluminum_leaf").addDropLate(Materials.Aluminium.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("zinc_leaf").addDropLate(Materials.Zinc.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("nickel_leaf").addDropLate(Materials.Nickel.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("thunder_grass").addDropLate(Materials.Thulium.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("manganese_leaf").addDropLate(Materials.Manganese.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("nuclear_grass").addDropLate(Materials.Uranium238.getItemForm(OrePrefix.nugget,2))
+                .addChanceDropLate(Materials.Uranium235.getItemForm(OrePrefix.nugget,1),0.1f);
+        CropRegistry.get("bedrock_heart").addDropLate(CraftingReceipe.getItemStack("<enderio:item_material:20>"));
+        CropRegistry.get("mica_grass").addDropLate(Materials.Mica.getItemForm(OrePrefix.dust,3));
+        CropRegistry.get("arid_lotus").addDropLate(Materials.Borax.getItemForm(OrePrefix.dust,3));
+        CropRegistry.get("rapeseed").addDropLate(DrMetaItems.RAPESEED_FLOWER.getStackForm(3));
+        CropRegistry.get("snapdragon").addDropLate(DrMetaItems.SNAPDRAGON.getStackForm(3));
+        CropRegistry.get("lucky_clover").addDropLate(DrMetaItems.LUCKY_CLOVER.getStackForm(3));
+        CropRegistry.get("mercury_flower").addDropLate(CraftingReceipe.getItemStack("thaumcraft:shimmerleaf",3l));
         CropRegistry.get("black_lotus")
-                .addChanceDropLate(CraftingReceipe.getItemStack(""),0.01f)
-                .addDropLate(CraftingReceipe.getItemStack(""));//黑莲花 植物魔法mana
+                .addChanceDropLate(CraftingReceipe.getItemStack("<botania:blacklotus:1>"),0.01f)
+                .addDropLate(CraftingReceipe.getItemStack("<botania:blacklotus>"));//黑莲花 植物魔法mana
         CropRegistry.get("salt_root")
                 .addChanceDropLate(Materials.Salt.getItemForm(OrePrefix.dust,4),0.5f)
                 .addChanceDropLate(Materials.RockSalt.getItemForm(OrePrefix.dust,4),0.5f);
         CropRegistry.get("whale_claw")
                 .addChanceDropLate(Materials.CertusQuartz.getItemForm(OrePrefix.dust,2),0.5f)
                 .addChanceDropLate(CraftingReceipe.getItemStack("<appliedenergistics2:material:2>",2l),0.5f);
+        // space_berry  platinum_leaf tungsten_leaf mech_brain  heartfruit
+        CropRegistry.get("space_berry").addChanceDropLate(MetaItems.UU_MATER.getStackForm(),0.05f);
+        CropRegistry.get("platinum_leaf").addDropLate(Materials.Platinum.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("tungsten_leaf").addDropLate(Materials.Tungsten.getItemForm(OrePrefix.nugget,2));
+        CropRegistry.get("heartfruit").addDropLate(CraftingReceipe.getItemStack("pollution:heartfruit"));
     }
     public static void registerDefaults() {
         // ================================================================
@@ -253,7 +272,6 @@ public class CropRegistry {
 
         register(new CropType.Builder("mercury_flower").displayName("水银花").tier(3)
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(24)
-                .addDrop(CraftingReceipe.getItemStack("thaumcraft:shimmerleaf",3l)) // 水银
                 .requiredBlocks()
                 .renderType(CropRenderType.CROSS).build());
 
@@ -276,7 +294,7 @@ public class CropRegistry {
         // ================================================================
         register(new CropType.Builder("stickreed").displayName("粘性甘蔗").tier(4)
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(26)
-                .addDrop(new ItemStack(Items.STICK)).addDrop(new ItemStack(Items.REEDS))
+                .addDrop(new ItemStack(Items.REEDS))
                 .waterRequirement(0.3f).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("blackthorn").displayName("黑荆棘").tier(4)
@@ -291,12 +309,12 @@ public class CropRegistry {
 
         register(new CropType.Builder("rapeseed").displayName("油菜花").tier(4)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(24)
-                .addDrop(DrMetaItems.RAPESEED_FLOWER.getStackForm(4)) // 菜籽油
+                //.addDrop(DrMetaItems.RAPESEED_FLOWER.getStackForm(4)) // 菜籽油
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("snapdragon").displayName("金鱼草").tier(4)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(24)
-                .addDrop(DrMetaItems.SNAPDRAGON.getStackForm(4)) // 金鱼草产物
+                //.addDrop(DrMetaItems.SNAPDRAGON.getStackForm(4)) // 金鱼草产物
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("fertilizer_grass").displayName("肥料草").tier(4)
@@ -548,19 +566,23 @@ public class CropRegistry {
 
         register(new CropType.Builder("silver_leaf").displayName("银叶子").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
-                .addDrop(placeholder()).renderType(CropRenderType.HASH).build());
+                .requiredBlocks("gregtech:meta_block_compressed_6:4")
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("aluminum_leaf").displayName("铝叶子").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
-                .addDrop(placeholder()).renderType(CropRenderType.HASH).build());
+                .requiredBlocks("gregtech:meta_block_compressed_0:2")
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("zinc_leaf").displayName("锌叶子").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
-                .addDrop(placeholder()).renderType(CropRenderType.HASH).build());
+                .requiredBlocks("gregtech:meta_block_compressed_7:10")
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("nickel_leaf").displayName("镍叶子").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
-                .addDrop(placeholder()).renderType(CropRenderType.HASH).build());
+                .requiredBlocks("gregtech:meta_block_compressed_4:5")
+                .renderType(CropRenderType.HASH).build());
 
         // ================================================================
         //  Tier 8
@@ -573,16 +595,17 @@ public class CropRegistry {
 
         register(new CropType.Builder("black_lotus").displayName("黑莲花").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
-                .lightRequirement(0).renderType(CropRenderType.CROSS).build());
+                .lightRequirement(0).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("thunder_grass").displayName("雷鸣草").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
-                .addDrop(placeholder()) // 钍
+                .requiredBlocks("gregtech:meta_block_compressed_6:13")
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("manganese_leaf").displayName("锰叶子").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
-                .addDrop(placeholder()).renderType(CropRenderType.HASH).build());
+                .requiredBlocks("gregtech:meta_block_compressed_3:13")
+                .renderType(CropRenderType.HASH).build());
 
         // ================================================================
         //  Tier 9
@@ -595,12 +618,12 @@ public class CropRegistry {
 
         register(new CropType.Builder("lucky_clover").displayName("幸运草").tier(9)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(44)
-                .addDrop(DrMetaItems.LUCKY_CLOVER.getStackForm(1)) // 幸运奖品
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("wither_flower").displayName("凋零花").tier(9)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(65)
                 .addDrop(new ItemStack(Items.SKULL, 1, 1))
+                .requiredBlocks("gregtech:meta_block_compressed_100:2")
                 .lightRequirement(0).renderType(CropRenderType.CROSS).build());
 
         // ================================================================
@@ -609,16 +632,17 @@ public class CropRegistry {
         register(new CropType.Builder("starwart").displayName("星之疣").tier(10)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(80)
                 .addDrop(new ItemStack(Items.NETHER_STAR))
+                .requiredBlocks("gregtech:meta_block_compressed_100:2")
                 .lightRequirement(0).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("nuclear_grass").displayName("核能草").tier(10)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(50)
-                .addDrop(placeholder()) // 铀238
+                .requiredBlocks("gregtech:meta_block_compressed_8:3")
                 .lightRequirement(0).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("bedrock_heart").displayName("基岩之心").tier(10)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(52)
-                .addDrop(placeholder()) // 基岩碎片
+                .requiredBlocks("minecraft:bedrock")
                 .renderType(CropRenderType.HASH).build());
 
         // ================================================================
@@ -626,30 +650,30 @@ public class CropRegistry {
         // ================================================================
         register(new CropType.Builder("space_berry").displayName("空间莓").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(55)
-                .addDrop(placeholder()) // 空间物质
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("platinum_leaf").displayName("铂叶子").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(55)
-                .addDrop(placeholder()).renderType(CropRenderType.HASH).build());
+                .requiredBlocks("gregtech:meta_block_compressed_5")
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("tungsten_leaf").displayName("钨叶子").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(55)
-                .addDrop(placeholder()).renderType(CropRenderType.HASH).build());
+                .requiredBlocks("gregtech:meta_block_compressed_7:3")
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("money_grass").displayName("多金草").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(55)
-                .addDrop(placeholder()) // 货币
+                .addDrop(new ItemStack(Blocks.GOLD_BLOCK,4)) // 货币
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("mech_brain").displayName("机械脑").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(58)
-                .addDrop(placeholder()) // 电路板
+                .lootTable("gregtech:chests/abandoned_safe_3")
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("heartfruit").displayName("心鸣果").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(60)
-                .addDrop(placeholder()) // 心脏
                 .canBeBreedResult(false) // 不允许杂交产出
                 .renderType(CropRenderType.CROSS).build());
     }
