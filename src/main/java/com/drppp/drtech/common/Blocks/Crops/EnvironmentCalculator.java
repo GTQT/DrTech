@@ -97,9 +97,7 @@ public class EnvironmentCalculator {
             IBlockState state = world.getBlockState(cropPos.down(depth));
             Block block = state.getBlock();
             int meta = block.getMetaFromState(state);
-            // 带meta: "gregtech:meta_block_compressed_3:7"
             result.add(block.getRegistryName().toString() + ":" + meta);
-            // 不带meta: "minecraft:iron_block"
             result.add(block.getRegistryName().toString());
         }
         return result;

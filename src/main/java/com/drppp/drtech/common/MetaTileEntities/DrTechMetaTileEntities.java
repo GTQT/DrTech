@@ -11,6 +11,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEnti
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLaserPipeBending;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
 import com.drppp.drtech.loaders.recipes.DrtechReceipes;
@@ -53,6 +54,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
 
     public static MetaTileentityCropsSimulateMachine CROPS_SIMULATE;
+    public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_256 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_1024 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
@@ -115,6 +117,7 @@ public class DrTechMetaTileEntities {
         COMB_PROVESS = registerMetaTileEntity(getID(), new MetaTileEntityCombProcess(getDrId("comb_process")));
 
         CROPS_SIMULATE = registerMetaTileEntity(getID(), new MetaTileentityCropsSimulateMachine(getDrId("crops_simulate_machine")));
+        INDUSTRIAL_APIARY = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialApiary(getDrId("industrial_apiary"), Textures.INDUSTRIAL_APIARY));
 
         if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {
             INDUSTRIAL_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialMixer(getDrId("industrial_mixer")));

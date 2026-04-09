@@ -31,4 +31,5 @@ public class KillGrassBehavior implements IItemBehaviour {
         }
         return EnumActionResult.SUCCESS;
     }
+
 }

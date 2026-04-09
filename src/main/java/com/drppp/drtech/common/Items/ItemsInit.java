@@ -2,6 +2,8 @@ package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Items.foods.ItemSoarXpBerry;
+import com.drppp.drtech.common.Items.foods.ItemXpBerry;
 import gregtech.api.block.VariantItemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -36,6 +38,9 @@ public class ItemsInit {
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID, BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
     public static ItemCropSeed CROP_SEED=new ItemCropSeed();
     public static ItemCropAnalyzer CROP_ANALYZER=new ItemCropAnalyzer();
+    public static ItemWeedingShears ITEM_WEEDING_SHEARS=new ItemWeedingShears();
+    public static ItemXpBerry ITEM_XP_BERRY=new ItemXpBerry();
+    public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY=new ItemSoarXpBerry();
     public static void init(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
         event.getRegistry().register(ITEM_BLOCK_WATER_MILL);
@@ -57,6 +62,9 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK, VariantItemBlock::new));
         event.getRegistry().register(CROP_SEED);
         event.getRegistry().register(CROP_ANALYZER);
+        event.getRegistry().register(ITEM_WEEDING_SHEARS);
+        event.getRegistry().register(ITEM_XP_BERRY);
+        event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
     }
 
@@ -70,6 +78,9 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(CROP_SEED, 0, new ModelResourceLocation(CROP_SEED.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(CROP_ANALYZER, 0, new ModelResourceLocation(CROP_ANALYZER.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_WEEDING_SHEARS, 0, new ModelResourceLocation(ITEM_WEEDING_SHEARS.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
     }
 
     @SideOnly(Side.CLIENT)

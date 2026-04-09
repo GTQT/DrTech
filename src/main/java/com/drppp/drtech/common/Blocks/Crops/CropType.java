@@ -25,6 +25,10 @@ public class CropType {
     private final float waterRequirement;
     private final CropRenderType renderType;
     private final boolean canBeBreedResult;
+    private final CompareMode lightCompare;
+    private final float lightRequirementMax;  // RANGE模式的上限
+    private final CompareMode humidityCompare;
+    private final float waterRequirementMax;  // RANGE模式的上限
 
     private CropType(Builder builder) {
         this.id = builder.id;
@@ -41,6 +45,10 @@ public class CropType {
         this.waterRequirement = builder.waterRequirement;
         this.renderType = builder.renderType;
         this.canBeBreedResult = builder.canBeBreedResult;
+        this.lightCompare = builder.lightCompare;
+        this.lightRequirementMax = builder.lightRequirementMax;
+        this.humidityCompare = builder.humidityCompare;
+        this.waterRequirementMax = builder.waterRequirementMax;
     }
 
     // ==================== 后续追加掉落物(init阶段使用) ====================
@@ -102,10 +110,14 @@ public class CropType {
     public float getWaterRequirement() { return waterRequirement; }
     public CropRenderType getRenderType() { return renderType; }
     public boolean canBeBreedResult() { return canBeBreedResult; }
+    public CompareMode getLightCompare() { return lightCompare; }
+    public float getLightRequirementMax() { return lightRequirementMax; }
+    public CompareMode getHumidityCompare() { return humidityCompare; }
+    public float getWaterRequirementMax() { return waterRequirementMax; }
 
     public boolean canGrowAt(float light, float humidity, List<String> blocksBelowIds) {
-        if (light < lightRequirement) return false;
-        if (humidity < waterRequirement) return false;
+        if (!checkValue(light, lightRequirement, lightRequirementMax, lightCompare)) return false;
+        if (!checkValue(humidity, waterRequirement, waterRequirementMax, humidityCompare)) return false;
         if (requiredBlocks != null && requiredBlocks.length > 0) {
             for (String req : requiredBlocks) {
                 for (String actual : blocksBelowIds) {
@@ -115,6 +127,15 @@ public class CropType {
             return false;
         }
         return true;
+    }
+
+    private static boolean checkValue(float actual, float min, float max, CompareMode mode) {
+        switch (mode) {
+            case LESS:    return actual <= min;
+            case RANGE:   return actual >= min && actual <= max;
+            case GREATER:
+            default:      return actual >= min;
+        }
     }
 
     // ==================== 概率掉落数据 ====================
@@ -146,6 +167,10 @@ public class CropType {
         private float waterRequirement = 0;
         private CropRenderType renderType = CropRenderType.CROSS;
         private boolean canBeBreedResult = true;
+        private CompareMode lightCompare = CompareMode.GREATER;
+        private float lightRequirementMax = 15;
+        private CompareMode humidityCompare = CompareMode.GREATER;
+        private float waterRequirementMax = 1.0f;
 
         public Builder(String id) { this.id = id; this.displayName = id; }
 
@@ -168,7 +193,32 @@ public class CropType {
         public Builder renderType(CropRenderType t) { this.renderType = t; return this; }
         /** 设为false则不允许通过杂交产出此作物 */
         public Builder canBeBreedResult(boolean v) { this.canBeBreedResult = v; return this; }
-
+        /** 光照小于等于某值 (蘑菇/暗处作物) */
+        public Builder lightRequirementLess(float max) {
+            this.lightRequirement = max;
+            this.lightCompare = CompareMode.LESS;
+            return this;
+        }
+        /** 光照在范围内 */
+        public Builder lightRequirementRange(float min, float max) {
+            this.lightRequirement = min;
+            this.lightRequirementMax = max;
+            this.lightCompare = CompareMode.RANGE;
+            return this;
+        }
+        /** 湿度小于等于某值 (干旱作物) */
+        public Builder waterRequirementLess(float max) {
+            this.waterRequirement = max;
+            this.humidityCompare = CompareMode.LESS;
+            return this;
+        }
+        /** 湿度在范围内 */
+        public Builder waterRequirementRange(float min, float max) {
+            this.waterRequirement = min;
+            this.waterRequirementMax = max;
+            this.humidityCompare = CompareMode.RANGE;
+            return this;
+        }
         public CropType build() { return new CropType(this); }
     }
 }
