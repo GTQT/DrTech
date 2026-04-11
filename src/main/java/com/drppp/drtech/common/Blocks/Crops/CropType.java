@@ -2,9 +2,7 @@ package com.drppp.drtech.common.Blocks.Crops;
 
 import net.minecraft.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * 定义一种作物类型的所有属性
@@ -29,6 +27,8 @@ public class CropType {
     private final float lightRequirementMax;  // RANGE模式的上限
     private final CompareMode humidityCompare;
     private final float waterRequirementMax;  // RANGE模式的上限
+    private final Map<String, List<ItemStack>> blockDrops;        // 方块ID → 特定掉落
+    private final Map<String, List<ChanceDrop>> blockChanceDrops; // 方块ID → 特定概率掉落
 
     private CropType(Builder builder) {
         this.id = builder.id;
@@ -49,10 +49,22 @@ public class CropType {
         this.lightRequirementMax = builder.lightRequirementMax;
         this.humidityCompare = builder.humidityCompare;
         this.waterRequirementMax = builder.waterRequirementMax;
+        this.blockDrops = new HashMap<>(builder.blockDrops);
+        this.blockChanceDrops = new HashMap<>(builder.blockChanceDrops);
     }
 
     // ==================== 后续追加掉落物(init阶段使用) ====================
+    /** 注册后追加方块特定掉落(init阶段使用) */
+    public CropType addBlockDropLate(String blockId, ItemStack item) {
+        this.blockDrops.computeIfAbsent(blockId, k -> new ArrayList<>()).add(item);
+        return this;
+    }
 
+    public CropType addBlockChanceDropLate(String blockId, ItemStack item, float chance) {
+        this.blockChanceDrops.computeIfAbsent(blockId, k -> new ArrayList<>())
+                .add(new ChanceDrop(item, chance));
+        return this;
+    }
     /**
      * 注册后追加固定掉落物。
      * 用于init阶段添加依赖其他mod的物品(如GTCEU MetaItems)。
@@ -93,7 +105,66 @@ public class CropType {
         }
         return result;
     }
+    /**
+     * 获取本次收获的所有掉落物(固定+概率)
+     * @param blocksBelowIds 下方方块ID列表(由EnvironmentCalculator提供)
+     */
+    public List<ItemStack> rollDrops(Random rand, int gainBonus, List<String> blocksBelowIds) {
+        List<ItemStack> result = new ArrayList<>();
 
+        // 检查是否有方块特定掉落
+        boolean matchedBlock = false;
+        if (blocksBelowIds != null && !blockDrops.isEmpty()) {
+            for (String blockId : blocksBelowIds) {
+                // 精确匹配(带meta)
+                if (blockDrops.containsKey(blockId)) {
+                    for (ItemStack drop : blockDrops.get(blockId)) {
+                        ItemStack copy = drop.copy();
+                        copy.setCount(copy.getCount() + gainBonus);
+                        result.add(copy);
+                    }
+                    if (blockChanceDrops.containsKey(blockId)) {
+                        for (ChanceDrop cd : blockChanceDrops.get(blockId)) {
+                            if (rand.nextFloat() < cd.chance) result.add(cd.item.copy());
+                        }
+                    }
+                    matchedBlock = true;
+                    break;
+                }
+                // 不带meta匹配
+                String noMeta = blockId.contains(":") ?
+                        blockId.substring(0, blockId.lastIndexOf(':')) : blockId;
+                if (blockDrops.containsKey(noMeta)) {
+                    for (ItemStack drop : blockDrops.get(noMeta)) {
+                        ItemStack copy = drop.copy();
+                        copy.setCount(copy.getCount() + gainBonus);
+                        result.add(copy);
+                    }
+                    if (blockChanceDrops.containsKey(noMeta)) {
+                        for (ChanceDrop cd : blockChanceDrops.get(noMeta)) {
+                            if (rand.nextFloat() < cd.chance) result.add(cd.item.copy());
+                        }
+                    }
+                    matchedBlock = true;
+                    break;
+                }
+            }
+        }
+
+        // 没有匹配到特定方块 → 使用默认掉落
+        if (!matchedBlock) {
+            for (ItemStack drop : drops) {
+                ItemStack copy = drop.copy();
+                copy.setCount(copy.getCount() + gainBonus);
+                result.add(copy);
+            }
+            for (ChanceDrop cd : chanceDrops) {
+                if (rand.nextFloat() < cd.chance) result.add(cd.item.copy());
+            }
+        }
+
+        return result;
+    }
     // ==================== Getters ====================
 
     public String getId() { return id; }
@@ -114,6 +185,8 @@ public class CropType {
     public float getLightRequirementMax() { return lightRequirementMax; }
     public CompareMode getHumidityCompare() { return humidityCompare; }
     public float getWaterRequirementMax() { return waterRequirementMax; }
+    public Map<String, List<ItemStack>> getBlockDrops() { return blockDrops; }
+    public Map<String, List<ChanceDrop>> getBlockChanceDrops() { return blockChanceDrops; }
 
     public boolean canGrowAt(float light, float humidity, List<String> blocksBelowIds) {
         if (!checkValue(light, lightRequirement, lightRequirementMax, lightCompare)) return false;
@@ -171,6 +244,8 @@ public class CropType {
         private float lightRequirementMax = 15;
         private CompareMode humidityCompare = CompareMode.GREATER;
         private float waterRequirementMax = 1.0f;
+        private Map<String, List<ItemStack>> blockDrops = new HashMap<>();
+        private Map<String, List<ChanceDrop>> blockChanceDrops = new HashMap<>();
 
         public Builder(String id) { this.id = id; this.displayName = id; }
 
@@ -180,6 +255,24 @@ public class CropType {
         public Builder harvestStage(int s) { this.harvestStage = s; return this; }
         public Builder stageRequirement(int r) { this.stageRequirement = r; return this; }
         public Builder addDrop(ItemStack s) { this.drops.add(s); return this; }
+
+
+        /**
+         * 底下放特定方块时产出特定物品
+         * 例: .addBlockDrop("minecraft:iron_block", new ItemStack(Items.IRON_INGOT))
+         *     .addBlockDrop("gregtech:meta_block_compressed_3:7", leadDust)
+         */
+        public Builder addBlockDrop(String blockId, ItemStack item) {
+            this.blockDrops.computeIfAbsent(blockId, k -> new ArrayList<>()).add(item);
+            return this;
+        }
+
+        /** 底下放特定方块时的概率掉落 */
+        public Builder addBlockChanceDrop(String blockId, ItemStack item, float chance) {
+            this.blockChanceDrops.computeIfAbsent(blockId, k -> new ArrayList<>())
+                    .add(new ChanceDrop(item, chance));
+            return this;
+        }
         /** 概率掉落: chance范围0.0~1.0 */
         public Builder addChanceDrop(ItemStack item, float chance) {
             this.chanceDrops.add(new ChanceDrop(item, chance));

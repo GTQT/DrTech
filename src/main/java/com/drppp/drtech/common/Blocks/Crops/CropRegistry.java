@@ -125,6 +125,13 @@ public class CropRegistry {
         CropRegistry.get("platinum_leaf").addDropLate(Materials.Platinum.getItemForm(OrePrefix.nugget,2));
         CropRegistry.get("tungsten_leaf").addDropLate(Materials.Tungsten.getItemForm(OrePrefix.nugget,2));
         CropRegistry.get("heartfruit").addDropLate(CraftingReceipe.getItemStack("pollution:heartfruit"));
+
+
+        CropRegistry.get("mech_brain")
+                .addBlockDropLate("gregtech:meta_block_compressed_6:3",MetaItems.SILICON_BOULE.getStackForm())
+                .addBlockDropLate("gregtech:meta_block_compressed_4:14",MetaItems.PHOSPHORUS_BOULE.getStackForm())
+                .addBlockDropLate("gregtech:meta_block_compressed_7:12",MetaItems.NAQUADAH_BOULE.getStackForm())
+                .addBlockDropLate("gregtech:meta_block_compressed_7:15",MetaItems.NEUTRONIUM_BOULE.getStackForm());
     }
     public static void registerDefaults() {
         // ================================================================
@@ -668,8 +675,11 @@ public class CropRegistry {
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("mech_brain").displayName("机械脑").tier(11)
-                .maxGrowthStage(7).harvestStage(7).stageRequirement(58)
-                .lootTable("gregtech:chests/abandoned_safe_3")
+                .maxGrowthStage(7).harvestStage(7).stageRequirement(200)
+                .requiredBlocks("gregtech:meta_block_compressed_6:3",
+                        "gregtech:meta_block_compressed_4:14",
+                        "gregtech:meta_block_compressed_7:12",
+                        "gregtech:meta_block_compressed_7:15")
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("heartfruit").displayName("心鸣果").tier(11)
