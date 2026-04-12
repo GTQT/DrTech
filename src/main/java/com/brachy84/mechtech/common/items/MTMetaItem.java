@@ -25,7 +25,10 @@ public class MTMetaItem extends StandardMetaItem {
         AUTO_FEEDER = addItem(4, "auto_feeder");
         TESLA_COIL = addItem(5, "tesla_coil");
         OXYGEN_MASK = addItem(6, "oxygen_mask");
-
+        ANTI_GRAVITY   = addItem(7, "anti_gravity");
+        SPRINT_MODULE  = addItem(8, "sprint_module");
+        ENERGY_SHIELD  = addItem(9, "energy_shield");
+        HEALING_MODULE = addItem(10, "healing_module");
         // Armor Platings
         for (Int2ObjectMap.Entry<MaterialArmorModuleBuilder> entry : Modules.getArmorModules().int2ObjectEntrySet()) {
             MaterialArmorModuleBuilder builder = entry.getValue();

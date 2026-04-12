@@ -59,6 +59,31 @@ mechtech.modules.auto_feeder.name=自动进食器
 mechtech.modules.tesla_coil.name=特斯拉线圈
 mechtech.modules.oxygen_mask.name=氧气面罩
 mechtech.modules.wireless_cover.name=无线接收器
+# --- 反重力模块 ---
+mechtech.modules.anti_gravity.name=反重力模块
+mechtech.anti_gravity.mode=反重力: %s
+item.metaitem.anti_gravity.name=反重力模块
+
+# --- 疾驰模块 ---
+mechtech.modules.sprint_module.name=疾驰模块
+mechtech.sprint_module.mode=疾驰加速: %s
+item.metaitem.sprint_module.name=疾驰模块
+
+# --- 能量护盾单元 ---
+mechtech.modules.energy_shield.name=能量护盾单元
+mechtech.energy_shield.mode=能量护盾: %s
+mechtech.energy_shield.tooltip.1=将EU转化为伤害吸收护盾
+mechtech.energy_shield.tooltip.2=消耗: %d EU / 伤害点
+mechtech.energy_shield.tooltip.3=单次最大吸收: %d 点
+item.metaitem.energy_shield.name=能量护盾单元
+
+# --- 治愈模块 ---
+mechtech.modules.healing_module.name=治愈模块
+mechtech.healing_module.active=治愈: 激活
+mechtech.healing_module.tooltip.1=穿戴时给予生命恢复效果
+mechtech.healing_module.tooltip.2=消耗: %d EU / 秒
+mechtech.healing_module.tooltip.3=在不同装甲部位叠加可提升等级
+item.metaitem.healing_module.name=治愈模块
 
 mechtech.modules.armor_plating.tooltip.1=§r耐久度：§a%d/%d
 mechtech.modules.armor_plating.tooltip.2=§r护甲值：§a%d
@@ -85,6 +110,12 @@ metaitem.tesla_coil.name=特斯拉线圈
 metaitem.tesla_coil.tooltip=通过电力攻击附近的生物，并为物品栏中的物品充电。可以装备在头部和胸部。
 metaitem.oxygen_mask.name=氧气面罩
 metaitem.oxygen_mask.tooltip=允许玩家在水下呼吸氧气
+metaitem.anti_gravity.name=反重力单元
+mechtech.anti_gravity.tooltip.1=创造飞行
+mechtech.anti_gravity.tooltip.2=耗电:%s EU/t
+metaitem.sprint_module.name=助行推进器
+metaitem.energy_shield.name=能量护盾
+metaitem.healing_module.name=治愈器
 
 metaitem.modular_armor.no_battery=§4请插入电池！
 metaitem.modular_armor.installed_modules=§b已安装模块：§7(%d/%d)

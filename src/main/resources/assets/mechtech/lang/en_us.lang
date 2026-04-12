@@ -60,6 +60,31 @@ mechtech.modules.auto_feeder.name=Auto Feeder
 mechtech.modules.tesla_coil.name=Tesla Coil
 mechtech.modules.oxygen_mask.name=Oxygen Mask
 mechtech.modules.wireless_cover.name=Wireless Receiver
+# --- Anti-Gravity Module ---
+mechtech.modules.anti_gravity.name=Anti-Gravity Module
+mechtech.anti_gravity.mode=Anti-Gravity: %s
+item.metaitem.anti_gravity.name=Anti-Gravity Module
+
+# --- Sprint Module ---
+mechtech.modules.sprint_module.name=Sprint Module
+mechtech.sprint_module.mode=Sprint Boost: %s
+item.metaitem.sprint_module.name=Sprint Module
+
+# --- Energy Shield ---
+mechtech.modules.energy_shield.name=Energy Shield Unit
+mechtech.energy_shield.mode=Energy Shield: %s
+mechtech.energy_shield.tooltip.1=Converts EU to a damage-absorbing shield
+mechtech.energy_shield.tooltip.2=Cost: %d EU per damage point
+mechtech.energy_shield.tooltip.3=Max absorption: %d per hit
+item.metaitem.energy_shield.name=Energy Shield Unit
+
+# --- Healing Module ---
+mechtech.modules.healing_module.name=Healing Module
+mechtech.healing_module.active=Healing: Active
+mechtech.healing_module.tooltip.1=Grants Regeneration while worn
+mechtech.healing_module.tooltip.2=Cost: %d EU per second
+mechtech.healing_module.tooltip.3=Stack across armor pieces for higher levels
+item.metaitem.healing_module.name=Healing Module
 
 mechtech.modules.armor_plating.tooltip.1=§rDurability: §a%d/%d
 mechtech.modules.armor_plating.tooltip.2=§rArmor: §a%d
@@ -93,3 +118,4 @@ metaitem.modular_armor.no_modules=§cNo Modules installed
 metaitem.modular_armor.max_fluid=§3Max fluid cell size: %s
 
 mechtech.modular_armor.usable=§3Can be used as a module in the Modular Armor
+
