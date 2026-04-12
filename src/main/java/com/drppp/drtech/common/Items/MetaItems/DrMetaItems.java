@@ -64,6 +64,9 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem XJC;
     public static MetaItem<?>.MetaValueItem INULIN;
     public static MetaItem<?>.MetaValueItem NATURAL_RUBBER;
+    public static MetaItem<?>.MetaValueItem RAPESEED_FLOWER;
+    public static MetaItem<?>.MetaValueItem SNAPDRAGON;
+    public static MetaItem<?>.MetaValueItem LUCKY_CLOVER;
 
     //  Fluid Cores
     public static MetaItem<?>.MetaValueItem FLUID_CORE_T1;
@@ -79,6 +82,5 @@ public final class DrMetaItems {
     public static void MetaItemsInit() {
         MetaItems1 metaItem = new MetaItems1();
         metaItem.setRegistryName("meta_items_mymod");
-
     }
 }

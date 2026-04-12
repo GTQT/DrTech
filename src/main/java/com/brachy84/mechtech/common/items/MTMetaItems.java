@@ -19,7 +19,13 @@ public class MTMetaItems {
     public static MetaItem<?>.MetaValueItem AUTO_FEEDER;
     public static MetaItem<?>.MetaValueItem TESLA_COIL;
     public static MetaItem<?>.MetaValueItem OXYGEN_MASK;
-
+    public static MetaItem<?>.MetaValueItem ANTI_GRAVITY;
+    public static MetaItem<?>.MetaValueItem SPRINT_MODULE;
+    public static MetaItem<?>.MetaValueItem ENERGY_SHIELD;
+    public static MetaItem<?>.MetaValueItem HEALING_MODULE;
+    public static MetaItem<?>.MetaValueItem APIARIST_SHIELD;
+    public static MetaItem<?>.MetaValueItem REVEALING_GOGGLES;
+    public static MetaItem<?>.MetaValueItem VIS_OPTIMIZER;
     // Armor
     public static ArmorMetaItem<?>.ArmorMetaValueItem MODULAR_HELMET;
     public static ArmorMetaItem<?>.ArmorMetaValueItem MODULAR_CHESTPLATE;

@@ -16,10 +16,12 @@ import javax.annotation.Nullable;
 public class CropOutputCategory implements IRecipeCategory<CropOutputRecipeWrapper> {
 
     private final IDrawable background;
+    private final IDrawable backgroundTall; // 方块产出用的加高版
     private final IDrawable icon;
 
     public CropOutputCategory(IGuiHelper guiHelper) {
-        this.background = guiHelper.createBlankDrawable(150, 65);
+        this.background = guiHelper.createBlankDrawable(160, 65);
+        this.backgroundTall = guiHelper.createBlankDrawable(160, 120);
         this.icon = guiHelper.createDrawableIngredient(ItemCropSeed.createSeedBag("wheat"));
     }
 
@@ -32,24 +34,27 @@ public class CropOutputCategory implements IRecipeCategory<CropOutputRecipeWrapp
     @Override
     public String getModName() { return "DRTech"; }
 
-    @Override
-    public IDrawable getBackground() { return background; }
 
     @Nullable
     @Override
     public IDrawable getIcon() { return icon; }
 
     @Override
+    public IDrawable getBackground() { return backgroundTall; }
+
+    @Override
     public void setRecipe(IRecipeLayout layout, CropOutputRecipeWrapper recipe, IIngredients ingredients) {
         IGuiItemStackGroup stacks = layout.getItemStacks();
 
-        // 左侧: 种子袋 (slot 0)
+        // 左侧: 种子袋
         stacks.init(0, true, 7, 24);
         stacks.set(0, recipe.getInput());
 
-        // 右侧: 产出物品 (slot 1~4, 最多4种)
-        for (int i = 0; i < Math.min(recipe.getAllOutputs().size(), 4); i++) {
-            stacks.init(1 + i, false, 85 + i * 18, 24);
+        // 右侧: 产出物品(最多8种)
+        for (int i = 0; i < Math.min(recipe.getAllOutputs().size(), 8); i++) {
+            int row = i / 4;
+            int col = i % 4;
+            stacks.init(1 + i, false, 85 + col * 18, 24 + row * 18);
             stacks.set(1 + i, recipe.getAllOutputs().get(i));
         }
     }
@@ -58,5 +63,6 @@ public class CropOutputCategory implements IRecipeCategory<CropOutputRecipeWrapp
     public void drawExtras(Minecraft minecraft) {
         minecraft.fontRenderer.drawString("\u2192", 38, 28, 0x808080);
     }
+
 }
 

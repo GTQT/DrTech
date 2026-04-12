@@ -353,8 +353,12 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.INULIN = this.addItem(63, "inulin").setMaxStackSize(64);
         DrMetaItems.NATURAL_RUBBER = this.addItem(64, "natural_rubber").setMaxStackSize(64);
 
+        DrMetaItems.RAPESEED_FLOWER = this.addItem(70, "rapeseed_flower");
+        DrMetaItems.SNAPDRAGON = this.addItem(71, "snapdragon");
+        DrMetaItems.LUCKY_CLOVER = this.addItem(72, "lucky_clover");
 
         /* --------------------------------------------------------------------- Fluid Cores ---------------------------------------------------------------------- */
+
 
         DrMetaItems.FLUID_CORE_T1 = this.addItem(100, "fluid_core.t1");
         DrMetaItems.FLUID_CORE_T2 = this.addItem(101, "fluid_core.t2");

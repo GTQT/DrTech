@@ -40,7 +40,13 @@ public class Modules {
     public static final IModule TESLA_COIL = new TeslaCoil();
     public static final IModule OXYGEN_MASK = new OxygenMask();
     public static final IModule RECEIVER_MODULE = new ReceiverModule();
-
+    public static final IModule ANTI_GRAVITY   = new AntiGravity();
+    public static final IModule SPRINT_MODULE  = new SprintModule();
+    public static final IModule ENERGY_SHIELD  = new EnergyShield();
+    public static final IModule HEALING_MODULE = new HealingModule();
+    public static final IModule APIARIST_SHIELD  = new ApiaristShield();
+    public static final IModule REVEALING_GOGGLES = new RevealingGoggles();
+    public static final IModule VIS_OPTIMIZER     = new VisOptimizer();
     static {
         registerModule(0, NIGHT_VISION);
         registerModule(1, SOLAR_GEN_I);
@@ -55,7 +61,13 @@ public class Modules {
         registerModule(10, TESLA_COIL);
         registerModule(11, OXYGEN_MASK);
         registerModule(12, RECEIVER_MODULE);
-
+        registerModule(13, ANTI_GRAVITY);
+        registerModule(14, SPRINT_MODULE);
+        registerModule(15, ENERGY_SHIELD);
+        registerModule(16, HEALING_MODULE);
+        registerModule(17, APIARIST_SHIELD);
+        registerModule(18, REVEALING_GOGGLES);
+        registerModule(19, VIS_OPTIMIZER);
         materialArmorBuilder(1000, Materials.Aluminium)
                 .armor(3.4)
                 .registerModule();

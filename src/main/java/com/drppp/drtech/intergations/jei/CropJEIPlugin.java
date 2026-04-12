@@ -32,12 +32,16 @@ public class CropJEIPlugin implements IModPlugin {
     @Override
     public void register(IModRegistry registry) {
         // === 种子产出配方 ===
+// === 种子产出配方 ===
         List<CropOutputRecipeWrapper> outputRecipes = new ArrayList<>();
         for (Map.Entry<String, CropType> entry : CropRegistry.getAll().entrySet()) {
             CropType type = entry.getValue();
             if (type.getId().equals("weed")) continue;
-            // 有固定掉落/概率掉落/战利品表 的都显示
-            if (type.getDrops().isEmpty() && type.getChanceDrops().isEmpty() && type.getLootTable() == null) continue;
+            // 有任何一种掉落方式就显示
+            if (type.getDrops().isEmpty()
+                    && type.getChanceDrops().isEmpty()
+                    && type.getLootTable() == null
+                    && type.getBlockDrops().isEmpty()) continue;
             outputRecipes.add(new CropOutputRecipeWrapper(type));
         }
         registry.addRecipes(outputRecipes, CROP_OUTPUT_UID);

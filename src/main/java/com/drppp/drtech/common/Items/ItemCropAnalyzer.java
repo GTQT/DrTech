@@ -1,5 +1,6 @@
 package com.drppp.drtech.common.Items;
 
+import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileCropStick;
 import com.drppp.drtech.common.Blocks.Crops.CropType;
@@ -25,7 +26,7 @@ public class ItemCropAnalyzer extends Item {
         setTranslationKey(Tags.MODID + ".crop_analyzer");
         setRegistryName(Tags.MODID, "crop_analyzer");
         setMaxStackSize(1);
-        setCreativeTab(CreativeTabs.TOOLS);
+        setCreativeTab(DrTechMain.DrTechTab);
     }
 
     @Override

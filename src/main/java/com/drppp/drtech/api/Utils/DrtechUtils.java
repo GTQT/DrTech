@@ -13,6 +13,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -69,6 +70,34 @@ public class DrtechUtils {
             e.printStackTrace();
             return null; // 反射失败
         }
+    }
+    public static void addAspectsToItemStack(ItemStack stack, String aspectKey, int amount) {
+        if (stack.isEmpty()) return;
+
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+        }
+
+        // 获取或创建 Aspects 列表
+        NBTTagList aspectsList;
+        if (tag.hasKey("Aspects", 9)) { // 9 = NBTTagList 的 ID
+            aspectsList = tag.getTagList("Aspects", 10); // 10 = NBTTagCompound 的 ID
+        } else {
+            aspectsList = new NBTTagList();
+        }
+
+        // 创建单个 Aspect 的 Compound
+        NBTTagCompound aspectCompound = new NBTTagCompound();
+        aspectCompound.setString("key", aspectKey);
+        aspectCompound.setInteger("amount", amount);
+
+        // 添加到列表
+        aspectsList.appendTag(aspectCompound);
+
+        // 写回根标签
+        tag.setTag("Aspects", aspectsList);
+        stack.setTagCompound(tag);
     }
     public static void addLogCreate(int EUt, int tick, int outNum, int meta)
     {

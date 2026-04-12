@@ -61,44 +61,10 @@ public class SingleItemStackHandler extends ItemStackHandler {
     }
     private Capability getCapMapInt(int i)
     {
-        switch (i)
-        {
-            case 0:
-                return DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD;
-            case 1:
-                return DrtechCommonCapabilities.CAPABILITY_HEAT_VENT;
-            case 2:
-                return DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER;
-            case 3:
-                return DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR;
-            case 4:
-                return DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL;
-        }
         return  null;
     }
     private int getIntMapCap(Capability i)
     {
-        if(i==null)
-            return -1;
-        if (i.equals(DrtechCommonCapabilities.CAPABILITY_FUEL_ROAD))
-        {
-            return 0;
-        }else if (i.equals(DrtechCommonCapabilities.CAPABILITY_HEAT_VENT))
-        {
-            return 1;
-        }
-        else if (i.equals(DrtechCommonCapabilities.CAPABILITY_HEAT_EXCHANGER))
-        {
-            return 2;
-        }
-        else if (i.equals(DrtechCommonCapabilities.CAPABILITY_NEUTRON_REFLECTOR))
-        {
-            return 3;
-        }
-        else if (i.equals(DrtechCommonCapabilities.CAPABILITY_COOLANT_CELL))
-        {
-            return 4;
-        }
         return   -1;
     }
 }

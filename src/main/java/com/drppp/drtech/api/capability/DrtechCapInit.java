@@ -1,17 +1,9 @@
 package com.drppp.drtech.api.capability;
 
-import com.drppp.drtech.api.capability.impl.HeatEnergyHandler;
-import com.drppp.drtech.api.capability.impl.HeatEnergyStore;
-import com.drppp.drtech.api.capability.impl.RotationEnergyHandler;
-import com.drppp.drtech.api.capability.impl.RotationEnergyStore;
-import gregtech.api.capability.SimpleCapabilityManager;
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-
-import java.util.concurrent.Callable;
 
 public class DrtechCapInit {
     public static <T> void registerCapabilityWithNoDefault(Class<T> capabilityClass) {
@@ -30,13 +22,6 @@ public class DrtechCapInit {
     }
     public static void init()
     {
-        registerCapabilityWithNoDefault(IFuelRodData.class);
-        registerCapabilityWithNoDefault(IHeatVent.class);
-        registerCapabilityWithNoDefault(INeutronReflector.class);
-        registerCapabilityWithNoDefault(IHeatExchanger.class);
-        registerCapabilityWithNoDefault(ICoolantCell.class);
-        registerCapabilityWithNoDefault(INuclearDataShow.class);
-        CapabilityManager.INSTANCE.register(IRotationEnergy.class,new RotationEnergyStore(), RotationEnergyHandler::new);
-        CapabilityManager.INSTANCE.register(IHeatEnergy.class,new HeatEnergyStore(), HeatEnergyHandler::new);
+
     }
 }

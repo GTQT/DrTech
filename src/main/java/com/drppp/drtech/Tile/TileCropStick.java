@@ -56,8 +56,8 @@ public class TileCropStick extends TileEntity implements ITickable {
 
         float light = EnvironmentCalculator.calcLight(world, pos);
         float humidity = EnvironmentCalculator.calcHumidity(world, pos);
-        String blockBelow = EnvironmentCalculator.getBlockBelowId(world, pos);
-        if (!type.canGrowAt(light * 15, humidity, blockBelow)) return;
+        List<String> blocksBelowIds = EnvironmentCalculator.getBlocksBelowIds(world, pos);
+        if (!type.canGrowAt(light * 15, humidity, blocksBelowIds)) return;
 
         float envScore = EnvironmentCalculator.calcEnvironmentScore(world, pos);
         int baseIncr = stats.rollGrowthIncrement(world.rand);
@@ -230,18 +230,20 @@ public class TileCropStick extends TileEntity implements ITickable {
 
         List<ItemStack> drops = new ArrayList<>();
 
-        // 固定掉落 + 概率掉落
-        drops.addAll(type.rollDrops(world.rand, stats.getYieldBonus(world.rand)));
+        // 获取下方方块ID列表
+        List<String> blocksBelowIds = EnvironmentCalculator.getBlocksBelowIds(world, pos);
 
-        // 战利品表掉落
+        // 固定+概率掉落(根据方块决定)
+        drops.addAll(type.rollDrops(world.rand, stats.getYieldBonus(world.rand), blocksBelowIds));
+
+        // 战利品表掉落(不受方块影响)
         if (type.getLootTable() != null && !type.getLootTable().isEmpty()) {
             if (world instanceof WorldServer) {
                 WorldServer ws = (WorldServer) world;
                 LootTable table = ws.getLootTableManager().getLootTableFromLocation(
                         new ResourceLocation(type.getLootTable()));
                 LootContext.Builder ctxBuilder = new LootContext.Builder(ws);
-                List<ItemStack> loot = table.generateLootForPools(world.rand, ctxBuilder.build());
-                drops.addAll(loot);
+                drops.addAll(table.generateLootForPools(world.rand, ctxBuilder.build()));
             }
         }
 

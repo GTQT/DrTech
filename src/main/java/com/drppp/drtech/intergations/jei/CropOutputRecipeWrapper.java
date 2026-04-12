@@ -12,11 +12,14 @@ import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 public class CropOutputRecipeWrapper implements IRecipeWrapper {
 
     private final CropType cropType;
     private final ItemStack input;
     private final List<ItemStack> allOutputs;
+    private final boolean hasBlockDrops;
 
     public CropOutputRecipeWrapper(CropType cropType) {
         this.cropType = cropType;
@@ -24,9 +27,30 @@ public class CropOutputRecipeWrapper implements IRecipeWrapper {
         this.allOutputs = new ArrayList<>();
         // 固定掉落
         allOutputs.addAll(cropType.getDrops());
-        // 概率掉落(也显示, 在drawInfo中标注概率)
+        // 概率掉落
         for (CropType.ChanceDrop cd : cropType.getChanceDrops()) {
             allOutputs.add(cd.item.copy());
+        }
+        // 方块特定掉落(全部收集进来展示)
+        this.hasBlockDrops = !cropType.getBlockDrops().isEmpty();
+        for (List<ItemStack> blockItems : cropType.getBlockDrops().values()) {
+            for (ItemStack item : blockItems) {
+                // 避免重复添加已有的物品
+                boolean dup = false;
+                for (ItemStack existing : allOutputs) {
+                    if (ItemStack.areItemsEqual(existing, item)) { dup = true; break; }
+                }
+                if (!dup) allOutputs.add(item.copy());
+            }
+        }
+        for (List<CropType.ChanceDrop> cds : cropType.getBlockChanceDrops().values()) {
+            for (CropType.ChanceDrop cd : cds) {
+                boolean dup = false;
+                for (ItemStack existing : allOutputs) {
+                    if (ItemStack.areItemsEqual(existing, cd.item)) { dup = true; break; }
+                }
+                if (!dup) allOutputs.add(cd.item.copy());
+            }
         }
     }
 
@@ -60,11 +84,35 @@ public class CropOutputRecipeWrapper implements IRecipeWrapper {
             mc.fontRenderer.drawString(TextFormatting.LIGHT_PURPLE + "\u2622 战利品表", 50, 52, 0x8844AA);
         }
 
-        // 特殊需求
-        int infoX = 90;
-        if (cropType.getRequiredBlocks() != null && cropType.getRequiredBlocks().length > 0) {
+        // 方块决定产出: 列出每个方块→产物
+        if (hasBlockDrops) {
+            int lineY = 14;
+            mc.fontRenderer.drawString(TextFormatting.GOLD + "\u25C6 底下方块决定产出:", 4, lineY, 0xAA8800);
+            lineY += 10;
+            for (Map.Entry<String, List<ItemStack>> entry : cropType.getBlockDrops().entrySet()) {
+                String blockId = entry.getKey();
+                // 简化显示: 去掉modid前缀中的"minecraft:"和"gregtech:"
+                String shortName = blockId;
+                if (shortName.contains(":")) {
+                    String[] parts = shortName.split(":");
+                    if (parts.length >= 2) {
+                        shortName = parts[1];
+                        if (parts.length >= 3) shortName += ":" + parts[2];
+                    }
+                }
+                // 产物名
+                StringBuilder dropNames = new StringBuilder();
+                for (ItemStack drop : entry.getValue()) {
+                    if (dropNames.length() > 0) dropNames.append("+");
+                    dropNames.append(drop.getDisplayName());
+                }
+                String line = TextFormatting.GRAY + shortName + TextFormatting.WHITE + " \u2192 " + TextFormatting.GREEN + dropNames;
+                mc.fontRenderer.drawString(line, 6, lineY, 0xFFFFFF);
+                lineY += 9;
+            }
+        } else if (cropType.getRequiredBlocks() != null && cropType.getRequiredBlocks().length > 0) {
             String blk = cropType.getRequiredBlocks()[0].replace("minecraft:", "");
-            mc.fontRenderer.drawString(TextFormatting.RED + blk, infoX, 52, 0xAA4444);
+            mc.fontRenderer.drawString(TextFormatting.RED + "\u2623 " + blk, 50, 52, 0xAA4444);
         }
     }
 }
