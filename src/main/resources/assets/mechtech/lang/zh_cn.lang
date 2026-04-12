@@ -84,6 +84,26 @@ mechtech.healing_module.tooltip.1=穿戴时给予生命恢复效果
 mechtech.healing_module.tooltip.2=消耗: %d EU / 秒
 mechtech.healing_module.tooltip.3=在不同装甲部位叠加可提升等级
 item.metaitem.healing_module.name=治愈模块
+# --- 防蜂单元 ---
+mechtech.modules.apiarist_shield.name=防蜂单元
+mechtech.apiarist_shield.tooltip.1=防护蜜蜂效果（林业）
+mechtech.apiarist_shield.tooltip.disabled=§7需要安装林业模组§r
+metaitem.apiarist_shield.name=防蜂单元
+
+# --- 揭示护目镜 ---
+mechtech.modules.revealing_goggles.name=揭示护目镜
+mechtech.revealing_goggles.mode=揭示: %s
+mechtech.revealing_goggles.tooltip.1=获得揭示之护目镜效果（神秘时代）
+mechtech.revealing_goggles.tooltip.2=消耗: %d EU/t
+mechtech.revealing_goggles.tooltip.disabled=§7需要安装神秘时代§r
+metaitem.revealing_goggles.name=揭示护目镜
+
+# --- 魔力优化单元 ---
+mechtech.modules.vis_optimizer.name=魔力优化单元
+mechtech.vis_optimizer.tooltip.1=减少 %d%% 的灵气(vis)消耗
+mechtech.vis_optimizer.tooltip.2=在多个装甲部位叠加可提高折扣
+mechtech.vis_optimizer.tooltip.disabled=§7需要安装神秘时代§r
+metaitem.vis_optimizer.name=魔力优化单元
 
 mechtech.modules.armor_plating.tooltip.1=§r耐久度：§a%d/%d
 mechtech.modules.armor_plating.tooltip.2=§r护甲值：§a%d

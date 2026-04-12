@@ -41,6 +41,7 @@ dependencies {
 
     compileOnly rfg.deobf("curse.maven:galacticraft-564236:6364107")
     compileOnlyApi rfg.deobf("curse.maven:baubles-227083:2518667")
+    compileOnlyApi rfg.deobf("curse.maven:thaumcraft-223628:2629023")
 
     implementation rfg.deobf("curse.maven:BdLib-70496:4675629")
     implementation rfg.deobf("curse.maven:forestry-59751:2684780")

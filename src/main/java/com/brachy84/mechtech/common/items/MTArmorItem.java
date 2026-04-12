@@ -3,6 +3,9 @@ package com.brachy84.mechtech.common.items;
 import com.brachy84.mechtech.api.armor.IModule;
 import com.brachy84.mechtech.api.armor.ModularArmor;
 import com.brachy84.mechtech.api.armor.ModularArmorStats;
+import com.brachy84.mechtech.api.armor.modules.ApiaristShield;
+import com.brachy84.mechtech.api.armor.modules.RevealingGoggles;
+import com.brachy84.mechtech.api.armor.modules.VisOptimizer;
 import com.brachy84.mechtech.common.MTConfig;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
@@ -10,6 +13,8 @@ import gregtech.api.items.armor.ArmorMetaItem;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -17,6 +22,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fml.common.Optional;
 import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nonnull;
@@ -27,7 +33,67 @@ import java.util.List;
 
 import static com.brachy84.mechtech.common.items.MTMetaItems.*;
 
-public class MTArmorItem extends ArmorMetaItem<ArmorMetaItem<?>.ArmorMetaValueItem> {
+@Optional.InterfaceList({
+        @Optional.Interface(iface = "forestry.api.apiculture.IArmorApiarist", modid = "forestry"),
+        @Optional.Interface(iface = "thaumcraft.api.items.IGoggles", modid = "thaumcraft"),
+        @Optional.Interface(iface = "thaumcraft.api.items.IVisDiscountGear", modid = "thaumcraft")
+})
+public class MTArmorItem extends ArmorMetaItem<ArmorMetaItem<?>.ArmorMetaValueItem>
+        implements forestry.api.apiculture.IArmorApiarist,
+                   thaumcraft.api.items.IGoggles,
+                   thaumcraft.api.items.IVisDiscountGear {
+
+    // ================================================================
+    // Forestry: IArmorApiarist
+    // ================================================================
+
+    @Override
+    @Optional.Method(modid = "forestry")
+    public boolean protectEntity(EntityLivingBase entity, ItemStack armor, String cause, boolean doProtect) {
+        // Forestry calls this PER armor slot. The ApiaristShield module is only in the chestplate,
+        // but Forestry requires ALL 4 slots to return true for full protection.
+        // Solution: when ANY modular armor piece is checked, scan ALL worn modular armor
+        // for the ApiaristShield module. If found anywhere, every piece reports protected.
+        if (entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) entity;
+            for (int i = 0; i < 4; i++) {
+                ItemStack armorPiece = player.inventory.armorInventory.get(i);
+                if (armorPiece.isEmpty()) continue;
+                Collection<IModule> modules = ModularArmor.getModulesOf(armorPiece);
+                for (IModule module : modules) {
+                    if (module instanceof ApiaristShield) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    // ================================================================
+    // Thaumcraft 6: IGoggles
+    // ================================================================
+
+    @Override
+    @Optional.Method(modid = "thaumcraft")
+    public boolean showIngamePopups(ItemStack stack, EntityLivingBase player) {
+        return RevealingGoggles.isActive(stack);
+    }
+
+    // ================================================================
+    // Thaumcraft 6: IVisDiscountGear
+    // 签名: int getVisDiscount(ItemStack, EntityPlayer)  ← 无 slot 参数
+    // ================================================================
+
+    @Override
+    @Optional.Method(modid = "thaumcraft")
+    public int getVisDiscount(ItemStack stack, EntityPlayer player) {
+        return VisOptimizer.getDiscount(stack);
+    }
+
+    // ================================================================
+    // 以下为原有代码，不变
+    // ================================================================
 
     @Override
     public void registerSubItems() {

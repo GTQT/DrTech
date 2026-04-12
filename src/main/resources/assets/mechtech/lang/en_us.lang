@@ -86,6 +86,27 @@ mechtech.healing_module.tooltip.2=Cost: %d EU per second
 mechtech.healing_module.tooltip.3=Stack across armor pieces for higher levels
 item.metaitem.healing_module.name=Healing Module
 
+# --- Apiarist Shield ---
+mechtech.modules.apiarist_shield.name=Apiarist Shield
+mechtech.apiarist_shield.tooltip.1=Protects against bee effects (Forestry)
+mechtech.apiarist_shield.tooltip.disabled=§7Requires Forestry§r
+metaitem.apiarist_shield.name=Apiarist Shield
+
+# --- Revealing Goggles ---
+mechtech.modules.revealing_goggles.name=Revealing Goggles
+mechtech.revealing_goggles.mode=Revealing: %s
+mechtech.revealing_goggles.tooltip.1=Grants Goggles of Revealing effect (Thaumcraft)
+mechtech.revealing_goggles.tooltip.2=Cost: %d EU/t
+mechtech.revealing_goggles.tooltip.disabled=§7Requires Thaumcraft§r
+metaitem.revealing_goggles.name=Revealing Goggles
+
+# --- Vis Optimizer ---
+mechtech.modules.vis_optimizer.name=Vis Optimizer
+mechtech.vis_optimizer.tooltip.1=Reduces vis cost by %d%%
+mechtech.vis_optimizer.tooltip.2=Stack across armor pieces for higher discount
+mechtech.vis_optimizer.tooltip.disabled=§7Requires Thaumcraft§r
+metaitem.vis_optimizer.name=Vis Optimizer
+
 mechtech.modules.armor_plating.tooltip.1=§rDurability: §a%d/%d
 mechtech.modules.armor_plating.tooltip.2=§rArmor: §a%d
 mechtech.modules.armor_plating.tooltip.3=§rToughness: §a%d
