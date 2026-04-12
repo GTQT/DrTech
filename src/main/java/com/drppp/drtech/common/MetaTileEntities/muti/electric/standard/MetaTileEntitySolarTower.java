@@ -1,26 +1,24 @@
 package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
-import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.loaders.recipes.DrtechReceipes;
-import gregtech.api.capability.impl.MultiblockRecipeLogic;
+import gregtech.api.capability.impl.NoEnergyMultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
+import gregtech.api.metatileentity.multiblock.NoEnergyMultiblockController;
+import gregtech.api.metatileentity.multiblock.ui.KeyManager;
+import gregtech.api.metatileentity.multiblock.ui.UISyncer;
 import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.recipes.Recipe;
 import gregtech.api.util.GTTransferUtils;
+import gregtech.api.util.KeyUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -28,8 +26,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -41,21 +37,18 @@ import java.util.List;
 
 import static gregtech.api.util.RelativeDirection.*;
 
-public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
+public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
     public static int max_heat = 100000;
     public int heat = 0;
     public int tick = 0;
     public int eff = 1;
-    private int tire = 0;
+    private int reflectAmount = 0;
 
     public MetaTileEntitySolarTower(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, DrtechReceipes.SOLAR_TOWER);
         this.recipeMapWorkable = new SolarTowerRecipeLogic(this);
     }
-    @Override
-    public boolean usesMui2() {
-        return false;
-    }
+
     @Override
     protected @NotNull BlockPattern createStructurePattern() {
         return FactoryBlockPattern.start(RIGHT, FRONT, UP)
@@ -117,17 +110,15 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
     }
 
     private void getTire(BlockPos pos) {
-        int[][] block = new int[31][31];
+        int count = 0;
         for (int i = pos.getX() - 15, ii = 0; i <= pos.getX() + 15; i++, ii++) {
             for (int j = pos.getZ() - 15, jj = 0; j <= pos.getZ() + 15; j++, jj++) {
                 IBlockState state = getWorld().getBlockState(new BlockPos(i, pos.getY(), j));
                 if (state == BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_REFLECTION_CASING))
-                    block[ii][jj] = 1;
-                else
-                    block[ii][jj] = 0;
+                    count++;
             }
         }
-        this.tire = DrtechUtils.getSolarTire(block);
+        this.reflectAmount = count;
     }
 
     @Override
@@ -147,63 +138,27 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
     }
 
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        super.addDisplayText(textList);
-        textList.add(new TextComponentTranslation("drtech.machine.solarpower.tire", this.tire));
-        textList.add(new TextComponentTranslation("drtech.machine.solarpower.eff", this.eff));
-        textList.add(new TextComponentTranslation("drtech.machine.solarpower.heat", this.heat));
-    }
-
-    private int getBuff() {
-        switch (this.tire) {
-            case 0:
-                return 0;
-            case 1:
-                return 1;
-            case 2:
-                return 2;
-            case 3:
-                return 4;
-            case 4:
-                return 8;
-            case 5:
-                return 16;
-            default:
-                return 0;
+    public void addCustomCapacity(KeyManager keyManager, UISyncer syncer) {
+        if (isStructureFormed()) {
+            keyManager.add(KeyUtil.lang("drtech.machine.solarpower.tire", syncer.syncInt(reflectAmount)));
+            keyManager.add(KeyUtil.lang("drtech.machine.solarpower.eff", syncer.syncInt(eff)));
+            keyManager.add(KeyUtil.lang("drtech.machine.solarpower.heat", syncer.syncInt(heat)));
         }
     }
 
-    private int getReflectConut() {
-        switch (this.tire) {
-            case 0:
-                return 0;
-            case 1:
-                return 36;
-            case 2:
-                return 88;
-            case 3:
-                return 156;
-            case 4:
-                return 240;
-            case 5:
-                return 340;
-            default:
-                return 0;
-        }
+    private int getReflectCount() {
+        return reflectAmount;
     }
 
     public boolean isDaytime(World world) {
         long timeOfDay = world.getWorldTime() % 24000;
-        // 白天时间从0到12000刻
         return timeOfDay < 12000;
     }
 
-    
 
+    protected class SolarTowerRecipeLogic extends NoEnergyMultiblockRecipeLogic {
 
-    protected class SolarTowerRecipeLogic extends MultiblockRecipeLogic {
-
-        public SolarTowerRecipeLogic(RecipeMapMultiblockController tileEntity) {
+        public SolarTowerRecipeLogic(NoEnergyMultiblockController tileEntity) {
             super(tileEntity);
         }
 
@@ -216,7 +171,7 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
                 eff = Math.min(eff, 100);
                 if (isDaytime(getWorld())) {
                     double x = (7000 - Math.pow(Math.abs(heat - 5000), 0.8)) / 7000;
-                    double h = getReflectConut() * x * (10 + Math.pow(2, tire - 1));
+                    double h = getReflectCount() * x * (10 + Math.pow(2, reflectAmount - 1));
                     heat += (int) h;
                     heat = Math.min(heat, max_heat);
                 } else {
@@ -228,19 +183,30 @@ public class MetaTileEntitySolarTower extends RecipeMapMultiblockController {
         }
 
         @Override
+        public boolean checkRecipe(@NotNull Recipe recipe) {
+            if (eff != 100) {
+                setWhyFailed("效率未达到100%");
+                return false;
+            }
+            if (heat < 30000) {
+                setWhyFailed("热能不足30000");
+                return false;
+            }
+            return true;
+        }
+
+        @Override
         protected void outputRecipeOutputs() {
             this.fluidOutputs.clear();
             List<FluidStack> fluidOutput = new ArrayList<>();
-            if (eff == 100 && heat >= 30000) {
-                for (int i = 0; i < this.getInputTank().getTanks(); i++) {
-                    if (isFluidSalt(this.getInputTank().getTankAt(i).getFluid().getFluid())) {
-                        int amount = Math.min(this.getInputTank().getTankAt(i).getFluidAmount(), heat);
-                        this.getInputTank().getTankAt(i).drain(amount, true);
-                        fluidOutput.add(new FluidStack(DrtechMaterials.HotSunSalt.getFluid(), amount));
-                    }
+            for (int i = 0; i < this.getInputTank().getTanks(); i++) {
+                if (isFluidSalt(this.getInputTank().getTankAt(i).getFluid().getFluid())) {
+                    int amount = Math.min(this.getInputTank().getTankAt(i).getFluidAmount(), heat);
+                    this.getInputTank().getTankAt(i).drain(amount, true);
+                    fluidOutput.add(new FluidStack(DrtechMaterials.HotSunSalt.getFluid(), amount));
                 }
-                GTTransferUtils.addFluidsToFluidHandler(this.getOutputTank(), false, fluidOutput);
             }
+            GTTransferUtils.addFluidsToFluidHandler(this.getOutputTank(), false, fluidOutput);
         }
 
         public boolean isFluidSalt(Fluid fluid) {

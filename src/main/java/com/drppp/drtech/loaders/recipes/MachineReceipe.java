@@ -200,12 +200,13 @@ public class MachineReceipe {
                 .EUt(16)
                 .duration(300)
                 .buildAndRegister();
+
         SOLAR_TOWER.recipeBuilder()
                 .fluidInputs(DrtechMaterials.ColdSunSalt.getFluid(1000))
                 .fluidOutputs(DrtechMaterials.HotSunSalt.getFluid(1000))
-                .EUt(1)
                 .duration(200)
                 .buildAndRegister();
+
         ASSEMBLER_RECIPES.recipeBuilder()
                 .input(MetaItems.ELECTRIC_PUMP_LV)
                 .inputs(MetaItems.FLUID_CELL_LARGE_ALUMINIUM.getStackForm(2))

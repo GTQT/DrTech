@@ -406,7 +406,7 @@ drtech.machine.solarpower.tip.2=Converting solar salts (cold) to solar salts (ho
 drtech.machine.solarpower.tip.3=If the amount of solar salts (cold) exceeds heat, the heat will drop to 0; efficiency is highest when close to half the maximum heat
 drtech.machine.solarpower.tip.4=Heat efficiency is lowest when heat is 0 or 100000; highest when heat is 50000
 drtech.machine.solarpower.tip.5=Heat efficiency formula: (7000 - |Current Heat - 50000|^0.8) / 7000. Heat gained each cycle: Number of Reflectors * Heat Efficiency * (10 + Gain)
-drtech.machine.solarpower.tip.6=Gain: 1 ring=1, 2 rings=2, 3 rings=4, 4 rings=8, 5 rings=16
+drtech.machine.solarpower.tip.6=反射器检索范围：多方块底座层30*30半径
 fuelrod.date.tip1=§cCurrent Durability: %s
 fuelrod.date.tip2=Maximum Durability: %s
 fuelrod.date.tip3=Temperature Influence: %s

@@ -5,6 +5,7 @@ import com.drppp.drtech.api.recipes.builder.DronePadRecipeBuilder;
 import gregtech.api.mui.GTGuiTextures;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.recipes.RecipeMapBuilder;
+import gregtech.api.recipes.builders.PrimitiveRecipeBuilder;
 import gregtech.api.recipes.builders.SimpleRecipeBuilder;
 import gregtech.core.sound.GTSoundEvents;
 
@@ -19,8 +20,8 @@ public final class DrtechReceipes {
             .sound(GTSoundEvents.CHEMICAL_REACTOR)
             .build();
 
-    public static final RecipeMap<SimpleRecipeBuilder> SOLAR_TOWER = new RecipeMapBuilder<>("solar_tower",
-            new SimpleRecipeBuilder())
+    public static final RecipeMap<PrimitiveRecipeBuilder> SOLAR_TOWER = new RecipeMapBuilder<>("solar_tower",
+            new PrimitiveRecipeBuilder())
             .itemInputs(0)
             .itemOutputs(0)
             .fluidInputs(1)
