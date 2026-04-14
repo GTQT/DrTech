@@ -11,8 +11,6 @@ import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import com.drppp.drtech.api.vein.VeinChunkEventHandler;
-import com.drppp.drtech.api.vein.VeinSystemInit;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.api.crop.CropInitHandler;
 import com.drppp.drtech.common.CommonProxy;
@@ -88,7 +86,7 @@ public class DrTechMain {
         DrTechMetaTileEntities.initialization();
         CropInitHandler.preInit();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
-        VeinSystemInit.init();
+
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
