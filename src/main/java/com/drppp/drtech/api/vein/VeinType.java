@@ -1,8 +1,6 @@
 package com.drppp.drtech.api.vein;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 矿脉类型：定义名称、可选矿物池，以及生成时随机抽取 2~4 种矿物的规则。
@@ -20,7 +18,8 @@ public class VeinType {
 
     /** 矿脉类型唯一标识，全小写，用下划线分隔 */
     public final String id;
-
+    //维度
+    private final Set<Integer> allowedDimensions = new HashSet<>();
     /** 矿物候选池（不可变，build 后锁定） */
     private final List<OreEntry> orePool = new ArrayList<>();
 
@@ -46,7 +45,29 @@ public class VeinType {
     public List<OreEntry> getOrePool() {
         return Collections.unmodifiableList(orePool);
     }
+    /**
+     * 添加允许生成的维度 ID。
+     * 不调用此方法 = 所有维度都允许（兼容旧代码）。
+     *
+     * 常用维度 ID：
+     *   0  = 主世界 (Overworld)
+     *  -1  = 下界 (Nether)
+     *   1  = 末地 (The End)
+     *  其他 = 模组自定义维度（通过 DimensionManager 查询）
+     */
+    public VeinType addDimension(int dimensionId) {
+        allowedDimensions.add(dimensionId);
+        return this;
+    }
 
+    public boolean isAllowedInDimension(int dimensionId) {
+        // 白名单为空 = 不限维度
+        return allowedDimensions.isEmpty() || allowedDimensions.contains(dimensionId);
+    }
+
+    public Set<Integer> getAllowedDimensions() {
+        return Collections.unmodifiableSet(allowedDimensions);
+    }
     public int getMinOreTypes() { return minOreTypes; }
     public int getMaxOreTypes() { return maxOreTypes; }
 }

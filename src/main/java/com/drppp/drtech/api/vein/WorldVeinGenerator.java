@@ -5,6 +5,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 基于世界种子的确定性矿脉生成器。
@@ -47,7 +48,7 @@ public final class WorldVeinGenerator {
      */
     public static void generateForChunk(World world, int chunkX, int chunkZ) {
         if (world.isRemote) return;
-
+        int dimensionId = world.provider.getDimension(); // 1.12.2 获取维度 ID
         Chunk chunk = world.getChunk(chunkX, chunkZ);
         ChunkVeinData data = getVeinData(chunk);
         if (data == null || data.isGenerated()) return;
@@ -60,7 +61,7 @@ public final class WorldVeinGenerator {
         Random denseRng = makeRng(worldSeed, chunkX, chunkZ, 0xDEAD);
         if (denseRng.nextDouble() < DENSE_CHANCE) {
             // 该区块本身标记为密集点（必然生成资源点）
-            trySetVein(world, chunk, worldSeed, chunkX, chunkZ, 1.0);
+            trySetVein(world, chunk, worldSeed, chunkX, chunkZ, 1.0,dimensionId);
 
             // 步骤 2：扩散到周围 8 个区块
             for (int dx = -1; dx <= 1; dx++) {
@@ -71,7 +72,7 @@ public final class WorldVeinGenerator {
                     ChunkVeinData nd = getVeinData(neighbour);
                     if (nd != null && !nd.isGenerated()) {
                         nd.setGenerated(true);
-                        trySetVein(world, neighbour, worldSeed, nx, nz, SPREAD_CHANCE);
+                        trySetVein(world, neighbour, worldSeed, nx, nz, SPREAD_CHANCE,dimensionId);
                     }
                 }
             }
@@ -81,7 +82,7 @@ public final class WorldVeinGenerator {
         if (!data.hasVein()) {
             Random soloRng = makeRng(worldSeed, chunkX, chunkZ, 0xC0DE);
             if (soloRng.nextDouble() < SOLO_CHANCE) {
-                assignVein(data, worldSeed, chunkX, chunkZ);
+                assignVein(data, worldSeed, chunkX, chunkZ,dimensionId);
             }
         }
     }
@@ -92,21 +93,25 @@ public final class WorldVeinGenerator {
      * 以给定概率为区块设置矿脉。
      */
     private static void trySetVein(World world, Chunk chunk,
-                                   long worldSeed, int cx, int cz, double prob) {
+                                   long worldSeed, int cx, int cz, double prob,int dimensionId) {
         ChunkVeinData data = getVeinData(chunk);
         if (data == null || data.hasVein()) return;
 
         Random probRng = makeRng(worldSeed, cx, cz, 0xBEEF);
         if (probRng.nextDouble() < prob) {
-            assignVein(data, worldSeed, cx, cz);
+            assignVein(data, worldSeed, cx, cz,dimensionId);
         }
     }
 
     /**
      * 确定性地为区块分配矿脉类型和矿物列表。
      */
-    private static void assignVein(ChunkVeinData data, long worldSeed, int cx, int cz) {
-        List<VeinType> types = VeinRegistry.getList();
+    private static void assignVein(ChunkVeinData data, long worldSeed, int cx, int cz, int dimensionId) {
+        // 过滤出允许在当前维度生成的类型
+        List<VeinType> types = VeinRegistry.getList().stream()
+                .filter(t -> t.isAllowedInDimension(dimensionId))
+                .collect(Collectors.toList());
+
         if (types.isEmpty()) return;
 
         // 选矿脉类型
