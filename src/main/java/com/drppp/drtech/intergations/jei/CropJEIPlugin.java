@@ -1,9 +1,9 @@
 package com.drppp.drtech.intergations.jei;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Blocks.Crops.CropRegistry;
-import com.drppp.drtech.common.Blocks.Crops.CropType;
-import com.drppp.drtech.common.Blocks.Crops.CrossBreedingRegistry;
+import com.drppp.drtech.api.crop.CropRegistry;
+import com.drppp.drtech.api.crop.CropType;
+import com.drppp.drtech.api.crop.CrossBreedingRegistry;
 import com.drppp.drtech.common.Items.ItemCropSeed;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;

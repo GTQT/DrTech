@@ -1,5 +1,6 @@
-package com.drppp.drtech.common.Blocks.Crops;
+package com.drppp.drtech.api.crop;
 
+import com.drppp.drtech.common.Blocks.Crops.BlockCropStick;
 import com.drppp.drtech.common.event.CropTickHandler;
 import net.minecraftforge.common.MinecraftForge;
 

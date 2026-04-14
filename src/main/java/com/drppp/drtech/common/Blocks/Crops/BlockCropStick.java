@@ -2,6 +2,9 @@ package com.drppp.drtech.common.Blocks.Crops;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileCropStick;
+import com.drppp.drtech.api.crop.CropRegistry;
+import com.drppp.drtech.api.crop.CropStats;
+import com.drppp.drtech.api.crop.CropType;
 import com.drppp.drtech.common.Items.ItemCropSeed;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;

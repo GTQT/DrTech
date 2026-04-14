@@ -2,10 +2,9 @@ package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Blocks.BlocksInit;
-import com.drppp.drtech.common.Blocks.Crops.CropRegistry;
-import com.drppp.drtech.common.Blocks.Crops.CropStats;
-import com.drppp.drtech.common.Blocks.Crops.CropType;
+import com.drppp.drtech.api.crop.CropRegistry;
+import com.drppp.drtech.api.crop.CropStats;
+import com.drppp.drtech.api.crop.CropType;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;

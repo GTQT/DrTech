@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.Blocks.Crops;
+package com.drppp.drtech.api.crop;
 
 public enum CompareMode {
     GREATER,    // 大于等于 (默认)

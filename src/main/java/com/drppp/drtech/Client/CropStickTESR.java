@@ -2,8 +2,8 @@ package com.drppp.drtech.Client;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileCropStick;
-import com.drppp.drtech.common.Blocks.Crops.CropRenderType;
-import com.drppp.drtech.common.Blocks.Crops.CropType;
+import com.drppp.drtech.api.crop.CropRenderType;
+import com.drppp.drtech.api.crop.CropType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;

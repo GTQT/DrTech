@@ -1,7 +1,7 @@
 package com.drppp.drtech.Tile;
 
 
-import com.drppp.drtech.common.Blocks.Crops.*;
+import com.drppp.drtech.api.crop.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;

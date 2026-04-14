@@ -1,7 +1,7 @@
 package com.drppp.drtech.intergations.jei;
 
 
-import com.drppp.drtech.common.Blocks.Crops.CropType;
+import com.drppp.drtech.api.crop.CropType;
 import com.drppp.drtech.common.Items.ItemCropSeed;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;

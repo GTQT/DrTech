@@ -1,8 +1,8 @@
 package com.drppp.drtech.Client;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Blocks.Crops.CropRegistry;
-import com.drppp.drtech.common.Blocks.Crops.CropType;
+import com.drppp.drtech.api.crop.CropRegistry;
+import com.drppp.drtech.api.crop.CropType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.Mod;
