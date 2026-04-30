@@ -1,0 +1,7 @@
+{
+  "parent": "drtech:block/no_cull_tinted_cube_column",
+  "textures": {
+    "side": "blocks/water_still",
+    "end": "blocks/water_still"
+  }
+}

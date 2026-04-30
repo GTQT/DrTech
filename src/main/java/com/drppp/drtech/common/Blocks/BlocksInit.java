@@ -21,6 +21,7 @@ public class BlocksInit {
     public static final BlockConnector BLOCK_CONNECTOR2 = new BlockConnector(2);
     public static final BlockConnector BLOCK_CONNECTOR3 = new BlockConnector(3);
     public static final BlockGoldenSea BLOCK_GOLDEN_SEA = new BlockGoldenSea();
+    public static final BlockBubbleColumn BLOCK_BUBBLE_COLUMN = new BlockBubbleColumn();
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
@@ -42,6 +43,7 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_CONNECTOR3);
         GameRegistry.registerTileEntity(TileEntityConnector.class, new ResourceLocation(Tags.MODID, "connetor"));
         event.getRegistry().register(BLOCK_GOLDEN_SEA);
+        event.getRegistry().register(BLOCK_BUBBLE_COLUMN);
         event.getRegistry().register(BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(BLOCK_STORAGE_PAIL);
         event.getRegistry().register(BLOCK_WASTE_DIRT);

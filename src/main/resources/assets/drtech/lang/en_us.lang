@@ -122,6 +122,7 @@ tile.drtech.connector_1.name=Grade 1 Capacitor
 tile.drtech.connector_2.name=Grade 2 Capacitor
 tile.drtech.connector_3.name=Grade 3 Capacitor
 tile.drtech.golden_sea.name=Cornucopia
+tile.drtech.bubble_column.name=Bubble Column
 tile.drtech.peaceful_table.name=Table of Peace
 tile.drtech.storage_compress.name=Storage Bucket
 tile.drtech.waste_dirt.name=Wasteland Dirt

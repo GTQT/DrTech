@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "drag_down=false,level=0": {
+      "model": "drtech:bubble_column"
+    },
+    "drag_down=true,level=0": {
+      "model": "drtech:bubble_column"
+    }
+  }
+}
