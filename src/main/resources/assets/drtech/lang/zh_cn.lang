@@ -478,4 +478,7 @@ drtech.machine.laser_bending_1048576.max.name=1048576A激光折弯器（§4MAX§
 #Entity
 entity.UTi Golem.name=铀钛合金傀儡
 entity.Advanced Rocket.name=高级火箭
-
+item.drtech.happy_ghast_harness.name=Happy Ghast Harness
+entity.happy_ghast.name=Happy Ghast
+tile.drtech.dried_ghast.name=Dried Ghast
+entity.drtech.ghastling.name=Ghastling

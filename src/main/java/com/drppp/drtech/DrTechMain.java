@@ -20,6 +20,7 @@ import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
+import com.drppp.drtech.common.world.DriedGhastWorldGenerator;
 import com.drppp.drtech.intergations.gtfo.TileCropFarmerMode;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.recipes.CraftingReceipe;
@@ -47,6 +48,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -86,6 +88,7 @@ public class DrTechMain {
         DrTechMetaTileEntities.initialization();
         CropInitHandler.preInit();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
+        GameRegistry.registerWorldGenerator(new DriedGhastWorldGenerator(), 0);
 
     }
 

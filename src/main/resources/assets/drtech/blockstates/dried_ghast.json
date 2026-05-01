@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "normal": { "model": "drtech:dried_ghast_hydration_0" },
+    "facing=north,hydration=0": { "model": "drtech:dried_ghast_hydration_0" },
+    "facing=east,hydration=0": { "model": "drtech:dried_ghast_hydration_0", "y": 90 },
+    "facing=south,hydration=0": { "model": "drtech:dried_ghast_hydration_0", "y": 180 },
+    "facing=west,hydration=0": { "model": "drtech:dried_ghast_hydration_0", "y": 270 },
+    "facing=north,hydration=1": { "model": "drtech:dried_ghast_hydration_1" },
+    "facing=east,hydration=1": { "model": "drtech:dried_ghast_hydration_1", "y": 90 },
+    "facing=south,hydration=1": { "model": "drtech:dried_ghast_hydration_1", "y": 180 },
+    "facing=west,hydration=1": { "model": "drtech:dried_ghast_hydration_1", "y": 270 },
+    "facing=north,hydration=2": { "model": "drtech:dried_ghast_hydration_2" },
+    "facing=east,hydration=2": { "model": "drtech:dried_ghast_hydration_2", "y": 90 },
+    "facing=south,hydration=2": { "model": "drtech:dried_ghast_hydration_2", "y": 180 },
+    "facing=west,hydration=2": { "model": "drtech:dried_ghast_hydration_2", "y": 270 },
+    "facing=north,hydration=3": { "model": "drtech:dried_ghast_hydration_3" },
+    "facing=east,hydration=3": { "model": "drtech:dried_ghast_hydration_3", "y": 90 },
+    "facing=south,hydration=3": { "model": "drtech:dried_ghast_hydration_3", "y": 180 },
+    "facing=west,hydration=3": { "model": "drtech:dried_ghast_hydration_3", "y": 270 }
+  }
+}

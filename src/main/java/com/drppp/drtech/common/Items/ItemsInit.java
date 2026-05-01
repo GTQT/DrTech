@@ -28,6 +28,7 @@ public class ItemsInit {
     public static final Item ITEM_CONNECTOR2 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID, "connector_2");
     public static final Item ITEM_CONNECTOR3 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID, "connector_3");
     public static final Item ITEM_BLOCK_GOLDEN_SEA = new ItemBlock(BlocksInit.BLOCK_GOLDEN_SEA).setRegistryName(Tags.MODID, "golden_sea");
+    public static final Item ITEM_BLOCK_DRIED_GHAST = new ItemBlock(BlocksInit.BLOCK_DRIED_GHAST).setRegistryName(Tags.MODID, "dried_ghast");
     public static final Item ITEM_BLOCK_PEACEFUL_TABLE = new ItemBlock(BlocksInit.BLOCK_PEACEFUL_TABLE).setRegistryName(Tags.MODID, "peaceful_table");
     public static final Item ITEM_BLOCK_STORAGE_PAIL = new ItemBlock(BlocksInit.BLOCK_STORAGE_PAIL).setRegistryName(Tags.MODID, BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_WASTE_DIRT = new ItemBlock(BlocksInit.BLOCK_WASTE_DIRT).setRegistryName(Tags.MODID, BlocksInit.BLOCK_WASTE_DIRT.getRegistryName().getPath());
@@ -39,12 +40,14 @@ public class ItemsInit {
     public static ItemWeedingShears ITEM_WEEDING_SHEARS=new ItemWeedingShears();
     public static ItemXpBerry ITEM_XP_BERRY=new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY=new ItemSoarXpBerry();
+    public static ItemHappyGhastHarness HAPPY_GHAST_HARNESS=new ItemHappyGhastHarness();
     public static void init(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
         event.getRegistry().register(ITEM_CONNECTOR1);
         event.getRegistry().register(ITEM_CONNECTOR2);
         event.getRegistry().register(ITEM_CONNECTOR3);
         event.getRegistry().register(ITEM_BLOCK_GOLDEN_SEA);
+        event.getRegistry().register(ITEM_BLOCK_DRIED_GHAST);
         event.getRegistry().register(ITEM_BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(ITEM_BLOCK_STORAGE_PAIL);
         event.getRegistry().register(ITEM_BLOCK_WASTE_DIRT);
@@ -61,6 +64,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_WEEDING_SHEARS);
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
+        event.getRegistry().register(HAPPY_GHAST_HARNESS);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
     }
 
@@ -77,6 +81,7 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_WEEDING_SHEARS, 0, new ModelResourceLocation(ITEM_WEEDING_SHEARS.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(HAPPY_GHAST_HARNESS, 0, new ModelResourceLocation(HAPPY_GHAST_HARNESS.getRegistryName(), "inventory"));
     }
 
     @SideOnly(Side.CLIENT)

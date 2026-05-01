@@ -7,13 +7,16 @@ import com.drppp.drtech.Client.Particle.ParticleRenderer;
 import com.drppp.drtech.Client.render.BulletRenderer;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
+import com.drppp.drtech.common.Blocks.BlockDriedGhast;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Entity.EntityGunBullet;
 import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
 import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import com.drppp.drtech.common.Items.ItemsInit;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -27,7 +30,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-
 @Mod.EventBusSubscriber(value = Side.CLIENT, modid = Tags.MODID)
 public final class DrTechModelRegister {
     @SubscribeEvent
@@ -40,13 +42,21 @@ public final class DrTechModelRegister {
 
     @SideOnly(Side.CLIENT)
     public static void onModelRegistration() {
-
         ModelResourceLocation model = new ModelResourceLocation(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY.getRegistryName(), "inventory");
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY), 0, model);
-      ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR1), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR1.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR1), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR1.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR2), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR2.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR3), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR3.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GOLDEN_SEA), 0, new ModelResourceLocation(BlocksInit.BLOCK_GOLDEN_SEA.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_DRIED_GHAST), 0, new ModelResourceLocation(BlocksInit.BLOCK_DRIED_GHAST.getRegistryName(), "inventory"));
+        ModelLoader.setCustomStateMapper(BlocksInit.BLOCK_DRIED_GHAST, new StateMapperBase() {
+            @Override
+            protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
+                return new ModelResourceLocation(BlocksInit.BLOCK_DRIED_GHAST.getRegistryName(),
+                        "facing=" + state.getValue(BlockDriedGhast.FACING).getName()
+                                + ",hydration=" + state.getValue(BlockDriedGhast.HYDRATION));
+            }
+        });
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_PEACEFUL_TABLE), 0, new ModelResourceLocation(BlocksInit.BLOCK_PEACEFUL_TABLE.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_STORAGE_PAIL), 0, new ModelResourceLocation(BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_WASTE_DIRT), 0, new ModelResourceLocation(BlocksInit.BLOCK_WASTE_DIRT.getRegistryName(), "inventory"));
@@ -54,7 +64,6 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON), 0, new ModelResourceLocation(BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_TIME_TABLE), 0, new ModelResourceLocation(BlocksInit.BLOCK_TIME_TABLE.getRegistryName(), "inventory"));
         ItemsInit.registerItemModels();
-
     }
 
     @SideOnly(Side.CLIENT)
@@ -68,6 +77,5 @@ public final class DrTechModelRegister {
         RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBullet.class, manager -> (Render<EntityTachyonBullet>) new TachyonRenderer(manager,
                 new ResourceLocation(Tags.MODID, "textures/entity/tachyon.png")));
         RenderingRegistry.registerEntityRenderingHandler(EntityParticleSpray.class, manager -> new InstantParticleRender(manager));
-
     }
 }

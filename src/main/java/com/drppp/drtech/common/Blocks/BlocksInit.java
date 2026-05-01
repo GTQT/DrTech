@@ -22,6 +22,7 @@ public class BlocksInit {
     public static final BlockConnector BLOCK_CONNECTOR3 = new BlockConnector(3);
     public static final BlockGoldenSea BLOCK_GOLDEN_SEA = new BlockGoldenSea();
     public static final BlockBubbleColumn BLOCK_BUBBLE_COLUMN = new BlockBubbleColumn();
+    public static final BlockDriedGhast BLOCK_DRIED_GHAST = new BlockDriedGhast();
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
@@ -44,11 +45,13 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityConnector.class, new ResourceLocation(Tags.MODID, "connetor"));
         event.getRegistry().register(BLOCK_GOLDEN_SEA);
         event.getRegistry().register(BLOCK_BUBBLE_COLUMN);
+        event.getRegistry().register(BLOCK_DRIED_GHAST);
         event.getRegistry().register(BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(BLOCK_STORAGE_PAIL);
         event.getRegistry().register(BLOCK_WASTE_DIRT);
         event.getRegistry().register(BLOCK_SAP_BAG);
         GameRegistry.registerTileEntity(TileEntityGoldenSea.class, new ResourceLocation(Tags.MODID, "gold_coin"));
+        GameRegistry.registerTileEntity(TileEntityDriedGhast.class, new ResourceLocation(Tags.MODID, "dried_ghast"));
         GameRegistry.registerTileEntity(TileEntityPeacefulTable.class, new ResourceLocation(Tags.MODID, "peaceful_table"));
         GameRegistry.registerTileEntity(TileEntityStoragePail.class, new ResourceLocation(Tags.MODID, "storage_pail"));
         GameRegistry.registerTileEntity(TileEntitySapBag.class, new ResourceLocation(Tags.MODID, "sap_bag"));

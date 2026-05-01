@@ -59,6 +59,9 @@ public class BlockBubbleColumn extends Block {
 
     @Override
     public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (entityIn.getAir() < 300) {
+            entityIn.setAir(300);
+        }
         if (entityIn.isSneaking()) {
             return;
         }
