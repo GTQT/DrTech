@@ -37,6 +37,9 @@ public class ItemsInit {
     public static final Item ITEM_BLOCK_MEDIUM_AMETHYST_BUD = new ItemBlock(BlocksInit.BLOCK_MEDIUM_AMETHYST_BUD).setRegistryName(Tags.MODID, "medium_amethyst_bud");
     public static final Item ITEM_BLOCK_LARGE_AMETHYST_BUD = new ItemBlock(BlocksInit.BLOCK_LARGE_AMETHYST_BUD).setRegistryName(Tags.MODID, "large_amethyst_bud");
     public static final Item ITEM_BLOCK_AMETHYST_CLUSTER = new ItemBlock(BlocksInit.BLOCK_AMETHYST_CLUSTER).setRegistryName(Tags.MODID, "amethyst_cluster");
+    public static final Item ITEM_BLOCK_LANTERN = new ItemBlock(BlocksInit.BLOCK_LANTERN).setRegistryName(Tags.MODID, "lantern");
+    public static final Item ITEM_BLOCK_SOUL_LANTERN = new ItemBlock(BlocksInit.BLOCK_SOUL_LANTERN).setRegistryName(Tags.MODID, "soul_lantern");
+    public static final Item ITEM_BLOCK_CHAIN = new ItemBlock(BlocksInit.BLOCK_CHAIN).setRegistryName(Tags.MODID, "chain");
     public static final Item ITEM_BLOCK_PEACEFUL_TABLE = new ItemBlock(BlocksInit.BLOCK_PEACEFUL_TABLE).setRegistryName(Tags.MODID, "peaceful_table");
     public static final Item ITEM_BLOCK_STORAGE_PAIL = new ItemBlock(BlocksInit.BLOCK_STORAGE_PAIL).setRegistryName(Tags.MODID, BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_WASTE_DIRT = new ItemBlock(BlocksInit.BLOCK_WASTE_DIRT).setRegistryName(Tags.MODID, BlocksInit.BLOCK_WASTE_DIRT.getRegistryName().getPath());
@@ -66,6 +69,9 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_MEDIUM_AMETHYST_BUD);
         event.getRegistry().register(ITEM_BLOCK_LARGE_AMETHYST_BUD);
         event.getRegistry().register(ITEM_BLOCK_AMETHYST_CLUSTER);
+        event.getRegistry().register(ITEM_BLOCK_LANTERN);
+        event.getRegistry().register(ITEM_BLOCK_SOUL_LANTERN);
+        event.getRegistry().register(ITEM_BLOCK_CHAIN);
         event.getRegistry().register(ITEM_BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(ITEM_BLOCK_STORAGE_PAIL);
         event.getRegistry().register(ITEM_BLOCK_WASTE_DIRT);

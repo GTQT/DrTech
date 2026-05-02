@@ -31,6 +31,9 @@ public class BlocksInit {
     public static final BlockAmethystCluster BLOCK_MEDIUM_AMETHYST_BUD = new BlockAmethystCluster("medium_amethyst_bud", 5, 4, 2, false);
     public static final BlockAmethystCluster BLOCK_LARGE_AMETHYST_BUD = new BlockAmethystCluster("large_amethyst_bud", 4, 5, 4, false);
     public static final BlockAmethystCluster BLOCK_AMETHYST_CLUSTER = new BlockAmethystCluster("amethyst_cluster", 3, 7, 5, true);
+    public static final BlockLantern BLOCK_LANTERN = new BlockLantern("lantern", 15);
+    public static final BlockLantern BLOCK_SOUL_LANTERN = new BlockLantern("soul_lantern", 10);
+    public static final BlockChain BLOCK_CHAIN = new BlockChain();
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
@@ -62,6 +65,9 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_MEDIUM_AMETHYST_BUD);
         event.getRegistry().register(BLOCK_LARGE_AMETHYST_BUD);
         event.getRegistry().register(BLOCK_AMETHYST_CLUSTER);
+        event.getRegistry().register(BLOCK_LANTERN);
+        event.getRegistry().register(BLOCK_SOUL_LANTERN);
+        event.getRegistry().register(BLOCK_CHAIN);
         event.getRegistry().register(BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(BLOCK_STORAGE_PAIL);
         event.getRegistry().register(BLOCK_WASTE_DIRT);

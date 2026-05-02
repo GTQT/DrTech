@@ -1,0 +1,6 @@
+{
+  "parent": "drtech:block/template_lantern",
+  "textures": {
+    "lantern": "drtech:blocks/soul_lantern"
+  }
+}

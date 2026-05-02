@@ -1,0 +1,6 @@
+{
+  "parent": "drtech:block/template_hanging_lantern",
+  "textures": {
+    "lantern": "drtech:blocks/lantern"
+  }
+}
