@@ -23,6 +23,14 @@ public class BlocksInit {
     public static final BlockGoldenSea BLOCK_GOLDEN_SEA = new BlockGoldenSea();
     public static final BlockBubbleColumn BLOCK_BUBBLE_COLUMN = new BlockBubbleColumn();
     public static final BlockDriedGhast BLOCK_DRIED_GHAST = new BlockDriedGhast();
+    public static final BlockSimpleDrTech BLOCK_SMOOTH_BASALT = new BlockSimpleDrTech("smooth_basalt", net.minecraft.block.material.Material.ROCK, net.minecraft.block.SoundType.STONE, 1.25F, 4.2F);
+    public static final BlockSimpleDrTech BLOCK_CALCITE = new BlockSimpleDrTech("calcite", net.minecraft.block.material.Material.ROCK, net.minecraft.block.SoundType.STONE, 0.75F, 0.75F);
+    public static final BlockSimpleDrTech BLOCK_AMETHYST_BLOCK = new BlockSimpleDrTech("amethyst_block", net.minecraft.block.material.Material.ROCK, net.minecraft.block.SoundType.GLASS, 1.5F, 1.5F);
+    public static final BlockBuddingAmethyst BLOCK_BUDDING_AMETHYST = new BlockBuddingAmethyst();
+    public static final BlockAmethystCluster BLOCK_SMALL_AMETHYST_BUD = new BlockAmethystCluster("small_amethyst_bud", 6, 3, 1, false);
+    public static final BlockAmethystCluster BLOCK_MEDIUM_AMETHYST_BUD = new BlockAmethystCluster("medium_amethyst_bud", 5, 4, 2, false);
+    public static final BlockAmethystCluster BLOCK_LARGE_AMETHYST_BUD = new BlockAmethystCluster("large_amethyst_bud", 4, 5, 4, false);
+    public static final BlockAmethystCluster BLOCK_AMETHYST_CLUSTER = new BlockAmethystCluster("amethyst_cluster", 3, 7, 5, true);
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
@@ -34,7 +42,7 @@ public class BlocksInit {
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
     public static final BlockTimeTable BLOCK_TIME_TABLE = new BlockTimeTable();
-    public static BlockCropStick CROP_STICK=new BlockCropStick();
+    public static BlockCropStick CROP_STICK = new BlockCropStick();
 
     public static void init(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(BLOCK_GRAVITATIONAL_ANOMALY);
@@ -46,6 +54,14 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_GOLDEN_SEA);
         event.getRegistry().register(BLOCK_BUBBLE_COLUMN);
         event.getRegistry().register(BLOCK_DRIED_GHAST);
+        event.getRegistry().register(BLOCK_SMOOTH_BASALT);
+        event.getRegistry().register(BLOCK_CALCITE);
+        event.getRegistry().register(BLOCK_AMETHYST_BLOCK);
+        event.getRegistry().register(BLOCK_BUDDING_AMETHYST);
+        event.getRegistry().register(BLOCK_SMALL_AMETHYST_BUD);
+        event.getRegistry().register(BLOCK_MEDIUM_AMETHYST_BUD);
+        event.getRegistry().register(BLOCK_LARGE_AMETHYST_BUD);
+        event.getRegistry().register(BLOCK_AMETHYST_CLUSTER);
         event.getRegistry().register(BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(BLOCK_STORAGE_PAIL);
         event.getRegistry().register(BLOCK_WASTE_DIRT);
@@ -79,5 +95,4 @@ public class BlocksInit {
         double z = z0 + radius.z * Math.cos(phi);
         return new Vector3f((float) x, (float) y, (float) z);
     }
-
 }

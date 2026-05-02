@@ -20,6 +20,7 @@ import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
+import com.drppp.drtech.common.world.AmethystGeodeWorldGenerator;
 import com.drppp.drtech.common.world.DriedGhastWorldGenerator;
 import com.drppp.drtech.intergations.gtfo.TileCropFarmerMode;
 import com.drppp.drtech.intergations.top.TopInit;
@@ -89,6 +90,7 @@ public class DrTechMain {
         CropInitHandler.preInit();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
         GameRegistry.registerWorldGenerator(new DriedGhastWorldGenerator(), 0);
+        GameRegistry.registerWorldGenerator(new AmethystGeodeWorldGenerator(), 0);
 
     }
 

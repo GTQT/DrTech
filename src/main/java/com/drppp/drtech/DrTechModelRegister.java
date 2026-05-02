@@ -49,6 +49,14 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR3), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR3.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GOLDEN_SEA), 0, new ModelResourceLocation(BlocksInit.BLOCK_GOLDEN_SEA.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_DRIED_GHAST), 0, new ModelResourceLocation(BlocksInit.BLOCK_DRIED_GHAST.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_SMOOTH_BASALT), 0, new ModelResourceLocation(BlocksInit.BLOCK_SMOOTH_BASALT.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CALCITE), 0, new ModelResourceLocation(BlocksInit.BLOCK_CALCITE.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_AMETHYST_BLOCK), 0, new ModelResourceLocation(BlocksInit.BLOCK_AMETHYST_BLOCK.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_BUDDING_AMETHYST), 0, new ModelResourceLocation(BlocksInit.BLOCK_BUDDING_AMETHYST.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_SMALL_AMETHYST_BUD), 0, new ModelResourceLocation(BlocksInit.BLOCK_SMALL_AMETHYST_BUD.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_MEDIUM_AMETHYST_BUD), 0, new ModelResourceLocation(BlocksInit.BLOCK_MEDIUM_AMETHYST_BUD.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_LARGE_AMETHYST_BUD), 0, new ModelResourceLocation(BlocksInit.BLOCK_LARGE_AMETHYST_BUD.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_AMETHYST_CLUSTER), 0, new ModelResourceLocation(BlocksInit.BLOCK_AMETHYST_CLUSTER.getRegistryName(), "inventory"));
         ModelLoader.setCustomStateMapper(BlocksInit.BLOCK_DRIED_GHAST, new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState state) {

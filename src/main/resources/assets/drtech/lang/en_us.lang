@@ -213,20 +213,20 @@ drtech.machine.common_burn_generator.name=Universal Chemical Engine
 drtech.machine.crops_simulate_machine.name=Crop Simulation Universe
 
 
-#Tips 搂0 Black 搂1 Dark Blue 搂2 Dark Green
+#Tips 鎼? Black 鎼? Dark Blue 鎼? Dark Green
 #
-#搂3 Cyan 搂4 Red 搂5 Purple
+#鎼? Cyan 鎼? Red 鎼? Purple
 #
-#搂6 Gold 搂7 Light Gray 搂8 Dark Gray
+#鎼? Gold 鎼? Light Gray 鎼? Dark Gray
 #
-#9 Light Purple 搂a Light Green 搂b Light Blue
+#9 Light Purple 鎼俛 Light Green 鎼俠 Light Blue
 #
-#搂c Light Red 搂d Light Purple 搂e Light Yellow
+#鎼俢 Light Red 鎼俤 Light Purple 鎼俥 Light Yellow
 #
-#搂f White
-drtech.machine.annihilation_generator.tooltip.1=搂cPower generation scales with matter amount (400 per stage)
-drtech.machine.annihilation_generator.tooltip.2=搂cGenerated amperage increases over time per stage; each stage has a max amperage, resetting to 1 upon advancing stage
-drtech.machine.annihilation_generator.tooltip.3=搂cCoil tier provides additional efficiency bonus
+#鎼俧 White
+drtech.machine.annihilation_generator.tooltip.1=鎼俢Power generation scales with matter amount (400 per stage)
+drtech.machine.annihilation_generator.tooltip.2=鎼俢Generated amperage increases over time per stage; each stage has a max amperage, resetting to 1 upon advancing stage
+drtech.machine.annihilation_generator.tooltip.3=鎼俢Coil tier provides additional efficiency bonus
 gregtech.multiblock.weight=Remaining mass: %s
 gregtech.multiblock.mEUt=Output power: %s %s
 drtech.multiblock.tire=Coil tier: %s
@@ -237,41 +237,41 @@ metaitem.weight.tooltip.3=Matter amount: 150
 metaitem.weight.tooltip.4=Matter amount: 200
 metaitem.weight.tooltip.5=Matter amount: 300
 metaitem.gravity_shield.tooltip.1=Shift+Right Click to toggle
-behavior.data_item.cd_rom.title=搂nData stored on disc:
-behavior.data_item.cd_rom.data=- 搂a%s
-drtech.machine.uuproducter.tip.1=搂6Enjoy the joy of large machines
-drtech.machine.uuproducter.tip.2=搂6Power consumption halved
-drtech.machine.uuproducter.tip.3=搂6Parallel = 8 * voltage tier
-drtech.machine.duplicator.tip.1=搂6Enjoy the joy of large machines
-drtech.machine.duplicator.tip.2=搂6Speed doubled
-drtech.machine.duplicator.tip.3=搂6Parallel = 8 * voltage tier
-drtech.machine.industrial_mixer.tooltip.1=搂6Enjoy the joy of large machines
-drtech.machine.industrial_mixer.tooltip.2=搂6250% faster than single-block at same voltage
-drtech.machine.industrial_mixer.tooltip.3=搂6Each voltage tier increases parallel processing by 8 items
-drtech.machine.industrial_roller_press.tooltip.1=搂6Enjoy the joy of large machines
-drtech.machine.industrial_roller_press.tooltip.2=搂6500% faster than single-block at same voltage
-drtech.machine.industrial_roller_press.tooltip.3=搂6Each voltage tier increases parallel processing by 4 items
-drtech.machine.industrial_cable_press.tooltip.1=搂6Enjoy the joy of large machines
-drtech.machine.industrial_cable_press.tooltip.2=搂6200% faster than single-block at same voltage
-drtech.machine.industrial_cable_press.tooltip.3=搂6Each voltage tier increases parallel processing by 4 items
-drtech.machine.industrial_cable_press.tooltip.4=搂6Power consumption reduced to 75%
-drtech.machine.industrial_sieve.tooltip.1=搂6Enjoy the joy of large machines
-drtech.machine.industrial_sieve.tooltip.2=搂6400% faster than single-block at same voltage
-drtech.machine.industrial_sieve.tooltip.3=搂6Each voltage tier increases parallel processing by 4 items
-drtech.machine.industrial_sieve.tooltip.4=搂6Power consumption reduced to 75%
-drtech.machine.industrial_centrifuge.tooltip.1=搂6Enjoy the joy of large machines
-drtech.machine.industrial_centrifuge.tooltip.2=搂6150% faster than single-block at same voltage
-drtech.machine.industrial_centrifuge.tooltip.3=搂6Each voltage tier increases parallel processing by 6 items
-drtech.machine.industrial_centrifuge.tooltip.4=搂6Power consumption reduced to 90%
-drtech.machine.logcreate.tip.1=搂1Yield formula: (2脳voltage_tier^2 - 2脳voltage_tier + 5)脳5脳output_coefficient
-drtech.machine.logcreate.tip.2=搂3Saw = 1x  Circular Saw = 2x  Chainsaw = 4x
-drtech.machine.logcreate.tip.3=搂3Fixed operation time: 5 seconds
-drtech.machine.recombination.tip.1=搂3Parallel = 2 * voltage tier
-drtech.machine.recombination.tip.2=搂3Molecular transformation!
-drtech.universal.tooltip.energy_storage_capacity=搂cFluid buffer: 搂r%s L
+behavior.data_item.cd_rom.title=鎼俷Data stored on disc:
+behavior.data_item.cd_rom.data=- 鎼俛%s
+drtech.machine.uuproducter.tip.1=鎼?Enjoy the joy of large machines
+drtech.machine.uuproducter.tip.2=鎼?Power consumption halved
+drtech.machine.uuproducter.tip.3=鎼?Parallel = 8 * voltage tier
+drtech.machine.duplicator.tip.1=鎼?Enjoy the joy of large machines
+drtech.machine.duplicator.tip.2=鎼?Speed doubled
+drtech.machine.duplicator.tip.3=鎼?Parallel = 8 * voltage tier
+drtech.machine.industrial_mixer.tooltip.1=鎼?Enjoy the joy of large machines
+drtech.machine.industrial_mixer.tooltip.2=鎼?250% faster than single-block at same voltage
+drtech.machine.industrial_mixer.tooltip.3=鎼?Each voltage tier increases parallel processing by 8 items
+drtech.machine.industrial_roller_press.tooltip.1=鎼?Enjoy the joy of large machines
+drtech.machine.industrial_roller_press.tooltip.2=鎼?500% faster than single-block at same voltage
+drtech.machine.industrial_roller_press.tooltip.3=鎼?Each voltage tier increases parallel processing by 4 items
+drtech.machine.industrial_cable_press.tooltip.1=鎼?Enjoy the joy of large machines
+drtech.machine.industrial_cable_press.tooltip.2=鎼?200% faster than single-block at same voltage
+drtech.machine.industrial_cable_press.tooltip.3=鎼?Each voltage tier increases parallel processing by 4 items
+drtech.machine.industrial_cable_press.tooltip.4=鎼?Power consumption reduced to 75%
+drtech.machine.industrial_sieve.tooltip.1=鎼?Enjoy the joy of large machines
+drtech.machine.industrial_sieve.tooltip.2=鎼?400% faster than single-block at same voltage
+drtech.machine.industrial_sieve.tooltip.3=鎼?Each voltage tier increases parallel processing by 4 items
+drtech.machine.industrial_sieve.tooltip.4=鎼?Power consumption reduced to 75%
+drtech.machine.industrial_centrifuge.tooltip.1=鎼?Enjoy the joy of large machines
+drtech.machine.industrial_centrifuge.tooltip.2=鎼?150% faster than single-block at same voltage
+drtech.machine.industrial_centrifuge.tooltip.3=鎼?Each voltage tier increases parallel processing by 6 items
+drtech.machine.industrial_centrifuge.tooltip.4=鎼?Power consumption reduced to 90%
+drtech.machine.logcreate.tip.1=鎼?Yield formula: (2鑴硋oltage_tier^2 - 2鑴硋oltage_tier + 5)鑴?鑴硂utput_coefficient
+drtech.machine.logcreate.tip.2=鎼?Saw = 1x  Circular Saw = 2x  Chainsaw = 4x
+drtech.machine.logcreate.tip.3=鎼?Fixed operation time: 5 seconds
+drtech.machine.recombination.tip.1=鎼?Parallel = 2 * voltage tier
+drtech.machine.recombination.tip.2=鎼?Molecular transformation!
+drtech.universal.tooltip.energy_storage_capacity=鎼俢Fluid buffer: 鎼俽%s L
 drtech.multiblock.yot_tank.fluid_type=Fluid type: %s
-gregtech.machine.yot_tank.tooltip1=搂9Ultra Super Super Quantum Tank!
-gregtech.machine.yot_tank.tooltip2=搂9Store any combination, runs without power!
+gregtech.machine.yot_tank.tooltip1=鎼?Ultra Super Super Quantum Tank!
+gregtech.machine.yot_tank.tooltip2=鎼?Store any combination, runs without power!
 drtech.multiblock.lbh.changep=Switch work type
 drtech.multiblock.lbh.changew=Switch work mode
 metaitem.pipe_1.tooltip.1=Pipe length: 1
@@ -286,8 +286,8 @@ gtqtcore.multiblock.tfft.threshold_increment=Move fluid forward
 gtqtcore.multiblock.tfft.clearfluid=Clear current fluid
 gtqtcore.multiblock.tfft.isoutput=Toggle output state
 drtech.multiblock.power_substation.output=Fluid output state: %s
-drtech.multiblock.power_substation.eut=Power consumption: 搂3%d EU/t
-drtech.universal.tooltip.energy_eut=搂cUnit power: 搂r%d EU/t
+drtech.multiblock.power_substation.eut=Power consumption: 鎼?%d EU/t
+drtech.universal.tooltip.energy_eut=鎼俢Unit power: 鎼俽%d EU/t
 drtech.machine.energytrans.connect=Connected position: %s
 drtech.machine.energytrans.energy=Capacitor stored energy: %s
 behavior.data_item.poscard.data=Stored coordinates: %s
@@ -306,10 +306,10 @@ drtech.machine.solarpower.tip.3=If Cold Solar Salt amount exceeds heat, heat dro
 drtech.machine.solarpower.tip.4=Heat efficiency is lowest at 0 or 100,000; highest at 50,000.
 drtech.machine.solarpower.tip.5=Heat efficiency formula: (7000 - |current_heat - 50000|^0.8) / 7000. Heat gained per cycle: reflector_count * heat_efficiency * (10 + bonus)
 drtech.machine.solarpower.tip.6=Bonus: Ring 1 = 1, Ring 2 = 2, Ring 3 = 4, Ring 4 = 8, Ring 5 = 16
-fuelrod.date.tip1=搂cCurrent durability: %s
+fuelrod.date.tip1=鎼俢Current durability: %s
 fuelrod.date.tip2=Max durability: %s
 fuelrod.date.tip3=Temperature effect: %s
-heatvent.date.tip1=搂cCurrent heat storage: %s
+heatvent.date.tip1=鎼俢Current heat storage: %s
 heatvent.date.tip2=Max heat storage: %s
 metaitem.nuclear.upgrade.io=Auto-input from input bus, auto-output depleted fuel rods and overcooled cooling cells
 metaitem.nuclear.upgrade.stop=Overheat shutdown and full energy shutdown
@@ -321,31 +321,31 @@ behavior.data_item.hand_pump.data.1=Fluid transfer tool with a capacity of 128,0
 behavior.data_item.hand_pump.data.2=Its main feature is extracting fluids from input hatches, solving the problem of excess fluid that is hard to clean up.
 behavior.data_item.hand_pump.data.3=Right-click on a fluid-containing device to extract fluid, filling itself as much as possible; sneak+right-click on a fluid storage device to output fluid.
 behavior.data_item.hand_pump.data.4=If it contains over 144 mB of solder, shift+right-click to repair a maintenance hatch.
-drtech.machine.large_alloy_smelter.tooltip.1=搂6Large alloy furnace, 2x faster than single-block
-drtech.machine.large_alloy_smelter.tooltip.2=搂6Smelt all the alloys you need!
-drtech.machine.large_alloy_smelter.tooltip.3=搂6Parallel = 2*(voltage_tier + coil_tier - 1)
-drtech.machine.large_extruder.tooltip.1=搂6Large extruder, 2.5x faster than single-block
-drtech.machine.large_extruder.tooltip.2=搂6Extrude to your heart's content!
-drtech.machine.large_extruder.tooltip.3=搂6Parallel: below UV = voltage_tier * 4, above UV = voltage_tier * 8
+drtech.machine.large_alloy_smelter.tooltip.1=鎼?Large alloy furnace, 2x faster than single-block
+drtech.machine.large_alloy_smelter.tooltip.2=鎼?Smelt all the alloys you need!
+drtech.machine.large_alloy_smelter.tooltip.3=鎼?Parallel = 2*(voltage_tier + coil_tier - 1)
+drtech.machine.large_extruder.tooltip.1=鎼?Large extruder, 2.5x faster than single-block
+drtech.machine.large_extruder.tooltip.2=鎼?Extrude to your heart's content!
+drtech.machine.large_extruder.tooltip.3=鎼?Parallel: below UV = voltage_tier * 4, above UV = voltage_tier * 8
 metaitem.upgrade.info=%s upgrade for Industrial Apiary
 metaitem.upgrade.maxnum=Max installed amount: %s
-metaitem.upgrade.speed=脳 Unlocks %sx speed boost
-metaitem.upgrade.energy=脳 Energy consumption %s
-metaitem.upgrade.product=脳 Unlocks 8x production upgrade
+metaitem.upgrade.speed=鑴?Unlocks %sx speed boost
+metaitem.upgrade.energy=鑴?Energy consumption %s
+metaitem.upgrade.product=鑴?Unlocks 8x production upgrade
 metaitem.upgrade.production.function=+25% production
-metaitem.upgrade.biomes=脳 Biome override: %s
-metaitem.upgrade.light=脳 Internal lighting
-metaitem.upgrade.flowering=脳 Flowering +20%
-metaitem.upgrade.dry=脳 Humidity -12.5%
-metaitem.upgrade.humidifier=脳 Humidity +12.5%
-metaitem.upgrade.pollen_scrubber=脳 Flowering -100%
-metaitem.upgrade.cooler=脳 Temperature -12.5%
-metaitem.upgrade.heater=脳 Temperature +12.5%
-metaitem.upgrade.lifespan=脳 Lifespan -33.3%
-metaitem.upgrade.seal=脳 Rainproof
-metaitem.upgrade.genetic_stabilizer=脳 Genetic decay -100%
-metaitem.upgrade.territory=脳 Territory +50%
-metaitem.upgrade.sieve=脳 Pollen collection
+metaitem.upgrade.biomes=鑴?Biome override: %s
+metaitem.upgrade.light=鑴?Internal lighting
+metaitem.upgrade.flowering=鑴?Flowering +20%
+metaitem.upgrade.dry=鑴?Humidity -12.5%
+metaitem.upgrade.humidifier=鑴?Humidity +12.5%
+metaitem.upgrade.pollen_scrubber=鑴?Flowering -100%
+metaitem.upgrade.cooler=鑴?Temperature -12.5%
+metaitem.upgrade.heater=鑴?Temperature +12.5%
+metaitem.upgrade.lifespan=鑴?Lifespan -33.3%
+metaitem.upgrade.seal=鑴?Rainproof
+metaitem.upgrade.genetic_stabilizer=鑴?Genetic decay -100%
+metaitem.upgrade.territory=鑴?Territory +50%
+metaitem.upgrade.sieve=鑴?Pollen collection
 metaitem.upgrade.tool_box.1=Tool box that can hold tools
 metaitem.upgrade.tool_box.2=Can repair maintenance hatch
 drtech.industrial_apiary.tootip.1=EU/t consumed: %s
@@ -358,7 +358,7 @@ drtech.gui.industrial_apiary.tooltip.1.enabled=Machine running
 drtech.gui.industrial_apiary.tooltip.2.disabled=Disable processing
 drtech.gui.industrial_apiary.tooltip.2.enabled=Enable processing
 behavior.matrix_gems.info=Stored data: %s
-drtech.multiblock.crops.seed=搂bSeed info: %s
+drtech.multiblock.crops.seed=鎼俠Seed info: %s
 #Fluids
 gregtech.material.cold_sun_salt=Cold Solar Salt
 gregtech.material.hot_sun_salt=Hot Solar Salt
@@ -399,82 +399,82 @@ drtech.machine.disassembly.uiv.name=Epic Disassembler III
 drtech.machine.disassembly.uxv.name=Epic Disassembler IV
 drtech.machine.disassembly.opv.name=Legendary Disassembler
 
-drtech.machine.laser_bending_256.iv.name=256A Laser Bender (搂1IV搂r)
-drtech.machine.laser_bending_256.luv.name=256A Laser Bender (搂dLuV搂r)
-drtech.machine.laser_bending_256.zpm.name=256A Laser Bender (搂cZPM搂r)
-drtech.machine.laser_bending_256.uv.name=256A Laser Bender (搂3UV搂r)
-drtech.machine.laser_bending_256.uhv.name=256A Laser Bender (搂4UHV搂r)
-drtech.machine.laser_bending_256.uev.name=256A Laser Bender (搂4UEV搂r)
-drtech.machine.laser_bending_256.uiv.name=256A Laser Bender (搂4UIV搂r)
-drtech.machine.laser_bending_256.uxv.name=256A Laser Bender (搂4UXV搂r)
-drtech.machine.laser_bending_256.opv.name=256A Laser Bender (搂4OPV搂r)
-drtech.machine.laser_bending_256.max.name=256A Laser Bender (搂4MAX搂r)
+drtech.machine.laser_bending_256.iv.name=256A Laser Bender (鎼?IV鎼俽)
+drtech.machine.laser_bending_256.luv.name=256A Laser Bender (鎼俤LuV鎼俽)
+drtech.machine.laser_bending_256.zpm.name=256A Laser Bender (鎼俢ZPM鎼俽)
+drtech.machine.laser_bending_256.uv.name=256A Laser Bender (鎼?UV鎼俽)
+drtech.machine.laser_bending_256.uhv.name=256A Laser Bender (鎼?UHV鎼俽)
+drtech.machine.laser_bending_256.uev.name=256A Laser Bender (鎼?UEV鎼俽)
+drtech.machine.laser_bending_256.uiv.name=256A Laser Bender (鎼?UIV鎼俽)
+drtech.machine.laser_bending_256.uxv.name=256A Laser Bender (鎼?UXV鎼俽)
+drtech.machine.laser_bending_256.opv.name=256A Laser Bender (鎼?OPV鎼俽)
+drtech.machine.laser_bending_256.max.name=256A Laser Bender (鎼?MAX鎼俽)
 
-drtech.machine.laser_bending_1024.iv.name=1024A Laser Bender (搂1IV搂r)
-drtech.machine.laser_bending_1024.luv.name=1024A Laser Bender (搂dLuV搂r)
-drtech.machine.laser_bending_1024.zpm.name=1024A Laser Bender (搂cZPM搂r)
-drtech.machine.laser_bending_1024.uv.name=1024A Laser Bender (搂3UV搂r)
-drtech.machine.laser_bending_1024.uhv.name=1024A Laser Bender (搂4UHV搂r)
-drtech.machine.laser_bending_1024.uev.name=1024A Laser Bender (搂4UEV搂r)
-drtech.machine.laser_bending_1024.uiv.name=1024A Laser Bender (搂4UIV搂r)
-drtech.machine.laser_bending_1024.uxv.name=1024A Laser Bender (搂4UXV搂r)
-drtech.machine.laser_bending_1024.opv.name=1024A Laser Bender (搂4OPV搂r)
-drtech.machine.laser_bending_1024.max.name=1024A Laser Bender (搂4MAX搂r)
+drtech.machine.laser_bending_1024.iv.name=1024A Laser Bender (鎼?IV鎼俽)
+drtech.machine.laser_bending_1024.luv.name=1024A Laser Bender (鎼俤LuV鎼俽)
+drtech.machine.laser_bending_1024.zpm.name=1024A Laser Bender (鎼俢ZPM鎼俽)
+drtech.machine.laser_bending_1024.uv.name=1024A Laser Bender (鎼?UV鎼俽)
+drtech.machine.laser_bending_1024.uhv.name=1024A Laser Bender (鎼?UHV鎼俽)
+drtech.machine.laser_bending_1024.uev.name=1024A Laser Bender (鎼?UEV鎼俽)
+drtech.machine.laser_bending_1024.uiv.name=1024A Laser Bender (鎼?UIV鎼俽)
+drtech.machine.laser_bending_1024.uxv.name=1024A Laser Bender (鎼?UXV鎼俽)
+drtech.machine.laser_bending_1024.opv.name=1024A Laser Bender (鎼?OPV鎼俽)
+drtech.machine.laser_bending_1024.max.name=1024A Laser Bender (鎼?MAX鎼俽)
 
-drtech.machine.laser_bending_4096.iv.name=4096A Laser Bender (搂1IV搂r)
-drtech.machine.laser_bending_4096.luv.name=4096A Laser Bender (搂dLuV搂r)
-drtech.machine.laser_bending_4096.zpm.name=4096A Laser Bender (搂cZPM搂r)
-drtech.machine.laser_bending_4096.uv.name=4096A Laser Bender (搂3UV搂r)
-drtech.machine.laser_bending_4096.uhv.name=4096A Laser Bender (搂4UHV搂r)
-drtech.machine.laser_bending_4096.uev.name=4096A Laser Bender (搂4UEV搂r)
-drtech.machine.laser_bending_4096.uiv.name=4096A Laser Bender (搂4UIV搂r)
-drtech.machine.laser_bending_4096.uxv.name=4096A Laser Bender (搂4UXV搂r)
-drtech.machine.laser_bending_4096.opv.name=4096A Laser Bender (搂4OPV搂r)
-drtech.machine.laser_bending_4096.max.name=4096A Laser Bender (搂4MAX搂r)
+drtech.machine.laser_bending_4096.iv.name=4096A Laser Bender (鎼?IV鎼俽)
+drtech.machine.laser_bending_4096.luv.name=4096A Laser Bender (鎼俤LuV鎼俽)
+drtech.machine.laser_bending_4096.zpm.name=4096A Laser Bender (鎼俢ZPM鎼俽)
+drtech.machine.laser_bending_4096.uv.name=4096A Laser Bender (鎼?UV鎼俽)
+drtech.machine.laser_bending_4096.uhv.name=4096A Laser Bender (鎼?UHV鎼俽)
+drtech.machine.laser_bending_4096.uev.name=4096A Laser Bender (鎼?UEV鎼俽)
+drtech.machine.laser_bending_4096.uiv.name=4096A Laser Bender (鎼?UIV鎼俽)
+drtech.machine.laser_bending_4096.uxv.name=4096A Laser Bender (鎼?UXV鎼俽)
+drtech.machine.laser_bending_4096.opv.name=4096A Laser Bender (鎼?OPV鎼俽)
+drtech.machine.laser_bending_4096.max.name=4096A Laser Bender (鎼?MAX鎼俽)
 
-drtech.machine.laser_bending_16384.iv.name=16384A Laser Bender (搂1IV搂r)
-drtech.machine.laser_bending_16384.luv.name=16384A Laser Bender (搂dLuV搂r)
-drtech.machine.laser_bending_16384.zpm.name=16384A Laser Bender (搂cZPM搂r)
-drtech.machine.laser_bending_16384.uv.name=16384A Laser Bender (搂3UV搂r)
-drtech.machine.laser_bending_16384.uhv.name=16384A Laser Bender (搂4UHV搂r)
-drtech.machine.laser_bending_16384.uev.name=16384A Laser Bender (搂4UEV搂r)
-drtech.machine.laser_bending_16384.uiv.name=16384A Laser Bender (搂4UIV搂r)
-drtech.machine.laser_bending_16384.uxv.name=16384A Laser Bender (搂4UXV搂r)
-drtech.machine.laser_bending_16384.opv.name=16384A Laser Bender (搂4OPV搂r)
-drtech.machine.laser_bending_16384.max.name=16384A Laser Bender (搂4MAX搂r)
+drtech.machine.laser_bending_16384.iv.name=16384A Laser Bender (鎼?IV鎼俽)
+drtech.machine.laser_bending_16384.luv.name=16384A Laser Bender (鎼俤LuV鎼俽)
+drtech.machine.laser_bending_16384.zpm.name=16384A Laser Bender (鎼俢ZPM鎼俽)
+drtech.machine.laser_bending_16384.uv.name=16384A Laser Bender (鎼?UV鎼俽)
+drtech.machine.laser_bending_16384.uhv.name=16384A Laser Bender (鎼?UHV鎼俽)
+drtech.machine.laser_bending_16384.uev.name=16384A Laser Bender (鎼?UEV鎼俽)
+drtech.machine.laser_bending_16384.uiv.name=16384A Laser Bender (鎼?UIV鎼俽)
+drtech.machine.laser_bending_16384.uxv.name=16384A Laser Bender (鎼?UXV鎼俽)
+drtech.machine.laser_bending_16384.opv.name=16384A Laser Bender (鎼?OPV鎼俽)
+drtech.machine.laser_bending_16384.max.name=16384A Laser Bender (鎼?MAX鎼俽)
 
-drtech.machine.laser_bending_65536.iv.name=65536A Laser Bender (搂1IV搂r)
-drtech.machine.laser_bending_65536.luv.name=65536A Laser Bender (搂dLuV搂r)
-drtech.machine.laser_bending_65536.zpm.name=65536A Laser Bender (搂cZPM搂r)
-drtech.machine.laser_bending_65536.uv.name=65536A Laser Bender (搂3UV搂r)
-drtech.machine.laser_bending_65536.uhv.name=65536A Laser Bender (搂4UHV搂r)
-drtech.machine.laser_bending_65536.uev.name=65536A Laser Bender (搂4UEV搂r)
-drtech.machine.laser_bending_65536.uiv.name=65536A Laser Bender (搂4UIV搂r)
-drtech.machine.laser_bending_65536.uxv.name=65536A Laser Bender (搂4UXV搂r)
-drtech.machine.laser_bending_65536.opv.name=65536A Laser Bender (搂4OPV搂r)
-drtech.machine.laser_bending_65536.max.name=65536A Laser Bender (搂4MAX搂r)
+drtech.machine.laser_bending_65536.iv.name=65536A Laser Bender (鎼?IV鎼俽)
+drtech.machine.laser_bending_65536.luv.name=65536A Laser Bender (鎼俤LuV鎼俽)
+drtech.machine.laser_bending_65536.zpm.name=65536A Laser Bender (鎼俢ZPM鎼俽)
+drtech.machine.laser_bending_65536.uv.name=65536A Laser Bender (鎼?UV鎼俽)
+drtech.machine.laser_bending_65536.uhv.name=65536A Laser Bender (鎼?UHV鎼俽)
+drtech.machine.laser_bending_65536.uev.name=65536A Laser Bender (鎼?UEV鎼俽)
+drtech.machine.laser_bending_65536.uiv.name=65536A Laser Bender (鎼?UIV鎼俽)
+drtech.machine.laser_bending_65536.uxv.name=65536A Laser Bender (鎼?UXV鎼俽)
+drtech.machine.laser_bending_65536.opv.name=65536A Laser Bender (鎼?OPV鎼俽)
+drtech.machine.laser_bending_65536.max.name=65536A Laser Bender (鎼?MAX鎼俽)
 
-drtech.machine.laser_bending_262144.iv.name=262144A Laser Bender (搂1IV搂r)
-drtech.machine.laser_bending_262144.luv.name=262144A Laser Bender (搂dLuV搂r)
-drtech.machine.laser_bending_262144.zpm.name=262144A Laser Bender (搂cZPM搂r)
-drtech.machine.laser_bending_262144.uv.name=262144A Laser Bender (搂6UV搂r)
-drtech.machine.laser_bending_262144.uhv.name=262144A Laser Bender (搂5UHV搂r)
-drtech.machine.laser_bending_262144.uev.name=262144A Laser Bender (搂2UEV搂r)
-drtech.machine.laser_bending_262144.uiv.name=262144A Laser Bender (搂4UIV搂r)
-drtech.machine.laser_bending_262144.uxv.name=262144A Laser Bender (搂4UXV搂r)
-drtech.machine.laser_bending_262144.opv.name=262144A Laser Bender (搂4OPV搂r)
-drtech.machine.laser_bending_262144.max.name=262144A Laser Bender (搂4MAX搂r)
+drtech.machine.laser_bending_262144.iv.name=262144A Laser Bender (鎼?IV鎼俽)
+drtech.machine.laser_bending_262144.luv.name=262144A Laser Bender (鎼俤LuV鎼俽)
+drtech.machine.laser_bending_262144.zpm.name=262144A Laser Bender (鎼俢ZPM鎼俽)
+drtech.machine.laser_bending_262144.uv.name=262144A Laser Bender (鎼?UV鎼俽)
+drtech.machine.laser_bending_262144.uhv.name=262144A Laser Bender (鎼?UHV鎼俽)
+drtech.machine.laser_bending_262144.uev.name=262144A Laser Bender (鎼?UEV鎼俽)
+drtech.machine.laser_bending_262144.uiv.name=262144A Laser Bender (鎼?UIV鎼俽)
+drtech.machine.laser_bending_262144.uxv.name=262144A Laser Bender (鎼?UXV鎼俽)
+drtech.machine.laser_bending_262144.opv.name=262144A Laser Bender (鎼?OPV鎼俽)
+drtech.machine.laser_bending_262144.max.name=262144A Laser Bender (鎼?MAX鎼俽)
 
-drtech.machine.laser_bending_1048576.iv.name=1048576A Laser Bender (搂1IV搂r)
-drtech.machine.laser_bending_1048576.luv.name=1048576A Laser Bender (搂3LuV搂r)
-drtech.machine.laser_bending_1048576.zpm.name=1048576A Laser Bender (搂5ZPM搂r)
-drtech.machine.laser_bending_1048576.uv.name=1048576A Laser Bender (搂6UV搂r)
-drtech.machine.laser_bending_1048576.uhv.name=1048576A Laser Bender (搂5UHV搂r)
-drtech.machine.laser_bending_1048576.uev.name=1048576A Laser Bender (搂2UEV搂r)
-drtech.machine.laser_bending_1048576.uiv.name=1048576A Laser Bender (搂4UIV搂r)
-drtech.machine.laser_bending_1048576.uxv.name=1048576A Laser Bender (搂4UXV搂r)
-drtech.machine.laser_bending_1048576.opv.name=1048576A Laser Bender (搂4OPV搂r)
-drtech.machine.laser_bending_1048576.max.name=1048576A Laser Bender (搂4MAX搂r)
+drtech.machine.laser_bending_1048576.iv.name=1048576A Laser Bender (鎼?IV鎼俽)
+drtech.machine.laser_bending_1048576.luv.name=1048576A Laser Bender (鎼?LuV鎼俽)
+drtech.machine.laser_bending_1048576.zpm.name=1048576A Laser Bender (鎼?ZPM鎼俽)
+drtech.machine.laser_bending_1048576.uv.name=1048576A Laser Bender (鎼?UV鎼俽)
+drtech.machine.laser_bending_1048576.uhv.name=1048576A Laser Bender (鎼?UHV鎼俽)
+drtech.machine.laser_bending_1048576.uev.name=1048576A Laser Bender (鎼?UEV鎼俽)
+drtech.machine.laser_bending_1048576.uiv.name=1048576A Laser Bender (鎼?UIV鎼俽)
+drtech.machine.laser_bending_1048576.uxv.name=1048576A Laser Bender (鎼?UXV鎼俽)
+drtech.machine.laser_bending_1048576.opv.name=1048576A Laser Bender (鎼?OPV鎼俽)
+drtech.machine.laser_bending_1048576.max.name=1048576A Laser Bender (鎼?MAX鎼俽)
 
 #Entity
 entity.UTi Golem.name=Uranium-Titanium Alloy Golem
@@ -482,3 +482,12 @@ entity.Advanced Rocket.name=Advanced Rocket
 entity.happy_ghast.name=Happy Ghast
 tile.drtech.dried_ghast.name=Dried Ghast
 entity.drtech.ghastling.name=Ghastling
+item.drtech.amethyst_shard.name=Amethyst Shard
+tile.drtech.smooth_basalt.name=Smooth Basalt
+tile.drtech.calcite.name=Calcite
+tile.drtech.amethyst_block.name=Amethyst Block
+tile.drtech.budding_amethyst.name=Budding Amethyst
+tile.drtech.small_amethyst_bud.name=Small Amethyst Bud
+tile.drtech.medium_amethyst_bud.name=Medium Amethyst Bud
+tile.drtech.large_amethyst_bud.name=Large Amethyst Bud
+tile.drtech.amethyst_cluster.name=Amethyst Cluster

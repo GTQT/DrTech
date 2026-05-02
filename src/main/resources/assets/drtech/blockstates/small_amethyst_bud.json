@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down": { "model": "drtech:small_amethyst_bud", "x": 180 },
+    "facing=east": { "model": "drtech:small_amethyst_bud", "x": 90, "y": 90 },
+    "facing=north": { "model": "drtech:small_amethyst_bud", "x": 90 },
+    "facing=south": { "model": "drtech:small_amethyst_bud", "x": 90, "y": 180 },
+    "facing=up": { "model": "drtech:small_amethyst_bud" },
+    "facing=west": { "model": "drtech:small_amethyst_bud", "x": 90, "y": 270 }
+  }
+}
