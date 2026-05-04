@@ -1,0 +1,15 @@
+{
+  "textures": {
+    "particle": "drtech:blocks/composter_compost",
+    "inside": "drtech:blocks/composter_compost"
+  },
+  "elements": [
+    {
+      "from": [2, 0, 2],
+      "to": [14, 3, 14],
+      "faces": {
+        "up": { "texture": "#inside" }
+      }
+    }
+  ]
+}

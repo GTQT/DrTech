@@ -492,4 +492,6 @@ tile.drtech.large_amethyst_bud.name=大型紫晶芽
 tile.drtech.amethyst_cluster.name=紫水晶簇
 tile.drtech.lantern.name=灯笼
 tile.drtech.soul_lantern.name=灵魂灯笼
+item.drtech.amethyst_shard.name=紫晶碎片
+tile.drtech.composter.name=堆肥桶
 tile.drtech.chain.name=锁链

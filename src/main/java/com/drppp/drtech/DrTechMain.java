@@ -11,6 +11,7 @@ import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.capability.DrtechCapInit;
+import com.drppp.drtech.common.Blocks.BlockComposter;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.api.crop.CropInitHandler;
 import com.drppp.drtech.common.CommonProxy;
@@ -150,6 +151,7 @@ public class DrTechMain {
             OBJLoader.INSTANCE.addDomain(MODID);
         }
         CropInitHandler.init();
+        BlockComposter.registerDispenseBehaviors();
     }
 
     @SideOnly(Side.CLIENT)

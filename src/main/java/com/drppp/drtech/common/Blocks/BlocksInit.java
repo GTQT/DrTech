@@ -34,6 +34,7 @@ public class BlocksInit {
     public static final BlockLantern BLOCK_LANTERN = new BlockLantern("lantern", 15);
     public static final BlockLantern BLOCK_SOUL_LANTERN = new BlockLantern("soul_lantern", 10);
     public static final BlockChain BLOCK_CHAIN = new BlockChain();
+    public static final BlockComposter BLOCK_COMPOSTER = new BlockComposter();
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
@@ -68,6 +69,7 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_LANTERN);
         event.getRegistry().register(BLOCK_SOUL_LANTERN);
         event.getRegistry().register(BLOCK_CHAIN);
+        event.getRegistry().register(BLOCK_COMPOSTER);
         event.getRegistry().register(BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(BLOCK_STORAGE_PAIL);
         event.getRegistry().register(BLOCK_WASTE_DIRT);
@@ -77,6 +79,7 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityPeacefulTable.class, new ResourceLocation(Tags.MODID, "peaceful_table"));
         GameRegistry.registerTileEntity(TileEntityStoragePail.class, new ResourceLocation(Tags.MODID, "storage_pail"));
         GameRegistry.registerTileEntity(TileEntitySapBag.class, new ResourceLocation(Tags.MODID, "sap_bag"));
+        GameRegistry.registerTileEntity(TileEntityComposter.class, new ResourceLocation(Tags.MODID, "composter"));
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
         event.getRegistry().register(COMMON_CASING1);

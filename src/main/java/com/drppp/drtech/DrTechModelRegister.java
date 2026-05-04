@@ -60,6 +60,7 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_LANTERN), 0, new ModelResourceLocation(BlocksInit.BLOCK_LANTERN.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_SOUL_LANTERN), 0, new ModelResourceLocation(BlocksInit.BLOCK_SOUL_LANTERN.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CHAIN), 0, new ModelResourceLocation(BlocksInit.BLOCK_CHAIN.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_COMPOSTER), 0, new ModelResourceLocation(BlocksInit.BLOCK_COMPOSTER.getRegistryName(), "inventory"));
         ModelLoader.setCustomStateMapper(BlocksInit.BLOCK_DRIED_GHAST, new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState state) {

@@ -182,7 +182,9 @@ public class CraftingReceipe {
                 'L', Items.LEATHER,
                 'G', Blocks.GLASS,
                 'W', new ItemStack(Blocks.WOOL, 1, 0));
-
+        ModHandler.addShapedRecipe("composter", new ItemStack(BlocksInit.BLOCK_COMPOSTER),
+                "S S", "S S", "SSS",
+                'S', new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
 
     }
 
