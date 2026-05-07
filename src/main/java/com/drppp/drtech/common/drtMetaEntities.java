@@ -5,6 +5,9 @@ import com.drppp.drtech.Client.render.Entity.RenderHappyGhast;
 import com.drppp.drtech.Client.render.Entity.RenderUTiGolem;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
+import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
+import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
+import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import com.drppp.drtech.common.Entity.moster.EntityHappyGhast;
 import com.drppp.drtech.common.Entity.moster.EntityUTiGolem;
 import net.minecraft.util.ResourceLocation;
@@ -20,6 +23,9 @@ public class drtMetaEntities {
         EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "uti_golem"),0x48e06e, 0x199038);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "happy_ghast"), EntityHappyGhast.class, "happy_ghast", 5, DrTechMain.instance, 96, 3, true);
         EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "happy_ghast"), 0xF4F4F4, 0x7ED6E7);
+        EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "hyper_gun_bullet"), EntityHyperGunBullet.class, "hyper_gun_bullet", 6, DrTechMain.instance, 64, 1, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "plasma_bullet"), EntityPlasmaBullet.class, "plasma_bullet", 7, DrTechMain.instance, 64, 1, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "tachyon_bullet"), EntityTachyonBullet.class, "tachyon_bullet", 8, DrTechMain.instance, 64, 1, true);
     }
 
     @SideOnly(Side.CLIENT)

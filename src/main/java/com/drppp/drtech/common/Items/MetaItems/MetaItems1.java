@@ -12,10 +12,7 @@ import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
 import gregtech.integration.baubles.BaubleBehavior;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -91,15 +88,18 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.TACTICAL_LASER_SUBMACHINE_GUN = this.addItem(17, "tactical_laser_submachine_gun")
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .setMaxStackSize(1)
-                .addComponents(ElectricStats.createElectricItem(12800000, GTValues.HV));
+                .addComponents(ElectricStats.createElectricItem(12800000, GTValues.HV))
+                .addComponents(new TacticalLaserSubmachineGunBehavior());
         DrMetaItems.ELECTRIC_PLASMA_GUN = this.addItem(18, "electric_plasma_gun")
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .setMaxStackSize(1)
-                .addComponents(ElectricStats.createElectricItem(12800000, GTValues.HV));
+                .addComponents(ElectricStats.createElectricItem(12800000, GTValues.HV))
+                .addComponents(new ElectricPlasmaGunBehavior());
         DrMetaItems.ADVANCED_TACHINO_DISRUPTOR = this.addItem(19, "advanced_tachino_disruptor")
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .setMaxStackSize(1)
-                .addComponents(ElectricStats.createElectricItem(51200000, GTValues.IV));
+                .addComponents(ElectricStats.createElectricItem(51200000, GTValues.IV))
+                .addComponents(new AdvancedTachinoDisruptorBehavior());
 
         DrMetaItems.NUCLEAR_BATTERY_LV = this.addItem(21, "nuclear_battery_lv")
                 .setCreativeTabs(DrTechMain.DrTechTab)
@@ -372,11 +372,7 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.FLUID_CORE_T10 = this.addItem(109, "fluid_core.t10");
     }
 
-    @Override
-    public @NotNull ActionResult<ItemStack> onItemRightClick(@NotNull World world, EntityPlayer player, @NotNull EnumHand hand) {
-        MetItemsEvent.onItemRightClick(world, player, hand);
-        return super.onItemRightClick(world, player, hand);
-    }
+
 
     @Override
     public @NotNull EnumActionResult onItemUse(EntityPlayer player, @NotNull World world, @NotNull BlockPos pos, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -384,9 +380,5 @@ public class MetaItems1 extends StandardMetaItem {
         return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
     }
 
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        MetItemsEvent.hitEntity(stack, target, attacker);
-        return super.hitEntity(stack, target, attacker);
-    }
+
 }

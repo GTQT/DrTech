@@ -47,9 +47,9 @@ public class XCustomizedParticle implements IXCustomizedEffect{
 		float[] info = DrtechMathUtils.getPlayerView(viewer, partialTicks);
 		float alpha = (1.0f - (float) currentTicks / (float) maxTicks);
 
-		int red = (int) color.x;
-		int blue = (int) color.y;
-		int green = (int) color.z;
+		int red = toColorChannel(color.x);
+		int green = toColorChannel(color.y);
+		int blue = toColorChannel(color.z);
 		GlStateManager.enableBlend();
 	    GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
 	    GlStateManager.depthMask(true);
@@ -69,6 +69,12 @@ public class XCustomizedParticle implements IXCustomizedEffect{
 		
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
+	}
+
+	private int toColorChannel(double value) {
+		double channel = value <= 1.0d ? value * 255.0d : value;
+		channel = Math.max(0.0d, Math.min(255.0d, channel));
+		return (int) channel;
 	}
 	
 	public void onSpecialRender(double x, double y, double z,float partialTicks)
