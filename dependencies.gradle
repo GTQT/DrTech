@@ -50,7 +50,7 @@ dependencies {
     implementation rfg.deobf("curse.maven:endercore-231868:4671384")
     implementation rfg.deobf("curse.maven:enderio-64578:4674244")
     implementation rfg.deobf(files("libs/modelloader-1.0.0.jar"))
-
+    embed files("libs/personalworlds-1.12.2-1.0.6.jar")
 
 
 }

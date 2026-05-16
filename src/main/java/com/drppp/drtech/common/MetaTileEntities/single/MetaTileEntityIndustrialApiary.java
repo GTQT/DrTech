@@ -92,14 +92,37 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     public int i=0;
     public boolean isActive=true;
     public boolean isWorkingEnabled=true;
+    private boolean isProcessing = false;
     public int mProgresstime=0;
     public int mMaxProgresstime=100;
     public int progressPer=0;
     public int mEUt=0;
-    ItemStackHandler inventoryBees = new OnlyBeesStackhandler(2);
-    ItemStackHandler inventoryUpgrade = new OnlyUpgradeStackhandler(4);
-    ItemStackHandler inventoryOutput = new InOutItemStackHandler(12,false);
-    public  ItemStack[] mOutputItems = new ItemStack[12];
+    private final ItemStackHandler inventoryBees = new OnlyBeesStackhandler(2) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            super.onContentsChanged(slot);
+            markDirty();
+            if (slot == queen) {
+                clearBeeCaches();
+            }
+        }
+    };
+    private final ItemStackHandler inventoryUpgrade = new OnlyUpgradeStackhandler(4) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            super.onContentsChanged(slot);
+            upgradeInventoryDirty = true;
+            markDirty();
+        }
+    };
+    private final ItemStackHandler inventoryOutput = new InOutItemStackHandler(12,false) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            super.onContentsChanged(slot);
+            markDirty();
+        }
+    };
+    public ItemStack[] mOutputItems = new ItemStack[12];
     public static final int beeCycleLength = 550;
     public static final int baseEUtUsage = 37;
     private static final int queen = 0;
@@ -116,6 +139,8 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     private ItemStack usedQueen = null;
     private IBee usedQueenBee = null;
     private IEffectData[] effectData = new IEffectData[2];
+    private boolean upgradeInventoryDirty = true;
+    private boolean errorStatesDirty = false;
     public MetaTileEntityIndustrialApiary(ResourceLocation metaTileEntityId, ICubeRenderer renderer) {
         super(metaTileEntityId, GTValues.UHV);
         this.renderer = renderer;
@@ -144,10 +169,10 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         scroll.addWidget(textWidget);
         builder.widget(scroll);
         var btn = new ToggleButtonWidget(13,18, 18, 18,
-                Textures.CROSS, this::isWorkingEnabled,this::setWorkingEnabled)
+                Textures.CROSS, this::isWorkingEnabled, pressed -> this.setWorkingEnabled(!pressed))
                 .setTooltipText("drtech.gui.industrial_apiary.tooltip.1")
                 .shouldUseBaseBackground();
-        if(isWorking())
+        if(isWorkingEnabled())
         {
             btn.setButtonTexture(Textures.CHECK_MARK);
             btn.updateScreenOnFrame();
@@ -158,7 +183,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         }
         builder.widget(btn);
         builder.widget(new ToggleButtonWidget(13,38, 18, 18,
-                GuiTextures.ARROW_DOUBLE, this::isActive,this::cancelProcess)
+                GuiTextures.ARROW_DOUBLE, this::isActive, pressed -> this.cancelProcess(!pressed))
                 .setTooltipText("drtech.gui.industrial_apiary.tooltip.2")
                 .shouldUseBaseBackground());
         builder.bindPlayerInventory(entityPlayer.inventory,86);
@@ -195,6 +220,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         super.writeInitialSyncData(buf);
         buf.writeBoolean(this.isActive);
         buf.writeBoolean(this.isWorkingEnabled);
+        buf.writeBoolean(this.isProcessing);
         if(usedQueen==null)
             usedQueen=ItemStack.EMPTY;
         buf.writeItemStack(usedQueen);
@@ -207,6 +233,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         super.receiveInitialSyncData(buf);
         isActive = buf.readBoolean();
         isWorkingEnabled = buf.readBoolean();
+        isProcessing = buf.readBoolean();
         try {
             usedQueen=buf.readItemStack();
         } catch (IOException e) {
@@ -217,9 +244,24 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     }
     @Override
     public void setWorkingEnabled(boolean b) {
+        if (this.isWorkingEnabled == b) {
+            return;
+        }
         this.isWorkingEnabled = b;
         markDirty();
         writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(isWorkingEnabled));
+        if (!b) {
+            setProcessing(false);
+        }
+    }
+
+    private void setProcessing(boolean processing) {
+        if (this.isProcessing == processing) {
+            return;
+        }
+        this.isProcessing = processing;
+        markDirty();
+        writeCustomData(4803, buf -> buf.writeBoolean(this.isProcessing));
     }
 
     public void setActive(boolean b) {
@@ -256,7 +298,10 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         } else if (dataId == GregtechDataCodes.WORKING_ENABLED) {
             isWorkingEnabled = buf.readBoolean();
             scheduleRenderUpdate();
-        }else if(dataId==4800)
+        } else if (dataId == 4803) {
+            isProcessing = buf.readBoolean();
+            scheduleRenderUpdate();
+        } else if(dataId==4800)
         {
             mEUt = buf.readInt();
         }else if(dataId==4801)
@@ -270,10 +315,6 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         {
             readData(buf);
         }
-//        else if(dataId==4803)
-//        {
-//            this.error = buf.readString(32700);
-//        }
     }
     @Nullable
     @Override
@@ -298,25 +339,19 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
             }
         }
         if (!getWorld().isRemote) {
-            if (!isWorking() && isActive()) {
-                if (this.energyContainer.getEnergyStored()>mEUt) {
-                    final boolean check = checkRecipe();
-                    if (check ) {
-                        setWorkingEnabled(true);
-                    }
-                }
-            } else {
-
+            if (isWorking()) {
                 if (this.mProgresstime < 0) {
                     this.mProgresstime++;
                     return;
                 }
                 if (this.energyContainer.addEnergy(-this.mEUt)>=0) {
-                    setWorkingEnabled(false);
+                    setProcessing(false);
                     return;
                 }
                 if (this.hasErrors()) {
-                    if (getOffsetTimer() % 100 == 0) if (!canWork(usedQueen)) setWorkingEnabled(false);
+                    if (getOffsetTimer() % 100 == 0 && !canWork(usedQueen)) {
+                        setProcessing(false);
+                    }
                     return;
                 }
                 this.mProgresstime++;
@@ -333,7 +368,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
 
                 if (this.mProgresstime % 100 == 0) {
                     if (!canWork(usedQueen)) {
-                        setWorkingEnabled(false);
+                        setProcessing(false);
                         return;
                     }
                 }
@@ -341,47 +376,22 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
                 if (this.mProgresstime >= this.mMaxProgresstime) {
                     if (usedQueenBee != null && !usedQueen.isEmpty()) doAcceleratedEffects();
                     updateModifiers();
-                    for (int i = 0; i < mOutputItems.length; i++)
-                    {
-                        if (mOutputItems[i] != null && !mOutputItems[i].isEmpty()) for (int j = 0; j < mOutputItems.length; j++) {
-                            if (j == 0 && isAutomated)
-                            {
-                                if (beeRoot.isMember(mOutputItems[i], EnumBeeType.QUEEN) || beeRoot.isMember(mOutputItems[i], EnumBeeType.PRINCESS))
-                                {
-                                   inventoryBees.insertItem(queen,mOutputItems[i].copy(),false) ;
-                                    mOutputItems[i]=null;
-                                } else if (beeRoot.isMember(mOutputItems[i], EnumBeeType.DRONE))
-                                {
-                                     if(inventoryBees.insertItem(drone,mOutputItems[i].copy(),true) == ItemStack.EMPTY)
-                                     {
-                                         inventoryBees.insertItem(drone,mOutputItems[i].copy(),false);
-                                         mOutputItems[i]=null;
-                                     }
-                                }
-                            } else if (mAutoQueen && i == 0 && j == 0 && beeRoot.isMember(mOutputItems[0], EnumBeeType.QUEEN))
-                            {
-                                inventoryBees.insertItem(queen,mOutputItems[i].copy(),false);
-                                mOutputItems[0]=null;
-                                break;
-                            }
-                        }
+                    flushPendingOutputs();
+                    resetProcessingState();
+                }
+            } else if (isActive() && isWorkingEnabled()) {
+                if (hasPendingProcess()) {
+                    if (this.energyContainer.getEnergyStored() > mEUt) {
+                        setProcessing(true);
                     }
-                    for (int j = 0; j < mOutputItems.length; j++) {
-                        if(mOutputItems!=null && mOutputItems[j]!=null && !mOutputItems[j].isEmpty())
-                            GTTransferUtils.insertItem(inventoryOutput,mOutputItems[j].copy(),false);
+                } else if (this.energyContainer.getEnergyStored()>mEUt) {
+                    final boolean check = checkRecipe();
+                    if (check ) {
+                        setProcessing(true);
                     }
-                    Arrays.fill(mOutputItems, null);
-                    mEUt = 0;
-                    setmEut(mEUt);
-                    mProgresstime = 0;
-                    mMaxProgresstime = 0;
-                    setUsedQueen(null);
-                    setWorkingEnabled(false);
-                    if (this.energyContainer.removeEnergy(this.mEUt)>0 && checkRecipe())
-                        setWorkingEnabled(true);
                 }
             }
-            progressPer = (int)(((float)mProgresstime / (float)mMaxProgresstime) * 100);
+            progressPer = this.mMaxProgresstime > 0 ? (int) (((float) this.mProgresstime / (float) this.mMaxProgresstime) * 100) : 0;
         }
     }
     private float getFinalChance(float baseChance, float speed, float prodMod, float modifier) {
@@ -389,36 +399,84 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         return (float) finalchance;
     }
 
+    private void clearBeeCaches() {
+        usedQueenBee = null;
+        retrievedpollen = null;
+        retrievingPollenInThisOperation = false;
+        flowercoords = null;
+        flowerBlock = null;
+        flowerBlockMeta = 0;
+        flowerType = "";
+        Arrays.fill(effectData, null);
+    }
+    private void dropInventoryContents(ItemStackHandler handler) {
+        BlockPos pos = getPos();
+        World world = getWorld();
+        for (int slot = 0; slot < handler.getSlots(); slot++) {
+            ItemStack stack = handler.getStackInSlot(slot);
+            if (stack.isEmpty()) {
+                continue;
+            }
+            world.spawnEntity(new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack.copy()));
+            handler.extractItem(slot, stack.getCount(), false);
+        }
+    }
+
+    private boolean tryRouteBeeOutput(ItemStack stack, int slotIndex) {
+        if (stack == null || stack.isEmpty()) {
+            return true;
+        }
+        if (isAutomated) {
+            if (beeRoot.isMember(stack, EnumBeeType.QUEEN) || beeRoot.isMember(stack, EnumBeeType.PRINCESS)) {
+                if (inventoryBees.insertItem(queen, stack.copy(), true).isEmpty()) {
+                    inventoryBees.insertItem(queen, stack.copy(), false);
+                    return true;
+                }
+            } else if (beeRoot.isMember(stack, EnumBeeType.DRONE) && inventoryBees.insertItem(drone, stack.copy(), true).isEmpty()) {
+                inventoryBees.insertItem(drone, stack.copy(), false);
+                return true;
+            }
+        }
+        if (mAutoQueen && slotIndex == 0 && beeRoot.isMember(stack, EnumBeeType.QUEEN)
+                && inventoryBees.insertItem(queen, stack.copy(), true).isEmpty()) {
+            inventoryBees.insertItem(queen, stack.copy(), false);
+            return true;
+        }
+        return false;
+    }
+
+    private void flushPendingOutputs() {
+        for (int slot = 0; slot < mOutputItems.length; slot++) {
+            ItemStack output = mOutputItems[slot];
+            if (output == null || output.isEmpty()) {
+                continue;
+            }
+            if (tryRouteBeeOutput(output, slot)) {
+                mOutputItems[slot] = null;
+                continue;
+            }
+            GTTransferUtils.insertItem(inventoryOutput, output.copy(), false);
+            mOutputItems[slot] = null;
+        }
+    }
+
+    private void resetProcessingState() {
+        Arrays.fill(mOutputItems, null);
+        setmEut(0);
+        mProgresstime = 0;
+        mMaxProgresstime = 0;
+        progressPer = 0;
+        setUsedQueen(null);
+        setProcessing(false);
+        clearBeeCaches();
+    }
+
     @Override
     public void onRemoval() {
         super.onRemoval();
-        for (int i = 0; i < inventoryBees.getSlots(); i++) {
-            var pos = getPos();
-            if(!inventoryBees.getStackInSlot(i).isEmpty())
-            {
-                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,inventoryBees.getStackInSlot(i)));
-                inventoryBees.extractItem(i,1,false);
-            }
-
-        }
-        for (int i = 0; i < inventoryUpgrade.getSlots(); i++) {
-            var pos = getPos();
-            if(!inventoryUpgrade.getStackInSlot(i).isEmpty())
-            {
-                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,inventoryUpgrade.getStackInSlot(i)));
-                inventoryUpgrade.extractItem(i,1,false);
-            }
-
-        }
-        for (int i = 0; i < inventoryOutput.getSlots(); i++) {
-            var pos = getPos();
-            if(!inventoryOutput.getStackInSlot(i).isEmpty())
-            {
-                getWorld().spawnEntity(new EntityItem(getWorld(),pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,inventoryOutput.getStackInSlot(i)));
-                inventoryOutput.extractItem(i,1,false);
-            }
-
-        }
+        dropInventoryContents(inventoryBees);
+        dropInventoryContents(inventoryUpgrade);
+        dropInventoryContents(inventoryOutput);
     }
 
     boolean retrievingPollenInThisOperation = false;
@@ -631,16 +689,19 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
             setmEut(0);
             mProgresstime = 0;
             mMaxProgresstime = 0;
+            setProcessing(false);
             setActive(false);
             if(inventoryBees.getStackInSlot(queen).isEmpty())
                 setQueen(usedQueen);
             else
                 GTTransferUtils.insertItem(inventoryOutput,usedQueen,false);
-            setWorkingEnabled(false);
             setUsedQueen(null);
+            clearBeeCaches();
         }else {
+            setProcessing(false);
             setActive(flag);
             setUsedQueen(null);
+            clearBeeCaches();
         }
     }
     @Override
@@ -648,6 +709,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         super.writeToNBT(data);
         data.setBoolean("isActive", isActive);
         data.setBoolean("isWorkingEnabled", isWorkingEnabled);
+        data.setBoolean("isProcessing", isProcessing);
         data.setInteger("Progresstime",this.mProgresstime);
         data.setInteger("maxProgresstime",this.mMaxProgresstime);
         data.setTag("invBees",inventoryBees.serializeNBT());
@@ -684,17 +746,24 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         super.readFromNBT(data);
         isActive = data.getBoolean("isActive");
         isWorkingEnabled = data.getBoolean("isWorkingEnabled");
+        isProcessing = data.getBoolean("isProcessing");
         mProgresstime = data.getInteger("Progresstime");
         mMaxProgresstime = data.getInteger("maxProgresstime");
         inventoryBees.deserializeNBT(data.getCompoundTag("invBees"));
         inventoryUpgrade.deserializeNBT(data.getCompoundTag("invUpgrade"));
         inventoryOutput.deserializeNBT(data.getCompoundTag("invOutputs"));
+        upgradeInventoryDirty = true;
+        clearBeeCaches();
         mEUt = data.getInteger("mEut");
         mSpeed = data.getInteger("mSpeed");
         if(data.hasKey("usedQueen"))
         {
             usedQueen = new ItemStack(data.getCompoundTag("usedQueen"));
-            if (usedQueenBee == null || usedQueen.isEmpty()) usedQueenBee = beeRoot.getMember(usedQueen);
+            if (!usedQueen.isEmpty()) {
+                usedQueenBee = beeRoot.getMember(usedQueen);
+            }
+        } else {
+            usedQueen = null;
         }
         mAutoQueen = data.getBoolean("autoQueen");
         for (int i = 0; i < 12; i++) {
@@ -712,6 +781,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
             uid = data.getUniqueId("PlayerUUID");
         if(data.hasKey("PlayerName"))
             name = data.getString("PlayerName");
+        errorStatesDirty = false;
     }
     public void setUUID(EntityPlayer player) {
         this.uid = player.getUniqueID();
@@ -734,7 +804,11 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     }
 
     public boolean isWorking() {
-        return this.isActive &&  this.isWorkingEnabled;
+        return this.isActive && this.isProcessing;
+    }
+
+    private boolean hasPendingProcess() {
+        return usedQueen != null && !usedQueen.isEmpty() && this.mMaxProgresstime > 0;
     }
 
     @Override
@@ -790,10 +864,13 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     private int maxspeed = 0;
     public HashSet<IErrorState> mErrorStates = new HashSet<>();
     public void updateModifiers() {
+        if (!upgradeInventoryDirty) {
+            return;
+        }
         final GT_ApiaryModifier mods = new GT_ApiaryModifier();
         for (int i = 0; i < upgradeSlotCount; i++) {
             final ItemStack s = inventoryUpgrade.getStackInSlot(upgradeSlot + i);
-            if (s == null) continue;
+            if (s.isEmpty()) continue;
             if (GT_ApiaryUpgrade.isUpgrade(s)) {
                 final GT_ApiaryUpgrade upgrade = GT_ApiaryUpgrade.getUpgrade(s);
                 upgrade.applyModifiers(mods, s);
@@ -820,12 +897,14 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
 
         if (mLockedSpeed) mSpeed = maxspeed;
         else mSpeed = Math.min(mSpeed, maxspeed);
+        upgradeInventoryDirty = false;
     }
     @Override
     public boolean setCondition(boolean b, IErrorState iErrorState) {
-        if (b) mErrorStates.add(iErrorState);
-        else mErrorStates.remove(iErrorState);
-        writeCustomData(4802,buf->writeData(buf));
+        final boolean changed = b ? mErrorStates.add(iErrorState) : mErrorStates.remove(iErrorState);
+        if (changed) {
+            errorStatesDirty = true;
+        }
         return b;
     }
     @Override
@@ -838,8 +917,10 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     }
     @Override
     public void clearErrors() {
-        mErrorStates.clear();
-        writeCustomData(4802,buf->writeData(buf));
+        if (!mErrorStates.isEmpty()) {
+            mErrorStates.clear();
+            errorStatesDirty = true;
+        }
     }
 
     @Override
@@ -850,78 +931,99 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
 
     @Override
     public void readData(PacketBuffer packetBuffer) {
-        for (int i = packetBuffer.readInt(); i > 0; i--)
-            mErrorStates.add(ForestryAPI.errorStateRegistry.getErrorState(packetBuffer.readString(32767)));
+        mErrorStates.clear();
+        for (int i = packetBuffer.readInt(); i > 0; i--) {
+            IErrorState errorState = ForestryAPI.errorStateRegistry.getErrorState(packetBuffer.readString(32767));
+            if (errorState != null) {
+                mErrorStates.add(errorState);
+            }
+        }
+        errorStatesDirty = false;
     }
-
 
     public ImmutableSet<IErrorState> getErrorStates() {
         return ImmutableSet.copyOf(mErrorStates);
     }
+
+    private void syncErrorStatesIfNeeded() {
+        if (!getWorld().isRemote && errorStatesDirty) {
+            errorStatesDirty = false;
+            writeCustomData(4802, buf -> writeData(buf));
+        }
+    }
+
+    private boolean applyBeeConditions(IBee bee) {
+        for (IErrorState err : bee.getCanWork(this)) {
+            setCondition(true, err);
+        }
+        setCondition(!checkFlower(bee), EnumErrorCode.NO_FLOWER);
+        if (contains(EnumErrorCode.NOT_NIGHT) && isselfUnlightedMod()) {
+            setCondition(false, EnumErrorCode.NOT_NIGHT);
+        }
+        syncErrorStatesIfNeeded();
+        return !hasErrors();
+    }
+
     private boolean canWork(ItemStack queen) {
         clearErrors();
-        if (queen == null) return true; // Reloaded the chunk ?
-        if (beeRoot.isMember(queen, EnumBeeType.PRINCESS)) return true;
-        final IBee bee = beeRoot.getMember(queen);
-        for (IErrorState err : bee.getCanWork(this)) setCondition(true, err);
-        setCondition(!checkFlower(bee), EnumErrorCode.NO_FLOWER);
-        if(contains(EnumErrorCode.NOT_NIGHT) && isselfUnlightedMod())
-        {
-            setCondition(false,EnumErrorCode.NOT_NIGHT);
+        if (queen == null || queen.isEmpty()) {
+            syncErrorStatesIfNeeded();
+            return true;
         }
-        return !hasErrors();
+        if (beeRoot.isMember(queen, EnumBeeType.PRINCESS)) {
+            syncErrorStatesIfNeeded();
+            return true;
+        }
+        return applyBeeConditions(beeRoot.getMember(queen));
     }
 
     private boolean canWork() {
         clearErrors();
-        final EnumBeeType beeType = beeRoot.getType(getQueen());
+        final ItemStack queenStack = getQueen();
+        final EnumBeeType beeType = beeRoot.getType(queenStack);
         if (beeType == EnumBeeType.PRINCESS) {
             setCondition(!beeRoot.isDrone(getDrone()), EnumErrorCode.NO_DRONE);
+            syncErrorStatesIfNeeded();
             return !hasErrors();
         }
         if (beeType == EnumBeeType.QUEEN) {
-            final IBee bee = beeRoot.getMember(getQueen());
-            for (IErrorState err : bee.getCanWork(this)) setCondition(true, err);
-            setCondition(!checkFlower(bee), EnumErrorCode.NO_FLOWER);
-            if(contains(EnumErrorCode.NOT_NIGHT) && isselfUnlightedMod())
-            {
-                setCondition(false,EnumErrorCode.NOT_NIGHT);
-            }
-            return !hasErrors();
-        } else {
-            setCondition(true, EnumErrorCode.NO_QUEEN);
-            return false;
+            return applyBeeConditions(beeRoot.getMember(queenStack));
         }
+        setCondition(true, EnumErrorCode.NO_QUEEN);
+        syncErrorStatesIfNeeded();
+        return false;
     }
 
     private boolean checkFlower(IBee bee) {
-        final String flowerType = bee.getGenome()
+        final World world = getWorld();
+        final String currentFlowerType = bee.getGenome()
                 .getFlowerProvider()
                 .getFlowerType();
-        if (!this.flowerType.equals(flowerType)) flowercoords = null;
+        if (!this.flowerType.equals(currentFlowerType)) {
+            flowercoords = null;
+        }
         if (flowercoords != null) {
-            IBlockState state = getWorld().getBlockState(flowercoords);
+            IBlockState state = world.getBlockState(flowercoords);
             Block block = state.getBlock();
             int meta = block.getMetaFromState(state);
-
-            if (block != flowerBlock || meta != flowerBlockMeta)
-                if (!FlowerManager.flowerRegistry.isAcceptedFlower(flowerType, getWorld(), flowercoords))
+            if (block != flowerBlock || meta != flowerBlockMeta) {
+                if (!FlowerManager.flowerRegistry.isAcceptedFlower(currentFlowerType, world, flowercoords)) {
                     flowercoords = null;
-                else {
-                    flowerBlock = getWorld().getBlockState(flowercoords).getBlock();
-                    flowerBlockMeta = flowerBlock.getMetaFromState(getWorld().getBlockState(flowercoords));
+                } else {
+                    flowerBlock = block;
+                    flowerBlockMeta = meta;
                 }
+            }
         }
         if (flowercoords == null) {
-            var s=  getTerritoryModifier(null, 1f) *  BeeManager.beeRoot.getBeekeepingMode(getWorld()).getBeeModifier().getTerritoryModifier(null, 1f);
-            var flowercoordss = FlowerManager.flowerRegistry.getAcceptedFlowerCoordinates(this, bee, flowerType,(int)s);
-
-            if(flowercoordss.size()>0)
-                flowercoords = flowercoordss.get(0);
-            if (flowercoords != null) {
-                flowerBlock = getWorld().getBlockState(flowercoords).getBlock();
-                flowerBlockMeta = flowerBlock.getMetaFromState(getWorld().getBlockState(flowercoords));
-                this.flowerType = flowerType;
+            float territory = getTerritoryModifier(null, 1f) * BeeManager.beeRoot.getBeekeepingMode(world).getBeeModifier().getTerritoryModifier(null, 1f);
+            List<BlockPos> acceptedFlowers = FlowerManager.flowerRegistry.getAcceptedFlowerCoordinates(this, bee, currentFlowerType, (int) territory);
+            if (!acceptedFlowers.isEmpty()) {
+                flowercoords = acceptedFlowers.get(0);
+                IBlockState state = world.getBlockState(flowercoords);
+                flowerBlock = state.getBlock();
+                flowerBlockMeta = flowerBlock.getMetaFromState(state);
+                this.flowerType = currentFlowerType;
             }
         }
         return flowercoords != null;
@@ -929,15 +1031,15 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     private void doEffect() {
         final IBeeGenome genome = usedQueenBee.getGenome();
         final IAlleleBeeEffect effect = genome.getEffect();
-        // 检查效果是否可组合
+        // Skip effects that cannot stack.
         if (!effect.isCombinable()) {
             return;
         }
         effectData[0] = effect.validateStorage(effectData[0]);
         effect.doEffect(genome, effectData[0], this);
-        // 获取非活跃等位基因的效果
+        // Apply the inactive effect allele when it can stack too.
         final IAlleleBeeEffect secondary = (IAlleleBeeEffect) genome.getInactiveAllele(EnumBeeChromosome.EFFECT);
-        // 检查第二个效果是否可组合
+        // Skip the secondary effect when it is not combinable.
         if (!secondary.isCombinable()) {
             return;
         }
@@ -1023,21 +1125,31 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
 
     @Override
     public void setQueen(ItemStack itemStack) {
-        if(itemStack==ItemStack.EMPTY)
-            inventoryBees.extractItem(queen,1,false);
-        if(inventoryBees.insertItem(queen, itemStack,true) == ItemStack.EMPTY)
+        if(itemStack == null || itemStack.isEmpty()) {
+            ItemStack existing = inventoryBees.getStackInSlot(queen);
+            if (!existing.isEmpty()) {
+                inventoryBees.extractItem(queen, existing.getCount(), false);
+            }
+            return;
+        }
+        if(inventoryBees.insertItem(queen, itemStack, true).isEmpty())
         {
-            inventoryBees.insertItem(queen, itemStack,false);
+            inventoryBees.insertItem(queen, itemStack, false);
         }
     }
 
     @Override
     public void setDrone(ItemStack itemStack) {
-        if(itemStack==ItemStack.EMPTY)
-            inventoryBees.extractItem(drone,1,false);
-        if(inventoryBees.insertItem(drone, itemStack,true) == ItemStack.EMPTY)
+        if(itemStack == null || itemStack.isEmpty()) {
+            ItemStack existing = inventoryBees.getStackInSlot(drone);
+            if (!existing.isEmpty()) {
+                inventoryBees.extractItem(drone, existing.getCount(), false);
+            }
+            return;
+        }
+        if(inventoryBees.insertItem(drone, itemStack, true).isEmpty())
         {
-            inventoryBees.insertItem(drone, itemStack,false);
+            inventoryBees.insertItem(drone, itemStack, false);
         }
     }
 
