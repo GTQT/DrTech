@@ -1,5 +1,6 @@
 package com.brachy84.mechtech.api.armor;
 
+import com.brachy84.mechtech.MechTech;
 import com.brachy84.mechtech.common.MTConfig;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -263,8 +264,8 @@ public class ModularArmor implements ISpecialArmorLogic {
     public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
         String armorTexture = "nano_muscule_suite";
         return slot != EntityEquipmentSlot.LEGS ?
-                String.format("gregtech:textures/armor/%s_1.png", armorTexture) :
-                String.format("gregtech:textures/armor/%s_2.png", armorTexture);
+                String.format("%s:textures/armor/%s_1.png", MechTech.MODID, armorTexture) :
+                String.format("%s:textures/armor/%s_2.png", MechTech.MODID, armorTexture);
     }
 
     public static NBTTagCompound getArmorData(ItemStack itemStack) {
