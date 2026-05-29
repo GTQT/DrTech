@@ -32,7 +32,7 @@ import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import gregtech.api.metatileentity.registry.MTEManager;
 import gregtech.api.unification.material.event.MaterialRegistryEvent;
-import gregtechfoodoption.machines.farmer.FarmerModeRegistry;
+import gregtechfoodoption.common.machines.farmer.FarmerModeRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -61,7 +61,7 @@ import static com.drppp.drtech.Tags.MODID;
 
 @Mod(modid = MODID, version = Tags.VERSION, name = Tags.MODNAME,
         acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "required-after:gregtech@[2.9.0-beta,);"
+        dependencies = "required-after:gregtech@[1.9.0,);"
 )
 public class DrTechMain {
     public static final Logger LOGGER = LogManager.getLogger(MODID);

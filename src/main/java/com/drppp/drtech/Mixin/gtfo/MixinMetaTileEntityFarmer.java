@@ -1,7 +1,7 @@
 package com.drppp.drtech.Mixin.gtfo;
 
 import com.drppp.drtech.Tile.TileCropStick;
-import gregtechfoodoption.machines.farmer.MetaTileEntityFarmer;
+import gregtechfoodoption.common.machines.farmer.MetaTileEntityFarmer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
