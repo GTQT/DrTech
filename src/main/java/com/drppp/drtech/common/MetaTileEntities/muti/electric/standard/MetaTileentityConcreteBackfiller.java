@@ -4,8 +4,6 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.renderer.ICubeRenderer;
@@ -19,6 +17,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
 public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithControl {
     public int level = 1;
@@ -117,28 +123,45 @@ public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithCont
         return false;
     }
 
+    private static SoftTemplate getTemplate(int level) {
+        return TemplatePool.getInstance().register(
+                "drtech:concrete_backfiller/" + level,
+                () -> buildTemplate(level)
+        );
+    }
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return getTemplate(level).get();
+    }
+
+    private static BlockPatternTemplate buildTemplate(int level) {
+        return DeclarativePatternBuilder.start()
                 .aisle("XXX", "#F#", "#F#", "#F#", "###", "###", "###")
                 .aisle("XXX", "FCF", "FCF", "FCF", "#F#", "#F#", "#F#")
                 .aisle("XSX", "#F#", "#F#", "#F#", "###", "###", "###")
-                .where('S', selfPredicate())
-                .where('X', states(getCasingState())
+                .where('S', selfPredicate(MetaTileentityConcreteBackfiller.class))
+                .where('X', states(getCasingState(level))
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setExactLimit(1).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(3).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
                 )
-                .where('C', states(getCasingState()))
-                .where('F', getFramePredicate())
+                .where('C', states(getCasingState(level)))
+                .where('F', getFramePredicate(level))
                 .where('#', any())
-                .build();
+                .buildTemplate();
+
     }
 
     public IBlockState getCasingState() {
+        return getCasingState(level);
+    }
+
+    private static IBlockState getCasingState(int level) {
         if (level == 2)
             return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE);
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
+
     }
 
     @Override
@@ -150,9 +173,15 @@ public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithCont
 
     @NotNull
     private TraceabilityPredicate getFramePredicate() {
+        return getFramePredicate(level);
+    }
+
+    @NotNull
+    private static TraceabilityPredicate getFramePredicate(int level) {
         if (level == 2)
             return frames(Materials.Titanium);
         return frames(Materials.Steel);
+
     }
 
     @Override

@@ -15,8 +15,6 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
@@ -43,6 +41,20 @@ import java.util.List;
 import java.util.UUID;
 
 
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.casing.GTCasingGroups;
+
+import gregtech.api.pattern.casing.ICasing;
+
+import gregtech.api.block.IHeatingCoilBlockStats;
+
 public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
     private final long maxEnergyStore = 100000000;
     private long energyStore = 0;
@@ -54,25 +66,36 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
         super(metaTileEntityId);
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:player_beacon",
+            MetaTileEntityPlayerBeacon::buildTemplate
+    );
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "GGGGG", "     ")
                 .aisle("ACCCA", "GTTTG", "     ")
                 .aisle("ACCCA", "GTTTG", "  X  ")
                 .aisle("ACCCA", "GTTTG", "     ")
                 .aisle("AASAA", "GGGGG", "     ")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntityPlayerBeacon.class))
                 .where('X', blocks(Blocks.BEACON))
                 .where('T', blocks(Blocks.IRON_BLOCK))
                 .where(' ', any())
-                .where('C', heatingCoils())
+                .tieredCasing('C', GTCasingGroups.heatingCoils().group())
+                .withChannel(GTCasingGroups.heatingCoils().channel())
                 .where('G', frames(Materials.Steel))
                 .where('A',
                         abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)
                                 .or(states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID)))
                 )
-                .build();
+                .buildTemplate();
+
     }
 
     @Override

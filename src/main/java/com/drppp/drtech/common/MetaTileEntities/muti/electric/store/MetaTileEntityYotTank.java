@@ -24,8 +24,6 @@ import gregtech.api.gui.widgets.WidgetGroup;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.api.unification.material.Materials;
@@ -60,6 +58,16 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 
 public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements IControllable, IProgressBarMultiblock {
     private static final String NBT_FLUID_BANK = "EnergyBank";
@@ -253,19 +261,28 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         this.fluidBank.clearStore();
     }
     @NotNull
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:yot_tank",
+            MetaTileEntityYotTank::buildTemplate
+    );
+
     @Override
-    protected BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, FRONT, UP)
+    protected BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
                 .aisle("#####", "#XXX#", "#XXX#", "#XXX#", "#####")
                 .aisle("XXSXX", "XCCCX", "XCCCX", "XCCCX", "XXXXX")
-                .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG").setRepeatable(1, 14)
+                .aisleRepeatable(1, 14, "GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
                 .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
                 .aisle("LLLLL", "L###L", "L###L", "L###L", "LLLLL")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntityYotTank.class))
                 .where('#', any())
                 .where('C', states(getCasingState()))
                 .where('X', states(getCasingState())
-                        .or(autoAbilities())
+                        .or(staticDisplayAutoAbilities(true, true))
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
                         .or(abilities(DrtechCapabilities.YOT_HATCH).setMaxGlobalLimited(1))
@@ -273,13 +290,14 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 .where('G', states(getGlassState()))
                 .where('L', frames(Materials.Steel))
                 .where('B', BATTERY_PREDICATE.get())
-                .build();
+                .buildTemplate();
+
     }
-    protected IBlockState getCasingState() {
+    protected static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.YOT_TANK_CASING);
     }
 
-    protected IBlockState getGlassState() {
+    protected static IBlockState getGlassState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.FUSION_GLASS);
     }
     @Override
@@ -423,7 +441,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         return 0;
     }
 
-    
+
 
 
     private static class YotPartMatchWrapper {
@@ -601,5 +619,19 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 storage[i] = BigInteger.ZERO;
             }
         }
+    }
+    private static TraceabilityPredicate staticDisplayAutoAbilities(boolean maintenance, boolean muffler) {
+        TraceabilityPredicate predicate = new TraceabilityPredicate();
+        if (maintenance && true) {
+            predicate = predicate.or(abilities(MultiblockAbility.MAINTENANCE_HATCH)
+                    .setMinGlobalLimited(gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0)
+                    .setMaxGlobalLimited(1));
+        }
+        if (muffler) {
+            predicate = predicate.or(abilities(MultiblockAbility.MUFFLER_HATCH)
+                    .setMinGlobalLimited(1)
+                    .setMaxGlobalLimited(1));
+        }
+        return predicate;
     }
 }

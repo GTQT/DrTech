@@ -370,6 +370,18 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.FLUID_CORE_T8 = this.addItem(107, "fluid_core.t8");
         DrMetaItems.FLUID_CORE_T9 = this.addItem(108, "fluid_core.t9");
         DrMetaItems.FLUID_CORE_T10 = this.addItem(109, "fluid_core.t10");
+
+        DrMetaItems.FUSION_FIRST_WALL_PLATE = this.addItem(120, "fusion_first_wall_plate").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.FUSION_MAGNET_COIL = this.addItem(121, "fusion_magnet_coil").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.FUSION_COOLING_CHANNEL = this.addItem(122, "fusion_cooling_channel").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.TRITIUM_BREEDING_CELL = this.addItem(123, "tritium_breeding_cell").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.NEUTRON_CAPTURE_CORE = this.addItem(124, "neutron_capture_core").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.MAGNETIC_FIELD_STORAGE_CELL = this.addItem(125, "magnetic_field_storage_cell").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.DT_FUEL_INJECTOR = this.addItem(126, "dt_fuel_injector").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.RF_GENERATOR_CORE = this.addItem(127, "rf_generator_core").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.RF_WAVEGUIDE = this.addItem(128, "rf_waveguide").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.RF_PHASE_SYNCHRONIZER = this.addItem(129, "rf_phase_synchronizer").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.CERAMIC_RF_WINDOW = this.addItem(130, "ceramic_rf_window").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
     }
 
 

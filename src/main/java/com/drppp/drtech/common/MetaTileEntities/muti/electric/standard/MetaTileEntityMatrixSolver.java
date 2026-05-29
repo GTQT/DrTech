@@ -17,8 +17,6 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiMapMultiblockController;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.util.GTTransferUtils;
@@ -41,6 +39,16 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.TraceabilityPredicate;
 
 public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
     public int mode = 0;
@@ -129,9 +137,18 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
         tooltip.add("不支持单步配方生产，即未联和运算过的配方(深度为1的配方)");
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:matrix_solver",
+            MetaTileEntityMatrixSolver::buildTemplate
+    );
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start()
                 .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA")
                 .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
                 .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
@@ -149,10 +166,10 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
                 .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
                 .aisle("AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "                 ", " CCC CCC CCC CCC ", " CCC CCC CCC CCC ", "AAAAAAAAAAAAAAAAA")
                 .aisle("AAAAAAAAAAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAASAAAAAAAA", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "B       B       B", "AAAAAAAAAAAAAAAAA")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntityMatrixSolver.class))
                 .where(' ', any())
                 .where('A', states(BlocksInit.COMMON_CASING1.getStateFromMeta(7)).setMinGlobalLimited(578)
-                        .or(autoAbilities(true, true))
+                        .or(staticDisplayAutoAbilities(true, true))
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
                         .or(abilities(MultiblockAbility.INPUT_LASER).setMaxGlobalLimited(1))
                         .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMaxGlobalLimited(16))
@@ -164,7 +181,8 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
                 .where('D', states(BlocksInit.COMMON_CASING.getStateFromMeta(3)))
                 .where('C', states(BlocksInit.TRANSPARENT_CASING1.getStateFromMeta(2))
                 )
-                .build();
+                .buildTemplate();
+
     }
 
     @Override
@@ -398,4 +416,18 @@ public class MetaTileEntityMatrixSolver extends MetaTileEntityBaseWithControl {
         return item.getItem() == DrMetaItems.MATRIX_GEMS.getMetaItem() && item.getMetadata() == DrMetaItems.MATRIX_GEMS.getMetaValue();
     }
 
+    private static TraceabilityPredicate staticDisplayAutoAbilities(boolean maintenance, boolean muffler) {
+        TraceabilityPredicate predicate = new TraceabilityPredicate();
+        if (maintenance && true) {
+            predicate = predicate.or(abilities(MultiblockAbility.MAINTENANCE_HATCH)
+                    .setMinGlobalLimited(gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0)
+                    .setMaxGlobalLimited(1));
+        }
+        if (muffler) {
+            predicate = predicate.or(abilities(MultiblockAbility.MUFFLER_HATCH)
+                    .setMinGlobalLimited(1)
+                    .setMaxGlobalLimited(1));
+        }
+        return predicate;
+    }
 }

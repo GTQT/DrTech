@@ -24,8 +24,6 @@ import gregtech.api.gui.widgets.WidgetGroup;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.api.util.BlockInfo;
@@ -61,6 +59,16 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 
 public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase implements IControllable, IProgressBarMultiblock {
     private static final String NBT_FLUID_BANK = "FluidBank";
@@ -258,15 +266,24 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         }
     }
     @NotNull
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:tfft_tank",
+            MetatileEntityTwentyFiveFluidTank::buildTemplate
+    );
+
     @Override
-    protected BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, DOWN, FRONT)
+    protected BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start(RIGHT, DOWN, FRONT)
                 .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
-                .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG").setRepeatable(3, 14)
+                .aisleRepeatable(3, 14, "GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
                 .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetatileEntityTwentyFiveFluidTank.class))
                 .where('X', states(getCasingState())
-                        .or(autoAbilities())
+                        .or(staticDisplayAutoAbilities(true, true))
                         .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1)
                                 .or(abilities(MultiblockAbility.IMPORT_ITEMS).setExactLimit(1))
@@ -274,13 +291,14 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 )
                 .where('G', states(getGlassState()))
                 .where('B', BATTERY_PREDICATE.get())
-                .build();
+                .buildTemplate();
+
     }
-    protected IBlockState getCasingState() {
+    protected static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.TFFT_CASING);
     }
 
-    protected IBlockState getGlassState() {
+    protected static IBlockState getGlassState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.LAMINATED_GLASS);
     }
     @Override
@@ -479,7 +497,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         return 0;
     }
 
-    
+
 
 
     private static class TfftPartMatchWrapper {
@@ -640,5 +658,19 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 storage[circuit][i]=0;
             }
         }
+    }
+    private static TraceabilityPredicate staticDisplayAutoAbilities(boolean maintenance, boolean muffler) {
+        TraceabilityPredicate predicate = new TraceabilityPredicate();
+        if (maintenance && true) {
+            predicate = predicate.or(abilities(MultiblockAbility.MAINTENANCE_HATCH)
+                    .setMinGlobalLimited(gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0)
+                    .setMaxGlobalLimited(1));
+        }
+        if (muffler) {
+            predicate = predicate.or(abilities(MultiblockAbility.MUFFLER_HATCH)
+                    .setMinGlobalLimited(1)
+                    .setMaxGlobalLimited(1));
+        }
+        return predicate;
     }
 }

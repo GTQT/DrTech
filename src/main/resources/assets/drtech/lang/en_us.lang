@@ -495,3 +495,29 @@ tile.drtech.lantern.name=Lantern
 tile.drtech.soul_lantern.name=Soul Lantern
 tile.drtech.chain.name=Chain
 tile.drtech.composter.name=Composter
+# Fusion Reactor Casings
+tile.fusion_reactor_casing.plasma_containment_casing.name=Plasma Containment Chamber
+tile.fusion_reactor_casing.first_wall_casing.name=Fusion Reactor First Wall
+tile.fusion_reactor_casing.superconducting_magnet_casing.name=Superconducting Magnet Material
+tile.fusion_reactor_casing.cooling_channel_casing.name=Coolant Circuit
+tile.fusion_reactor_casing.tritium_breeding_blanket_casing.name=Tritium Breeding Blanket
+tile.fusion_reactor_casing.neutron_capture_casing.name=Neutron Capture Module
+tile.fusion_reactor_casing.radiation_shielding_casing.name=Radiation Shielding Shell
+tile.fusion_reactor_casing.rf_device_casing.name=RF Device Casing
+tile.fusion_reactor_casing.rf_waveguide_casing.name=RF Waveguide
+tile.fusion_reactor_casing.rf_capacitor_casing.name=RF High Voltage Storage Array
+tile.fusion_reactor_casing.rf_phase_synchronizer_casing.name=RF Phase Synchronizer
+tile.fusion_reactor_casing.rf_ceramic_window_casing.name=RF Ceramic Vacuum Window
+
+# Fusion Reactor Meta Items
+metaitem.fusion_first_wall_plate.name=Fusion Reactor First Wall Plate
+metaitem.fusion_magnet_coil.name=Fusion Reactor Superconducting Magnet Coil
+metaitem.fusion_cooling_channel.name=Fusion Reactor Cooling Channel Assembly
+metaitem.tritium_breeding_cell.name=Tritium Breeding Cell
+metaitem.neutron_capture_core.name=Neutron Capture Core
+metaitem.magnetic_field_storage_cell.name=Magnetic Field Storage Cell
+metaitem.dt_fuel_injector.name=DT Fuel Injection Nozzle
+metaitem.rf_generator_core.name=RF Generator Core
+metaitem.rf_waveguide.name=RF Waveguide Assembly
+metaitem.rf_phase_synchronizer.name=RF Phase Synchronizer Assembly
+metaitem.ceramic_rf_window.name=Ceramic Vacuum Window

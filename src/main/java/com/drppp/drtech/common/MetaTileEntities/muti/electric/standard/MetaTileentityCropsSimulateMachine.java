@@ -11,8 +11,6 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.KeyUtil;
 import gregtech.client.renderer.ICubeRenderer;
@@ -40,6 +38,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
 public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithControl {
     private ItemStack seed = new ItemStack(Items.AIR);
     private int seedCout = 0;
@@ -55,15 +61,24 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
         return new MetaTileentityCropsSimulateMachine(this.metaTileEntityId);
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:crops_simulate_machine",
+            MetaTileentityCropsSimulateMachine::buildTemplate
+    );
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "B###B", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "B###B", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "B###B", "AAAAA")
                 .aisle("AASAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "AAAAA")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileentityCropsSimulateMachine.class))
                 .where('B', states(getGlassesState()))
                 .where('X',  blocks(Blocks.FARMLAND))
                 .where('A',
@@ -75,9 +90,10 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
                                 .or(states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN)))
                 )
                 .where('#', any())
-                .build();
+                .buildTemplate();
+
     }
-    protected IBlockState getGlassesState() {
+    protected static IBlockState getGlassesState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
     @SideOnly(Side.CLIENT)

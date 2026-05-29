@@ -79,6 +79,20 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem FLUID_CORE_T8;
     public static MetaItem<?>.MetaValueItem FLUID_CORE_T9;
     public static MetaItem<?>.MetaValueItem FLUID_CORE_T10;
+
+    // Fusion reactor parts
+    public static MetaItem<?>.MetaValueItem FUSION_FIRST_WALL_PLATE;
+    public static MetaItem<?>.MetaValueItem FUSION_MAGNET_COIL;
+    public static MetaItem<?>.MetaValueItem FUSION_COOLING_CHANNEL;
+    public static MetaItem<?>.MetaValueItem TRITIUM_BREEDING_CELL;
+    public static MetaItem<?>.MetaValueItem NEUTRON_CAPTURE_CORE;
+    public static MetaItem<?>.MetaValueItem MAGNETIC_FIELD_STORAGE_CELL;
+    public static MetaItem<?>.MetaValueItem DT_FUEL_INJECTOR;
+    public static MetaItem<?>.MetaValueItem RF_GENERATOR_CORE;
+    public static MetaItem<?>.MetaValueItem RF_WAVEGUIDE;
+    public static MetaItem<?>.MetaValueItem RF_PHASE_SYNCHRONIZER;
+    public static MetaItem<?>.MetaValueItem CERAMIC_RF_WINDOW;
+
     public static void MetaItemsInit() {
         MetaItems1 metaItem = new MetaItems1();
         metaItem.setRegistryName("meta_items_mymod");

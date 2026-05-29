@@ -1,0 +1,70 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "plasma_containment_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/plasma_containment_casing"
+        }
+      },
+      "first_wall_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/first_wall_casing"
+        }
+      },
+      "superconducting_magnet_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/superconducting_magnet_casing"
+        }
+      },
+      "cooling_channel_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/cooling_channel_casing"
+        }
+      },
+      "tritium_breeding_blanket_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/tritium_breeding_blanket_casing"
+        }
+      },
+      "neutron_capture_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/neutron_capture_casing"
+        }
+      },
+      "radiation_shielding_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/radiation_shielding_casing"
+        }
+      },
+      "rf_device_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/rf_device_casing"
+        }
+      },
+      "rf_waveguide_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/rf_waveguide_casing"
+        }
+      },
+      "rf_capacitor_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/rf_capacitor_casing"
+        }
+      },
+      "rf_phase_synchronizer_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/rf_phase_synchronizer_casing"
+        }
+      },
+      "rf_ceramic_window_casing": {
+        "textures": {
+          "all": "drtech:blocks/fusion/rf_ceramic_window_casing"
+        }
+      }
+    }
+  }
+}

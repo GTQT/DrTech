@@ -15,7 +15,6 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
-import gregtech.api.pattern.BlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.client.renderer.ICubeRenderer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -122,10 +121,7 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
 
     }
 
-    @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return null;
-    }
+
 
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {

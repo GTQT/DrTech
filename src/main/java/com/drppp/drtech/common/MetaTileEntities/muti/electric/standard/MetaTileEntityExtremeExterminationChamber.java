@@ -17,8 +17,6 @@ import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
 import gregtech.api.metatileentity.multiblock.ui.MultiblockUIFactory;
 import gregtech.api.mui.GTGuiTextures;
 import gregtech.api.mui.GTGuis;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
@@ -59,6 +57,14 @@ import java.util.List;
 
 import static crafttweaker.mc1120.CraftTweaker.server;
 import static crazypants.enderio.base.fluid.Fluids.XP_JUICE;
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
 public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBaseWithControl {
 
@@ -327,15 +333,24 @@ public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBas
         displayedLooting = 0;
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:mob_killer",
+            MetaTileEntityExtremeExterminationChamber::buildTemplate
+    );
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start()
                 .aisle("XXXXX", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXSXX", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "XXXXX")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntityExtremeExterminationChamber.class))
                 .where('X', states(getCasingState()).setMinGlobalLimited(10)
                         .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
                         .or(abilities(MultiblockAbility.MUFFLER_HATCH).setExactLimit(1))
@@ -347,7 +362,8 @@ public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBas
                 .where('F', frames(Materials.Steel))
                 .where('A', air())
                 .where('#', blocks(Blocks.END_ROD))
-                .build();
+                .buildTemplate();
+
     }
 
     @SideOnly(Side.CLIENT)

@@ -25,7 +25,7 @@ dependencies {
     // Published dependencies
     api("com.cleanroommc:modularui:3.0.7") { transitive = false }
 
-    implementation rfg.deobf(files("libs/gregtech-gtqt-1.12.2-2.9.0-190.jar"))
+    implementation rfg.deobf(files("libs/gregtech-gtqt-1.12.2-1.9.0.jar"))
     implementation rfg.deobf(files("libs/ae2fc-2.7.10-unofficial.jar"))
     implementation rfg.deobf(files("libs/appliedenergistics2-v1.0.5-gtqt.jar"))
     implementation rfg.deobf(files("libs/GregicalityMultiblocks-gtqt-1.9.0.jar"))

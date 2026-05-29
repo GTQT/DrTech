@@ -25,8 +25,6 @@ import gregtech.api.metatileentity.ITieredMetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.api.unification.material.Materials;
@@ -58,6 +56,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
 public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase implements ITieredMetaTileEntity, IWorkable, IProgressBarMultiblock {
 
@@ -112,29 +118,39 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
         }
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:fluid_drilling_rig.iv",
+            MetaTileEntityInfiniteFluidDrill::buildTemplate
+    );
+
     @Override
-    protected BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
+    protected BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start()
                 .aisle("XXX", "#F#", "#F#", "#F#", "###", "###", "###")
                 .aisle("XXX", "FCF", "FCF", "FCF", "#F#", "#F#", "#F#")
                 .aisle("XSX", "#F#", "#F#", "#F#", "###", "###", "###")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntityInfiniteFluidDrill.class))
                 .where('X', states(getCasingState()).setMinGlobalLimited(3)
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(3))
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMaxGlobalLimited(1)))
                 .where('C', states(getCasingState()))
                 .where('F', getFramePredicate())
                 .where('#', any())
-                .build();
+                .buildTemplate();
+
     }
 
-    private IBlockState getCasingState() {
+    private static IBlockState getCasingState() {
 
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.NEUTRON_MACHINE_CASING);
     }
 
     @NotNull
-    private TraceabilityPredicate getFramePredicate() {
+    private static TraceabilityPredicate getFramePredicate() {
         return frames(Materials.NaquadahAlloy);
     }
 
@@ -390,5 +406,5 @@ public class MetaTileEntityInfiniteFluidDrill extends MultiblockWithDisplayBase 
     }
 
 
-    
+
 }

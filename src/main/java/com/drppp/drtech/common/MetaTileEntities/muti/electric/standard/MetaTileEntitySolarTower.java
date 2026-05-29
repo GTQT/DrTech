@@ -13,8 +13,6 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.NoEnergyMultiblockController;
 import gregtech.api.metatileentity.multiblock.ui.KeyManager;
 import gregtech.api.metatileentity.multiblock.ui.UISyncer;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.util.GTTransferUtils;
@@ -37,6 +35,14 @@ import java.util.List;
 
 import static gregtech.api.util.RelativeDirection.*;
 
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
 public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
     public static int max_heat = 100000;
     public int heat = 0;
@@ -49,20 +55,29 @@ public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
         this.recipeMapWorkable = new SolarTowerRecipeLogic(this);
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:solar_tower",
+            MetaTileEntitySolarTower::buildTemplate
+    );
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, FRONT, UP)
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
                 .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTTTTTTTT", "TTTTTTTTTTT", "TTTTTTTTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
                 .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTYYYTTTT", "TTTTYYYTTTT", "TTTTYYYTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
                 .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
                 .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
                 .aisle("###########", "###########", "#####T#####", "####TTT####", "###TYYYT###", "##TTYYYTT##", "###TYYYT###", "####TTT####", "#####T#####", "###########", "###########")
                 .aisle("###########", "###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTTYTTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########", "###########")
-                .aisle("###########", "###########", "###########", "###########", "#####G#####", "####GYG####", "#####G#####", "###########", "###########", "###########", "###########").setRepeatable(15)
-                .aisle("###########", "###########", "###########", "#####R#####", "####RRR####", "###RRYRR###", "####RRR####", "#####R#####", "###########", "###########", "###########").setRepeatable(5)
+                .aisleRepeatable(15, 15, "###########", "###########", "###########", "###########", "#####G#####", "####GYG####", "#####G#####", "###########", "###########", "###########", "###########")
+                .aisleRepeatable(5, 5, "###########", "###########", "###########", "#####R#####", "####RRR####", "###RRYRR###", "####RRR####", "#####R#####", "###########", "###########", "###########")
                 .aisle("###########", "###########", "###########", "###########", "#####Y#####", "####YYY####", "#####Y#####", "###########", "###########", "###########", "###########")
                 .aisle("###########", "###########", "###########", "###########", "###########", "#####S#####", "###########", "###########", "###########", "###########", "###########")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntitySolarTower.class))
                 .where('#', any())
                 .where('T', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING)).setMinGlobalLimited(210)
                         .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
@@ -74,7 +89,8 @@ public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
                 .where('Y', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING)))
                 .where('G', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING)))
                 .where('R', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_INHIBITION_CASING)))
-                .build();
+                .buildTemplate();
+
     }
 
     @Override

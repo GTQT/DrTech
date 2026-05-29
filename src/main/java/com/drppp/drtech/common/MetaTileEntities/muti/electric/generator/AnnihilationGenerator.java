@@ -27,8 +27,6 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
@@ -67,6 +65,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static gregtech.common.blocks.BlockGlassCasing.CasingType.FUSION_GLASS;
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.casing.GTCasingGroups;
+
+import gregtech.api.pattern.casing.ICasing;
 
 public class AnnihilationGenerator extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable, IFastRenderMetaTileEntity {
     private final AnnihilationGeneratorLogic logic;
@@ -149,19 +159,29 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
 
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:annihilation_generator",
+            AnnihilationGenerator::buildTemplate
+    );
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start()
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "BXXXB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B#W#B", "BXXXB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "BXXXB", "TTTTT")
                 .aisle("AASAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "TTTTT")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(AnnihilationGenerator.class))
                 .where('T', states(getCasingState()))
                 .where('B', states(getGlassesState()))
                 .where('W', blocks(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY))
-                .where('X', heatingCoils())
+                .tieredCasing('X', GTCasingGroups.heatingCoils().group())
+                .withChannel(GTCasingGroups.heatingCoils().channel())
                 .where('A',
                         abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)
                                 .or(abilities(MultiblockAbility.OUTPUT_ENERGY).setMaxGlobalLimited(1))
@@ -172,17 +192,18 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
                                 .or(states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE)))
                 )
                 .where('#', any())
-                .build();
+                .buildTemplate();
+
     }
     @Override
     public boolean usesMui2() {
         return false;
     }
-    protected IBlockState getCasingState() {
+    protected static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.GRAVITATION_FIELD_CASING);
     }
 
-    protected IBlockState getGlassesState() {
+    protected static IBlockState getGlassesState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(FUSION_GLASS);
     }
 
@@ -268,12 +289,10 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
         this.itemImportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
         this.itemOutInventory = new ItemHandlerList(getAbilities(MultiblockAbility.EXPORT_ITEMS));
 
-        Object type = context.get("CoilType");
-        if (type instanceof IHeatingCoilBlockStats) {
-            this.leve = ((IHeatingCoilBlockStats) type).getLevel();
-        } else {
-            this.leve = 1;
-        }
+        ICasing matchedCoil = GTCasingGroups.heatingCoils().channel().getMatchedCasing(context);
+        IHeatingCoilBlockStats type = matchedCoil == null ? null :
+                matchedCoil.getPayloadAs(IHeatingCoilBlockStats.class);
+        this.leve = type == null ? 1 : type.getLevel();
     }
 
     @SideOnly(Side.CLIENT)
@@ -377,6 +396,6 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
         return new AxisAlignedBB(getPos(), getPos().add(5, 10, 5));
     }
 
-    
+
 }
 

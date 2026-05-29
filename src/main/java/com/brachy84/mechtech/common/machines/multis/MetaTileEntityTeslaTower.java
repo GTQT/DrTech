@@ -308,7 +308,7 @@ public class MetaTileEntityTeslaTower extends MultiblockWithDisplayBase {
     }
 
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
         return FactoryBlockPattern.start(RIGHT, FRONT, UP)
                 .aisle("#####S#####",
                         "#####C#####",
@@ -409,7 +409,7 @@ public class MetaTileEntityTeslaTower extends MultiblockWithDisplayBase {
                         "##TT###TT##",
                         "####TTT####",
                         "###########")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntityTeslaTower.class))
                 .where('C', states(getCasingState())
                         .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(8).setMinGlobalLimited(1, 2))
                         .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)))
@@ -417,7 +417,7 @@ public class MetaTileEntityTeslaTower extends MultiblockWithDisplayBase {
                 .where('L', coilPredicate())
                 .where('P', states(materialBlockState(Materials.Polyethylene)))
                 .where('#', any())
-                .build();
+                .buildTemplate();
     }
 
     private IBlockState materialBlockState(Material material) {

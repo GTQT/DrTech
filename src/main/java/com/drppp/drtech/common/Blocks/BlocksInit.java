@@ -42,6 +42,7 @@ public class BlocksInit {
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
     public static final MetaCasing1 COMMON_CASING1 = new MetaCasing1();
+    public static final BlockFusionReactorCasing FUSION_REACTOR_CASING = new BlockFusionReactorCasing();
     public static final BlockYotTankPart YOT_TANK = new BlockYotTankPart();
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
@@ -83,6 +84,7 @@ public class BlocksInit {
         event.getRegistry().register(TRANSPARENT_CASING1);
         event.getRegistry().register(COMMON_CASING);
         event.getRegistry().register(COMMON_CASING1);
+        event.getRegistry().register(FUSION_REACTOR_CASING);
         event.getRegistry().register(YOT_TANK);
         event.getRegistry().register(TFFT_TANK);
         event.getRegistry().register(BLOCK_ADVANCED_CAULDRON);

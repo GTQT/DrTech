@@ -25,8 +25,6 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
-import gregtech.api.pattern.BlockPattern;
-import gregtech.api.pattern.FactoryBlockPattern;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
@@ -56,6 +54,14 @@ import java.util.List;
 
 import static forestry.api.apiculture.BeeManager.beeRoot;
 import static gregtech.api.util.RelativeDirection.*;
+
+import gregtech.api.pattern.BlockPatternTemplate;
+
+import gregtech.api.pattern.SoftTemplate;
+
+import gregtech.api.pattern.TemplatePool;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
 public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
     private final SingleItemStackHandler inventory = new SingleItemStackHandler(1024,false);
@@ -213,7 +219,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                 this.isWorkingEnabled());
     }
 
-    protected IBlockState getGlassessCasingState() {
+    protected static IBlockState getGlassessCasingState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
 
@@ -222,9 +228,18 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         return Textures.BRONZE_PLATED_BRICKS;
     }
 
+    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
+            "drtech:large_bee_hive",
+            MetaTileEntutyLargeBeeHive::buildTemplate
+    );
+
     @Override
-    protected @NotNull BlockPattern createStructurePattern() {
-        return FactoryBlockPattern.start(RIGHT, FRONT, DOWN)
+    protected @NotNull BlockPatternTemplate createStructureTemplate() {
+        return TEMPLATE.get();
+    }
+
+    private static BlockPatternTemplate buildTemplate() {
+        return DeclarativePatternBuilder.start(RIGHT, FRONT, DOWN)
                 .aisle("               ", "               ", "               ", "      HHH      ", "    HHAAAHH    ", "    HAPLPAH    ", "   HAPAAAPAH   ", "   HALAAALAH   ", "   HAPAAAPAH   ", "    HAPLPAH    ", "    HHAAAHH    ", "      HHH      ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "      GGG      ", "   GGG   GG    ", "   G       G   ", "   G       G   ", "  G         G  ", "  G         G  ", "  G         G  ", "   G       G   ", "   G       G   ", "    GG   GG    ", "      GGG      ", "               ", "               ")
                 .aisle("               ", "      HHH      ", "   HHH   HHH   ", "  H        GH  ", "  H         H  ", "  H         H  ", " H           H ", " H           H ", " H           H ", "  H         H  ", "  H         H  ", "  HG       GH  ", "   HHH   HHH   ", "      HHH      ", "               ")
@@ -242,7 +257,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                 .aisle("               ", "               ", "               ", "       G       ", "     GGBGG     ", "    GBBBBBG    ", "    GBBBBBG    ", "   GBBBBBBBG   ", "    GBBBBBG    ", "    GBBBBBG    ", "     GGBGG     ", "       G       ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "               ", "               ", "      HHH      ", "     HHHHH     ", "    HHBBBHH    ", "    HHBBBHH    ", "    HHBBBHH    ", "     HHBHH     ", "      HHH      ", "               ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "               ", "               ", "               ", "               ", "      GGG      ", "      GHG      ", "      GGG      ", "               ", "               ", "               ", "               ", "               ", "               ")
-                .where('S', selfPredicate())
+                .where('S', selfPredicate(MetaTileEntutyLargeBeeHive.class))
                 .where('A', states(getGlassessCasingState()))
                 .where('B', blocks(Blocks.DIRT, Blocks.GRASS))
                 .where('H', blocks(Blocks.PLANKS))
@@ -263,7 +278,8 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                                                 .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)))
                                 )))
                 .where(' ', any())
-                .build();
+                .buildTemplate();
+
     }
 
     @Override
@@ -397,7 +413,7 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         return Math.log((double) this.energyContainer.getEnergyCapacity() / 8d) / 1.3862943611199 + 1e-8d;
     }
 
-    
+
 
 
     private static class BeeSimulator {

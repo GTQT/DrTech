@@ -495,3 +495,29 @@ tile.drtech.soul_lantern.name=灵魂灯笼
 item.drtech.amethyst_shard.name=紫晶碎片
 tile.drtech.composter.name=堆肥桶
 tile.drtech.chain.name=锁链
+# Fusion Reactor Casings
+tile.fusion_reactor_casing.plasma_containment_casing.name=等离子约束腔体
+tile.fusion_reactor_casing.first_wall_casing.name=聚变堆第一壁
+tile.fusion_reactor_casing.superconducting_magnet_casing.name=超导磁体材料
+tile.fusion_reactor_casing.cooling_channel_casing.name=冷却剂回路
+tile.fusion_reactor_casing.tritium_breeding_blanket_casing.name=氚增殖包层
+tile.fusion_reactor_casing.neutron_capture_casing.name=中子捕获模块
+tile.fusion_reactor_casing.radiation_shielding_casing.name=辐射屏蔽外壳
+tile.fusion_reactor_casing.rf_device_casing.name=RF装置外壳
+tile.fusion_reactor_casing.rf_waveguide_casing.name=RF波导管
+tile.fusion_reactor_casing.rf_capacitor_casing.name=RF高压储能阵列
+tile.fusion_reactor_casing.rf_phase_synchronizer_casing.name=RF相位同步器
+tile.fusion_reactor_casing.rf_ceramic_window_casing.name=RF陶瓷真空窗
+
+# Fusion Reactor Meta Items
+metaitem.fusion_first_wall_plate.name=聚变堆第一壁板
+metaitem.fusion_magnet_coil.name=聚变堆超导磁体线圈
+metaitem.fusion_cooling_channel.name=聚变堆冷却通道组件
+metaitem.tritium_breeding_cell.name=氚增殖单元
+metaitem.neutron_capture_core.name=中子捕获核心
+metaitem.magnetic_field_storage_cell.name=磁场储能单元
+metaitem.dt_fuel_injector.name=DT燃料注入喷嘴
+metaitem.rf_generator_core.name=RF射频发生核心
+metaitem.rf_waveguide.name=RF波导组件
+metaitem.rf_phase_synchronizer.name=RF相位同步组件
+metaitem.ceramic_rf_window.name=陶瓷真空窗
