@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "offset=north": { "model": "drtech:gol_subordinate" },
+    "offset=north_east": { "model": "drtech:gol_subordinate" },
+    "offset=east": { "model": "drtech:gol_subordinate" },
+    "offset=south_east": { "model": "drtech:gol_subordinate" },
+    "offset=south": { "model": "drtech:gol_subordinate" },
+    "offset=south_west": { "model": "drtech:gol_subordinate" },
+    "offset=west": { "model": "drtech:gol_subordinate" },
+    "offset=north_west": { "model": "drtech:gol_subordinate" }
+  }
+}

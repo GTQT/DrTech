@@ -14,6 +14,7 @@ import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
 import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import com.drppp.drtech.common.Items.ItemsInit;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
@@ -42,6 +43,15 @@ public final class DrTechModelRegister {
 
     @SideOnly(Side.CLIENT)
     public static void onModelRegistration() {
+        // LootGames models
+        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.DUNGEON_BRICKS, 0, "lootgames_dungeon_bricks");
+        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.DUNGEON_LAMP, 0, "lootgames_dungeon_lamp");
+        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.DUNGEON_LAMP, 1, "lootgames_dungeon_lamp_broken");
+        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.PUZZLE_MASTER, 0, "lootgames_puzzle_master");
+        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.GOL_MASTER, 0, "lootgames_gol_master");
+        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.GOL_SUBORDINATE, 0, "lootgames_gol_subordinate");
+        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.MS_ACTIVATOR, 0, "lootgames_ms_activator");
+
         ModelResourceLocation model = new ModelResourceLocation(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY.getRegistryName(), "inventory");
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY), 0, model);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_CONNECTOR1), 0, new ModelResourceLocation(BlocksInit.BLOCK_CONNECTOR1.getRegistryName(), "inventory"));
@@ -76,6 +86,12 @@ public final class DrTechModelRegister {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON), 0, new ModelResourceLocation(BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_TIME_TABLE), 0, new ModelResourceLocation(BlocksInit.BLOCK_TIME_TABLE.getRegistryName(), "inventory"));
         ItemsInit.registerItemModels();
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static void registerBlockModel(Block block, int meta, String modelName) {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta,
+                new ModelResourceLocation(Tags.MODID + ":" + modelName, "inventory"));
     }
 
     @SideOnly(Side.CLIENT)

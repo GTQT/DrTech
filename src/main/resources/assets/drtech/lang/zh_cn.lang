@@ -521,3 +521,23 @@ metaitem.rf_generator_core.name=RF射频发生核心
 metaitem.rf_waveguide.name=RF波导组件
 metaitem.rf_phase_synchronizer.name=RF相位同步组件
 metaitem.ceramic_rf_window.name=陶瓷真空窗
+
+# LootGames
+# 方块
+tile.lootgames.dungeon_bricks.name=地牢砖
+tile.lootgames.dungeon_lamp.name=地牢灯
+tile.lootgames.puzzle_master.name=谜题方块
+tile.lootgames.gol_master.name=光线记忆游戏方块
+tile.lootgames.gol_subordinate.name=光线记忆子方块
+tile.lootgames.ms_activator.name=扫雷启动器
+tile.lootgames.ms_master.name=扫雷主方块
+tile.lootgames.smart_subordinate.name=智能子方块
+
+# 消息
+msg.lootgames.win=胜利！
+msg.lootgames.lose=失败！
+msg.lootgames.gol_master.start=游戏即将开始！
+msg.lootgames.gol_master.rules=观察灯光顺序并重复输入！
+msg.lootgames.gol_master.wrong_block=输入错误！
+msg.lootgames.gol_master.not_ready=游戏尚未准备就绪！
+msg.lootgames.gol_master.reward_level_reached=达到等级%d，宝箱已生成！（最佳：%d）

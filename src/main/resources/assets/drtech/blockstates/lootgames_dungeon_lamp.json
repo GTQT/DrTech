@@ -1,0 +1,13 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "broken": {
+      "true": {
+        "model": "drtech:dungeon_lamp_broken"
+      },
+      "false": {
+        "model": "drtech:dungeon_lamp"
+      }
+    }
+  }
+}

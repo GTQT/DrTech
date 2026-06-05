@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "variant=dungeon_wall": {
+      "model": "drtech:dungeon_wall"
+    },
+    "variant=dungeon_ceiling": {
+      "model": "drtech:dungeon_ceiling"
+    },
+    "variant=dungeon_floor": {
+      "model": "drtech:dungeon_floor"
+    },
+    "variant=dungeon_wall_cracked": {
+      "model": "drtech:dungeon_wall_cracked"
+    },
+    "variant=dungeon_ceiling_cracked": {
+      "model": "drtech:dungeon_ceiling_cracked"
+    },
+    "variant=dungeon_floor_cracked": {
+      "model": "drtech:dungeon_floor_cracked"
+    },
+    "variant=dungeon_floor_shielded": {
+      "model": "drtech:dungeon_floor_shielded"
+    }
+  }
+}

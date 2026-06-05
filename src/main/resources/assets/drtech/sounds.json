@@ -1,0 +1,83 @@
+{
+  "gol_start_game": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/gol_start_game",
+        "stream": false
+      }
+    ]
+  },
+  "gol_sequence_wrong": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/gol_sequence_wrong",
+        "stream": false
+      }
+    ]
+  },
+  "gol_sequence_complete": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/gol_sequence_complete",
+        "stream": false
+      }
+    ]
+  },
+  "gol_gameover_win": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/gol_gameover_win",
+        "stream": false
+      }
+    ]
+  },
+  "gol_gameover_lose": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/gol_gameover_lose",
+        "stream": false
+      }
+    ]
+  },
+  "ms_start_game": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/ms_start_game",
+        "stream": false
+      }
+    ]
+  },
+  "ms_empty_revel_neighbours": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/ms_empty_revel_neighbours",
+        "stream": false
+      }
+    ]
+  },
+  "bomb_activated": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/bomb_activated",
+        "stream": false
+      }
+    ]
+  },
+  "puzzle_master_strange": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootgames/puzzle_master_strange",
+        "stream": false
+      }
+    ]
+  }
+}

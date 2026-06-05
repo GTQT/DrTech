@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "normal": { "model": "drtech:standard_gameblock_model" }
+  }
+}

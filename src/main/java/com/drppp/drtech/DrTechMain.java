@@ -28,6 +28,19 @@ import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
 import com.drppp.drtech.loaders.recipes.builder.DisassemblyHandler;
+import com.drppp.drtech.lootgames.LootGames;
+import com.drppp.drtech.lootgames.api.minigame.GameManager;
+import com.drppp.drtech.lootgames.api.task.TaskCreateExplosion;
+import com.drppp.drtech.lootgames.api.task.TaskRegistry;
+import com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion;
+import com.drppp.drtech.lootgames.minigame.gameoflight.GameOfLight;
+import com.drppp.drtech.lootgames.minigame.minesweeper.GameMineSweeper;
+import com.drppp.drtech.lootgames.minigame.minesweeper.client.TESRMSMaster;
+import com.drppp.drtech.lootgames.minigame.minesweeper.tileentity.TileEntityMSMaster;
+import com.drppp.drtech.lootgames.minigame.gameoflight.client.TESRGOLMaster;
+import com.drppp.drtech.lootgames.minigame.gameoflight.TileEntityGOLMaster;
+import com.drppp.drtech.lootgames.packets.NetworkHandler;
+import com.drppp.drtech.lootgames.registry.ModBlocks;
 import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import gregtech.api.metatileentity.registry.MTEManager;
@@ -93,6 +106,11 @@ public class DrTechMain {
         GameRegistry.registerWorldGenerator(new DriedGhastWorldGenerator(), 0);
         GameRegistry.registerWorldGenerator(new AmethystGeodeWorldGenerator(), 0);
 
+        // LootGames init
+        ModBlocks.registerTileEntities();
+        NetworkHandler.registerPackets();
+        LootGames.gameManager = new GameManager();
+
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -123,6 +141,8 @@ public class DrTechMain {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMSMaster.class, new TESRMSMaster());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGOLMaster.class, new TESRGOLMaster());
         TextureUtils.addIconRegister(Textures::register);
     }
 
@@ -130,14 +150,18 @@ public class DrTechMain {
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
     }
 
-    @SubscribeEvent
-    public void registerItems(RegistryEvent.Register<Item> event) {
-        ItemsInit.init(event);
-    }
+
 
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         BlocksInit.init(event);
+        ModBlocks.registerBlocks(event);
+    }
+
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        ItemsInit.init(event);
+        ModBlocks.registerItemBlocks(event);
     }
 
     @EventHandler
@@ -152,6 +176,12 @@ public class DrTechMain {
         }
         CropInitHandler.init();
         BlockComposter.registerDispenseBehaviors();
+
+        // LootGames game & task registration
+        LootGames.gameManager.registerGame(GameOfLight.class, new GameOfLight.Factory());
+        LootGames.gameManager.registerGame(GameMineSweeper.class, new GameMineSweeper.Factory());
+        TaskRegistry.registerTask(TaskCreateExplosion.class);
+        TaskRegistry.registerTask(com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion.class);
     }
 
     @SideOnly(Side.CLIENT)

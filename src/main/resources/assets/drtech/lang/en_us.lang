@@ -521,3 +521,23 @@ metaitem.rf_generator_core.name=RF Generator Core
 metaitem.rf_waveguide.name=RF Waveguide Assembly
 metaitem.rf_phase_synchronizer.name=RF Phase Synchronizer Assembly
 metaitem.ceramic_rf_window.name=Ceramic Vacuum Window
+
+# LootGames
+# Blocks
+tile.lootgames.dungeon_bricks.name=Dungeon Bricks
+tile.lootgames.dungeon_lamp.name=Dungeon Lamp
+tile.lootgames.puzzle_master.name=Puzzle Master
+tile.lootgames.gol_master.name=Game of Light Master
+tile.lootgames.gol_subordinate.name=Game of Light Subordinate
+tile.lootgames.ms_activator.name=Minesweeper Activator
+tile.lootgames.ms_master.name=Minesweeper Master
+tile.lootgames.smart_subordinate.name=Smart Subordinate Block
+
+# Messages
+msg.lootgames.win=Victory!
+msg.lootgames.lose=Defeat!
+msg.lootgames.gol_master.start=The game is about to start!
+msg.lootgames.gol_master.rules=Observe the light sequence and repeat!
+msg.lootgames.gol_master.wrong_block=Wrong input!
+msg.lootgames.gol_master.not_ready=The game is not ready yet!
+msg.lootgames.gol_master.reward_level_reached=Reached level %d, chests spawned! (Best: %d)
