@@ -524,8 +524,15 @@ metaitem.ceramic_rf_window.name=陶瓷真空窗
 
 # LootGames
 # 方块
-tile.lootgames.dungeon_bricks.name=地牢砖
-tile.lootgames.dungeon_lamp.name=地牢灯
+tile.lootgames.dungeon_bricks.dungeon_floor.name=地牢地板
+tile.lootgames.dungeon_bricks.dungeon_floor_cracked.name=开裂地牢地板
+tile.lootgames.dungeon_bricks.dungeon_floor_shielded.name=封印地牢地板
+tile.lootgames.dungeon_bricks.dungeon_wall.name=地牢墙壁
+tile.lootgames.dungeon_bricks.dungeon_wall_cracked.name=开裂地牢墙壁
+tile.lootgames.dungeon_bricks.dungeon_ceiling.name=地牢天花板
+tile.lootgames.dungeon_bricks.dungeon_ceiling_cracked.name=开裂地牢天花板
+tile.lootgames.dungeon_lamp.dungeon_lamp.name=地牢灯
+tile.lootgames.dungeon_lamp.dungeon_lamp_broken.name=破损地牢灯
 tile.lootgames.puzzle_master.name=谜题方块
 tile.lootgames.gol_master.name=光线记忆游戏方块
 tile.lootgames.gol_subordinate.name=光线记忆子方块

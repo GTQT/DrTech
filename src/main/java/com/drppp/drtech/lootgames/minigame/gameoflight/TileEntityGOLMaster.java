@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.lootgames.api.tileentity.TileEntityGameMaster;
 import com.drppp.drtech.lootgames.api.util.DirectionOctagonal;
+import com.drppp.drtech.lootgames.api.util.GameUtils;
+import com.drppp.drtech.lootgames.loot.ModLootTables;
 import com.drppp.drtech.lootgames.block.BlockDungeonLamp;
 import com.drppp.drtech.lootgames.packets.CMessageGOLFeedback;
 import com.drppp.drtech.lootgames.packets.NetworkHandler;
@@ -47,6 +49,9 @@ public class TileEntityGOLMaster extends TileEntityGameMaster<GameOfLight> {
     private static final int maxAttempts = 2;
     private static final int timeout = 30;
     private static final int expandFieldAtStage = 3;
+    // Cumulative rounds needed to advance through each level {level1, level2, level3, level4(win)}
+    // Level 1: 2 rounds → Level 2: +3=5 rounds → Level 3: +4=9 rounds → Level 4: +5=14 rounds → WIN
+    private static final int[] ROUNDS_CUMULATIVE = {2, 5, 9, 14};
 
     private int currentRound = -1;
     private int gameLevel = 1;
@@ -182,19 +187,21 @@ public class TileEntityGOLMaster extends TileEntityGameMaster<GameOfLight> {
             if (symbolIndex == symbolSequence.size() - 1) {
                 currentRound++;
 
-                if (currentRound >= 1) {
+                NetworkRegistry.TargetPoint point = new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 15);
+
+                if (currentRound >= ROUNDS_CUMULATIVE[3]) {
                     gameLevel = 4;
                     onGameEnded(player);
                     return;
                 }
 
-                NetworkRegistry.TargetPoint point = new NetworkRegistry.TargetPoint(world.provider.getDimension(), getPos().getX(), getPos().getY(), getPos().getZ(), 15);
+                if (currentRound >= ROUNDS_CUMULATIVE[gameLevel - 1]) {
+                    gameLevel++;
+                    onGameLevelChanged();
 
-                gameLevel++;
-                onGameLevelChanged();
-
-                NetworkHandler.INSTANCE.sendToAllAround(new SMessageGOLDrawStuff(getPos(), EnumDrawStuff.SEQUENCE_ACCEPTED.ordinal()), point);
-                world.playSound(null, getPos(), SoundManager.golSequenceComplete, SoundCategory.BLOCKS, 0.75F, 1.0F);
+                    NetworkHandler.INSTANCE.sendToAllAround(new SMessageGOLDrawStuff(getPos(), EnumDrawStuff.SEQUENCE_ACCEPTED.ordinal()), point);
+                    world.playSound(null, getPos(), SoundManager.golSequenceComplete, SoundCategory.BLOCKS, 0.75F, 1.0F);
+                }
 
                 generateSequence(symbolSequence.size() + 1);
                 updateGameStage(GameStage.SHOWING_SEQUENCE);
@@ -378,7 +385,7 @@ public class TileEntityGOLMaster extends TileEntityGameMaster<GameOfLight> {
     }
 
     private boolean isLastStagePassed() {
-        return gameLevel == 4 && currentRound >= 1;
+        return gameLevel == 4 && currentRound >= ROUNDS_CUMULATIVE[3];
     }
 
     private void genLootChests(EntityPlayer player) {
@@ -388,18 +395,17 @@ public class TileEntityGOLMaster extends TileEntityGameMaster<GameOfLight> {
         }
         if (bestLevelReached < 1) return;
 
-        // Simplified: spawn chests at corners
         if (bestLevelReached >= 1) {
-            world.setBlockState(pos.add(-2, 0, 0), Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(world, pos, -2, 0, ModLootTables.GOL_LEVEL1);
         }
         if (bestLevelReached >= 2) {
-            world.setBlockState(pos.add(2, 0, 0), Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(world, pos, 2, 0, ModLootTables.GOL_LEVEL2);
         }
         if (bestLevelReached >= 3) {
-            world.setBlockState(pos.add(0, 0, -2), Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(world, pos, 0, -2, ModLootTables.GOL_LEVEL3);
         }
         if (bestLevelReached >= 4) {
-            world.setBlockState(pos.add(0, 0, 2), Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(world, pos, 0, 2, ModLootTables.GOL_LEVEL4);
         }
     }
 

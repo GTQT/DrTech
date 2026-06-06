@@ -32,7 +32,9 @@ import com.drppp.drtech.lootgames.LootGames;
 import com.drppp.drtech.lootgames.api.minigame.GameManager;
 import com.drppp.drtech.lootgames.api.task.TaskCreateExplosion;
 import com.drppp.drtech.lootgames.api.task.TaskRegistry;
+import com.drppp.drtech.lootgames.loot.ModLootTables;
 import com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion;
+import com.drppp.drtech.lootgames.world.gen.LootGamesWorldGen;
 import com.drppp.drtech.lootgames.minigame.gameoflight.GameOfLight;
 import com.drppp.drtech.lootgames.minigame.minesweeper.GameMineSweeper;
 import com.drppp.drtech.lootgames.minigame.minesweeper.client.TESRMSMaster;
@@ -110,6 +112,8 @@ public class DrTechMain {
         ModBlocks.registerTileEntities();
         NetworkHandler.registerPackets();
         LootGames.gameManager = new GameManager();
+        ModLootTables.init();
+        GameRegistry.registerWorldGenerator(new LootGamesWorldGen(), 0);
 
     }
 

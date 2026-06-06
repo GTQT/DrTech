@@ -20,7 +20,9 @@ public class NBTUtils {
         for (T[] innerArr : arr) {
             NBTTagList innerList = new NBTTagList();
             for (T elem : innerArr) {
-                innerList.appendTag(serializer.apply(elem));
+                if (elem != null) {
+                    innerList.appendTag(serializer.apply(elem));
+                }
             }
             outerList.appendTag(innerList);
         }

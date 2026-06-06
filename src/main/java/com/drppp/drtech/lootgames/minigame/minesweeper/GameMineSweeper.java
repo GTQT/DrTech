@@ -16,6 +16,7 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.lootgames.api.minigame.ILootGameFactory;
 import com.drppp.drtech.lootgames.api.minigame.LootGame;
 import com.drppp.drtech.lootgames.api.util.GameUtils;
+import com.drppp.drtech.lootgames.loot.ModLootTables;
 import com.drppp.drtech.lootgames.api.util.NBTUtils;
 import com.drppp.drtech.lootgames.api.util.Pos2i;
 import com.drppp.drtech.lootgames.block.BlockDungeonLamp;
@@ -124,7 +125,7 @@ public class GameMineSweeper extends LootGame {
         if (board.getType(clickedPos) == MSField.EMPTY) {
             revealAllNeighbours(clickedPos, true);
         }
-        saveData();
+        saveDataAndSendToClient();
     }
 
     public void revealField(Pos2i pos) {
@@ -271,18 +272,17 @@ public class GameMineSweeper extends LootGame {
         if (currentLevel < 2) return;
 
         BlockPos central = getCentralGamePos();
-        // Simplified chest spawning at corners
         if (currentLevel >= 2) {
-            getWorld().setBlockState(central.add(-2, 0, 0), net.minecraft.init.Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(getWorld(), central, -2, 0, ModLootTables.MS_LEVEL2);
         }
         if (currentLevel >= 3) {
-            getWorld().setBlockState(central.add(2, 0, 0), net.minecraft.init.Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(getWorld(), central, 2, 0, ModLootTables.MS_LEVEL3);
         }
         if (currentLevel >= 4) {
-            getWorld().setBlockState(central.add(0, 0, -2), net.minecraft.init.Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(getWorld(), central, 0, -2, ModLootTables.MS_LEVEL4);
         }
         if (currentLevel >= 5) {
-            getWorld().setBlockState(central.add(0, 0, 2), net.minecraft.init.Blocks.CHEST.getDefaultState());
+            GameUtils.fillLootChest(getWorld(), central, 0, 2, ModLootTables.MS_LEVEL5);
         }
     }
 
@@ -386,6 +386,7 @@ public class GameMineSweeper extends LootGame {
         if (compound.hasKey("board")) {
             NBTTagCompound boardTag = compound.getCompoundTag("board");
             MSField[][] boardArr = NBTUtils.readTwoDimArrFromNBT(boardTag, MSField.class, () -> new MSField(MSField.EMPTY, true, MSField.NO_MARK));
+            fillNullFields(boardArr);
             board.setBoard(boardArr);
         }
         attemptCount = compound.getInteger("attempt_count");
@@ -409,6 +410,7 @@ public class GameMineSweeper extends LootGame {
             NBTTagCompound boardTag = compound.getCompoundTag("board");
             MSField[][] boardArr = NBTUtils.readTwoDimArrFromNBT(boardTag, MSField.class, compoundIn ->
                     new MSField(compoundIn.hasKey("type") ? compoundIn.getInteger("type") : MSField.EMPTY, compoundIn.getBoolean("hidden"), compoundIn.getInteger("mark")));
+            fillNullFields(boardArr);
             board.setBoard(boardArr);
             board.updateFlaggedFields_c();
         }
@@ -432,6 +434,16 @@ public class GameMineSweeper extends LootGame {
         stage = Stage.values()[compound.getInteger("stage")];
         ticks = compound.getInteger("ticks");
         currentLevel = compound.getInteger("current_level");
+    }
+
+    private static void fillNullFields(MSField[][] boardArr) {
+        for (int i = 0; i < boardArr.length; i++) {
+            for (int j = 0; j < boardArr[i].length; j++) {
+                if (boardArr[i][j] == null) {
+                    boardArr[i][j] = new MSField(MSField.EMPTY, true, MSField.NO_MARK);
+                }
+            }
+        }
     }
 
     public enum Stage {

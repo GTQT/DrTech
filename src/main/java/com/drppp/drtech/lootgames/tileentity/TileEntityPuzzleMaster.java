@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.lootgames.LootGames;
+import com.drppp.drtech.lootgames.world.gen.DungeonGenerator;
 
 import java.util.Random;
 
@@ -16,14 +17,19 @@ public class TileEntityPuzzleMaster extends TileEntity implements ITickable {
 
     public void onBlockClickedByPlayer(EntityPlayer player) {
         try {
-            int centerToBorder = 10;
-            int masterTeOffset = 3;
-            int roomHeight = 8;
+            int centerToBorder = DungeonGenerator.PUZZLEROOM_CENTER_TO_BORDER;
+            int masterTeOffset = DungeonGenerator.PUZZLEROOM_MASTER_TE_OFFSET;
+            int roomHeight = DungeonGenerator.PUZZLEROOM_HEIGHT;
 
             BlockPos bottomPos = new BlockPos(
                     getPos().add(-centerToBorder, -masterTeOffset, -centerToBorder));
             BlockPos topPos = bottomPos.add(
                     centerToBorder * 2 + 1, roomHeight, centerToBorder * 2 + 1);
+
+            // Reset shielded floor to regular floor so the game is playable
+            BlockPos floorPos = new BlockPos(
+                    getPos().add(-centerToBorder, -masterTeOffset + 1, -centerToBorder));
+            DungeonGenerator.resetUnbreakablePlayfield(world, floorPos);
 
             LootGames.gameManager.generateRandomGame(world, getPos(), bottomPos, topPos);
 

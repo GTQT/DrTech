@@ -32,7 +32,7 @@ public class TESRMSMaster extends TileEntitySpecialRenderer<TileEntityMSMaster> 
 
         float cellUV = 0.25F; // 1/4 of the atlas (4x4 grid)
 
-        if (!game.cIsGenerated) {
+        if (!game.cIsGenerated || !game.getBoard().isGenerated()) {
             for (int xL = 0; xL < boardSize; xL++) {
                 for (int zL = 0; zL < boardSize; zL++) {
                     drawTexturedRect(xL, zL, 1, 1, -0.005F, 0, 0, cellUV, cellUV);

@@ -524,8 +524,15 @@ metaitem.ceramic_rf_window.name=Ceramic Vacuum Window
 
 # LootGames
 # Blocks
-tile.lootgames.dungeon_bricks.name=Dungeon Bricks
-tile.lootgames.dungeon_lamp.name=Dungeon Lamp
+tile.lootgames.dungeon_bricks.dungeon_floor.name=Dungeon Floor
+tile.lootgames.dungeon_bricks.dungeon_floor_cracked.name=Cracked Dungeon Floor
+tile.lootgames.dungeon_bricks.dungeon_floor_shielded.name=Shielded Dungeon Floor
+tile.lootgames.dungeon_bricks.dungeon_wall.name=Dungeon Wall
+tile.lootgames.dungeon_bricks.dungeon_wall_cracked.name=Cracked Dungeon Wall
+tile.lootgames.dungeon_bricks.dungeon_ceiling.name=Dungeon Ceiling
+tile.lootgames.dungeon_bricks.dungeon_ceiling_cracked.name=Cracked Dungeon Ceiling
+tile.lootgames.dungeon_lamp.dungeon_lamp.name=Dungeon Lamp
+tile.lootgames.dungeon_lamp.dungeon_lamp_broken.name=Broken Dungeon Lamp
 tile.lootgames.puzzle_master.name=Puzzle Master
 tile.lootgames.gol_master.name=Game of Light Master
 tile.lootgames.gol_subordinate.name=Game of Light Subordinate

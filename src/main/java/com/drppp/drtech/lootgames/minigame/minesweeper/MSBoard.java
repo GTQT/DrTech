@@ -30,7 +30,7 @@ public class MSBoard {
         cFlaggedFields = 0;
         for (MSField[] msFields : board) {
             for (MSField msField : msFields) {
-                if (msField.getMark() == MSField.FLAG) {
+                if (msField != null && msField.getMark() == MSField.FLAG) {
                     cFlaggedFields++;
                 }
             }

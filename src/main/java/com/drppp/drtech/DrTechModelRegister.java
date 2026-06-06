@@ -14,6 +14,8 @@ import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
 import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.lootgames.block.BlockDungeonBricks;
+import com.drppp.drtech.lootgames.registry.ModBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -44,13 +46,22 @@ public final class DrTechModelRegister {
     @SideOnly(Side.CLIENT)
     public static void onModelRegistration() {
         // LootGames models
-        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.DUNGEON_BRICKS, 0, "lootgames_dungeon_bricks");
-        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.DUNGEON_LAMP, 0, "lootgames_dungeon_lamp");
-        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.DUNGEON_LAMP, 1, "lootgames_dungeon_lamp_broken");
-        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.PUZZLE_MASTER, 0, "lootgames_puzzle_master");
-        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.GOL_MASTER, 0, "lootgames_gol_master");
-        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.GOL_SUBORDINATE, 0, "lootgames_gol_subordinate");
-        registerBlockModel(com.drppp.drtech.lootgames.registry.ModBlocks.MS_ACTIVATOR, 0, "lootgames_ms_activator");
+        // DUNGEON_BRICKS - register all 7 variants directly from blockstate
+        Item dungeonBricksItem = Item.getItemFromBlock(ModBlocks.DUNGEON_BRICKS);
+        for (int meta = 0; meta < BlockDungeonBricks.EnumType.values().length; meta++) {
+            String variantName = BlockDungeonBricks.EnumType.byMetadata(meta).getName();
+            ModelLoader.setCustomModelResourceLocation(dungeonBricksItem, meta,
+                    new ModelResourceLocation(Tags.MODID + ":lootgames_dungeon_bricks", "variant=" + variantName));
+        }
+        // DUNGEON_LAMP - register both variants using forge_marker property syntax
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.DUNGEON_LAMP), 0,
+                new ModelResourceLocation(Tags.MODID + ":lootgames_dungeon_lamp", "broken=false"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.DUNGEON_LAMP), 1,
+                new ModelResourceLocation(Tags.MODID + ":lootgames_dungeon_lamp", "broken=true"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.PUZZLE_MASTER), 0, new ModelResourceLocation(Tags.MODID + ":lootgames_puzzle_master", "inventory"));
+        registerBlockModel(ModBlocks.GOL_MASTER, 0, "lootgames_gol_master");
+        registerBlockModel(ModBlocks.GOL_SUBORDINATE, 0, "lootgames_gol_subordinate");
+        registerBlockModel(ModBlocks.MS_ACTIVATOR, 0, "lootgames_ms_activator");
 
         ModelResourceLocation model = new ModelResourceLocation(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY.getRegistryName(), "inventory");
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY), 0, model);

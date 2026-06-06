@@ -1,5 +1,8 @@
 package com.drppp.drtech.lootgames.api.util;
 
+import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.lootgames.api.loot.GameLootTable;
+import com.drppp.drtech.lootgames.api.loot.LootTableRegistry;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -114,6 +117,55 @@ public class GameUtils {
 
         public int getMinItems() {
             return minItems;
+        }
+    }
+
+    /**
+     * Places a chest at the given offset from centralPos and fills it with items
+     * from a registered {@link GameLootTable}.
+     *
+     * @param world          the world
+     * @param centralPos     the central game position
+     * @param offsetX        x offset from central
+     * @param offsetZ        z offset from central
+     * @param lootTableName  the registered name of the GameLootTable to use
+     */
+    public static void fillLootChest(World world, BlockPos centralPos, int offsetX, int offsetZ, ResourceLocation lootTableName) {
+        if (world.isRemote) return;
+
+        GameLootTable table = LootTableRegistry.get(lootTableName);
+        if (table == null) {
+            DrTechMain.LOGGER.warn("No game loot table found for: {}", lootTableName);
+            return;
+        }
+
+        EnumFacing facing;
+        if (offsetX == 0 && offsetZ == -1) facing = EnumFacing.SOUTH;
+        else if (offsetX == 0 && offsetZ == 1) facing = EnumFacing.NORTH;
+        else if (offsetX == 1 && offsetZ == 0) facing = EnumFacing.WEST;
+        else facing = EnumFacing.EAST;
+
+        IBlockState chest = Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, facing);
+        BlockPos placePos = centralPos.add(offsetX, 0, offsetZ);
+        world.setBlockState(placePos, chest);
+
+        TileEntityChest teChest = (TileEntityChest) Objects.requireNonNull(world.getTileEntity(placePos));
+        Random rand = world.rand;
+
+        List<ItemStack> loot = table.generate(rand);
+        for (ItemStack stack : loot) {
+            int slot = rand.nextInt(teChest.getSizeInventory());
+            if (teChest.getStackInSlot(slot).isEmpty()) {
+                teChest.setInventorySlotContents(slot, stack);
+            } else {
+                // Try to find an empty slot
+                for (int i = 0; i < teChest.getSizeInventory(); i++) {
+                    if (teChest.getStackInSlot(i).isEmpty()) {
+                        teChest.setInventorySlotContents(i, stack);
+                        break;
+                    }
+                }
+            }
         }
     }
 }
