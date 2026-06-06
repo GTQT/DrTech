@@ -27,13 +27,13 @@ import com.drppp.drtech.intergations.gtfo.TileCropFarmerMode;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
+import com.drppp.drtech.loaders.ModRewardBoxes;
 import com.drppp.drtech.loaders.recipes.builder.DisassemblyHandler;
 import com.drppp.drtech.lootgames.LootGames;
 import com.drppp.drtech.lootgames.api.minigame.GameManager;
 import com.drppp.drtech.lootgames.api.task.TaskCreateExplosion;
 import com.drppp.drtech.lootgames.api.task.TaskRegistry;
 import com.drppp.drtech.lootgames.loot.ModLootTables;
-import com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion;
 import com.drppp.drtech.lootgames.world.gen.LootGamesWorldGen;
 import com.drppp.drtech.lootgames.minigame.gameoflight.GameOfLight;
 import com.drppp.drtech.lootgames.minigame.minesweeper.GameMineSweeper;
@@ -50,7 +50,9 @@ import gregtech.api.unification.material.event.MaterialRegistryEvent;
 import gregtechfoodoption.common.machines.farmer.FarmerModeRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -71,6 +73,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import static com.drppp.drtech.Tags.MODID;
 
@@ -95,7 +98,7 @@ public class DrTechMain {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        DrTechTab = new DrTechCreativeTabs("mytab");
+        DrTechTab = new DrTechCreativeTabs("drtech");
         DrMetaItems.MetaItemsInit();
         DrtechCapInit.init();
         Textures.init();
@@ -113,6 +116,7 @@ public class DrTechMain {
         NetworkHandler.registerPackets();
         LootGames.gameManager = new GameManager();
         ModLootTables.init();
+        ModRewardBoxes.init();
         GameRegistry.registerWorldGenerator(new LootGamesWorldGen(), 0);
 
     }

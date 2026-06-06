@@ -8,7 +8,6 @@ public class DrTechCreativeTabs extends CreativeTabs {
     public DrTechCreativeTabs(String label) {
         super(label);
     }
-
     @Override
     public ItemStack createIcon() {
         return new ItemStack(ItemsInit.ITEM_BLOCK_GRAVITATIONAL_ANOMALY);

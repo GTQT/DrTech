@@ -93,8 +93,64 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem RF_PHASE_SYNCHRONIZER;
     public static MetaItem<?>.MetaValueItem CERAMIC_RF_WINDOW;
 
+    // Loot Table
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_TEST;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_STONE_AGE;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_STEAM_AGE;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_LV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_MV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_HV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_EV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_IV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_LUV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_ZPM;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_UV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_UHV;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_AE1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_AE2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_BEE1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_BEE2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_BEE3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_BM1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_BM2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_BM3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_COMPUTER1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_CROPS;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FLOPPIES;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FOOD1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FOOD2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FOOD3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FOOD4;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FOREST1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FOREST2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_FOREST3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_GARDENS;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_HEE1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_HEE2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_LEGENDARY;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_MAGIC1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_MAGIC2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_MAGIC3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_MAGIC4;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_MAGIC5;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_RAIL1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_RAIL2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_RAIL3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_SEEDS;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_SPACE1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_SPACE2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_SPACE3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH1;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH2;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH3;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH4;
+    public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH5;
+
     public static void MetaItemsInit() {
         MetaItems1 metaItem = new MetaItems1();
-        metaItem.setRegistryName("meta_items_mymod");
+        metaItem.setRegistryName("meta_items");
+
+        MetaItemLootTable metaItemLootTable = new MetaItemLootTable();
+        metaItemLootTable.setRegistryName("loot_table");
     }
 }

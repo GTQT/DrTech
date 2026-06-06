@@ -27,6 +27,7 @@ public class SoundManager {
     public static SoundEvent msOnEmptyRevealNeighbours = new SoundEvent(new ResourceLocation(Tags.MODID, "ms_empty_revel_neighbours"));
     public static SoundEvent msBombActivated = new SoundEvent(new ResourceLocation(Tags.MODID, "bomb_activated"));
     public static SoundEvent puzzleMasterStrange = new SoundEvent(new ResourceLocation(Tags.MODID, "puzzle_master_strange"));
+    public static SoundEvent lootBag = new SoundEvent(new ResourceLocation(Tags.MODID, "lootbag"));
 
     @SubscribeEvent
     public static void onSoundEvenrRegistration(RegistryEvent.Register<SoundEvent> event)
@@ -45,6 +46,7 @@ public class SoundManager {
         event.getRegistry().register(msOnEmptyRevealNeighbours.setRegistryName("ms_empty_revel_neighbours"));
         event.getRegistry().register(msBombActivated.setRegistryName("bomb_activated"));
         event.getRegistry().register(puzzleMasterStrange.setRegistryName("puzzle_master_strange"));
+        event.getRegistry().register(lootBag.setRegistryName("lootbag"));
     }
 
 }

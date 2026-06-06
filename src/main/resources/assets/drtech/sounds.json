@@ -79,5 +79,14 @@
         "stream": false
       }
     ]
+  },
+  "lootbag": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "drtech:lootbag",
+        "stream": false
+      }
+    ]
   }
 }
