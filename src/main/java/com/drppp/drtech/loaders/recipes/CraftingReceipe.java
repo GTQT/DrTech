@@ -155,12 +155,6 @@ public class CraftingReceipe {
         );
         ModHandler.addShapelessRecipe("peaceful_table", new ItemStack(ItemsInit.ITEM_BLOCK_PEACEFUL_TABLE), Blocks.CRAFTING_TABLE, Items.IRON_SWORD);
 
-        ModHandler.addShapedRecipe("sap_bag", new ItemStack(BlocksInit.BLOCK_SAP_BAG),
-                "WWW", "SCS", "SSS",
-                'W', Items.LEATHER,
-                'S', Blocks.HARDENED_CLAY,
-                'C', ToolItems.SAW
-        );
         gregtech.loaders.recipe.MetaTileEntityLoader.registerMachineRecipe(DrTechMetaTileEntities.DISASSEMBLY, "AVA", "VMV", "WCW", 'M', HULL, 'V', CONVEYOR, 'A', ROBOT_ARM,
                 'C', CIRCUIT, 'W', CABLE);
 
@@ -182,7 +176,8 @@ public class CraftingReceipe {
                 'L', Items.LEATHER,
                 'G', Blocks.GLASS,
                 'W', new ItemStack(Blocks.WOOL, 1, 0));
-        ModHandler.addShapedRecipe("composter", new ItemStack(BlocksInit.BLOCK_COMPOSTER),
+
+        ModHandler.addShapedRecipe("composter", new ItemStack(BlocksInit.BLOCK_COMPOSTER),
                 "S S", "S S", "SSS",
                 'S', new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
 

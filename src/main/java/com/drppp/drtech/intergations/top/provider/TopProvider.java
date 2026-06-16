@@ -1,8 +1,8 @@
 package com.drppp.drtech.intergations.top.provider;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.Tile.TileCropStick;
-import com.drppp.drtech.api.crop.CropType;
+import com.meowmel.cropQT.tile.TileCropStick;
+import com.meowmel.cropQT.api.CropType;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import gregtech.api.util.GTUtility;

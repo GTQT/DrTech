@@ -4,7 +4,8 @@ package com.drppp.drtech.common.Blocks;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.Utils.Datas;
-import com.drppp.drtech.common.Blocks.Crops.BlockCropStick;
+import com.meowmel.cropQT.block.BlockCropStick;
+import com.meowmel.cropQT.tile.TileCropStick;
 import com.drppp.drtech.common.Blocks.MetaBlocks.*;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -37,7 +38,6 @@ public class BlocksInit {
     public static final BlockComposter BLOCK_COMPOSTER = new BlockComposter();
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
-    public static final BlockSapBag BLOCK_SAP_BAG = new BlockSapBag();
     public static final BlockStoragePail BLOCK_STORAGE_PAIL = new BlockStoragePail("compress", 1);
     public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
@@ -74,7 +74,6 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_PEACEFUL_TABLE);
         event.getRegistry().register(BLOCK_STORAGE_PAIL);
         event.getRegistry().register(BLOCK_WASTE_DIRT);
-        event.getRegistry().register(BLOCK_SAP_BAG);
         GameRegistry.registerTileEntity(TileEntityGoldenSea.class, new ResourceLocation(Tags.MODID, "gold_coin"));
         GameRegistry.registerTileEntity(TileEntityDriedGhast.class, new ResourceLocation(Tags.MODID, "dried_ghast"));
         GameRegistry.registerTileEntity(TileEntityPeacefulTable.class, new ResourceLocation(Tags.MODID, "peaceful_table"));
