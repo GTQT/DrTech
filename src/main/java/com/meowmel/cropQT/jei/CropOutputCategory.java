@@ -21,7 +21,7 @@ public class CropOutputCategory implements IRecipeCategory<CropOutputRecipeWrapp
 
     public CropOutputCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createBlankDrawable(160, 65);
-        this.backgroundTall = guiHelper.createBlankDrawable(160, 120);
+        this.backgroundTall = guiHelper.createBlankDrawable(160, 140);
         this.icon = guiHelper.createDrawableIngredient(ItemCropSeed.createSeedBag("wheat"));
     }
 
