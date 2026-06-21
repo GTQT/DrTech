@@ -8,8 +8,11 @@ import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.Materials;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockNetherWart;
+import net.minecraft.block.BlockStem;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,7 +37,7 @@ import static com.drppp.drtech.loaders.recipes.DrtechReceipes.LOG_CREATE;
 import static gregtech.api.GregTechAPI.materialManager;
 
 public class DrtechUtils {
-    public static Map<Item, IBlockState> ItemCrops = new HashMap();
+    public static Map<Item, IBlockState> ItemCrops = new HashMap<>();
     @Nonnull
     public static ResourceLocation getRL(@Nonnull String path) {
         return new ResourceLocation(Tags.MODID, path);
@@ -46,13 +49,28 @@ public class DrtechUtils {
             if (block instanceof BlockCrops) {
                 BlockCrops crop = (BlockCrops)block;
                 var seed = getSeedFromCropReflection(crop);
-                if(seed != null);
-                {
-                    ItemCrops.put(seed,crop.withAge(crop.getMaxAge()));
+                if (seed != null) {
+                    registerCrop(seed, crop.withAge(crop.getMaxAge()));
                 }
             }
         }
+        registerSpecialCrops();
     }
+
+    private static void registerSpecialCrops() {
+        registerCrop(Items.MELON_SEEDS, Blocks.MELON_STEM.getDefaultState().withProperty(BlockStem.AGE, 7));
+        registerCrop(Items.PUMPKIN_SEEDS, Blocks.PUMPKIN_STEM.getDefaultState().withProperty(BlockStem.AGE, 7));
+        registerCrop(Items.NETHER_WART, Blocks.NETHER_WART.getDefaultState().withProperty(BlockNetherWart.AGE, 3));
+        registerCrop(Items.REEDS, Blocks.REEDS.getDefaultState());
+        registerCrop(Item.getItemFromBlock(Blocks.CACTUS), Blocks.CACTUS.getDefaultState());
+    }
+
+    private static void registerCrop(@Nullable Item seed, @Nullable IBlockState cropState) {
+        if (seed != null && cropState != null) {
+            ItemCrops.put(seed, cropState);
+        }
+    }
+
     public static Item getSeedFromCropReflection(BlockCrops crop) {
         try {
             // 1. 获取 BlockCrops 的 Class 对象

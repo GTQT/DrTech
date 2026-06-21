@@ -9,6 +9,7 @@ import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.CustomeRecipe;
+import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.Blocks.BlockComposter;
 import com.drppp.drtech.common.Blocks.BlocksInit;
@@ -205,6 +206,7 @@ public class DrTechMain {
         if (DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         FarmerModeRegistry.registerFarmerMode(new TileCropFarmerMode());
+        DrtechUtils.initCropsList();
     }
 
     @EventHandler
