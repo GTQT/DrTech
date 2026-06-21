@@ -1,10 +1,10 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "drtech:blocks/glasses/copy_glass_block",
-		"1": "drtech:blocks/glasses/uu_glass_block",
+		"0": "drtech:blocks/glasses/recombination_glass_block",
+		"1": "drtech:blocks/glasses/sne_boron_silicate_glass_block",
 		"3": "drtech:blocks/time_table",
-		"particle": "drtech:blocks/glasses/copy_glass_block"
+		"particle": "drtech:blocks/glasses/recombination_glass_block"
 	},
 	"elements": [
 		{
@@ -39,8 +39,8 @@
 				"east": {"uv": [0, 0, 4, 9.5], "texture": "#1"},
 				"south": {"uv": [0, 0, 4, 9.5], "texture": "#1"},
 				"west": {"uv": [0, 0, 4, 9.5], "texture": "#1"},
-				"up": {"uv": [0, 0, 4, 4], "texture": "#missing"},
-				"down": {"uv": [0, 0, 4, 4], "texture": "#missing"}
+				"up": {"uv": [0, 0, 4, 4], "texture": "#1"},
+				"down": {"uv": [0, 0, 4, 4], "texture": "#1"}
 			}
 		}
 	],

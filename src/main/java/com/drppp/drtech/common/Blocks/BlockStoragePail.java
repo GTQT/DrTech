@@ -3,7 +3,7 @@ package com.drppp.drtech.common.Blocks;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Tile.TileEntityStoragePail;
-import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
+import com.cleanroommc.modularui.factory.TileEntityGuiFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -48,8 +48,7 @@ public class BlockStoragePail extends Block {
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileEntity tile = worldIn.getTileEntity(pos);
         if (tile instanceof TileEntityStoragePail && !worldIn.isRemote) {
-            TileEntityStoragePail storagePail = (TileEntityStoragePail)tile;
-            TileEntityUIFactory.INSTANCE.openUI( storagePail, (EntityPlayerMP) playerIn);
+            TileEntityGuiFactory.INSTANCE.open((EntityPlayerMP) playerIn, pos);
 
             return true;
         }

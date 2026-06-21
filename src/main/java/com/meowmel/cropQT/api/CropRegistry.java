@@ -270,7 +270,7 @@ public class CropRegistry {
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(22)
                 .addChanceDrop(new ItemStack(Items.EGG, 1),0.4f)
                 .addChanceDrop(new ItemStack(Items.FEATHER, 1),0.4f)
-                .renderType(CropRenderType.CROSS).build());
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("rubber_grass").displayName("橡胶草").tier(3)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(22)

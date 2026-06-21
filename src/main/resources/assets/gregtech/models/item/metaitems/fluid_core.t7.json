@@ -1,7 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "drtech:items/metaitems/cells/t7",
-    "layer1": "gtqtcore:items/metaitems/numbers/7"
+    "layer0": "drtech:items/metaitems/cells/t7"
   }
 }
