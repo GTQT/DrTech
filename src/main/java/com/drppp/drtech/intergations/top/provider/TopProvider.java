@@ -1,11 +1,11 @@
 package com.drppp.drtech.intergations.top.provider;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileentityCropsSimulateMachine;
-import com.meowmel.cropQT.tile.TileCropStick;
-import com.meowmel.cropQT.api.CropType;
 import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileentityCropsSimulateMachine;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
+import com.meowmel.cropQT.api.CropType;
+import com.meowmel.cropQT.tile.TileCropStick;
 import gregtech.api.util.GTUtility;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -24,19 +24,33 @@ import java.util.List;
 public class TopProvider implements IProbeInfoProvider {
     @Override
     public String getID() {
-        return Tags.MODID+":top_info_provider";
+        return Tags.MODID + ":top_info_provider";
     }
 
     @Override
-    public void addProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, EntityPlayer entityPlayer, World world, IBlockState iBlockState, IProbeHitData iProbeHitData)
-    {
+    public void addProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, EntityPlayer entityPlayer, World world,
+                             IBlockState iBlockState, IProbeHitData iProbeHitData) {
         if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileentityCropsSimulateMachine) {
-            MetaTileentityCropsSimulateMachine machine = (MetaTileentityCropsSimulateMachine) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
+            MetaTileentityCropsSimulateMachine machine =
+                    (MetaTileentityCropsSimulateMachine) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
             iProbeInfo.text(new TextComponentString(
                     TextFormatting.GREEN + "阶段: " + TextFormatting.WHITE + machine.getWorkPhaseDisplayName()).getFormattedText());
             iProbeInfo.text(new TextComponentString(
                     TextFormatting.AQUA + "模式: " + TextFormatting.WHITE + machine.getCoreModeDisplayName()).getFormattedText());
-            iProbeInfo.progress(machine.getProgress(), Math.max(1, machine.getMaxProgress()));
+            if (machine.hasCropRackGrowthProgress()) {
+                iProbeInfo.progress(machine.getCropRackGrowthProgressTicks(), Math.max(1, machine.getCropRackGrowthMaxTicks()),
+                        iProbeInfo.defaultProgressStyle()
+                                .showText(false)
+                                .filledColor(0xFFBFBFBF)
+                                .alternateFilledColor(0xFFD4D4D4)
+                                .backgroundColor(0xFF111111)
+                                .borderColor(0xFFFFFFFF)
+                                .height(12)
+                                .width(140));
+                iProbeInfo.text(String.format("实际生长: %.1f / %.1f s",
+                        machine.getCropRackGrowthProgressSeconds(), machine.getCropRackGrowthMaxSeconds()));
+            }
+            //iProbeInfo.progress(machine.getProgress(), Math.max(1, machine.getMaxProgress()));
             iProbeInfo.text(new TextComponentString(
                     TextFormatting.YELLOW + "已部署: " + TextFormatting.WHITE + machine.getTotalDeployedCount() +
                             TextFormatting.GRAY + " / " + TextFormatting.WHITE + machine.getDeployedVarietyCount() + " 种").getFormattedText());
@@ -55,23 +69,20 @@ public class TopProvider implements IProbeInfoProvider {
                 }
             }
         }
-        if (GTUtility.getMetaTileEntity(world,iProbeHitData.getPos()) instanceof MetaTileEntityYotTank) {
-            var s = (MetaTileEntityYotTank)GTUtility.getMetaTileEntity(world,iProbeHitData.getPos());
-            if(s.isActive() && s.isWorkingEnabled())
-            {
-                iProbeInfo.text("流体:"+s.getFluid().getLocalizedName());
-                iProbeInfo.text("容量"+s.getFluidBank().getStored()+"/"+s.getFluidBank().getCapacity());
+        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityYotTank) {
+            var s = (MetaTileEntityYotTank) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
+            if (s.isActive() && s.isWorkingEnabled()) {
+                iProbeInfo.text("流体:" + s.getFluid().getLocalizedName());
+                iProbeInfo.text("容量" + s.getFluidBank().getStored() + "/" + s.getFluidBank().getCapacity());
             }
         }
-        if(world.getTileEntity(iProbeHitData.getPos()) instanceof TileCropStick)
-        {
-            TileCropStick tile = (TileCropStick)world.getTileEntity(iProbeHitData.getPos());
+        if (world.getTileEntity(iProbeHitData.getPos()) instanceof TileCropStick) {
+            TileCropStick tile = (TileCropStick) world.getTileEntity(iProbeHitData.getPos());
             CropType type = tile.getCropType();
             String name = type != null ? type.getDisplayName() : tile.getCropId();
             iProbeInfo.text(new TextComponentString(
                     TextFormatting.GREEN + "作物: " + TextFormatting.WHITE + name).getFormattedText());
-            if(entityPlayer.getHeldItem(EnumHand.MAIN_HAND).getItem()== ItemsInit.CROP_ANALYZER)
-            {
+            if (entityPlayer.getHeldItem(EnumHand.MAIN_HAND).getItem() == ItemsInit.CROP_ANALYZER) {
                 iProbeInfo.text(new TextComponentString(
                         TextFormatting.GREEN + "Tier: " + TextFormatting.WHITE +
                                 (type != null ? type.getTier() : "?")).getFormattedText());

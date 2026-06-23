@@ -11,6 +11,7 @@ import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.item.ItemCropSeed;
+import com.meowmel.cropQT.tile.TileCropStick;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -75,6 +76,8 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
     private static final int NORMAL_FERTILIZER_PER_CROP = 2;
     private static final int CROP_RACK_FERTILIZER_PER_CROP = 40;
     private static final int PREVIEW_LIMIT = 4;
+    private static final int CROP_RACK_RUN_TIME = 100;
+    private static final int MIN_CROP_RACK_MATURE_TICKS = 20;
 
     private ItemStack seed = ItemStack.EMPTY;
     private int seedCout = 0;
@@ -416,6 +419,9 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
             }
 
             state.cropQtSeedStacks.add(extractedSeed);
+            state.cropQtElapsedTicks.add(0);
+            state.cropQtCycleFullFertilizedSeeds.add(0);
+            state.cropQtCyclePartialFertilizer.add(0);
             state.seedCount += extractedSeed.getCount();
             state.cropStickCount += extractMatchingItems(Item.getItemFromBlock(BlocksInit.CROP_STICK), extractedSeed.getCount());
             if (needsSupport && supportSelection != null) {
@@ -464,6 +470,9 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
         }
 
         setActive(true);
+        if (this.coreMode == CoreMode.CROP_RACK) {
+            tickCropRackGrowthAndHarvest();
+        }
         if (++this.process < this.maxProcess) {
             return;
         }
@@ -480,7 +489,7 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
 
         for (DeployedCropState state : this.deployedCrops) {
             if (state.isCropQt()) {
-                remainingFertilizer = runCropRackEntry(state, outlist, remainingFertilizer);
+                remainingFertilizer = prepareCropRackCycle(state, remainingFertilizer);
             } else {
                 remainingFertilizer = runNormalEntry(state, outlist, remainingFertilizer);
             }
@@ -489,6 +498,23 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
         int fertilizerUsed = availableFertilizer - remainingFertilizer;
         if (fertilizerUsed > 0) {
             extractFertilizer(fertilizerUsed);
+        }
+        if (!outlist.isEmpty()) {
+            GTTransferUtils.addItemsToItemHandler(this.outputInventory, false, outlist);
+        }
+    }
+
+    private void tickCropRackGrowthAndHarvest() {
+        if (this.coreMode != CoreMode.CROP_RACK || this.outputInventory == null) {
+            return;
+        }
+
+        NonNullList<ItemStack> outlist = NonNullList.create();
+        for (DeployedCropState state : this.deployedCrops) {
+            if (!state.isCropQt()) {
+                continue;
+            }
+            tickCropRackEntry(state, outlist);
         }
         if (!outlist.isEmpty()) {
             GTTransferUtils.addItemsToItemHandler(this.outputInventory, false, outlist);
@@ -513,20 +539,37 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
         return remainingFertilizer;
     }
 
-    private int runCropRackEntry(DeployedCropState state, NonNullList<ItemStack> outlist, int availableFertilizer) {
+    private void tickCropRackEntry(DeployedCropState state, NonNullList<ItemStack> outlist) {
         CropType cropType = CropRegistry.get(state.cropQtId);
         if (cropType == null) {
-            return availableFertilizer;
+            return;
         }
 
-        int remainingFertilizer = availableFertilizer;
         List<String> supportBlockIds = state.getSupportBlockIds();
-        for (ItemStack seedStack : state.cropQtSeedStacks) {
+        for (int stackIndex = 0; stackIndex < state.cropQtSeedStacks.size(); stackIndex++) {
+            ItemStack seedStack = state.cropQtSeedStacks.get(stackIndex);
+            if (seedStack.isEmpty()) {
+                continue;
+            }
             CropStats stats = ItemCropSeed.getCropStats(seedStack);
+            int matureTicks = getCropRackSeedMatureTicks(cropType, stats);
+            int elapsedTicks = state.getElapsedTicks(stackIndex) + 1;
+            int matureTimes = elapsedTicks / matureTicks;
+            state.setElapsedTicks(stackIndex, elapsedTicks % matureTicks);
+            if (matureTimes <= 0) {
+                continue;
+            }
+
+            int fullyFertilizedSeeds = state.getCycleFullFertilizedSeeds(stackIndex);
+            int partialFertilizer = state.getCyclePartialFertilizer(stackIndex);
             for (int i = 0; i < seedStack.getCount(); i++) {
-                int fertilizerUsed = Math.min(remainingFertilizer, CROP_RACK_FERTILIZER_PER_CROP);
-                remainingFertilizer -= fertilizerUsed;
-                double totalRolls = 1.0 + fertilizerUsed * 0.1;
+                int fertilizerUsed = 0;
+                if (i < fullyFertilizedSeeds) {
+                    fertilizerUsed = CROP_RACK_FERTILIZER_PER_CROP;
+                } else if (i == fullyFertilizedSeeds) {
+                    fertilizerUsed = partialFertilizer;
+                }
+                double totalRolls = matureTimes * (1.0 + fertilizerUsed * 0.1);
                 int guaranteedRolls = (int) totalRolls;
                 double extraRollChance = totalRolls - guaranteedRolls;
 
@@ -537,6 +580,29 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
                     appendSingleCropQtHarvest(outlist, cropType, stats, supportBlockIds);
                 }
             }
+        }
+    }
+
+    private int prepareCropRackCycle(DeployedCropState state, int availableFertilizer) {
+        CropType cropType = CropRegistry.get(state.cropQtId);
+        if (cropType == null) {
+            state.clearCycleFertilizerPlan();
+            return availableFertilizer;
+        }
+
+        int remainingFertilizer = availableFertilizer;
+        for (int stackIndex = 0; stackIndex < state.cropQtSeedStacks.size(); stackIndex++) {
+            ItemStack seedStack = state.cropQtSeedStacks.get(stackIndex);
+            if (seedStack.isEmpty()) {
+                state.setCycleFertilizerPlan(stackIndex, 0, 0);
+                continue;
+            }
+
+            int totalFertilizerUsed = Math.min(remainingFertilizer, seedStack.getCount() * CROP_RACK_FERTILIZER_PER_CROP);
+            remainingFertilizer -= totalFertilizerUsed;
+            state.setCycleFertilizerPlan(stackIndex,
+                    totalFertilizerUsed / CROP_RACK_FERTILIZER_PER_CROP,
+                    totalFertilizerUsed % CROP_RACK_FERTILIZER_PER_CROP);
         }
         return remainingFertilizer;
     }
@@ -685,6 +751,61 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
 
     public int getProgressPercent() {
         return this.maxProcess <= 0 ? 0 : (int) ((long) this.process * 100L / this.maxProcess);
+    }
+
+    public boolean hasCropRackGrowthProgress() {
+        return this.coreMode == CoreMode.CROP_RACK && !this.deployedCrops.isEmpty();
+    }
+
+    public int getCropRackGrowthProgressTicks() {
+        CropRackProgressInfo info = getNextCropRackProgressInfo();
+        return info == null ? 0 : info.elapsedTicks;
+    }
+
+    public int getCropRackGrowthMaxTicks() {
+        CropRackProgressInfo info = getNextCropRackProgressInfo();
+        return info == null ? 0 : info.matureTicks;
+    }
+
+    public double getCropRackGrowthProgressSeconds() {
+        return getCropRackGrowthProgressTicks() / 20.0;
+    }
+
+    public double getCropRackGrowthMaxSeconds() {
+        return getCropRackGrowthMaxTicks() / 20.0;
+    }
+
+    @Nullable
+    private CropRackProgressInfo getNextCropRackProgressInfo() {
+        if (this.coreMode != CoreMode.CROP_RACK) {
+            return null;
+        }
+
+        CropRackProgressInfo best = null;
+        for (DeployedCropState state : this.deployedCrops) {
+            if (!state.isCropQt()) {
+                continue;
+            }
+            CropType cropType = CropRegistry.get(state.cropQtId);
+            if (cropType == null) {
+                continue;
+            }
+            for (int stackIndex = 0; stackIndex < state.cropQtSeedStacks.size(); stackIndex++) {
+                ItemStack seedStack = state.cropQtSeedStacks.get(stackIndex);
+                if (seedStack.isEmpty()) {
+                    continue;
+                }
+                CropStats stats = ItemCropSeed.getCropStats(seedStack);
+                int matureTicks = getCropRackSeedMatureTicks(cropType, stats);
+                int elapsedTicks = Math.max(0, Math.min(state.getElapsedTicks(stackIndex), Math.max(0, matureTicks - 1)));
+                int remainingTicks = matureTicks - elapsedTicks;
+
+                if (best == null || remainingTicks < best.remainingTicks) {
+                    best = new CropRackProgressInfo(elapsedTicks, matureTicks, remainingTicks);
+                }
+            }
+        }
+        return best;
     }
 
     public String getPreviewOutputText() {
@@ -998,7 +1119,17 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
     }
 
     private int getCurrentProcessTime() {
-        return this.coreMode == CoreMode.NORMAL ? getNormalProcessTime() : 20;
+        return this.coreMode == CoreMode.NORMAL ? getNormalProcessTime() : CROP_RACK_RUN_TIME;
+    }
+
+    private int getCropRackSeedMatureTicks(CropType cropType, CropStats stats) {
+        int progressPerGrowthCycle = Math.max(1, Math.round((stats.getGrowth() + 1.5f) * 1.5f));
+        int cyclesPerStage = Math.max(1, (cropType.getStageRequirement() + progressPerGrowthCycle - 1) / progressPerGrowthCycle);
+        int totalGrowthCycles = Math.max(1, cyclesPerStage * Math.max(1, cropType.getHarvestStage()));
+        int totalGrowthTicks = totalGrowthCycles * TileCropStick.GROWTH_CYCLE;
+        int speedFactor = Math.max(1, (getInputTier() - GTValues.EV) * 32);
+        int matureTicks = (totalGrowthTicks + speedFactor - 1) / speedFactor;
+        return Math.max(MIN_CROP_RACK_MATURE_TICKS, matureTicks);
     }
 
     private int getNormalProcessTime() {
@@ -1115,11 +1246,26 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
         }
     }
 
+    private static class CropRackProgressInfo {
+        private final int elapsedTicks;
+        private final int matureTicks;
+        private final int remainingTicks;
+
+        private CropRackProgressInfo(int elapsedTicks, int matureTicks, int remainingTicks) {
+            this.elapsedTicks = elapsedTicks;
+            this.matureTicks = matureTicks;
+            this.remainingTicks = remainingTicks;
+        }
+    }
+
     private static class DeployedCropState {
         private ItemStack displaySeed = ItemStack.EMPTY;
         private int seedCount;
         private String cropQtId = "";
         private final List<ItemStack> cropQtSeedStacks = new ArrayList<>();
+        private final List<Integer> cropQtElapsedTicks = new ArrayList<>();
+        private final List<Integer> cropQtCycleFullFertilizedSeeds = new ArrayList<>();
+        private final List<Integer> cropQtCyclePartialFertilizer = new ArrayList<>();
         private int cropStickCount;
         private ItemStack supportBlockTemplate = ItemStack.EMPTY;
         private int supportBlockCount;
@@ -1147,6 +1293,50 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
             return blockIds;
         }
 
+        private int getElapsedTicks(int index) {
+            if (index < 0 || index >= this.cropQtElapsedTicks.size()) {
+                return 0;
+            }
+            return this.cropQtElapsedTicks.get(index);
+        }
+
+        private void setElapsedTicks(int index, int ticks) {
+            while (this.cropQtElapsedTicks.size() <= index) {
+                this.cropQtElapsedTicks.add(0);
+            }
+            this.cropQtElapsedTicks.set(index, ticks);
+        }
+
+        private int getCycleFullFertilizedSeeds(int index) {
+            if (index < 0 || index >= this.cropQtCycleFullFertilizedSeeds.size()) {
+                return 0;
+            }
+            return this.cropQtCycleFullFertilizedSeeds.get(index);
+        }
+
+        private int getCyclePartialFertilizer(int index) {
+            if (index < 0 || index >= this.cropQtCyclePartialFertilizer.size()) {
+                return 0;
+            }
+            return this.cropQtCyclePartialFertilizer.get(index);
+        }
+
+        private void setCycleFertilizerPlan(int index, int fullSeeds, int partialFertilizer) {
+            while (this.cropQtCycleFullFertilizedSeeds.size() <= index) {
+                this.cropQtCycleFullFertilizedSeeds.add(0);
+            }
+            while (this.cropQtCyclePartialFertilizer.size() <= index) {
+                this.cropQtCyclePartialFertilizer.add(0);
+            }
+            this.cropQtCycleFullFertilizedSeeds.set(index, fullSeeds);
+            this.cropQtCyclePartialFertilizer.set(index, partialFertilizer);
+        }
+
+        private void clearCycleFertilizerPlan() {
+            this.cropQtCycleFullFertilizedSeeds.clear();
+            this.cropQtCyclePartialFertilizer.clear();
+        }
+
         private NBTTagCompound writeToNBT() {
             NBTTagCompound tag = new NBTTagCompound();
             tag.setInteger("SeedCount", this.seedCount);
@@ -1164,6 +1354,22 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
                 seedList.appendTag(stack.writeToNBT(new NBTTagCompound()));
             }
             tag.setTag("CropQtSeedStacks", seedList);
+            NBTTagList elapsedList = new NBTTagList();
+            for (Integer ticks : this.cropQtElapsedTicks) {
+                NBTTagCompound elapsedTag = new NBTTagCompound();
+                elapsedTag.setInteger("Ticks", ticks);
+                elapsedList.appendTag(elapsedTag);
+            }
+            tag.setTag("CropQtElapsedTicks", elapsedList);
+            NBTTagList fertilizerPlanList = new NBTTagList();
+            int fertilizerPlanSize = Math.max(this.cropQtCycleFullFertilizedSeeds.size(), this.cropQtCyclePartialFertilizer.size());
+            for (int i = 0; i < fertilizerPlanSize; i++) {
+                NBTTagCompound fertilizerTag = new NBTTagCompound();
+                fertilizerTag.setInteger("Full", getCycleFullFertilizedSeeds(i));
+                fertilizerTag.setInteger("Partial", getCyclePartialFertilizer(i));
+                fertilizerPlanList.appendTag(fertilizerTag);
+            }
+            tag.setTag("CropQtCycleFertilizer", fertilizerPlanList);
             return tag;
         }
 
@@ -1172,6 +1378,9 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
             this.seedCount = tag.getInteger("SeedCount");
             this.cropQtId = tag.getString("CropQtId");
             this.cropQtSeedStacks.clear();
+            this.cropQtElapsedTicks.clear();
+            this.cropQtCycleFullFertilizedSeeds.clear();
+            this.cropQtCyclePartialFertilizer.clear();
             this.cropStickCount = tag.getInteger("CropStickCount");
             this.supportBlockTemplate = ItemStack.EMPTY;
             this.supportBlockCount = tag.getInteger("SupportBlockCount");
@@ -1186,7 +1395,25 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
             for (int i = 0; i < seedList.tagCount(); i++) {
                 this.cropQtSeedStacks.add(new ItemStack(seedList.getCompoundTagAt(i)));
             }
+            NBTTagList elapsedList = tag.getTagList("CropQtElapsedTicks", Constants.NBT.TAG_COMPOUND);
+            for (int i = 0; i < elapsedList.tagCount(); i++) {
+                this.cropQtElapsedTicks.add(elapsedList.getCompoundTagAt(i).getInteger("Ticks"));
+            }
+            NBTTagList fertilizerPlanList = tag.getTagList("CropQtCycleFertilizer", Constants.NBT.TAG_COMPOUND);
+            for (int i = 0; i < fertilizerPlanList.tagCount(); i++) {
+                NBTTagCompound fertilizerTag = fertilizerPlanList.getCompoundTagAt(i);
+                this.cropQtCycleFullFertilizedSeeds.add(fertilizerTag.getInteger("Full"));
+                this.cropQtCyclePartialFertilizer.add(fertilizerTag.getInteger("Partial"));
+            }
+            while (this.cropQtElapsedTicks.size() < this.cropQtSeedStacks.size()) {
+                this.cropQtElapsedTicks.add(0);
+            }
+            while (this.cropQtCycleFullFertilizedSeeds.size() < this.cropQtSeedStacks.size()) {
+                this.cropQtCycleFullFertilizedSeeds.add(0);
+            }
+            while (this.cropQtCyclePartialFertilizer.size() < this.cropQtSeedStacks.size()) {
+                this.cropQtCyclePartialFertilizer.add(0);
+            }
         }
     }
 }
-
