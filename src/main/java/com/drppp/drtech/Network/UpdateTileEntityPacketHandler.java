@@ -1,6 +1,9 @@
 package com.drppp.drtech.Network;
 
 import com.drppp.drtech.Tile.TileEntityConnector;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
+import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IThreadListener;
@@ -18,8 +21,16 @@ public class UpdateTileEntityPacketHandler implements IMessageHandler<UpdateTile
         mainThread.addScheduledTask(() -> {
             WorldServer serverWorld = ctx.getServerHandler().player.getServerWorld();
             TileEntity tileEntity = serverWorld.getTileEntity(message.getPos());
+            NBTTagCompound nbt = message.getNbt();
+            if (tileEntity instanceof IGregTechTileEntity && nbt.hasKey("industrialApiaryAction")) {
+                MetaTileEntity metaTileEntity = ((IGregTechTileEntity) tileEntity).getMetaTileEntity();
+                if (metaTileEntity instanceof MetaTileEntityIndustrialApiary) {
+                    ((MetaTileEntityIndustrialApiary) metaTileEntity).handleApiaryClientAction(nbt.getString("industrialApiaryAction"));
+                    tileEntity.markDirty();
+                }
+                return;
+            }
             if (tileEntity != null && tileEntity instanceof TileEntityConnector) {
-                NBTTagCompound nbt = message.getNbt();
                 if(nbt.hasKey("locahost"))
                 {
                     NBTTagCompound host = nbt.getCompoundTag("locahost");

@@ -9,6 +9,8 @@ import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.DrtConfig;
+import com.drppp.drtech.Network.SyncInit;
+import com.drppp.drtech.Network.UpdateTileEntityPacket;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
 import com.drppp.drtech.api.ItemHandler.OnlyBeesStackhandler;
 import com.drppp.drtech.api.ItemHandler.OnlyUpgradeStackhandler;
@@ -125,6 +127,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     public ItemStack[] mOutputItems = new ItemStack[12];
     public static final int beeCycleLength = 550;
     public static final int baseEUtUsage = 37;
+    private static final int DATA_ID_PROGRESS = 4804;
     private static final int queen = 0;
     private static final int drone = 1;
     private static final int upgradeSlot = 0;
@@ -141,6 +144,9 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     private IEffectData[] effectData = new IEffectData[2];
     private boolean upgradeInventoryDirty = true;
     private boolean errorStatesDirty = false;
+    private int lastSyncedProgressTime = Integer.MIN_VALUE;
+    private int lastSyncedMaxProgress = Integer.MIN_VALUE;
+    private int lastSyncedProgressPercent = Integer.MIN_VALUE;
     public MetaTileEntityIndustrialApiary(ResourceLocation metaTileEntityId, ICubeRenderer renderer) {
         super(metaTileEntityId, GTValues.UHV);
         this.renderer = renderer;
@@ -151,44 +157,160 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     }
     @Override
     protected ModularUI createUI(EntityPlayer entityPlayer) {
-        ModularUI.Builder builder;
-        builder = ModularUI.builder(Textures.BACKGROUND, 176, 166);
-        builder.slot(inventoryBees,0,36,21,true,true,Textures.BEE_QUEEN_LOGO);
-        builder.slot(inventoryBees,1,36,41,true,true,Textures.BEE_DRONE_LOGO);
-        for (int j = 0; j < inventoryUpgrade.getSlots(); j++) {
-            builder.slot(inventoryUpgrade,j,61+j%2*18, 23+j/2*18,true,true, gregtech.api.gui.GuiTextures.SLOT);
-        }
-        for (int j = 0; j < inventoryOutput.getSlots(); j++) {
-            builder.slot(inventoryOutput,j,107+j%3*18,8+ j/3*18,true,false, gregtech.api.gui.GuiTextures.SLOT);
-        }
-        builder.widget(new gregtech.api.gui.widgets.ProgressWidget(this::getProgressPercent, 70, 5, 20, 20, gregtech.api.gui.GuiTextures.PROGRESS_BAR_ARROW, gregtech.api.gui.widgets.ProgressWidget.MoveType.HORIZONTAL));
-        ImageWidget logo = new ImageWidget(70,62, 17, 17, gregtech.api.gui.GuiTextures.GREGTECH_LOGO).setIgnoreColor(true);
-        builder.widget(logo);
-        var scroll = new ScrollableListWidget(8,62,60,22);
-        AdvancedTextWidget textWidget = new AdvancedTextWidget(0,0,this::addErrorText,0x52135);
-        scroll.addWidget(textWidget);
-        builder.widget(scroll);
-        var btn = new ToggleButtonWidget(13,18, 18, 18,
-                Textures.CROSS, this::isWorkingEnabled, pressed -> this.setWorkingEnabled(!pressed))
-                .setTooltipText("drtech.gui.industrial_apiary.tooltip.1")
-                .shouldUseBaseBackground();
-        if(isWorkingEnabled())
-        {
-            btn.setButtonTexture(Textures.CHECK_MARK);
-            btn.updateScreenOnFrame();
-        }
-        else {
-            btn.setButtonTexture(Textures.CROSS);
-            btn.updateScreenOnFrame();
-        }
-        builder.widget(btn);
-        builder.widget(new ToggleButtonWidget(13,38, 18, 18,
-                GuiTextures.ARROW_DOUBLE, this::isActive, pressed -> this.cancelProcess(!pressed))
-                .setTooltipText("drtech.gui.industrial_apiary.tooltip.2")
-                .shouldUseBaseBackground());
-        builder.bindPlayerInventory(entityPlayer.inventory,86);
+        ModularUI.Builder builder = ModularUI.builder(Textures.BACKGROUND, 176, 166);
+        buildApiaryHeader(builder);
+        buildBeeInventory(builder);
+        buildUpgradeInventory(builder);
+        buildOutputInventory(builder);
+        buildApiaryControls(builder);
+        builder.bindPlayerInventory(entityPlayer.inventory,88);
         return builder.build(this.getHolder(),entityPlayer);
     }
+
+    private void buildApiaryHeader(ModularUI.Builder builder) {
+        builder.widget(new LabelWidget(7, 5, "drtech.gui.industrial_apiary.title"));
+        builder.widget(new DynamicLabelWidget(7, 80, this::getApiaryStatusText, 0x404040));
+        builder.widget(new gregtech.api.gui.widgets.ProgressWidget(this::getProgressPercent, 86, 39, 20, 20,
+                gregtech.api.gui.GuiTextures.PROGRESS_BAR_ARROW, gregtech.api.gui.widgets.ProgressWidget.MoveType.HORIZONTAL).setHoverTextConsumer(this::addErrorText));
+    }
+
+    private void buildBeeInventory(ModularUI.Builder builder) {
+        builder.widget(new LabelWidget(8, 17, "drtech.gui.industrial_apiary.bees", 0x404040));
+        builder.slot(inventoryBees, queen, 8, 28, true, true, Textures.BEE_QUEEN_LOGO);
+        builder.slot(inventoryBees, drone, 8, 50, true, true, Textures.BEE_DRONE_LOGO);
+    }
+
+    private void buildUpgradeInventory(ModularUI.Builder builder) {
+        builder.widget(new LabelWidget(40, 17, "drtech.gui.industrial_apiary.upgrades", 0x404040));
+        for (int j = 0; j < inventoryUpgrade.getSlots(); j++) {
+            builder.slot(inventoryUpgrade, j, 40 + j % 2 * 18, 28 + j / 2 * 18, true, true, gregtech.api.gui.GuiTextures.SLOT);
+        }
+    }
+
+    private void buildOutputInventory(ModularUI.Builder builder) {
+        builder.widget(new LabelWidget(118, 5, "drtech.gui.industrial_apiary.output", 0x404040));
+        for (int j = 0; j < inventoryOutput.getSlots(); j++) {
+            builder.slot(inventoryOutput, j, 116 + j % 3 * 18, 14 + j / 3 * 18, true, false, gregtech.api.gui.GuiTextures.SLOT);
+        }
+    }
+
+    private void buildApiaryControls(ModularUI.Builder builder) {
+        builder.widget(new ApiaryActionButton(38, 66, 34, 14,
+                "drtech.gui.industrial_apiary.pause",
+                "drtech.gui.industrial_apiary.tooltip.1",
+                "pause"));
+        builder.widget(new ApiaryActionButton(76, 66, 34, 14,
+                "drtech.gui.industrial_apiary.stop",
+                "drtech.gui.industrial_apiary.tooltip.2",
+                "stop"));
+    }
+    private String getApiaryStatusText() {
+        if (!isActive()) return localize("drtech.gui.industrial_apiary.status.stopped");
+        if (!isWorkingEnabled()) return localize("drtech.gui.industrial_apiary.status.paused");
+        if (isWorking()) return localize("drtech.gui.industrial_apiary.status.working", progressPer);
+        if (hasPendingProcess()) return localize("drtech.gui.industrial_apiary.status.waiting_eu");
+        return localize("drtech.gui.industrial_apiary.status.ready");
+    }
+
+    private String localize(String key, Object... args) {
+        return new TextComponentTranslation(key, args).getFormattedText();
+    }
+
+    private void pauseApiary() {
+        setWorkingEnabled(false);
+        setProcessing(false);
+    }
+
+    private void resumeApiary() {
+        setActive(true);
+        setWorkingEnabled(true);
+    }
+
+    private void stopApiary() {
+        cancelProcess(false);
+        setWorkingEnabled(false);
+    }
+
+    private void togglePauseApiary() {
+        if (isWorkingEnabled()) {
+            pauseApiary();
+        } else {
+            resumeApiary();
+        }
+    }
+
+    private void toggleStopApiary() {
+        if (isActive()) {
+            stopApiary();
+        } else {
+            resumeApiary();
+        }
+    }
+
+    public void handleApiaryClientAction(String action) {
+        if ("pause".equals(action)) {
+            togglePauseApiary();
+        } else if ("stop".equals(action)) {
+            toggleStopApiary();
+        }
+    }
+
+    private class ApiaryActionButton extends gregtech.api.gui.Widget {
+        private final String labelKey;
+        private final String tooltipKey;
+        private final String action;
+
+        private ApiaryActionButton(int x, int y, int width, int height, String labelKey, String tooltipKey, String action) {
+            super(x, y, width, height);
+            this.labelKey = labelKey;
+            this.tooltipKey = tooltipKey;
+            this.action = action;
+        }
+
+        @Override
+        public void drawInBackground(int mouseX, int mouseY, float partialTicks, gregtech.api.gui.IRenderContext context) {
+            super.drawInBackground(mouseX, mouseY, partialTicks, context);
+            int x = getPosition().x;
+            int y = getPosition().y;
+            int width = getSize().width;
+            int height = getSize().height;
+            boolean hovered = isMouseOverElement(mouseX, mouseY);
+            drawSolidRect(x, y, width, height, hovered ? 0xFF546477 : 0xFF3F4A5A);
+            drawBorder(x, y, width, height, 1, hovered ? 0xFF8DEBFF : 0xFF6F7C8F);
+            drawStringSized(localize(getDisplayLabelKey()), x + width / 2.0, y + 3.0, 0xFFFFFFFF, true, 0.75F, true);
+        }
+
+        private String getDisplayLabelKey() {
+            if ("pause".equals(action) && !isWorkingEnabled()) {
+                return "drtech.gui.industrial_apiary.start";
+            }
+            if ("stop".equals(action) && !isActive()) {
+                return "drtech.gui.industrial_apiary.start";
+            }
+            return labelKey;
+        }
+
+        @Override
+        public void drawInForeground(int mouseX, int mouseY) {
+            super.drawInForeground(mouseX, mouseY);
+            if (isMouseOverElement(mouseX, mouseY)) {
+                drawHoveringText(ItemStack.EMPTY, Collections.singletonList(localize(tooltipKey)), 300, mouseX, mouseY);
+            }
+        }
+
+        @Override
+        public boolean mouseClicked(int mouseX, int mouseY, int button) {
+            if (button == 0 && isMouseOverElement(mouseX, mouseY)) {
+                NBTTagCompound tag = new NBTTagCompound();
+                tag.setString("industrialApiaryAction", action);
+                SyncInit.NETWORK.sendToServer(new UpdateTileEntityPacket(MetaTileEntityIndustrialApiary.this.getPos(), tag));
+                playButtonClickSound();
+                return true;
+            }
+            return false;
+        }
+    }
+
     protected void addErrorText(List<ITextComponent> textList) {
         textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.1",this.mEUt));
         textList.add(new TextComponentTranslation("drtech.industrial_apiary.tootip.2",getTemperature()));
@@ -225,6 +347,9 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
             usedQueen=ItemStack.EMPTY;
         buf.writeItemStack(usedQueen);
         buf.writeInt(mEUt);
+        buf.writeInt(mProgresstime);
+        buf.writeInt(mMaxProgresstime);
+        buf.writeInt(progressPer);
         writeData(buf);
     }
 
@@ -240,11 +365,17 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
             throw new RuntimeException(e);
         }
         mEUt = buf.readInt();
+        mProgresstime = buf.readInt();
+        mMaxProgresstime = buf.readInt();
+        progressPer = buf.readInt();
         readData(buf);
     }
     @Override
     public void setWorkingEnabled(boolean b) {
         if (this.isWorkingEnabled == b) {
+            if (!b) {
+                setProcessing(false);
+            }
             return;
         }
         this.isWorkingEnabled = b;
@@ -301,6 +432,10 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         } else if (dataId == 4803) {
             isProcessing = buf.readBoolean();
             scheduleRenderUpdate();
+        } else if (dataId == DATA_ID_PROGRESS) {
+            mProgresstime = buf.readInt();
+            mMaxProgresstime = buf.readInt();
+            progressPer = buf.readInt();
         } else if(dataId==4800)
         {
             mEUt = buf.readInt();
@@ -392,7 +527,29 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
                 }
             }
             progressPer = this.mMaxProgresstime > 0 ? (int) (((float) this.mProgresstime / (float) this.mMaxProgresstime) * 100) : 0;
+            if (getOffsetTimer() % 5 == 0 || mProgresstime == 0 || mProgresstime >= mMaxProgresstime) {
+                syncProgressData();
+            }
         }
+    }
+
+    private void syncProgressData() {
+        if (getWorld() == null || getWorld().isRemote) {
+            return;
+        }
+        if (lastSyncedProgressTime == mProgresstime
+                && lastSyncedMaxProgress == mMaxProgresstime
+                && lastSyncedProgressPercent == progressPer) {
+            return;
+        }
+        lastSyncedProgressTime = mProgresstime;
+        lastSyncedMaxProgress = mMaxProgresstime;
+        lastSyncedProgressPercent = progressPer;
+        writeCustomData(DATA_ID_PROGRESS, buf -> {
+            buf.writeInt(mProgresstime);
+            buf.writeInt(mMaxProgresstime);
+            buf.writeInt(progressPer);
+        });
     }
     private float getFinalChance(float baseChance, float speed, float prodMod, float modifier) {
         double finalchance = (1+modifier/6)*(Math.pow(baseChance,0.5))*2f*(1+speed)+Math.pow(prodMod,Math.pow(baseChance,0.333f))-3;
@@ -469,6 +626,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
         setUsedQueen(null);
         setProcessing(false);
         clearBeeCaches();
+        syncProgressData();
     }
 
     @Override
@@ -689,14 +847,17 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
             setmEut(0);
             mProgresstime = 0;
             mMaxProgresstime = 0;
+            progressPer = 0;
             setProcessing(false);
             setActive(false);
             if(inventoryBees.getStackInSlot(queen).isEmpty())
                 setQueen(usedQueen);
             else
                 GTTransferUtils.insertItem(inventoryOutput,usedQueen,false);
+            setWorkingEnabled(false);
             setUsedQueen(null);
             clearBeeCaches();
+            syncProgressData();
         }else {
             setProcessing(false);
             setActive(flag);
