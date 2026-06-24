@@ -578,7 +578,7 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(32)
                 .addChanceDrop(Materials.CertusQuartz.getItemForm(OrePrefix.dust, 2), 0.5f)
                 .addChanceDrop(CraftingReceipe.getItemStack("<appliedenergistics2:material:2>", 2L), 0.5f)
-                .requiredBlocks("gregtech:meta_block_compressed_13:6")
+                .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.CertusQuartz))
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("tin_leaf").displayName("锡叶子").tier(6)
@@ -927,10 +927,10 @@ public class CropRegistry {
                         MetaBlocks.COMPRESSED.get(Materials.Phosphorus),
                         MetaBlocks.COMPRESSED.get(Materials.Naquadah),
                         MetaBlocks.COMPRESSED.get(Materials.Neutronium))
-                .addBlockDrop("gregtech:meta_block_compressed_6:3", MetaItems.SILICON_BOULE.getStackForm())
-                .addBlockDrop("gregtech:meta_block_compressed_4:14", MetaItems.PHOSPHORUS_BOULE.getStackForm())
-                .addBlockDrop("gregtech:meta_block_compressed_7:12", MetaItems.NAQUADAH_BOULE.getStackForm())
-                .addBlockDrop("gregtech:meta_block_compressed_7:15", MetaItems.NEUTRONIUM_BOULE.getStackForm())
+                .addBlockDrop(MetaBlocks.COMPRESSED.get(Materials.Silicon), MetaItems.SILICON_BOULE.getStackForm())
+                .addBlockDrop(MetaBlocks.COMPRESSED.get(Materials.Phosphorus), MetaItems.PHOSPHORUS_BOULE.getStackForm())
+                .addBlockDrop(MetaBlocks.COMPRESSED.get(Materials.Naquadah), MetaItems.NAQUADAH_BOULE.getStackForm())
+                .addBlockDrop(MetaBlocks.COMPRESSED.get(Materials.Neutronium), MetaItems.NEUTRONIUM_BOULE.getStackForm())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("heartfruit").displayName("心鸣果").tier(11)
