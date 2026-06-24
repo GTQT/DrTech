@@ -809,16 +809,16 @@ public class CropRegistry {
         register(new CropType.Builder("reactoria_leaf").displayName("反应堆叶").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.REACTORIA_LEAF.getStackForm())
-                .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium))
-                .seedTexture("oreberry").seedColor(Materials.Uranium.getMaterialRGB())
+                .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium238))
+                .seedTexture("oreberry").seedColor(Materials.Uranium238.getMaterialRGB())
                 .lightRequirement(0)
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("reactoria_stem").displayName("反应堆茎").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.REACTORIA_STEM.getStackForm())
-                .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium))
-                .seedTexture("oreberry").seedColor(Materials.Uranium.getMaterialRGB())
+                .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium238))
+                .seedTexture("oreberry").seedColor(Materials.Uranium238.getMaterialRGB())
                 .lightRequirement(0)
                 .renderType(CropRenderType.HASH).build());
 
@@ -869,8 +869,8 @@ public class CropRegistry {
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(50)
                 .addDrop(Materials.Uranium238.getItemForm(OrePrefix.nugget, 2))
                 .addChanceDrop(Materials.Uranium235.getItemForm(OrePrefix.nugget, 1), 0.1f)
-                .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium))
-                .seedTexture("oreberry").seedColor(Materials.Uranium.getMaterialRGB())
+                .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium238))
+                .seedTexture("oreberry").seedColor(Materials.Uranium238.getMaterialRGB())
                 .lightRequirement(0).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("bedrock_heart").displayName("基岩之心").tier(10)
