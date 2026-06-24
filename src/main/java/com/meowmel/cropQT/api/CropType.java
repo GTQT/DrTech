@@ -1,6 +1,9 @@
 package com.meowmel.cropQT.api;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.*;
 
@@ -281,6 +284,27 @@ public class CropType {
         /** 从战利品表获取掉落 */
         public Builder lootTable(String table) { this.lootTable = table; return this; }
         public Builder requiredBlocks(String... b) { this.requiredBlocks = b; return this; }
+        /** 接受Block实例，自动转为注册名。仅在init阶段后可用 */
+        public Builder requiredBlocks(Block... blocks) {
+            this.requiredBlocks = new String[blocks.length];
+            for (int i = 0; i < blocks.length; i++) {
+                ResourceLocation rl = Block.REGISTRY.getNameForObject(blocks[i]);
+                this.requiredBlocks[i] = rl == null ? "" : rl.toString();
+            }
+            return this;
+        }
+        /** 接受IBlockState实例，自动转为带meta的注册名(如 gregtech:compressed_1:9)。仅在init阶段后可用 */
+        public Builder requiredBlocks(IBlockState... states) {
+            this.requiredBlocks = new String[states.length];
+            for (int i = 0; i < states.length; i++) {
+                IBlockState state = states[i];
+                Block block = state.getBlock();
+                ResourceLocation rl = Block.REGISTRY.getNameForObject(block);
+                int meta = block.getMetaFromState(state);
+                this.requiredBlocks[i] = rl == null ? "" : rl.toString() + ":" + meta;
+            }
+            return this;
+        }
         public Builder lightRequirement(float l) { this.lightRequirement = l; return this; }
         public Builder waterRequirement(float w) { this.waterRequirement = w; return this; }
         public Builder renderType(CropRenderType t) { this.renderType = t; return this; }

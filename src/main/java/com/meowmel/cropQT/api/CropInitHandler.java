@@ -22,14 +22,13 @@ public class CropInitHandler {
 
     public static void preInit()
     {
-        CropRegistry.registerDefaults();
-        CrossBreedingRegistry.registerDefaults();
-        BlockCropStick.initVanillaSeedMap();
         MinecraftForge.EVENT_BUS.register(new CropTickHandler());
     }
     public static void init()
     {
-        CropRegistry.registerMoreInfo();
+        CropRegistry.registerAll();
+        CrossBreedingRegistry.registerDefaults();
+        BlockCropStick.initVanillaSeedMap();
     }
 
 }
