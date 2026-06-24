@@ -17,7 +17,6 @@ import java.util.Map;
 /**
  * 作物类型注册表
  */
-
 public class CropRegistry {
     private static final Map<String, CropType> REGISTRY = new HashMap<>();
 

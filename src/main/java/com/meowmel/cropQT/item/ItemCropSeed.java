@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -105,8 +106,8 @@ public class ItemCropSeed extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world,
-                               List<String> tooltip, ITooltipFlag flag) {
+    public void addInformation(@NotNull ItemStack stack, @Nullable World world,
+                               @NotNull List<String> tooltip, @NotNull ITooltipFlag flag) {
         String cropId = getCropId(stack);
         if (cropId.isEmpty()) {
             tooltip.add(TextFormatting.GRAY + "右键作物架进行种植");

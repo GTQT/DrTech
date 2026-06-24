@@ -1,6 +1,7 @@
 package com.drppp.drtech;
 
 import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
+import com.meowmel.cropQT.api.unification.material.info.CropQTOrePrefix;
 import gregtech.api.GregTechAPI;
 import gregtech.api.metatileentity.registry.MTEManager;
 import gregtech.api.unification.material.event.MaterialEvent;
@@ -19,6 +20,7 @@ public class DrtechEventHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void registerMaterials(MaterialEvent event) {
         DrtechMaterials.init();
+        CropQTOrePrefix.init();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

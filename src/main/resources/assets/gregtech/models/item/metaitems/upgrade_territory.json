@@ -1,1 +1,6 @@
-{"parent":"item/generated","textures":{"layer0":"drtech:items/metaitems/225"}}
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "drtech:items/metaitems/upgrade_territory"
+  }
+}

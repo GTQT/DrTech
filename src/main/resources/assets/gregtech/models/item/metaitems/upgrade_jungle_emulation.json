@@ -1,1 +1,6 @@
-{"parent":"item/generated","textures":{"layer0":"drtech:items/metaitems/224"}}
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "drtech:items/metaitems/upgrade_jungle_emulation"
+  }
+}

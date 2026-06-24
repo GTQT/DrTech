@@ -1,5 +1,6 @@
 package com.drppp.drtech.common.Items.MetaItems;
 
+import com.meowmel.cropQT.item.MetaCrops;
 import gregtech.api.items.metaitem.MetaItem;
 
 public final class DrMetaItems {
@@ -13,7 +14,7 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem PIPIE_1;
     public static MetaItem<?>.MetaValueItem PIPIE_5;
     public static MetaItem<?>.MetaValueItem PIPIE_10;
-    public static MetaItem<?>.MetaValueItem POS_CARD;
+
     public static MetaItem<?>.MetaValueItem GOLD_COIN;
     public static MetaItem<?>.MetaValueItem FLY_RING;
     public static MetaItem<?>.MetaValueItem LIFE_SUPPORT_RING;
@@ -146,9 +147,53 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH4;
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH5;
 
+    public static MetaItem<?>.MetaValueItem ARGENTIA_LEAF;
+    public static MetaItem<?>.MetaValueItem AURONIA_LEAF;
+    public static MetaItem<?>.MetaValueItem BAUXIA_LEAF;
+    public static MetaItem<?>.MetaValueItem BOBS_YER_UNCLE_BERRY;
+    public static MetaItem<?>.MetaValueItem CANOLA_FLOWER;
+    public static MetaItem<?>.MetaValueItem COPPON_FIBER;
+    public static MetaItem<?>.MetaValueItem FERROFERN_LEAF;
+    public static MetaItem<?>.MetaValueItem GALVANIA_LEAF;
+    public static MetaItem<?>.MetaValueItem HEMP_STEM;
+    public static MetaItem<?>.MetaValueItem HOPS;
+    public static MetaItem<?>.MetaValueItem INDIGO_BLOSSOM;
+    public static MetaItem<?>.MetaValueItem IRIDINE_FLOWER;
+    public static MetaItem<?>.MetaValueItem MAGIC_ESSENCE;
+    public static MetaItem<?>.MetaValueItem MICADIA_FLOWER;
+    public static MetaItem<?>.MetaValueItem MILK_WART;
+    public static MetaItem<?>.MetaValueItem NICKELBACK_LEAF;
+    public static MetaItem<?>.MetaValueItem OIL_BERRY;
+    public static MetaItem<?>.MetaValueItem OSMIANTH_FLOWER;
+    public static MetaItem<?>.MetaValueItem PLATINA_LEAF;
+    public static MetaItem<?>.MetaValueItem PLUMBILIA_LEAF;
+    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_0;
+    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_1;
+    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_2;
+    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_3;
+    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_BANANA;
+    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_CANADA;
+    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_NO_EGG;
+    public static MetaItem<?>.MetaValueItem REACTORIA_LEAF;
+    public static MetaItem<?>.MetaValueItem REACTORIA_STEM;
+    public static MetaItem<?>.MetaValueItem SALTY_ROOT;
+    public static MetaItem<?>.MetaValueItem SCHEELINIUM_LEAF;
+    public static MetaItem<?>.MetaValueItem SPACE_FLOWER;
+    public static MetaItem<?>.MetaValueItem STAR_WART;
+    public static MetaItem<?>.MetaValueItem STARGATIUM_LEAF;
+    public static MetaItem<?>.MetaValueItem THIOSULFINE_FLOWER;
+    public static MetaItem<?>.MetaValueItem THUNDER_FLOWER;
+    public static MetaItem<?>.MetaValueItem TINE_TWIG;
+    public static MetaItem<?>.MetaValueItem TITANIA_LEAF;
+    public static MetaItem<?>.MetaValueItem UUA_BERRY;
+    public static MetaItem<?>.MetaValueItem UUM_BERRY;
+
     public static void MetaItemsInit() {
         MetaItems1 metaItem = new MetaItems1();
         metaItem.setRegistryName("meta_items");
+
+        MetaCrops metaItemCrops = new MetaCrops();
+        metaItemCrops.setRegistryName("meta_crops");
 
         MetaItemLootTable metaItemLootTable = new MetaItemLootTable();
         metaItemLootTable.setRegistryName("loot_table");

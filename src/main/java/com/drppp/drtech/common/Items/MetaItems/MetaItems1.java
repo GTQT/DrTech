@@ -64,7 +64,6 @@ public class MetaItems1 extends StandardMetaItem {
                 .addComponents(new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.pipe_10.tooltip.1"));
                 }));
-        DrMetaItems.POS_CARD = this.addItem(13, "pos_card").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(1).addComponents(new DataItemBehavior(true));
         DrMetaItems.GOLD_COIN = this.addItem(14, "gold_coin").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.gold_coin.tooltip.1"));
@@ -383,14 +382,4 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.RF_PHASE_SYNCHRONIZER = this.addItem(129, "rf_phase_synchronizer").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
         DrMetaItems.CERAMIC_RF_WINDOW = this.addItem(130, "ceramic_rf_window").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
     }
-
-
-
-    @Override
-    public @NotNull EnumActionResult onItemUse(EntityPlayer player, @NotNull World world, @NotNull BlockPos pos, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
-        MetItemsEvent.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
-        return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
-    }
-
-
 }

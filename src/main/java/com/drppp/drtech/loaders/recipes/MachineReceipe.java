@@ -188,14 +188,6 @@ public class MachineReceipe {
                 .buildAndRegister();
 
         ASSEMBLER_RECIPES.recipeBuilder()
-                .input(OrePrefix.plate, Polyethylene)
-                .input(Items.PAPER)
-                .output(DrMetaItems.POS_CARD)
-                .circuitMeta(24)
-                .EUt(16)
-                .duration(100)
-                .buildAndRegister();
-        ASSEMBLER_RECIPES.recipeBuilder()
                 .input(Blocks.GOLD_BLOCK, 64)
                 .output(DrMetaItems.GOLD_COIN)
                 .EUt(16)
