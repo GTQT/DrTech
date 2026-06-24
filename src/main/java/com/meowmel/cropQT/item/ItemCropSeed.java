@@ -5,6 +5,8 @@ import com.drppp.drtech.Tags;
 import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -145,6 +147,48 @@ public class ItemCropSeed extends Item {
             if (!type.getId().equals("weed")) {
                 items.add(createSeedBag(type.getId()));
             }
+        }
+    }
+
+    // ==================== 种子袋染色 ====================
+
+    /** 根据种子袋内的作物类型，对双层白模贴图上色 */
+    public static class SeedColorHandler implements net.minecraft.client.renderer.color.IItemColor {
+        @Override
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
+            String cropId = getCropId(stack);
+            if (!cropId.isEmpty()) {
+                CropType type = CropRegistry.get(cropId);
+                if (type != null && type.getSeedColor() != 0xFFFFFF) {
+                    return type.getSeedColor();
+                }
+            }
+            return 0xFFFFFF; // 不着色
+        }
+    }
+
+    // ==================== 种子袋贴图路由 ====================
+
+    /**
+     * 根据种子袋NBT中的cropId，动态选择物品模型贴图
+     * - 若作物设定了seedTexture → 使用 drtech:crop_seed_<seedTexture值> (多个作物可共享)
+     * - 否则 → 使用默认 drtech:crop_seed
+     */
+    public static class SeedMeshDefinition implements ItemMeshDefinition {
+        public static final ModelResourceLocation DEFAULT_MODEL =
+                new ModelResourceLocation(Tags.MODID + ":crop_seed", "inventory");
+
+        @Override
+        public ModelResourceLocation getModelLocation(ItemStack stack) {
+            String cropId = getCropId(stack);
+            if (!cropId.isEmpty()) {
+                CropType type = CropRegistry.get(cropId);
+                if (type != null && type.getSeedTexture() != null) {
+                    return new ModelResourceLocation(
+                            Tags.MODID + ":crop_seed_" + type.getSeedTexture(), "inventory");
+                }
+            }
+            return DEFAULT_MODEL;
         }
     }
 }

@@ -27,11 +27,11 @@ public class CropTextureHandler {
     @SubscribeEvent
     public static void onTextureStitch(TextureStitchEvent.Pre event) {
         for (CropType type : CropRegistry.getAll().values()) {
-            String cropId = type.getId();
+            String texDir = type.getTexturePath();
             int maxStage = type.getMaxGrowthStage();
 
             for (int stage = 0; stage <= maxStage; stage++) {
-                String path = Tags.MODID + ":blocks/crop/" + cropId + "/stage_" + stage;
+                String path = Tags.MODID + ":blocks/crop/" + texDir + "/stage_" + stage;
                 event.getMap().registerSprite(new ResourceLocation(path));
             }
         }

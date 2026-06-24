@@ -22,10 +22,21 @@ import java.util.Map;
 public class CropRegistry {
     private static final Map<String, CropType> REGISTRY = new HashMap<>();
 
-    public static void register(CropType crop) { REGISTRY.put(crop.getId(), crop); }
-    public static CropType get(String id) { return REGISTRY.get(id); }
-    public static boolean exists(String id) { return REGISTRY.containsKey(id); }
-    public static Map<String, CropType> getAll() { return REGISTRY; }
+    public static void register(CropType crop) {
+        REGISTRY.put(crop.getId(), crop);
+    }
+
+    public static CropType get(String id) {
+        return REGISTRY.get(id);
+    }
+
+    public static boolean exists(String id) {
+        return REGISTRY.containsKey(id);
+    }
+
+    public static Map<String, CropType> getAll() {
+        return REGISTRY;
+    }
 
     public static void registerAll() {
         // ================================================================
@@ -161,6 +172,7 @@ public class CropRegistry {
         register(new CropType.Builder("milk_wart").displayName("牛奶疣").tier(3)
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(22)
                 .addDrop(DrMetaItems.MILK_WART.getStackForm())
+                .seedTexture("spore").seedColor(0xF8F8F8)
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("egg_berry").displayName("鸡蛋莓").tier(3)
@@ -184,6 +196,7 @@ public class CropRegistry {
         register(new CropType.Builder("hemp_stem").displayName("大麻茎").tier(3)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(22)
                 .addDrop(DrMetaItems.HEMP_STEM.getStackForm())
+                .seedTexture("grains").seedColor(0x88AA44)
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("papyrus").displayName("纸莎草").tier(3)
@@ -256,27 +269,36 @@ public class CropRegistry {
         register(new CropType.Builder("canola_flower").displayName("油菜花").tier(4)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(24)
                 .addDrop(DrMetaItems.CANOLA_FLOWER.getStackForm())
+                .seedTexture("flower").seedColor(0xFFDD00)
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("hops").displayName("啤酒花").tier(4)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(24)
                 .addDrop(DrMetaItems.HOPS.getStackForm())
+                .seedTexture("flower").seedColor(0x88CC00)
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("indigo_blossom").displayName("靛蓝花").tier(4)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(24)
                 .addDrop(DrMetaItems.INDIGO_BLOSSOM.getStackForm())
+                .seedTexture("flower").seedColor(0x4444FF)
                 .renderType(CropRenderType.CROSS).build());
 
         // 神秘莓系列 (6种)
         {
             ItemStack crystal_essence = CraftingReceipe.getItemStack("thaumcraft:crystal_essence");
-            ItemStack ignis = crystal_essence.copy(); DrtechUtils.addAspectsToItemStack(ignis, "ignis", 1);
-            ItemStack aer = crystal_essence.copy(); DrtechUtils.addAspectsToItemStack(aer, "aer", 1);
-            ItemStack aqua = crystal_essence.copy(); DrtechUtils.addAspectsToItemStack(aqua, "aqua", 1);
-            ItemStack terra = crystal_essence.copy(); DrtechUtils.addAspectsToItemStack(terra, "terra", 1);
-            ItemStack ordo = crystal_essence.copy(); DrtechUtils.addAspectsToItemStack(ordo, "ordo", 1);
-            ItemStack perditio = crystal_essence.copy(); DrtechUtils.addAspectsToItemStack(perditio, "perditio", 1);
+            ItemStack ignis = crystal_essence.copy();
+            DrtechUtils.addAspectsToItemStack(ignis, "ignis", 1);
+            ItemStack aer = crystal_essence.copy();
+            DrtechUtils.addAspectsToItemStack(aer, "aer", 1);
+            ItemStack aqua = crystal_essence.copy();
+            DrtechUtils.addAspectsToItemStack(aqua, "aqua", 1);
+            ItemStack terra = crystal_essence.copy();
+            DrtechUtils.addAspectsToItemStack(terra, "terra", 1);
+            ItemStack ordo = crystal_essence.copy();
+            DrtechUtils.addAspectsToItemStack(ordo, "ordo", 1);
+            ItemStack perditio = crystal_essence.copy();
+            DrtechUtils.addAspectsToItemStack(perditio, "perditio", 1);
 
             register(new CropType.Builder("mystical_order").displayName("秩序神秘莓").tier(4)
                     .maxGrowthStage(5).harvestStage(5).stageRequirement(25)
@@ -306,10 +328,10 @@ public class CropRegistry {
 
         // 16色神秘花
         String[][] mysticColors = {
-                {"white","白色"},{"black","黑色"},{"red","红色"},{"green","绿色"},
-                {"brown","棕色"},{"orange","橙色"},{"magenta","品红色"},{"light_blue","淡蓝色"},
-                {"yellow","黄色"},{"lime","黄绿色"},{"pink","粉色"},{"gray","灰色"},
-                {"silver","淡灰"},{"cyan","青色"},{"blue","蓝色"},{"purple","紫色"}
+                {"white", "白色"}, {"black", "黑色"}, {"red", "红色"}, {"green", "绿色"},
+                {"brown", "棕色"}, {"orange", "橙色"}, {"magenta", "品红色"}, {"light_blue", "淡蓝色"},
+                {"yellow", "黄色"}, {"lime", "黄绿色"}, {"pink", "粉色"}, {"gray", "灰色"},
+                {"silver", "淡灰"}, {"cyan", "青色"}, {"blue", "蓝色"}, {"purple", "紫色"}
         };
         for (int i = 0; i < mysticColors.length; i++) {
             register(new CropType.Builder("mystic_flower_" + mysticColors[i][0])
@@ -374,6 +396,7 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(new ItemStack(Items.IRON_NUGGET, 2))
                 .requiredBlocks(Blocks.IRON_BLOCK)
+                .seedTexture("oreberry").seedColor(Materials.Iron.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("shining").displayName("闪光草").tier(5)
@@ -420,6 +443,7 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(Materials.Lead.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Lead))
+                .seedTexture("oreberry").seedColor(Materials.Lead.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("salt_root").displayName("盐根").tier(5)
@@ -450,52 +474,61 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.ARGENTIA_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Silver))
+                .seedTexture("oreberry").seedColor(Materials.Silver.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("auronia_leaf").displayName("金叶草").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.AURONIA_LEAF.getStackForm())
                 .requiredBlocks(Blocks.GOLD_BLOCK)
+                .seedTexture("oreberry").seedColor(Materials.Gold.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("bauxia_leaf").displayName("铝土叶").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.BAUXIA_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Aluminium))
+                .seedTexture("oreberry").seedColor(Materials.Aluminium.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("coppon_fiber").displayName("铜纤维草").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.COPPON_FIBER.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Copper))
+                .seedTexture("oreberry").seedColor(Materials.Copper.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("ferrofern_leaf").displayName("铁蕨叶").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.FERROFERN_LEAF.getStackForm())
                 .requiredBlocks(Blocks.IRON_BLOCK)
+                .seedTexture("oreberry").seedColor(Materials.Iron.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("micadia_flower").displayName("云母花").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(28)
                 .addDrop(DrMetaItems.MICADIA_FLOWER.getStackForm())
+                .seedTexture("oreberry").seedColor(Materials.Mica.getMaterialRGB())
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("plumbilia_leaf").displayName("铅叶草").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.PLUMBILIA_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Lead))
+                .seedTexture("oreberry").seedColor(Materials.Lead.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("salty_root").displayName("盐根").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(28)
                 .addDrop(DrMetaItems.SALTY_ROOT.getStackForm())
+                .seedTexture("oreberry").seedColor(Materials.Salt.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("tine_twig").displayName("锡枝").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.TINE_TWIG.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Tin))
+                .seedTexture("oreberry").seedColor(Materials.Tin.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         // ================================================================
@@ -552,18 +585,21 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(32)
                 .addDrop(Materials.Tin.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Tin))
+                .seedTexture("oreberry").seedColor(Materials.Tin.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("copper_leaf").displayName("铜叶子").tier(6)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(32)
                 .addDrop(Materials.Copper.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Copper))
+                .seedTexture("oreberry").seedColor(Materials.Copper.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("titanium_leaf").displayName("钛叶子").tier(6)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(34)
                 .addDrop(Materials.Titanium.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Titanium))
+                .seedTexture("oreberry").seedColor(Materials.Titanium.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         // --- MetaCrops Tier 6 ---
@@ -576,12 +612,14 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(32)
                 .addDrop(DrMetaItems.NICKELBACK_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Nickel))
+                .seedTexture("oreberry").seedColor(Materials.Nickel.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("scheelinium_leaf").displayName("钨叶草").tier(6)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(34)
                 .addDrop(DrMetaItems.SCHEELINIUM_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Tungsten))
+                .seedTexture("oreberry").seedColor(Materials.Tungsten.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("thiosulfine_flower").displayName("硫磺花").tier(6)
@@ -593,6 +631,7 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(34)
                 .addDrop(DrMetaItems.TITANIA_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Titanium))
+                .seedTexture("oreberry").seedColor(Materials.Titanium.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         // ================================================================
@@ -602,6 +641,7 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(35)
                 .addDrop(new ItemStack(Items.GOLD_NUGGET, 2))
                 .requiredBlocks(Blocks.GOLD_BLOCK)
+                .seedTexture("oreberry").seedColor(Materials.Gold.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("tearflower").displayName("哭泣花").tier(7)
@@ -619,41 +659,48 @@ public class CropRegistry {
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
                 .addDrop(Materials.Silver.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Silver))
+                .seedTexture("oreberry").seedColor(Materials.Silver.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("aluminum_leaf").displayName("铝叶子").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
                 .addDrop(Materials.Aluminium.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Aluminium))
+                .seedTexture("oreberry").seedColor(Materials.Aluminium.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("zinc_leaf").displayName("锌叶子").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
                 .addDrop(Materials.Zinc.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Zinc))
+                .seedTexture("oreberry").seedColor(Materials.Zinc.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("nickel_leaf").displayName("镍叶子").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
                 .addDrop(Materials.Nickel.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Nickel))
+                .seedTexture("oreberry").seedColor(Materials.Nickel.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         // --- MetaCrops Tier 7 ---
         register(new CropType.Builder("iridine_flower").displayName("铱花").tier(7)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(36)
                 .addDrop(DrMetaItems.IRIDINE_FLOWER.getStackForm())
+                .seedTexture("oreberry").seedColor(0xE0E0FF)
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("osmianth_flower").displayName("锇花").tier(7)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(36)
                 .addDrop(DrMetaItems.OSMIANTH_FLOWER.getStackForm())
+                .seedTexture("oreberry").seedColor(0x6060A0)
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("platina_leaf").displayName("铂叶草").tier(7)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(36)
                 .addDrop(DrMetaItems.PLATINA_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Platinum))
+                .seedTexture("oreberry").seedColor(Materials.Platinum.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("stargatium_leaf").displayName("星门叶").tier(7)
@@ -673,6 +720,7 @@ public class CropRegistry {
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(new ItemStack(Items.DIAMOND))
                 .requiredBlocks(Blocks.DIAMOND_BLOCK).lightRequirement(12)
+                .seedTexture("oreberry").seedColor(Materials.Diamond.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("black_lotus").displayName("黑莲花").tier(8)
@@ -685,72 +733,84 @@ public class CropRegistry {
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(Materials.Thulium.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Thulium))
+                .seedTexture("oreberry").seedColor(Materials.Thulium.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("manganese_leaf").displayName("锰叶子").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(Materials.Manganese.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         // --- MetaCrops Tier 8 ---
         register(new CropType.Builder("bobs_yer_uncle_berry").displayName("鲍勃叔叔浆果").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.BOBS_YER_UNCLE_BERRY.getStackForm())
+                .seedTexture("oreberry").seedColor(0xFF4488)
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("magic_essence").displayName("魔法精华").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.MAGIC_ESSENCE.getStackForm())
+                .seedTexture("magic").seedColor(0xFF00FF)
                 .lightRequirement(0)
                 .renderType(CropRenderType.CROSS).build());
 
-        register(new CropType.Builder("pyrolusium_leaf.0").displayName("软锰矿叶").tier(8)
+        register(new CropType.Builder("pyrolusium_leaf.0").displayName("软锰矿叶").tier(8).texturePath("pyrolusium")
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.PYROLUSIUM_LEAF_0.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("pyrolusium_leaf.1").displayName("软锰矿叶I").tier(8)
+        register(new CropType.Builder("pyrolusium_leaf.1").displayName("软锰矿叶I").tier(8).texturePath("pyrolusium")
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.PYROLUSIUM_LEAF_1.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("pyrolusium_leaf.2").displayName("软锰矿叶II").tier(8)
+        register(new CropType.Builder("pyrolusium_leaf.2").displayName("软锰矿叶II").tier(8).texturePath("pyrolusium")
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.PYROLUSIUM_LEAF_2.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("pyrolusium_leaf.3").displayName("软锰矿叶III").tier(8)
+        register(new CropType.Builder("pyrolusium_leaf.3").displayName("软锰矿叶III").tier(8).texturePath("pyrolusium")
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.PYROLUSIUM_LEAF_3.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("pyrolusium_leaf.banana").displayName("香蕉软锰矿叶").tier(8)
+        register(new CropType.Builder("pyrolusium_leaf.banana").displayName("香蕉软锰矿叶").tier(8).texturePath("pyrolusium")
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.PYROLUSIUM_LEAF_BANANA.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("pyrolusium_leaf.canada").displayName("加拿大软锰矿叶").tier(8)
+        register(new CropType.Builder("pyrolusium_leaf.canada").displayName("加拿大软锰矿叶").tier(8).texturePath("pyrolusium")
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.PYROLUSIUM_LEAF_CANADA.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("pyrolusium_leaf.no_egg").displayName("无蛋软锰矿叶").tier(8)
+        register(new CropType.Builder("pyrolusium_leaf.no_egg").displayName("无蛋软锰矿叶").tier(8).texturePath("pyrolusium")
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.PYROLUSIUM_LEAF_NO_EGG.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Manganese))
+                .seedTexture("oreberry").seedColor(Materials.Manganese.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("reactoria_leaf").displayName("反应堆叶").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.REACTORIA_LEAF.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium))
+                .seedTexture("oreberry").seedColor(Materials.Uranium.getMaterialRGB())
                 .lightRequirement(0)
                 .renderType(CropRenderType.HASH).build());
 
@@ -758,6 +818,7 @@ public class CropRegistry {
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
                 .addDrop(DrMetaItems.REACTORIA_STEM.getStackForm())
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium))
+                .seedTexture("oreberry").seedColor(Materials.Uranium.getMaterialRGB())
                 .lightRequirement(0)
                 .renderType(CropRenderType.HASH).build());
 
@@ -768,6 +829,7 @@ public class CropRegistry {
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(45)
                 .addDrop(new ItemStack(Items.EMERALD))
                 .requiredBlocks(Blocks.EMERALD_BLOCK).lightRequirement(12)
+                .seedTexture("oreberry").seedColor(Materials.Emerald.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("lucky_clover").displayName("幸运草").tier(9)
@@ -785,11 +847,13 @@ public class CropRegistry {
         register(new CropType.Builder("space_flower").displayName("太空花").tier(9)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(45)
                 .addDrop(DrMetaItems.SPACE_FLOWER.getStackForm())
+                .seedTexture("flower").seedColor(0xFF44FF)
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("uua_berry").displayName("UUA浆果").tier(9)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(45)
                 .addDrop(DrMetaItems.UUA_BERRY.getStackForm())
+                .seedTexture("magic").seedColor(0xAA00FF)
                 .renderType(CropRenderType.CROSS).build());
 
         // ================================================================
@@ -806,6 +870,7 @@ public class CropRegistry {
                 .addDrop(Materials.Uranium238.getItemForm(OrePrefix.nugget, 2))
                 .addChanceDrop(Materials.Uranium235.getItemForm(OrePrefix.nugget, 1), 0.1f)
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Uranium))
+                .seedTexture("oreberry").seedColor(Materials.Uranium.getMaterialRGB())
                 .lightRequirement(0).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("bedrock_heart").displayName("基岩之心").tier(10)
@@ -818,12 +883,14 @@ public class CropRegistry {
         register(new CropType.Builder("star_wart").displayName("星之疣").tier(10)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(50)
                 .addDrop(DrMetaItems.STAR_WART.getStackForm())
+                .seedTexture("spore").seedColor(0xFFFF00)
                 .lightRequirement(0)
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("uum_berry").displayName("UUM浆果").tier(10)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(50)
                 .addDrop(DrMetaItems.UUM_BERRY.getStackForm())
+                .seedTexture("magic").seedColor(0x4400AA)
                 .renderType(CropRenderType.CROSS).build());
 
         // ================================================================
@@ -838,12 +905,14 @@ public class CropRegistry {
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(55)
                 .addDrop(Materials.Platinum.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Platinum))
+                .seedTexture("oreberry").seedColor(Materials.Platinum.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("tungsten_leaf").displayName("钨叶子").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(55)
                 .addDrop(Materials.Tungsten.getItemForm(OrePrefix.nugget, 2))
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.Tungsten))
+                .seedTexture("oreberry").seedColor(Materials.Tungsten.getMaterialRGB())
                 .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("money_grass").displayName("多金草").tier(11)

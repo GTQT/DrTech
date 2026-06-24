@@ -14,6 +14,9 @@ import java.util.*;
 public class CropType {
     private final String id;
     private final String displayName;
+    private final String texturePath; // 自定义作物贴图目录，null则使用id
+    private final String seedTexture; // 自定义种子袋贴图分组键，null则使用默认
+    private final int seedColor;      // 种子袋染色RGB，0xFFFFFF为不着色
     private final int tier;
     private final int maxGrowthStage;
     private final int harvestStage;
@@ -36,6 +39,9 @@ public class CropType {
     private CropType(Builder builder) {
         this.id = builder.id;
         this.displayName = builder.displayName;
+        this.texturePath = builder.texturePath;
+        this.seedTexture = builder.seedTexture;
+        this.seedColor = builder.seedColor;
         this.tier = builder.tier;
         this.maxGrowthStage = builder.maxGrowthStage;
         this.harvestStage = builder.harvestStage;
@@ -172,6 +178,12 @@ public class CropType {
 
     public String getId() { return id; }
     public String getDisplayName() { return displayName; }
+    /** 作物贴图目录路径，未设定则返回id */
+    public String getTexturePath() { return texturePath != null ? texturePath : id; }
+    /** 种子袋贴图分组键，未设定则返回null(使用默认种子袋贴图) */
+    public String getSeedTexture() { return seedTexture; }
+    /** 种子袋染色RGB，未设定返回0xFFFFFF(不着色) */
+    public int getSeedColor() { return seedColor; }
     public int getTier() { return tier; }
     public int getMaxGrowthStage() { return maxGrowthStage; }
     public int getHarvestStage() { return harvestStage; }
@@ -249,6 +261,9 @@ public class CropType {
         private float waterRequirementMax = 1.0f;
         private Map<String, List<ItemStack>> blockDrops = new HashMap<>();
         private Map<String, List<ChanceDrop>> blockChanceDrops = new HashMap<>();
+        private String texturePath = null;    // 自定义贴图目录
+        private String seedTexture = null;   // 自定义种子袋贴图分组键
+        private int seedColor = 0xFFFFFF;    // 种子袋染色RGB
 
         public Builder(String id) { this.id = id; this.displayName = id; }
 
@@ -308,6 +323,12 @@ public class CropType {
         public Builder lightRequirement(float l) { this.lightRequirement = l; return this; }
         public Builder waterRequirement(float w) { this.waterRequirement = w; return this; }
         public Builder renderType(CropRenderType t) { this.renderType = t; return this; }
+        /** 自定义作物贴图目录名(默认使用cropId) — 影响作物架TESR */
+        public Builder texturePath(String path) { this.texturePath = path; return this; }
+        /** 自定义种子袋贴图分组键(如 "oreberry")，指向 models/item/crop_seed_<key>.json，多个作物可共享 */
+        public Builder seedTexture(String key) { this.seedTexture = key; return this; }
+        /** 种子袋染色(如 Materials.Silver.materialRGB)，与seedTexture配合对白模着色 */
+        public Builder seedColor(int rgb) { this.seedColor = rgb; return this; }
         /** 设为false则不允许通过杂交产出此作物 */
         public Builder canBeBreedResult(boolean v) { this.canBeBreedResult = v; return this; }
         /** 光照小于等于某值 (蘑菇/暗处作物) */

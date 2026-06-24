@@ -107,12 +107,30 @@ public class ItemsInit {
         registerItemModel(BlocksInit.TFFT_TANK);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(AMETHYST_SHARD, 0, new ModelResourceLocation(AMETHYST_SHARD.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(CROP_SEED, 0, new ModelResourceLocation(CROP_SEED.getRegistryName(), "inventory"));
+        ModelLoader.setCustomMeshDefinition(CROP_SEED, new ItemCropSeed.SeedMeshDefinition());
+        // 种子袋变体模型(含默认 + 8个自定义，硬编码避免依赖CropRegistry时序)
+        ModelLoader.registerItemVariants(CROP_SEED,
+                new ModelResourceLocation(CROP_SEED.getRegistryName(), "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_oreberry", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_flower", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_grains", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_magic", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_spore", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_bonsai", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_botania", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_vanilla", "inventory"));
         ModelLoader.setCustomModelResourceLocation(CROP_ANALYZER, 0, new ModelResourceLocation(CROP_ANALYZER.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_WEEDING_SHEARS, 0, new ModelResourceLocation(ITEM_WEEDING_SHEARS.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(HAPPY_GHAST_HARNESS, 0, new ModelResourceLocation(HAPPY_GHAST_HARNESS.getRegistryName(), "inventory"));
+    }
+
+    /** 在CropRegistry.registerAll()之后调用，注册染色处理器 */
+    @SideOnly(Side.CLIENT)
+    public static void registerSeedModelsLate() {
+        net.minecraft.client.Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                new ItemCropSeed.SeedColorHandler(), CROP_SEED);
     }
 
     @SideOnly(Side.CLIENT)

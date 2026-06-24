@@ -44,13 +44,13 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
         int stage = Math.min(te.getGrowthStage(), type.getMaxGrowthStage());
 
         // 获取贴图
-        String texPath = Tags.MODID + ":blocks/crop/" + te.getCropId() + "/stage_" + stage;
+        String texPath = Tags.MODID + ":blocks/crop/" + type.getTexturePath() + "/stage_" + stage;
         TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(texPath);
 
         TextureAtlasSprite missing = Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
         if (sprite == missing) {
             // fallback到stage_0
-            texPath = Tags.MODID + ":blocks/crop/" + te.getCropId() + "/stage_0";
+            texPath = Tags.MODID + ":blocks/crop/" + type.getTexturePath() + "/stage_0";
             sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(texPath);
             if (sprite == missing) return;
         }
