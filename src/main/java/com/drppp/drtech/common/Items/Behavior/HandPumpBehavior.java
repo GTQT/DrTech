@@ -3,6 +3,7 @@ package com.drppp.drtech.common.Items.Behavior;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.MetaTileEntityHolder;
+import gregtech.api.metatileentity.multiblock.IMaintenance;
 import gregtech.api.util.GTUtility;
 import gregtech.common.metatileentities.multi.MetaTileEntityTankValve;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMaintenanceHatch;
@@ -63,10 +64,10 @@ public class HandPumpBehavior implements IItemBehaviour {
             } else if (tileEntity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null)) {
                 drainFromCapabilities(tileEntity, player, fluidHandlerItem, capacity, content);
                 return EnumActionResult.SUCCESS;
-            } else if (GTUtility.getMetaTileEntity(world, pos) instanceof MetaTileEntityMaintenanceHatch) {
+            } else if (GTUtility.getMetaTileEntity(world, pos) instanceof IMaintenance) {
                 if (fluidHandlerItem.getTankProperties()[0].getContents().getFluid().equals(SolderingAlloy.getFluid()) && fluidHandlerItem.getTankProperties()[0].getContents().amount >= 144) {
                     fluidHandlerItem.drain(144, true);
-                    ((MetaTileEntityMaintenanceHatch) (GTUtility.getMetaTileEntity(world, pos))).fixAllMaintenanceProblems();
+                    ((IMaintenance) (GTUtility.getMetaTileEntity(world, pos))).fixAllMaintenance();
                 }
             }
 

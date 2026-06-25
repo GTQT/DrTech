@@ -8,7 +8,6 @@ import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
-import com.drppp.drtech.api.Utils.CustomeRecipe;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.Blocks.BlockComposter;
@@ -180,7 +179,6 @@ public class DrTechMain {
         DrTechReceipeManager.init();
         SyncInit.init();
         TopInit.init();
-        CustomeRecipe.InitCanDoWorkMachines();
         if (FMLLaunchHandler.side() == Side.CLIENT) {
             OBJLoader.INSTANCE.addDomain(MODID);
         }
@@ -199,6 +197,7 @@ public class DrTechMain {
     public void Clientinit(FMLInitializationEvent event) {
         SyncInit.init();
         drtMetaEntities.initRenderers();
+        CropInitHandler.clienInit();
     }
 
     @EventHandler

@@ -38,6 +38,12 @@ public class CropRegistry {
         return REGISTRY;
     }
 
+    public static void ensureRegistered() {
+        if (REGISTRY.isEmpty()) {
+            registerAll();
+        }
+    }
+
     public static void registerAll() {
         // ================================================================
         //  Tier 0: 杂草

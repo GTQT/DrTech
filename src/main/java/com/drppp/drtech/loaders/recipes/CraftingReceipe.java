@@ -22,8 +22,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import static com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities.*;
-import static gregicality.multiblocks.api.unification.GCYMMaterials.MolybdenumDisilicide;
+
 import static gregtech.api.GTValues.EV;
 import static gregtech.api.GTValues.IV;
 import static gregtech.api.unification.material.Materials.*;

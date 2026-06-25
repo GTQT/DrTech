@@ -31,8 +31,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
-    
-    public static MetaTileEntityMatrixSolver MATRIX_SOLVER;
+
     public static MetaTileEntityExtremeExterminationChamber MOB_KILLER;
     public static MetaTileEntitySolarTower SOLAR_TOWER;
     public static MetatileEntityTwentyFiveFluidTank TFFT;
@@ -102,7 +101,6 @@ public class DrTechMetaTileEntities {
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getDrId("large_alloy_smelter")));
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getDrId("large_bee_hive")));
 
-        MATRIX_SOLVER = registerMetaTileEntity(getID(), new MetaTileEntityMatrixSolver(getDrId("matrix_solver")));
         MOB_KILLER = registerMetaTileEntity(getID(), new MetaTileEntityExtremeExterminationChamber(getDrId("mob_killer")));
 
         SOLAR_TOWER = registerMetaTileEntity(getID(), new MetaTileEntitySolarTower(getDrId("solar_tower")));

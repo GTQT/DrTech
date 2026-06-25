@@ -14,6 +14,7 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
@@ -38,7 +39,7 @@ import gregtech.api.pattern.TraceabilityPredicate;
 
 public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
     public MetaTileEntityCombProcess(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId, DrtechReceipes.COMBS_PRODUCT);
+        super(metaTileEntityId, RecipeMaps.COMBS_PRODUCT);
         this.recipeMapWorkable = new SelfRecipeLogic(this, true);
     }
 

@@ -26,6 +26,7 @@ public class CropTextureHandler {
 
     @SubscribeEvent
     public static void onTextureStitch(TextureStitchEvent.Pre event) {
+        CropRegistry.ensureRegistered();
         for (CropType type : CropRegistry.getAll().values()) {
             String texDir = type.getTexturePath();
             int maxStage = type.getMaxGrowthStage();

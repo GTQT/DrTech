@@ -27,10 +27,12 @@ public class CropInitHandler {
     }
     public static void init()
     {
-        CropRegistry.registerAll();
-        ItemsInit.registerSeedModelsLate();
+        CropRegistry.ensureRegistered();
         CrossBreedingRegistry.registerDefaults();
         BlockCropStick.initVanillaSeedMap();
     }
-
+    public static void clienInit()
+    {
+        ItemsInit.registerSeedModelsLate();
+    }
 }

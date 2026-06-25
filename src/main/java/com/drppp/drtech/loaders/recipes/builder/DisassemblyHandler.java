@@ -15,7 +15,6 @@ import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.util.GTUtility;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.electric.MetaTileEntityHull;
-import gtqt.common.items.GTQTMetaItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.item.crafting.IRecipe;
@@ -29,23 +28,24 @@ import static com.drppp.drtech.loaders.recipes.DrtechReceipes.DISASSEMBLER_RECIP
 import static gregtech.api.unification.material.Materials.Ash;
 import static gregtech.api.unification.ore.OrePrefix.dustTiny;
 
+
 public class DisassemblyHandler {
     public  static  List<ItemStack> black_list = new ArrayList<>();
     public static final Map<String, Tuple<ItemStack, Integer>> circuitToUse = createCircuitMap(Arrays.asList(
-            GTQTMetaItems.GENERAL_CIRCUIT_LV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_MV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_HV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_EV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_IV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_LuV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_ZPM.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_UV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_UHV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_UEV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_UIV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_UXV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_OpV.getStackForm(),
-            GTQTMetaItems.GENERAL_CIRCUIT_MAX.getStackForm()
+           MetaItems.GENERAL_CIRCUIT_LV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_MV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_HV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_EV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_IV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_LuV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_ZPM.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_UV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_UHV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_UEV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_UIV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_UXV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_OpV.getStackForm(),
+           MetaItems.GENERAL_CIRCUIT_MAX.getStackForm()
     ));
 
     public static void buildDisassemblerRecipes() {
