@@ -127,10 +127,15 @@ tile.drtech.connector_3.name=3级电容
 tile.drtech.golden_sea.name=聚宝盆
 tile.drtech.bubble_column.name=气泡柱
 tile.drtech.peaceful_table.name=和平者之桌
+tile.drtech.peaceful_table.tooltip.1=仅在和平难度下工作。
+tile.drtech.peaceful_table.tooltip.2=在上方放置容器，并把剑放入容器。
+tile.drtech.peaceful_table.tooltip.3=约每 10 秒消耗剑耐久，生成当前维度怪物掉落物。
 tile.drtech.storage_compress.name=存储桶
 tile.drtech.waste_dirt.name=废土泥土
 tile.drtech.SapBag.name=树脂收集器
 tile.advanced_cauldron.name=进阶炼药锅
+tile.advanced_cauldron.tooltip.1=可从附近储水容器或流体机器中自动补水。
+tile.advanced_cauldron.tooltip.2=检查 3x3x3 范围；未满时消耗 1,000 mB 水补满。
 tile.drtech.Time_Table.name=时间之瓶挂机桌
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=重力场约束方块
@@ -364,6 +369,19 @@ drtech.multiblock.crops.seed=§b种子信息:%s
 #流体
 gregtech.material.cold_sun_salt=冷太阳能盐
 gregtech.material.hot_sun_salt=热太阳能盐
+gregtech.material.chorus=紫菘果
+gregtech.material.demulsifier=破乳剂
+gregtech.material.high_energy_demulsifier=高能破乳剂
+gregtech.material.high_energy_chorus_solution=高能紫菘溶液
+gregtech.material.ender_precipitate=末影沉淀物
+gregtech.material.ender_extractant=末影萃取剂
+gregtech.material.extracted_chorus_solvent=萃取紫菘溶剂
+gregtech.material.chorus_waste=紫菘废液
+gregtech.material.ender_energy_factor=末影能量因子
+gregtech.material.high_energy_diesel=高能柴油
+gregtech.material.high_energy_gasoline=高能汽油
+item.gregtech.material.chorus.dust=粉碎紫菘果
+item.gregtech.material.ender_precipitate.dust=末影沉淀物
 
 
 #收集器

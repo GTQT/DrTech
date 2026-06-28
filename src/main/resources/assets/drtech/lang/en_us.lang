@@ -128,10 +128,15 @@ tile.drtech.connector_3.name=Grade 3 Capacitor
 tile.drtech.golden_sea.name=Cornucopia
 tile.drtech.bubble_column.name=Bubble Column
 tile.drtech.peaceful_table.name=Table of Peace
+tile.drtech.peaceful_table.tooltip.1=Works only while the world is set to Peaceful difficulty.
+tile.drtech.peaceful_table.tooltip.2=Place an inventory above it and put swords inside.
+tile.drtech.peaceful_table.tooltip.3=Every 10 seconds, swords are damaged to generate current-dimension monster drops.
 tile.drtech.storage_compress.name=Storage Bucket
 tile.drtech.waste_dirt.name=Wasteland Dirt
 tile.drtech.SapBag.name=Resin Collector
 tile.advanced_cauldron.name=Advanced Cauldron
+tile.advanced_cauldron.tooltip.1=Automatically refills itself from nearby water tanks or fluid machines.
+tile.advanced_cauldron.tooltip.2=Checks a 3x3x3 area and consumes 1,000 mB water when not full.
 tile.drtech.Time_Table.name=Time Bottle AFK Table
 #MetaCasing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=Gravitational Field Casing
@@ -365,6 +370,19 @@ drtech.multiblock.crops.seed=闂佸綊妫跨换婕噀ed info: %s
 #Fluids
 gregtech.material.cold_sun_salt=Cold Solar Salt
 gregtech.material.hot_sun_salt=Hot Solar Salt
+gregtech.material.chorus=Chorus Fruit
+gregtech.material.demulsifier=Demulsifier
+gregtech.material.high_energy_demulsifier=High-Energy Demulsifier
+gregtech.material.high_energy_chorus_solution=High-Energy Chorus Solution
+gregtech.material.ender_precipitate=Ender Precipitate
+gregtech.material.ender_extractant=Ender Extractant
+gregtech.material.extracted_chorus_solvent=Extracted Chorus Solvent
+gregtech.material.chorus_waste=Chorus Waste
+gregtech.material.ender_energy_factor=Ender Energy Factor
+gregtech.material.high_energy_diesel=High-Energy Diesel
+gregtech.material.high_energy_gasoline=High-Energy Gasoline
+item.gregtech.material.chorus.dust=Crushed Chorus Fruit
+item.gregtech.material.ender_precipitate.dust=Ender Precipitate
 
 
 #Collector
