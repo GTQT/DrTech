@@ -1,6 +1,5 @@
 package com.drppp.drtech.common.Items.MetaItems;
 
-import baubles.api.BaubleType;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.common.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.common.Items.Baubles.ElectricLifeSupportRingBehavior;
@@ -10,7 +9,6 @@ import gregtech.api.items.metaitem.ElectricStats;
 import gregtech.api.items.metaitem.FilteredFluidStats;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
-import gregtech.integration.baubles.BaubleBehavior;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumActionResult;
@@ -79,10 +77,6 @@ public class MetaItems1 extends StandardMetaItem {
                     .setCreativeTabs(DrTechMain.DrTechTab)
                     .setMaxStackSize(1).addComponents(ElectricStats.createElectricItem(25600000, GTValues.HV))
                     .addComponents(new ElectricLifeSupportRingBehavior());
-            DrMetaItems.TELEPATHIC_NECKLACE = this.addItem(24, "telepathic_necklace")
-                    .setCreativeTabs(DrTechMain.DrTechTab)
-                    .setMaxStackSize(1)
-                    .addComponents(new BaubleBehavior(BaubleType.HEAD));
         }
         DrMetaItems.TACTICAL_LASER_SUBMACHINE_GUN = this.addItem(17, "tactical_laser_submachine_gun")
                 .setCreativeTabs(DrTechMain.DrTechTab)
@@ -111,9 +105,6 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.NUCLEAR_BATTERY_HV = this.addItem(23, "nuclear_battery_hv")
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .addComponents(ElectricStatsNuclear.createBattery(32000000, GTValues.HV, true))
-                .setMaxStackSize(1);
-        DrMetaItems.WIRELESS_NETWORK_CONTROL_PANEL = this.addItem(25,"wireless_network_control_panel")
-                .setCreativeTabs(DrTechMain.DrTechTab)
                 .setMaxStackSize(1);
         DrMetaItems.HAND_PUMP = this.addItem(26,"hand_pump")
 

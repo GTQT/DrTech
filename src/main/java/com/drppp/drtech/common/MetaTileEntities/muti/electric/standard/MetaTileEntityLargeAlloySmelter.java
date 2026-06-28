@@ -15,6 +15,7 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.pattern.MultiblockShapeInfo;
+import gregtech.api.pattern.FormedStructureView;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.recipes.RecipeMaps;
 import gregtech.client.renderer.ICubeRenderer;
@@ -142,8 +143,9 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
     }
 
     @Override
-    protected void formStructure(PatternMatchContext context) {
-        super.formStructure(context);
+    protected void formStructure(@NotNull FormedStructureView formed) {
+        super.formStructure(formed);
+        PatternMatchContext context = formed.copyLegacyCallbackContext();
         ICasing matchedCoil = GTCasingGroups.heatingCoils().channel().getMatchedCasing(context);
         IHeatingCoilBlockStats type = matchedCoil == null ? null :
                 matchedCoil.getPayloadAs(IHeatingCoilBlockStats.class);

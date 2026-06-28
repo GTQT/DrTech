@@ -276,8 +276,9 @@ public class MetaTileEntityTeslaTower extends MultiblockWithDisplayBase {
     }
 
     @Override
-    protected void formStructure(PatternMatchContext context) {
-        super.formStructure(context);
+    protected void formStructure(@NotNull FormedStructureView formed) {
+        super.formStructure(formed);
+        PatternMatchContext context = formed.copyLegacyCallbackContext();
         coilHeight = context.getInt("Count") / 12 - 1;
 
         float amps = 0;

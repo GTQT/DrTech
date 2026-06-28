@@ -13,7 +13,7 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.NoEnergyMultiblockController;
 import gregtech.api.metatileentity.multiblock.ui.KeyManager;
 import gregtech.api.metatileentity.multiblock.ui.UISyncer;
-import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.pattern.FormedStructureView;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.KeyUtil;
@@ -119,8 +119,8 @@ public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
     }
 
     @Override
-    protected void formStructure(PatternMatchContext context) {
-        super.formStructure(context);
+    protected void formStructure(@NotNull FormedStructureView formed) {
+        super.formStructure(formed);
         BlockPos pos = this.getPos().add(0, -27, 0);
         getTire(pos);
     }

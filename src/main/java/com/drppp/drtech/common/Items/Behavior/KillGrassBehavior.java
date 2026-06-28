@@ -24,7 +24,7 @@ public class KillGrassBehavior implements IItemBehaviour {
                     BlockPos currentPos = pos.add(x, y, z);
                     Block block = world.getBlockState(currentPos).getBlock();
                     if (block == Blocks.TALLGRASS || block instanceof BlockTallGrass || block instanceof BlockDoublePlant) {
-                        world.setBlockToAir(currentPos);
+                        world.destroyBlock(currentPos, true);
                     }
                 }
             }

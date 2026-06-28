@@ -24,8 +24,6 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_LV;
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_MV;
     public static MetaItem<?>.MetaValueItem NUCLEAR_BATTERY_HV;
-    public static MetaItem<?>.MetaValueItem TELEPATHIC_NECKLACE;
-    public static MetaItem<?>.MetaValueItem WIRELESS_NETWORK_CONTROL_PANEL;
     public static MetaItem<?>.MetaValueItem HAND_PUMP;
     public static MetaItem<?>.MetaValueItem GRASS_KILLER;
     public static MetaItem<?>.MetaValueItem UPGRADE_NULL;

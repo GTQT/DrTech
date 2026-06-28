@@ -8,11 +8,15 @@ import com.meowmel.cropQT.item.ItemCropAnalyzer;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemWeedingShears;
 import gregtech.api.block.VariantItemBlock;
+import gregtech.api.unification.OreDictUnifier;
+import gregtech.api.unification.material.Materials;
+import gregtech.api.unification.ore.OrePrefix;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -95,6 +99,14 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(HAPPY_GHAST_HARNESS);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
+        registerOreDicts();
+    }
+
+    private static void registerOreDicts() {
+        OreDictUnifier.registerOre(new ItemStack(ITEM_BLOCK_SMOOTH_BASALT), OrePrefix.stone, Materials.Basalt);
+        OreDictUnifier.registerOre(new ItemStack(ITEM_BLOCK_CALCITE), OrePrefix.stone, Materials.Calcite);
+        OreDictUnifier.registerOre(new ItemStack(AMETHYST_SHARD), OrePrefix.gem, Materials.Amethyst);
+        OreDictUnifier.registerOre(new ItemStack(AMETHYST_SHARD), OrePrefix.gemChipped, Materials.Amethyst);
     }
 
     @SideOnly(Side.CLIENT)
