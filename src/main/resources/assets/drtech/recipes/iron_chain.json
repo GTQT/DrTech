@@ -1,0 +1,20 @@
+﻿{
+	"type": "forge:ore_shaped",
+	"pattern": [
+		"  L",
+		" L ",
+		"L  "
+	],
+	"key": {
+		"L": {
+			"item": "drtech:hooked_component",
+			"data": 2
+		}
+	},
+	"result": {
+		"item": "drtech:hooked_component",
+		"data": 3
+	}
+}
+
+

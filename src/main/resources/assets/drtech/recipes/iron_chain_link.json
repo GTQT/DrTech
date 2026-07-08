@@ -1,0 +1,21 @@
+﻿{
+	"type": "forge:ore_shaped",
+	"pattern": [
+		" II",
+		"I I",
+		"II "
+	],
+	"key": {
+		"I": {
+			"type": "forge:ore_dict",
+			"ore": "ingotIron"
+		}
+	},
+	"result": {
+		"item": "drtech:hooked_component",
+		"data": 2,
+		"count": 3
+	}
+}
+
+

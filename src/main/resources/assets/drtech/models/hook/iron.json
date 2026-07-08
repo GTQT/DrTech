@@ -1,0 +1,7 @@
+﻿{
+	"parent": "drtech:hook/base",
+	"textures": {
+		"texture": "drtech:hooks/iron/hook"
+	}
+}
+

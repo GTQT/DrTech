@@ -4,6 +4,9 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.foods.ItemSoarXpBerry;
 import com.drppp.drtech.common.Items.foods.ItemXpBerry;
+import com.drppp.drtech.hooked.HookComponentType;
+import com.drppp.drtech.hooked.HookRegistry;
+import com.drppp.drtech.hooked.HookType;
 import com.meowmel.cropQT.item.ItemCropAnalyzer;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemWeedingShears;
@@ -60,6 +63,8 @@ public class ItemsInit {
     public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
     public static ItemHappyGhastHarness HAPPY_GHAST_HARNESS = new ItemHappyGhastHarness();
+    public static final Item HOOK_ITEM = HookRegistry.HOOK_ITEM;
+    public static final Item HOOK_COMPONENT_ITEM = HookRegistry.COMPONENT_ITEM;
 
     public static void init(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
@@ -98,6 +103,8 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(HAPPY_GHAST_HARNESS);
+        event.getRegistry().register(HOOK_ITEM);
+        event.getRegistry().register(HOOK_COMPONENT_ITEM);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
         registerOreDicts();
     }
@@ -136,6 +143,14 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(HAPPY_GHAST_HARNESS, 0, new ModelResourceLocation(HAPPY_GHAST_HARNESS.getRegistryName(), "inventory"));
+        for (HookType type : HookType.values()) {
+            ModelLoader.setCustomModelResourceLocation(HOOK_ITEM, type.ordinal(),
+                    new ModelResourceLocation(Tags.MODID + ":hook_" + type.name().toLowerCase(), "inventory"));
+        }
+        for (HookComponentType type : HookComponentType.values()) {
+            ModelLoader.setCustomModelResourceLocation(HOOK_COMPONENT_ITEM, type.ordinal(),
+                    new ModelResourceLocation(Tags.MODID + ":" + type.name().toLowerCase(), "inventory"));
+        }
     }
 
     /** 在CropRegistry.registerAll()之后调用，注册染色处理器 */

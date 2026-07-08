@@ -1,0 +1,27 @@
+﻿{
+	"type": "forge:ore_shaped",
+	"pattern": [
+		"SSP",
+		" RS",
+		"R S"
+	],
+	"key": {
+		"P": {
+			"item": "minecraft:stone_pickaxe"
+		},
+		"R": {
+			"item": "drtech:hooked_component",
+			"data": 1
+		},
+		"S": {
+			"type": "forge:ore_dict",
+			"ore": "stickWood"
+		}
+	},
+	"result": {
+		"item": "drtech:hook",
+		"data": 0
+	}
+}
+
+

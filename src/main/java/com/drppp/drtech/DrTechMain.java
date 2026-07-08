@@ -21,6 +21,10 @@ import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
 import com.drppp.drtech.common.world.AmethystGeodeWorldGenerator;
 import com.drppp.drtech.common.world.DriedGhastWorldGenerator;
+import com.drppp.drtech.hooked.HookCapability;
+import com.drppp.drtech.hooked.HookClientHooks;
+import com.drppp.drtech.hooked.HookNetwork;
+import com.drppp.drtech.hooked.HookTickHandler;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.meowmel.cropQT.api.CropInitHandler;
 import com.meowmel.cropQT.client.CropStickTESR;
@@ -102,12 +106,15 @@ public class DrTechMain {
         DrTechTab = new DrTechCreativeTabs("drtech");
         DrMetaItems.MetaItemsInit();
         DrtechCapInit.init();
+        HookCapability.init();
         Textures.init();
         drtMetaEntities.init();
         TileEntityUIFactory.INSTANCE.init();
         DrtToolItems.init();
         DrTechMetaTileEntities.initialization();
         CropInitHandler.preInit();
+        HookNetwork.init();
+        HookTickHandler.init();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
         GameRegistry.registerWorldGenerator(new DriedGhastWorldGenerator(), 0);
         GameRegistry.registerWorldGenerator(new AmethystGeodeWorldGenerator(), 0);
@@ -138,6 +145,7 @@ public class DrTechMain {
     public void ClientpreInit(FMLPreInitializationEvent event) {
         TexturesInit();
         drtMetaEntities.initRenderers();
+        HookClientHooks.init();
 
     }
 
