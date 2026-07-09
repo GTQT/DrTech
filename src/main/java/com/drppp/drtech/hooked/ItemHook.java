@@ -4,6 +4,7 @@ import baubles.api.BaubleType;
 import baubles.api.BaublesApi;
 import baubles.api.IBauble;
 import baubles.api.cap.IBaublesItemHandler;
+import com.drppp.drtech.DrTechMain;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -58,7 +59,7 @@ public class ItemHook extends ItemMultiVariant implements IBauble {
             }
         }
         if (GuiScreen.isShiftKeyDown()) {
-            String controls = I18n.format("tooltip.drtech.hook_" + hookLangName + ".controls", "C");
+            String controls = I18n.format("tooltip.drtech.hook_" + hookLangName + ".controls", DrTechMain.proxy.getHookKeyDisplayName());
             for (String line : controls.split("\\\\n")) {
                 tooltip.add("- " + line);
             }
@@ -129,7 +130,7 @@ public class ItemHook extends ItemMultiVariant implements IBauble {
 
     @Nullable
     public static ItemStack getItem(EntityPlayer player) {
-        if (Loader.isModLoaded("baubles")) {
+        if ((HookConfig.searchLocations & HookConfig.SEARCH_BAUBLES) != 0 && Loader.isModLoaded("baubles")) {
             IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
             for (int slot = 0; slot < baubles.getSlots(); slot++) {
                 ItemStack stack = baubles.getStackInSlot(slot);
@@ -138,16 +139,28 @@ public class ItemHook extends ItemMultiVariant implements IBauble {
                 }
             }
         }
-        if (player.getHeldItemMainhand().getItem() == HookRegistry.HOOK_ITEM) {
-            return player.getHeldItemMainhand();
+        if ((HookConfig.searchLocations & HookConfig.SEARCH_HANDS) != 0) {
+            if (player.getHeldItemMainhand().getItem() == HookRegistry.HOOK_ITEM) {
+                return player.getHeldItemMainhand();
+            }
+            if (player.getHeldItemOffhand().getItem() == HookRegistry.HOOK_ITEM) {
+                return player.getHeldItemOffhand();
+            }
         }
-        if (player.getHeldItemOffhand().getItem() == HookRegistry.HOOK_ITEM) {
-            return player.getHeldItemOffhand();
+        if ((HookConfig.searchLocations & HookConfig.SEARCH_HOTBAR) != 0) {
+            for (int slot = 0; slot <= 8; slot++) {
+                ItemStack stack = player.inventory.getStackInSlot(slot);
+                if (!stack.isEmpty() && stack.getItem() == HookRegistry.HOOK_ITEM) {
+                    return stack;
+                }
+            }
         }
-        for (int slot = 0; slot <= 35; slot++) {
-            ItemStack stack = player.inventory.getStackInSlot(slot);
-            if (!stack.isEmpty() && stack.getItem() == HookRegistry.HOOK_ITEM) {
-                return stack;
+        if ((HookConfig.searchLocations & HookConfig.SEARCH_INVENTORY) != 0) {
+            for (int slot = 9; slot <= 35; slot++) {
+                ItemStack stack = player.inventory.getStackInSlot(slot);
+                if (!stack.isEmpty() && stack.getItem() == HookRegistry.HOOK_ITEM) {
+                    return stack;
+                }
             }
         }
         return null;

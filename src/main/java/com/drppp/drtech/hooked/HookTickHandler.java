@@ -1,6 +1,8 @@
 package com.drppp.drtech.hooked;
 
+import com.drppp.drtech.DrTechMain;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumParticleTypes;
@@ -12,6 +14,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
@@ -59,6 +62,7 @@ public final class HookTickHandler {
             return;
         }
         EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        DrTechMain.proxy.setAutoJump(player, true);
         HooksCap cap = HookCapability.get(player);
         if (cap == null) {
             return;
@@ -148,6 +152,10 @@ public final class HookTickHandler {
             cap.updateRedMovement(player);
         }
         applyPull(player, cap, type, waist);
+        Vec3d center = cap.getCenterPos();
+        if (center != null && !player.world.isRemote) {
+            player.world.spawnParticle(EnumParticleTypes.FLAME, center.x, center.y, center.z, 0.0, 0.0, 0.0, 0);
+        }
     }
 
     public static Vec3d getWaistPos(Entity entity) {
@@ -244,6 +252,8 @@ public final class HookTickHandler {
             }
         }
         player.fallDistance = 0f;
+        setJumpTicks(player, 10);
+        DrTechMain.proxy.setAutoJump(player, false);
     }
 
     private int countPlanted(HooksCap cap) {
@@ -267,6 +277,10 @@ public final class HookTickHandler {
 
     private double randomOffset() {
         return ThreadLocalRandom.current().nextDouble(-0.05, 0.05);
+    }
+
+    private void setJumpTicks(EntityLivingBase entity, int value) {
+        ObfuscationReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, value, "field_70773_bE", "jumpTicks");
     }
 
     private static final class ItemStackHolder {

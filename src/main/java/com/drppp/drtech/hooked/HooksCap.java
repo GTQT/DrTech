@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
@@ -66,6 +67,9 @@ public class HooksCap {
         if (!player.world.isRemote) {
             return;
         }
+        if (player != Minecraft.getMinecraft().player) {
+            return;
+        }
         double movementY = 0.0;
         if (player.isSneaking()) {
             movementY -= VERTICAL_SPEED;
@@ -81,10 +85,40 @@ public class HooksCap {
         }
         Vec2f horizontal = moveRelative(player, strafe, forward, 0.25f);
         Vec3d offset = new Vec3d(horizontal.x, movementY, horizontal.y);
+        offset = collideOffset(player, offset);
         if (offset.lengthSquared() > 0.001) {
             setCenterPos(HookMath.add(HookTickHandler.getWaistPos(player), offset));
             correctPos();
         }
+    }
+
+    private Vec3d collideOffset(EntityPlayer player, Vec3d offset) {
+        AxisAlignedBB box = player.getEntityBoundingBox();
+        List<AxisAlignedBB> collisions = player.world.getCollisionBoxes(player, box.expand(offset.x, offset.y, offset.z));
+        double x = offset.x;
+        double y = offset.y;
+        double z = offset.z;
+
+        if (y != 0.0D) {
+            for (AxisAlignedBB collision : collisions) {
+                y = collision.calculateYOffset(box, y);
+            }
+            box = box.offset(0.0D, y, 0.0D);
+        }
+        if (x != 0.0D) {
+            for (AxisAlignedBB collision : collisions) {
+                x = collision.calculateXOffset(box, x);
+            }
+            if (x != 0.0D) {
+                box = box.offset(x, 0.0D, 0.0D);
+            }
+        }
+        if (z != 0.0D) {
+            for (AxisAlignedBB collision : collisions) {
+                z = collision.calculateZOffset(box, z);
+            }
+        }
+        return new Vec3d(x, y, z);
     }
 
     public Vec3d limitToHookLength(Vec3d pos, List<HookInfo> planted) {

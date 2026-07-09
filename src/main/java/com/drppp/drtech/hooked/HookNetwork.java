@@ -1,5 +1,6 @@
 package com.drppp.drtech.hooked;
 
+import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -101,8 +102,8 @@ public final class HookNetwork {
             }
             double spawnDistance = player.getPositionVector().distanceTo(pos);
             if (spawnDistance > 10) {
+                DrTechMain.LOGGER.warn("Player {} spawned a hook too far from their body: {}", player.getName(), spawnDistance);
                 cap.update(player);
-                return;
             }
             HookType type = cap.hookType;
             if (type == null) {
