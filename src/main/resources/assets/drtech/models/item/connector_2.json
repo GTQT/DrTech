@@ -1,3 +1,6 @@
 {
-  "parent": "drtech:block/connector_2"
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "drtech:blocks/connector_2"
+  }
 }

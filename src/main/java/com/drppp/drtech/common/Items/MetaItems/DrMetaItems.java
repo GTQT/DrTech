@@ -91,6 +91,9 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem RF_WAVEGUIDE;
     public static MetaItem<?>.MetaValueItem RF_PHASE_SYNCHRONIZER;
     public static MetaItem<?>.MetaValueItem CERAMIC_RF_WINDOW;
+    public static MetaItem<?>.MetaValueItem LOW_VOLTAGE_WIRE;
+    public static MetaItem<?>.MetaValueItem MEDIUM_VOLTAGE_WIRE;
+    public static MetaItem<?>.MetaValueItem HIGH_VOLTAGE_WIRE;
 
     // Loot Table
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_TEST;

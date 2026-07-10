@@ -3,20 +3,13 @@ package com.drppp.drtech.common.MetaTileEntities.muti.electric.store;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-
-import com.cleanroommc.modularui.factory.PosGuiData;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.Client.Particle.DrtechLaserBeamParticle;
 import com.drppp.drtech.Tile.TileEntityConnector;
 import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IControllable;
-import gregtech.api.capability.IEnergyContainer;
-import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.ClickButtonWidget;
@@ -26,7 +19,11 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
+import gregtech.api.pattern.BlockPatternTemplate;
 import gregtech.api.pattern.FormedStructureView;
+import gregtech.api.pattern.SoftTemplate;
+import gregtech.api.pattern.TemplatePool;
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.particle.GTParticleManager;
 import gregtech.client.renderer.ICubeRenderer;
@@ -38,6 +35,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -46,6 +44,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -53,26 +52,18 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import static gregtech.api.util.RelativeDirection.*;
-
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
-import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+import static gregtech.api.util.RelativeDirection.FRONT;
+import static gregtech.api.util.RelativeDirection.RIGHT;
+import static gregtech.api.util.RelativeDirection.UP;
 
 public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase implements IControllable {
-    private boolean isActive=true, isWorkingEnabled = true;
-    private IEnergyContainer inenergyContainer;
-    private IEnergyContainer outenergyContainer;
+    private boolean isActive = true;
+    private boolean isWorkingEnabled = true;
     private TileEntityConnector connector;
-    private BlockPos pos;
     private int beamCount;
+
     public MetaTileEntityEnergyTransTower(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
@@ -83,14 +74,15 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     }
 
     @Override
-    public void setWorkingEnabled(boolean b) {
-        this.isWorkingEnabled = b;
+    public void setWorkingEnabled(boolean isWorkingEnabled) {
+        this.isWorkingEnabled = isWorkingEnabled;
         markDirty();
         World world = getWorld();
         if (world != null && !world.isRemote) {
             writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(isWorkingEnabled));
         }
     }
+
     @Override
     public boolean isActive() {
         return super.isActive() && this.isActive;
@@ -119,97 +111,62 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         }
         return super.getCapability(capability, side);
     }
+
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
         this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), this.isActive(), this.isWorkingEnabled());
     }
+
     @Override
     protected void updateFormedValid() {
-
-      if(!this.getWorld().isRemote)
-      {
-          beamCount++;
-          if(this.connector==null)
-          {
-              getConnectorPos();
-          }
-          if(this.connector !=null && this.inenergyContainer!= null)
-          {
-              this.inenergyContainer.changeEnergy(-this.connector.fill(this.inenergyContainer.getEnergyStored()));
-              this.connector.markDirty();
-          }
-          if(this.connector !=null && this.outenergyContainer!= null)
-          {
-              this.outenergyContainer.changeEnergy(this.connector.drain(this.outenergyContainer.getEnergyCapacity() -this.outenergyContainer.getEnergyStored()));
-              this.connector.markDirty();
-          }
-          if (beamCount >20) {
-              beamCount = 0;
-              writeCustomData(GregtechDataCodes.UPDATE_PARTICLE, this::writeParticles);
-          }
-      }
-
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound data) {
-        return super.writeToNBT(data);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound data) {
-        super.readFromNBT(data);
+        if (this.getWorld().isRemote) {
+            return;
+        }
+        if (this.connector == null) {
+            getConnectorPos();
+        }
+        if (beamCount++ > 20) {
+            beamCount = 0;
+            writeCustomData(GregtechDataCodes.UPDATE_PARTICLE, this::writeParticles);
+        }
     }
 
     @Override
     public void invalidateStructure() {
         super.invalidateStructure();
-        resetTileAbilities();
-        if(this.connector!=null)
-         this.connector.success = 0;
-
+        this.connector = null;
     }
+
     @Override
     protected void formStructure(@NotNull FormedStructureView formed) {
         super.formStructure(formed);
-        initializeAbilities();
         getConnectorPos();
     }
 
-    private void getConnectorPos()
-    {
-            BlockPos pos = null;
-            switch (this.getFrontFacing()){
+    private void getConnectorPos() {
+        BlockPos connectorPos = null;
+        switch (this.getFrontFacing()) {
+            case SOUTH:
+                connectorPos = new BlockPos(this.getPos().getX(), this.getPos().getY() + 10, this.getPos().getZ() - 1);
+                break;
+            case NORTH:
+                connectorPos = new BlockPos(this.getPos().getX(), this.getPos().getY() + 10, this.getPos().getZ() + 1);
+                break;
+            case EAST:
+                connectorPos = new BlockPos(this.getPos().getX() - 1, this.getPos().getY() + 10, this.getPos().getZ());
+                break;
+            case WEST:
+                connectorPos = new BlockPos(this.getPos().getX() + 1, this.getPos().getY() + 10, this.getPos().getZ());
+                break;
+            default:
+                break;
+        }
 
-                case SOUTH:
-                    pos = new BlockPos(this.getPos().getX(),this.getPos().getY()+10,this.getPos().getZ()-1);
-                    break;
-                case NORTH:
-                    pos = new BlockPos(this.getPos().getX(),this.getPos().getY()+10,this.getPos().getZ()+1);
-                    break;
-                case EAST:
-                    pos = new BlockPos(this.getPos().getX()-1,this.getPos().getY()+10,this.getPos().getZ());
-                    break;
-                case WEST:
-                    pos = new BlockPos(this.getPos().getX()+1,this.getPos().getY()+10,this.getPos().getZ());
-                    break;
-            }
-
-        if(pos!= null && this.getWorld().getTileEntity(pos)!= null && this.getWorld().getTileEntity(pos) instanceof TileEntityConnector)
-        {
-            this.connector = (TileEntityConnector) this.getWorld().getTileEntity(pos);
-            this.connector.success = 1;
-            this.pos = pos;
+        if (connectorPos != null && this.getWorld().getTileEntity(connectorPos) instanceof TileEntityConnector) {
+            this.connector = (TileEntityConnector) this.getWorld().getTileEntity(connectorPos);
         }
     }
-    private void initializeAbilities() {
-        this.inenergyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
-        this.outenergyContainer =new EnergyContainerList(getAbilities(MultiblockAbility.OUTPUT_ENERGY));
-    }
-    private void resetTileAbilities() {
-        this.inenergyContainer = new EnergyContainerList(new ArrayList());
-        this.outenergyContainer = new EnergyContainerList(new ArrayList());
-    }
+
     private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
             "drtech:trans_tower",
             MetaTileEntityEnergyTransTower::buildTemplate
@@ -232,18 +189,17 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
                 .where('#', any())
                 .where('C', states(getCasingState())
                         .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
-                        .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(2).setPreviewCount(1))
-                        .or(abilities(MultiblockAbility.OUTPUT_ENERGY).setMaxGlobalLimited(2).setPreviewCount(1))
                 )
                 .where('G', blocks(Blocks.IRON_BARS))
                 .where('L', frames(Materials.Steel))
-                .where('D', blocks(BlocksInit.BLOCK_CONNECTOR1,BlocksInit.BLOCK_CONNECTOR2,BlocksInit.BLOCK_CONNECTOR3))
+                .where('D', blocks(BlocksInit.BLOCK_CONNECTOR1, BlocksInit.BLOCK_CONNECTOR2, BlocksInit.BLOCK_CONNECTOR3))
                 .buildTemplate();
-
     }
+
     private static IBlockState getCasingState() {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.SOLID_STEEL_CASING;
@@ -253,27 +209,27 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityEnergyTransTower(this.metaTileEntityId);
     }
+
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
-                               boolean advanced) {
+    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
         tooltip.add(I18n.format("drtech.machine.energytrans.tooltip.1"));
         tooltip.add(I18n.format("drtech.machine.energytrans.tooltip.2"));
+        tooltip.add(I18n.format("drtech.machine.energytrans.tooltip.3"));
     }
 
     @Override
     protected void addDisplayText(List<ITextComponent> textList) {
         super.addDisplayText(textList);
-        if(this.connector!=null)
-        {
-            textList.add(new TextComponentTranslation("drtech.machine.energytrans.connect",this.connector.beforePos==null?":无":": X:"+
-                    this.connector.beforePos.getX()+" Y:" + this.connector.beforePos.getY() +" Z:" + this.connector.beforePos.getZ()));
-            textList.add(new TextComponentTranslation("drtech.machine.energytrans.energy",String.valueOf(this.connector.StoredEnergy)));
-            if(this.connector.beforePos!=null)
-                textList.add(new TextComponentTranslation("drtech.machine.energytrans.posdist",String.valueOf(DrtechUtils.getPosDist(this.connector.beforePos,this.connector.getPos()))));
-            else
-                textList.add(new TextComponentTranslation("drtech.machine.energytrans.posdist",String.valueOf("0")));
+        if (this.connector != null) {
+            BlockPos targetPos = getPrimaryConnectionTarget();
+            textList.add(new TextComponentTranslation("drtech.machine.energytrans.connect", targetPos == null ? ":None" :
+                    ": X:" + targetPos.getX() + " Y:" + targetPos.getY() + " Z:" + targetPos.getZ()));
+            textList.add(new TextComponentTranslation("drtech.machine.energytrans.energy", String.valueOf(this.connector.StoredEnergy)));
+            textList.add(new TextComponentTranslation("drtech.machine.energytrans.posdist", targetPos == null ? "0" :
+                    String.valueOf(DrtechUtils.getPosDist(targetPos, this.connector.getPos()))));
         }
     }
+
     @Override
     @Nonnull
     protected Widget getFlexButton(int x, int y, int width, int height) {
@@ -283,14 +239,15 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
                 .setTooltipText("gtqtcore.multiblock.energytrans.clearpos"));
         return group;
     }
-    private void clearpos(Widget.ClickData clickData)
-    {
-        this.connector.beforePos = null;
-        NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setInteger("ClearPos",1);
-        if(!this.getWorld().isRemote)
-            DrtechUtils.sendTileEntityClientUpdate(this.connector,nbt);
+
+    private void clearpos(Widget.ClickData clickData) {
+        World world = getWorld();
+        if (world != null && !world.isRemote && this.connector != null) {
+            this.connector.removeAllConnections(true);
+            writeCustomData(GregtechDataCodes.UPDATE_PARTICLE, this::writeParticles);
+        }
     }
+
     @Override
     public void writeInitialSyncData(PacketBuffer buf) {
         super.writeInitialSyncData(buf);
@@ -310,6 +267,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
             throw new RuntimeException(e);
         }
     }
+
     @Override
     public void receiveCustomData(int dataId, @NotNull PacketBuffer buf) {
         super.receiveCustomData(dataId, buf);
@@ -319,47 +277,59 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         } else if (dataId == GregtechDataCodes.WORKING_ENABLED) {
             isWorkingEnabled = buf.readBoolean();
             scheduleRenderUpdate();
-        }
-        else if (dataId == GregtechDataCodes.UPDATE_PARTICLE) {
+        } else if (dataId == GregtechDataCodes.UPDATE_PARTICLE) {
             try {
                 readParticles(buf);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-
     }
-    private void writeParticles(@NotNull PacketBuffer buf) {
-        //buf.writeVarInt(beamCount);
-        NBTTagCompound tag = new NBTTagCompound();
-        if(this.connector!=null && this.connector.beforePos!=null)
-        {
-            tag.setInteger("Sx",this.connector.getPos().getX());
-            tag.setInteger("Sy",this.connector.getPos().getY());
-            tag.setInteger("Sz",this.connector.getPos().getZ());
-            tag.setInteger("Ex",this.connector.beforePos.getX());
-            tag.setInteger("Ey",this.connector.beforePos.getY());
-            tag.setInteger("Ez",this.connector.beforePos.getZ());
 
+    private void writeParticles(@NotNull PacketBuffer buf) {
+        NBTTagCompound tag = new NBTTagCompound();
+        NBTTagList connectionTags = new NBTTagList();
+        if (this.connector != null) {
+            for (TileEntityConnector.WireConnection connection : this.connector.getConnections()) {
+                NBTTagCompound connectionTag = new NBTTagCompound();
+                connectionTag.setInteger("Sx", this.connector.getPos().getX());
+                connectionTag.setInteger("Sy", this.connector.getPos().getY());
+                connectionTag.setInteger("Sz", this.connector.getPos().getZ());
+                connectionTag.setInteger("Ex", connection.target.getX());
+                connectionTag.setInteger("Ey", connection.target.getY());
+                connectionTag.setInteger("Ez", connection.target.getZ());
+                connectionTags.appendTag(connectionTag);
+            }
         }
+        tag.setTag("Connections", connectionTags);
         buf.writeCompoundTag(tag);
     }
+
     @SideOnly(Side.CLIENT)
     private void readParticles(@NotNull PacketBuffer buf) throws IOException {
         NBTTagCompound tag = buf.readCompoundTag();
-        if(tag.hasKey("Ex"))
-        {
-            BlockPos Spos = new BlockPos(tag.getInteger("Sx"),tag.getInteger("Sy"),tag.getInteger("Sz"));
-            BlockPos Epos = new BlockPos(tag.getInteger("Ex"),tag.getInteger("Ey"),tag.getInteger("Ez"));
-            operateClient(Spos,Epos,20);
+        if (tag == null) {
+            return;
         }
-
+        NBTTagList connectionTags = tag.getTagList("Connections", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < connectionTags.tagCount(); i++) {
+            NBTTagCompound connectionTag = connectionTags.getCompoundTagAt(i);
+            BlockPos startPos = new BlockPos(connectionTag.getInteger("Sx"), connectionTag.getInteger("Sy"), connectionTag.getInteger("Sz"));
+            BlockPos endPos = new BlockPos(connectionTag.getInteger("Ex"), connectionTag.getInteger("Ey"), connectionTag.getInteger("Ez"));
+            operateClient(startPos, endPos, 20);
+        }
     }
+
     @SideOnly(Side.CLIENT)
-    public void operateClient(BlockPos Spos,BlockPos Epos,int age) {
-        GTParticleManager.INSTANCE.addEffect(new DrtechLaserBeamParticle(this,Spos,Epos,age));
+    public void operateClient(BlockPos startPos, BlockPos endPos, int age) {
+        GTParticleManager.INSTANCE.addEffect(new DrtechLaserBeamParticle(this, startPos, endPos, age));
     }
 
-
-
+    @Nullable
+    private BlockPos getPrimaryConnectionTarget() {
+        if (this.connector == null || this.connector.getConnections().isEmpty()) {
+            return null;
+        }
+        return this.connector.getConnections().get(0).target;
+    }
 }

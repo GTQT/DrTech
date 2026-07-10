@@ -372,5 +372,11 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.RF_WAVEGUIDE = this.addItem(128, "rf_waveguide").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
         DrMetaItems.RF_PHASE_SYNCHRONIZER = this.addItem(129, "rf_phase_synchronizer").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
         DrMetaItems.CERAMIC_RF_WINDOW = this.addItem(130, "ceramic_rf_window").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+        DrMetaItems.LOW_VOLTAGE_WIRE = this.addItem(131, "low_voltage_wire").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64)
+                .addComponents(new ConnectorWireBehavior(1));
+        DrMetaItems.MEDIUM_VOLTAGE_WIRE = this.addItem(132, "medium_voltage_wire").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64)
+                .addComponents(new ConnectorWireBehavior(2));
+        DrMetaItems.HIGH_VOLTAGE_WIRE = this.addItem(133, "high_voltage_wire").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64)
+                .addComponents(new ConnectorWireBehavior(3));
     }
 }

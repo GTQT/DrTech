@@ -1,12 +1,20 @@
 {
-  "parent": "block/cube",
   "textures": {
     "particle": "drtech:blocks/connector_1",
-    "down": "drtech:blocks/connector_1",
-    "up": "drtech:blocks/connector_1",
-    "north": "drtech:blocks/connector_1",
-    "south":"drtech:blocks/connector_1",
-    "west": "drtech:blocks/connector_1",
-    "east": "drtech:blocks/connector_1"
-  }
+    "all": "drtech:blocks/connector_1"
+  },
+  "elements": [
+    {
+      "from": [6, 0, 6],
+      "to": [10, 16, 10],
+      "faces": {
+        "down": { "texture": "#all" },
+        "up": { "texture": "#all" },
+        "north": { "texture": "#all" },
+        "south": { "texture": "#all" },
+        "west": { "texture": "#all" },
+        "east": { "texture": "#all" }
+      }
+    }
+  ]
 }

@@ -4,6 +4,7 @@ import codechicken.lib.texture.TextureUtils;
 import com.drppp.drtech.Client.ClientProxy;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Client.render.TileEntityRendererConnector;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.*;
@@ -153,6 +154,7 @@ public class DrTechMain {
     public void TexturesInit() {
         try {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGravitationalAnomaly.class, new TileEntityRendererGravitationalAnomaly());
+            ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new TileEntityRendererConnector());
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTimeTable.class, new TesrTimeTable());
             ClientRegistry.bindTileEntitySpecialRenderer(TileCropStick.class, new CropStickTESR());
         } catch (Exception e) {
