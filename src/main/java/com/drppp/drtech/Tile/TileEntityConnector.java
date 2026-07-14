@@ -438,15 +438,27 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             return;
         }
 
-        IEnergyContainer energyContainer = getEnergyContainer(tileEntity, targetSide);
-        if (energyContainer == null) {
+        IEnergyContainer targetSideContainer = getEnergyContainer(tileEntity, targetSide);
+        if (targetSideContainer != null) {
+            if (targetSideContainer.outputsEnergy(targetSide)) {
+                pullEnergyFromMachine(targetSideContainer, targetSide);
+                return;
+            }
+            if (targetSideContainer.inputsEnergy(targetSide)) {
+                pushEnergyToMachine(targetSideContainer, targetSide);
+                return;
+            }
+        }
+
+        EnergyConnection inputConnection = findEnergyConnection(tileEntity, targetSide, true);
+        if (inputConnection != null) {
+            pushEnergyToMachine(inputConnection.energyContainer, inputConnection.side);
             return;
         }
 
-        if (energyContainer.inputsEnergy(targetSide)) {
-            pushEnergyToMachine(energyContainer, targetSide);
-        } else if (energyContainer.outputsEnergy(targetSide)) {
-            pullEnergyFromMachine(energyContainer, targetSide);
+        EnergyConnection outputConnection = findEnergyConnection(tileEntity, targetSide, false);
+        if (outputConnection != null) {
+            pullEnergyFromMachine(outputConnection.energyContainer, outputConnection.side);
         }
     }
 
@@ -508,8 +520,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
                 continue;
             }
 
-            IEnergyContainer energyContainer = getEnergyContainer(tileEntity, connection.targetSide);
-            if (energyContainer == null || (!energyContainer.inputsEnergy(connection.targetSide) && !energyContainer.outputsEnergy(connection.targetSide))) {
+            if (findEnergyConnection(tileEntity, connection.targetSide, true) == null && findEnergyConnection(tileEntity, connection.targetSide, false) == null) {
                 iterator.remove();
                 changed = true;
             }
@@ -565,6 +576,38 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     @Nullable
     private static IEnergyContainer getEnergyContainer(@Nullable TileEntity tileEntity, @Nullable EnumFacing side) {
         return tileEntity == null ? null : tileEntity.getCapability(GregtechCapabilities.CAPABILITY_ENERGY_CONTAINER, side);
+    }
+
+    @Nullable
+    private static EnergyConnection findEnergyConnection(@Nullable TileEntity tileEntity, @Nullable EnumFacing preferredSide, boolean input) {
+        EnergyConnection preferredConnection = getUsableEnergyConnection(tileEntity, preferredSide, input);
+        if (preferredConnection != null) {
+            return preferredConnection;
+        }
+
+        for (EnumFacing side : EnumFacing.VALUES) {
+            if (side == preferredSide) {
+                continue;
+            }
+            EnergyConnection connection = getUsableEnergyConnection(tileEntity, side, input);
+            if (connection != null) {
+                return connection;
+            }
+        }
+
+        return preferredSide == null ? null : getUsableEnergyConnection(tileEntity, null, input);
+    }
+
+    @Nullable
+    private static EnergyConnection getUsableEnergyConnection(@Nullable TileEntity tileEntity, @Nullable EnumFacing side, boolean input) {
+        IEnergyContainer energyContainer = getEnergyContainer(tileEntity, side);
+        if (energyContainer == null) {
+            return null;
+        }
+        if (input ? energyContainer.inputsEnergy(side) : energyContainer.outputsEnergy(side)) {
+            return new EnergyConnection(energyContainer, side);
+        }
+        return null;
     }
 
     private static int inferTier(long capacity) {
@@ -626,6 +669,17 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             this.wireTier = clampTier(wireTier);
             this.length = length;
             this.targetSide = targetSide;
+        }
+    }
+
+    private static class EnergyConnection {
+        private final IEnergyContainer energyContainer;
+        @Nullable
+        private final EnumFacing side;
+
+        private EnergyConnection(IEnergyContainer energyContainer, @Nullable EnumFacing side) {
+            this.energyContainer = energyContainer;
+            this.side = side;
         }
     }
 

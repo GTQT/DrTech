@@ -51,7 +51,7 @@ public class ConnectorWireBehavior implements IItemBehaviour {
             }
             return EnumActionResult.FAIL;
         }
-        if (!(tileEntity instanceof TileEntityConnector) && !isEnergyConnectable(tileEntity, side)) {
+        if (!(tileEntity instanceof TileEntityConnector) && getEnergyConnectableSide(tileEntity, side) == null) {
             return storedLink == null ? EnumActionResult.PASS : EnumActionResult.FAIL;
         }
 
@@ -103,7 +103,8 @@ public class ConnectorWireBehavior implements IItemBehaviour {
             sendMessage(player, "message.drtech.connector_wire.wrong_tier");
             return EnumActionResult.FAIL;
         }
-        if (!targetIsConnector && !isEnergyConnectable(secondTile, targetSide)) {
+        EnumFacing normalizedTargetSide = targetIsConnector ? targetSide : getEnergyConnectableSide(secondTile, targetSide);
+        if (!targetIsConnector && normalizedTargetSide == null) {
             sendMessage(player, "message.drtech.connector_wire.invalid");
             return EnumActionResult.FAIL;
         }
@@ -127,7 +128,7 @@ public class ConnectorWireBehavior implements IItemBehaviour {
         if (targetIsConnector) {
             connected = TileEntityConnector.connect(world, storedLink.pos, targetPos, wireTier);
         } else {
-            connected = first.addMachineConnection(targetPos, wireTier, length, targetSide);
+            connected = first.addMachineConnection(targetPos, wireTier, length, normalizedTargetSide);
         }
         if (!connected) {
                 sendMessage(player, "message.drtech.connector_wire.invalid");
@@ -140,6 +141,18 @@ public class ConnectorWireBehavior implements IItemBehaviour {
         }
         sendMessage(player, "message.drtech.connector_wire.connected", length);
         return EnumActionResult.SUCCESS;
+    }
+
+    private static EnumFacing getEnergyConnectableSide(TileEntity tileEntity, EnumFacing preferredSide) {
+        if (isEnergyConnectable(tileEntity, preferredSide)) {
+            return preferredSide;
+        }
+        for (EnumFacing side : EnumFacing.VALUES) {
+            if (side != preferredSide && isEnergyConnectable(tileEntity, side)) {
+                return side;
+            }
+        }
+        return null;
     }
 
     private static boolean isEnergyConnectable(TileEntity tileEntity, EnumFacing side) {

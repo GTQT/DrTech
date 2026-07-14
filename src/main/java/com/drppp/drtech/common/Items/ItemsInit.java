@@ -1,7 +1,10 @@
 package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.Tags;
+import com.drppp.drtech.Client.render.Items.RenderItemLightsaber;
 import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberColor;
 import com.drppp.drtech.common.Items.foods.ItemSoarXpBerry;
 import com.drppp.drtech.common.Items.foods.ItemXpBerry;
 import com.drppp.drtech.hooked.HookComponentType;
@@ -63,6 +66,7 @@ public class ItemsInit {
     public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
     public static ItemHappyGhastHarness HAPPY_GHAST_HARNESS = new ItemHappyGhastHarness();
+    public static final ItemLightsaber LIGHTSABER = new ItemLightsaber();
     public static final Item HOOK_ITEM = HookRegistry.HOOK_ITEM;
     public static final Item HOOK_COMPONENT_ITEM = HookRegistry.COMPONENT_ITEM;
 
@@ -103,6 +107,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(HAPPY_GHAST_HARNESS);
+        event.getRegistry().register(LIGHTSABER);
         event.getRegistry().register(HOOK_ITEM);
         event.getRegistry().register(HOOK_COMPONENT_ITEM);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
@@ -143,6 +148,11 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(HAPPY_GHAST_HARNESS, 0, new ModelResourceLocation(HAPPY_GHAST_HARNESS.getRegistryName(), "inventory"));
+        LIGHTSABER.setTileEntityItemStackRenderer(new RenderItemLightsaber());
+        for (LightsaberColor color : LightsaberColor.values()) {
+            ModelLoader.setCustomModelResourceLocation(LIGHTSABER, color.getMetadata(),
+                    new ModelResourceLocation(LIGHTSABER.getRegistryName(), "inventory"));
+        }
         for (HookType type : HookType.values()) {
             ModelLoader.setCustomModelResourceLocation(HOOK_ITEM, type.ordinal(),
                     new ModelResourceLocation(Tags.MODID + ":hook_" + type.name().toLowerCase(), "inventory"));

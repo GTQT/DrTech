@@ -88,5 +88,38 @@
         "stream": false
       }
     ]
+  },
+  "player.lightsaber.on": {
+    "category": "player",
+    "sounds": [
+      "drtech:item/lightsaber/on"
+    ]
+  },
+  "player.lightsaber.off": {
+    "category": "player",
+    "sounds": [
+      "drtech:item/lightsaber/off"
+    ]
+  },
+  "player.lightsaber.swing": {
+    "category": "player",
+    "sounds": [
+      "drtech:item/lightsaber/swing1",
+      "drtech:item/lightsaber/swing2",
+      "drtech:item/lightsaber/swing3",
+      "drtech:item/lightsaber/swing4"
+    ]
+  },
+  "player.lightsaber.hit": {
+    "category": "player",
+    "sounds": [
+      "drtech:item/lightsaber/hit1",
+      "drtech:item/lightsaber/hit2",
+      "drtech:item/lightsaber/hit3",
+      "drtech:item/lightsaber/hit4",
+      "drtech:item/lightsaber/hit5",
+      "drtech:item/lightsaber/hit6",
+      "drtech:item/lightsaber/hit7"
+    ]
   }
 }

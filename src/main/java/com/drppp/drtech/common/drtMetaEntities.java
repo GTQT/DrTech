@@ -2,12 +2,14 @@ package com.drppp.drtech.common;
 
 import com.drppp.drtech.Client.render.Entity.EntityRemderFactory;
 import com.drppp.drtech.Client.render.Entity.RenderHappyGhast;
+import com.drppp.drtech.Client.render.Entity.RenderThrownLightsaber;
 import com.drppp.drtech.Client.render.Entity.RenderUTiGolem;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
 import com.drppp.drtech.common.Entity.EntityTachyonBullet;
+import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
 import com.drppp.drtech.common.Entity.moster.EntityHappyGhast;
 import com.drppp.drtech.common.Entity.moster.EntityUTiGolem;
 import net.minecraft.util.ResourceLocation;
@@ -26,12 +28,14 @@ public class drtMetaEntities {
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "hyper_gun_bullet"), EntityHyperGunBullet.class, "hyper_gun_bullet", 6, DrTechMain.instance, 64, 1, true);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "plasma_bullet"), EntityPlasmaBullet.class, "plasma_bullet", 7, DrTechMain.instance, 64, 1, true);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "tachyon_bullet"), EntityTachyonBullet.class, "tachyon_bullet", 8, DrTechMain.instance, 64, 1, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "thrown_lightsaber"), EntityThrownLightsaber.class, "thrown_lightsaber", 9, DrTechMain.instance, 64, 10, true);
     }
 
     @SideOnly(Side.CLIENT)
     public static void initRenderers() {
         RenderingRegistry.registerEntityRenderingHandler(EntityUTiGolem.class,new EntityRemderFactory<>(RenderUTiGolem.class));
         RenderingRegistry.registerEntityRenderingHandler(EntityHappyGhast.class, RenderHappyGhast::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityThrownLightsaber.class, RenderThrownLightsaber::new);
     }
 
 }

@@ -4,6 +4,7 @@ import com.drppp.drtech.Client.Particle.EntityParticleGroup;
 import com.drppp.drtech.Client.Particle.EntityParticleSpray;
 import com.drppp.drtech.Client.Particle.InstantParticleRender;
 import com.drppp.drtech.Client.Particle.ParticleRenderer;
+import com.drppp.drtech.Client.render.Items.LightsaberBakedModel;
 import com.drppp.drtech.Client.render.BulletRenderer;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
@@ -24,6 +25,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.b3d.B3DLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
@@ -41,6 +43,14 @@ public final class DrTechModelRegister {
         B3DLoader.INSTANCE.addDomain("drtech");
         onModelRegistration();
         EntityRenderReg();
+    }
+
+    @SubscribeEvent
+    public static void onModelBake(ModelBakeEvent event) {
+        ModelResourceLocation location = new ModelResourceLocation(Tags.MODID + ":lightsaber", "inventory");
+        if (event.getModelRegistry().getObject(location) != null) {
+            event.getModelRegistry().putObject(location, new LightsaberBakedModel(event.getModelRegistry().getObject(location)));
+        }
     }
 
     @SideOnly(Side.CLIENT)
