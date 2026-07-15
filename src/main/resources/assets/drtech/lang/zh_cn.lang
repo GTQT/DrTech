@@ -731,6 +731,7 @@ key.drtech.fire_hook=发射钩爪
 tooltip.drtech.lightsaber.active=状态：已启动
 tooltip.drtech.lightsaber.inactive=状态：已关闭
 tooltip.drtech.lightsaber.controls=右键开关。潜行 + 右键丢掷并自动回收。
+tooltip.drtech.lightsaber.damage=攻击伤害：%s-%s；投掷：1.5 倍
 tooltip.drtech.hook.showControls=<按住 Shift>
 tooltip.drtech.hook.inhibited=受限模式
 tooltip.drtech.hook.inhibited.help=- 限制为1个钩爪。潜行 + 使用键解除限制

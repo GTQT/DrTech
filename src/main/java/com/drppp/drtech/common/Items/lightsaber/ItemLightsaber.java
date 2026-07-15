@@ -24,9 +24,13 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 public class ItemLightsaber extends Item {
-    public static final double ATTACK_DAMAGE = 40.0D;
+    public static final int MIN_ATTACK_DAMAGE = 40;
+    public static final int MAX_ATTACK_DAMAGE = 60;
+    public static final float THROWN_DAMAGE_MULTIPLIER = 1.5F;
+    public static final double ATTACK_DAMAGE = MIN_ATTACK_DAMAGE - 1.0D;
     private static final double ATTACK_SPEED = -2.4D;
     private static final String ACTIVE_TAG = "active";
     private static final String BLADE_COLOR_TAG = "BladeColor";
@@ -89,11 +93,6 @@ public class ItemLightsaber extends Item {
 
     @Override
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        if (isActive(stack)) {
-            attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
-                    DrTechSounds.LIGHTSABER_HIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
-        }
-
         return true;
     }
 
@@ -124,6 +123,7 @@ public class ItemLightsaber extends Item {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
         tooltip.add(I18n.format(isActive(stack) ? "tooltip.drtech.lightsaber.active" : "tooltip.drtech.lightsaber.inactive"));
+        tooltip.add(I18n.format("tooltip.drtech.lightsaber.damage", MIN_ATTACK_DAMAGE, MAX_ATTACK_DAMAGE));
         for (LightsaberPartType type : LightsaberPartType.values()) {
             tooltip.add(I18n.format("tooltip.drtech.lightsaber.part." + type.getTextureName(), getPart(stack, type).getDisplayName()));
         }
@@ -214,6 +214,10 @@ public class ItemLightsaber extends Item {
             return;
         }
         getOrCreateTag(stack).setBoolean(ACTIVE_TAG, active);
+    }
+
+    public static float rollAttackDamage(Random random) {
+        return MIN_ATTACK_DAMAGE + random.nextInt(MAX_ATTACK_DAMAGE - MIN_ATTACK_DAMAGE + 1);
     }
 
     private static NBTTagCompound getOrCreateTag(ItemStack stack) {

@@ -731,6 +731,7 @@ key.drtech.fire_hook=Fire Hook
 tooltip.drtech.lightsaber.active=State: active
 tooltip.drtech.lightsaber.inactive=State: inactive
 tooltip.drtech.lightsaber.controls=Right click to toggle. Sneak + right click to throw and recall.
+tooltip.drtech.lightsaber.damage=Attack Damage: %s-%s; Thrown: 1.5x
 tooltip.drtech.hook.showControls=<Hold Shift>
 tooltip.drtech.hook.inhibited=Inhibited
 tooltip.drtech.hook.inhibited.help=- Limited to 1 hook. Sneak + Use to remove limit

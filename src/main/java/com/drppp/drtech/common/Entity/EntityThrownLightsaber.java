@@ -101,7 +101,8 @@ public class EntityThrownLightsaber extends EntityThrowable implements IEntityAd
         EntityLivingBase thrower = getThrower();
 
         if (result.entityHit != null && result.entityHit != thrower) {
-            result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, thrower), (float) ItemLightsaber.ATTACK_DAMAGE);
+            float damage = ItemLightsaber.rollAttackDamage(rand) * ItemLightsaber.THROWN_DAMAGE_MULTIPLIER;
+            result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, thrower), damage);
             world.playSound(null, posX, posY, posZ, DrTechSounds.LIGHTSABER_HIT,
                     SoundCategory.PLAYERS, 1.0F, 1.0F);
         }

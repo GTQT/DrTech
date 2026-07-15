@@ -18,7 +18,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
@@ -82,23 +81,6 @@ public class ItemDoubleLightsaber extends Item {
 
     @Override
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        if (!isActive(stack)) {
-            return true;
-        }
-
-        if (!attacker.world.isRemote) {
-            float width = attacker.width * 2.0F;
-            DamageSource source = attacker instanceof EntityPlayer
-                    ? DamageSource.causePlayerDamage((EntityPlayer) attacker)
-                    : DamageSource.causeMobDamage(attacker);
-            List<EntityLivingBase> nearby = attacker.world.getEntitiesWithinAABB(EntityLivingBase.class,
-                    attacker.getEntityBoundingBox().grow(width, 0.0D, width), entity -> entity != attacker);
-            for (EntityLivingBase entity : nearby) {
-                entity.attackEntityFrom(source, (float) ItemLightsaber.ATTACK_DAMAGE);
-            }
-            attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
-                    DrTechSounds.LIGHTSABER_HIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
-        }
         return true;
     }
 
@@ -129,6 +111,8 @@ public class ItemDoubleLightsaber extends Item {
                                net.minecraft.client.util.ITooltipFlag flag) {
         tooltip.add(I18n.format(isActive(stack)
                 ? "tooltip.drtech.lightsaber.active" : "tooltip.drtech.lightsaber.inactive"));
+        tooltip.add(I18n.format("tooltip.drtech.lightsaber.damage",
+                ItemLightsaber.MIN_ATTACK_DAMAGE, ItemLightsaber.MAX_ATTACK_DAMAGE));
         tooltip.add(I18n.format("tooltip.drtech.double_lightsaber.upper", getUpper(stack).getDisplayName()));
         tooltip.add(I18n.format("tooltip.drtech.double_lightsaber.lower", getLower(stack).getDisplayName()));
         tooltip.add(I18n.format("tooltip.drtech.lightsaber.controls"));
