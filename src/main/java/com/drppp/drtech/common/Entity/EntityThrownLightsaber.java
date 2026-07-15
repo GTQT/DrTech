@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.Entity;
 
 import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
 import com.drppp.drtech.common.Sound.DrTechSounds;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
@@ -38,7 +39,6 @@ public class EntityThrownLightsaber extends EntityThrowable implements IEntityAd
         super(world, thrower);
         returnHand = hand;
         setItem(stack);
-        setSize(0.9F, 0.2F);
         shoot(thrower, thrower.rotationPitch, thrower.rotationYaw, 0.0F, 2.0F, 0.0F);
     }
 
@@ -161,7 +161,8 @@ public class EntityThrownLightsaber extends EntityThrowable implements IEntityAd
         lightsaber = stack.isEmpty() ? ItemStack.EMPTY : stack.copy();
         if (!lightsaber.isEmpty()) {
             lightsaber.setCount(1);
-            ItemLightsaber.setActive(lightsaber, true);
+            setLightsaberActive(lightsaber, true);
+            setSize(lightsaber.getItem() instanceof ItemDoubleLightsaber ? 1.42F : 0.9F, 0.2F);
         }
     }
 
@@ -175,7 +176,7 @@ public class EntityThrownLightsaber extends EntityThrowable implements IEntityAd
 
     private void giveBack(EntityLivingBase thrower) {
         ItemStack stack = lightsaber.copy();
-        ItemLightsaber.setActive(stack, true);
+        setLightsaberActive(stack, true);
 
         if (thrower instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) thrower;
@@ -190,6 +191,14 @@ public class EntityThrownLightsaber extends EntityThrowable implements IEntityAd
         }
 
         lightsaber = ItemStack.EMPTY;
+    }
+
+    private static void setLightsaberActive(ItemStack stack, boolean active) {
+        if (stack.getItem() instanceof ItemDoubleLightsaber) {
+            ItemDoubleLightsaber.setActive(stack, active);
+        } else {
+            ItemLightsaber.setActive(stack, active);
+        }
     }
 
     private void dropItem(Entity location) {

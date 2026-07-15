@@ -6,12 +6,14 @@ import com.drppp.drtech.loaders.recipes.chain.ChorusFruitChainRecipes;
 import com.drppp.drtech.loaders.recipes.chain.LaserBending;
 import com.drppp.drtech.loaders.recipes.chain.MobsDropsRecipe;
 import com.drppp.drtech.loaders.recipes.MachineReceipe;
+import com.drppp.drtech.loaders.recipes.LightsaberRecipes;
 import com.drppp.drtech.loaders.recipes.misc.BinneRecipes;
 
 public class DrTechReceipeManager {
     public static void init()
     {
         MachineReceipe.load();
+        LightsaberRecipes.init();
         MobsDropsRecipe.load();
         FluidStoreRecpie.init();
         ChorusFruitChainRecipes.init();

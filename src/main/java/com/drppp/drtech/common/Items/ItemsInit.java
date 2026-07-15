@@ -2,9 +2,18 @@ package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.Client.render.Items.RenderItemLightsaber;
+import com.drppp.drtech.Client.render.Items.RenderItemDoubleLightsaber;
+import com.drppp.drtech.Client.render.Items.RenderItemLightsaberPart;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemFocusingCrystal;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaberCrystal;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaberPart;
 import com.drppp.drtech.common.Items.lightsaber.LightsaberColor;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberHilt;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberPartType;
+import com.drppp.drtech.common.Items.lightsaber.FocusingCrystal;
 import com.drppp.drtech.common.Items.foods.ItemSoarXpBerry;
 import com.drppp.drtech.common.Items.foods.ItemXpBerry;
 import com.drppp.drtech.hooked.HookComponentType;
@@ -66,7 +75,20 @@ public class ItemsInit {
     public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
     public static ItemHappyGhastHarness HAPPY_GHAST_HARNESS = new ItemHappyGhastHarness();
-    public static final ItemLightsaber LIGHTSABER = new ItemLightsaber();
+    public static final ItemLightsaber[] LIGHTSABERS = createLightsabers();
+    public static final ItemLightsaber LIGHTSABER = LIGHTSABERS[LightsaberHilt.GRAFLEX.getMetadata()];
+    public static final ItemDoubleLightsaber DOUBLE_LIGHTSABER = new ItemDoubleLightsaber();
+    public static final ItemSimpleDrTech LIGHTSABER_CIRCUITRY = new ItemSimpleDrTech("lightsaber_circuitry");
+    public static final ItemLightsaberCrystal LIGHTSABER_CRYSTAL = new ItemLightsaberCrystal();
+    public static final ItemFocusingCrystal FOCUSING_CRYSTAL = new ItemFocusingCrystal();
+    public static final ItemLightsaberPart LIGHTSABER_EMITTER =
+            new ItemLightsaberPart("lightsaber_blade_emitter", LightsaberPartType.EMITTER);
+    public static final ItemLightsaberPart LIGHTSABER_SWITCH =
+            new ItemLightsaberPart("lightsaber_switch_module", LightsaberPartType.SWITCH_SECTION);
+    public static final ItemLightsaberPart LIGHTSABER_GRIP =
+            new ItemLightsaberPart("lightsaber_grip", LightsaberPartType.BODY);
+    public static final ItemLightsaberPart LIGHTSABER_POMMEL =
+            new ItemLightsaberPart("lightsaber_pommel", LightsaberPartType.POMMEL);
     public static final Item HOOK_ITEM = HookRegistry.HOOK_ITEM;
     public static final Item HOOK_COMPONENT_ITEM = HookRegistry.COMPONENT_ITEM;
 
@@ -107,7 +129,15 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(HAPPY_GHAST_HARNESS);
-        event.getRegistry().register(LIGHTSABER);
+        event.getRegistry().registerAll(LIGHTSABERS);
+        event.getRegistry().register(DOUBLE_LIGHTSABER);
+        event.getRegistry().register(LIGHTSABER_CIRCUITRY);
+        event.getRegistry().register(LIGHTSABER_CRYSTAL);
+        event.getRegistry().register(FOCUSING_CRYSTAL);
+        event.getRegistry().register(LIGHTSABER_EMITTER);
+        event.getRegistry().register(LIGHTSABER_SWITCH);
+        event.getRegistry().register(LIGHTSABER_GRIP);
+        event.getRegistry().register(LIGHTSABER_POMMEL);
         event.getRegistry().register(HOOK_ITEM);
         event.getRegistry().register(HOOK_COMPONENT_ITEM);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
@@ -148,10 +178,30 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(HAPPY_GHAST_HARNESS, 0, new ModelResourceLocation(HAPPY_GHAST_HARNESS.getRegistryName(), "inventory"));
-        LIGHTSABER.setTileEntityItemStackRenderer(new RenderItemLightsaber());
+        ModelResourceLocation lightsaberModel = new ModelResourceLocation(Tags.MODID + ":lightsaber", "inventory");
+        for (ItemLightsaber lightsaber : LIGHTSABERS) {
+            lightsaber.setTileEntityItemStackRenderer(new RenderItemLightsaber());
+            ModelLoader.setCustomModelResourceLocation(lightsaber, 0, lightsaberModel);
+        }
+        DOUBLE_LIGHTSABER.setTileEntityItemStackRenderer(new RenderItemDoubleLightsaber());
+        ModelLoader.setCustomModelResourceLocation(DOUBLE_LIGHTSABER, 0, lightsaberModel);
+        ModelLoader.setCustomModelResourceLocation(LIGHTSABER_CIRCUITRY, 0,
+                new ModelResourceLocation(LIGHTSABER_CIRCUITRY.getRegistryName(), "inventory"));
         for (LightsaberColor color : LightsaberColor.values()) {
-            ModelLoader.setCustomModelResourceLocation(LIGHTSABER, color.getMetadata(),
-                    new ModelResourceLocation(LIGHTSABER.getRegistryName(), "inventory"));
+            ModelLoader.setCustomModelResourceLocation(LIGHTSABER_CRYSTAL, color.getMetadata(),
+                    new ModelResourceLocation(LIGHTSABER_CRYSTAL.getRegistryName(), "inventory"));
+        }
+        for (FocusingCrystal crystal : FocusingCrystal.values()) {
+            ModelLoader.setCustomModelResourceLocation(FOCUSING_CRYSTAL, crystal.getMetadata(),
+                    new ModelResourceLocation(Tags.MODID + ":focusing_crystal_" + crystal.getSerializedName(), "inventory"));
+        }
+        for (ItemLightsaberPart part : new ItemLightsaberPart[] {
+                LIGHTSABER_EMITTER, LIGHTSABER_SWITCH, LIGHTSABER_GRIP, LIGHTSABER_POMMEL }) {
+            part.setTileEntityItemStackRenderer(new RenderItemLightsaberPart());
+            for (LightsaberHilt hilt : LightsaberHilt.values()) {
+                ModelLoader.setCustomModelResourceLocation(part, hilt.getMetadata(),
+                        new ModelResourceLocation(part.getRegistryName(), "inventory"));
+            }
         }
         for (HookType type : HookType.values()) {
             ModelLoader.setCustomModelResourceLocation(HOOK_ITEM, type.ordinal(),
@@ -168,6 +218,9 @@ public class ItemsInit {
     public static void registerSeedModelsLate() {
         net.minecraft.client.Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
                 new ItemCropSeed.SeedColorHandler(), CROP_SEED);
+        net.minecraft.client.Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                (stack, tintIndex) -> LightsaberColor.byMetadata(stack.getMetadata()).getPackedRgb(),
+                LIGHTSABER_CRYSTAL);
     }
 
     @SideOnly(Side.CLIENT)
@@ -184,5 +237,20 @@ public class ItemsInit {
         ItemBlock itemBlock = producer.apply(block);
         itemBlock.setRegistryName(Objects.requireNonNull(block.getRegistryName()));
         return itemBlock;
+    }
+
+    public static ItemLightsaber getLightsaber(LightsaberHilt hilt) {
+        return LIGHTSABERS[hilt.getMetadata()];
+    }
+
+    private static ItemLightsaber[] createLightsabers() {
+        LightsaberHilt[] hilts = LightsaberHilt.values();
+        ItemLightsaber[] lightsabers = new ItemLightsaber[hilts.length];
+        for (LightsaberHilt hilt : hilts) {
+            String registryName = hilt == LightsaberHilt.GRAFLEX
+                    ? "lightsaber" : "lightsaber_" + hilt.getSerializedName();
+            lightsabers[hilt.getMetadata()] = new ItemLightsaber(registryName, hilt);
+        }
+        return lightsabers;
     }
 }

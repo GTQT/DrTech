@@ -40,6 +40,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityYotTank YOUT_TANK;
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
     public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
+    public static SimpleMachineMetaTileEntity[] LIGHTSABER_ASSEMBLER = new SimpleMachineMetaTileEntity[10];
     public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
 
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
@@ -78,6 +79,10 @@ public class DrTechMetaTileEntities {
         }
 
         registerSimpleMetaTileEntity(DISASSEMBLY, 110, "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerSimpleMetaTileEntity(LIGHTSABER_ASSEMBLER, 120, "lightsaber_assembler",
+                DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES,
+                gregtech.client.renderer.texture.Textures.ASSEMBLER_OVERLAY, true,
+                DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
 
         //激光折弯
         for (int i = 0; i < 10; i++) {

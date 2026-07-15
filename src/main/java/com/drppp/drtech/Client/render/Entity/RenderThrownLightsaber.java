@@ -1,7 +1,9 @@
 package com.drppp.drtech.Client.render.Entity;
 
 import com.drppp.drtech.Client.render.Items.LightsaberRenderHelper;
+import com.drppp.drtech.Client.render.Items.RenderItemDoubleLightsaber;
 import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -30,7 +32,11 @@ public class RenderThrownLightsaber extends Render<EntityThrownLightsaber> {
         GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate((entity.ticksExisted + partialTicks) * 40.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.scale(0.2F, 0.2F, 0.2F);
-        LightsaberRenderHelper.renderLightsaber(stack, true, false);
+        if (stack.getItem() instanceof ItemDoubleLightsaber) {
+            RenderItemDoubleLightsaber.renderLightsaber(stack, true, false);
+        } else {
+            LightsaberRenderHelper.renderLightsaber(stack, true, false);
+        }
         GlStateManager.popMatrix();
 
         super.doRender(entity, x, y, z, entityYaw, partialTicks);

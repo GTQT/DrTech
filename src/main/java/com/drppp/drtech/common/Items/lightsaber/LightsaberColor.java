@@ -24,12 +24,14 @@ public enum LightsaberColor {
 
     private final int metadata;
     private final String serializedName;
+    private final int packedRgb;
     private final float[] rgb;
     private final float glowIntensity;
 
     LightsaberColor(int metadata, String serializedName, int color) {
         this.metadata = metadata;
         this.serializedName = serializedName;
+        this.packedRgb = color;
         this.rgb = new float[] {
                 ((color >> 16) & 0xFF) / 255.0F,
                 ((color >> 8) & 0xFF) / 255.0F,
@@ -49,6 +51,10 @@ public enum LightsaberColor {
 
     public float[] getRgb() {
         return rgb;
+    }
+
+    public int getPackedRgb() {
+        return packedRgb;
     }
 
     public float getGlowIntensity() {

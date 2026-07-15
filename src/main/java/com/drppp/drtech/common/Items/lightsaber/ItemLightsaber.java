@@ -26,23 +26,29 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemLightsaber extends Item {
-    public static final double ATTACK_DAMAGE = 8.0D;
+    public static final double ATTACK_DAMAGE = 40.0D;
     private static final double ATTACK_SPEED = -2.4D;
     private static final String ACTIVE_TAG = "active";
+    private static final String BLADE_COLOR_TAG = "BladeColor";
+    private static final String PARTS_TAG = "HiltParts";
+    private static final String FOCUSING_CRYSTALS_TAG = "FocusingCrystals";
+    private final LightsaberHilt baseHilt;
+    private final LightsaberColor defaultColor;
 
-    public ItemLightsaber() {
-        setRegistryName(Tags.MODID, "lightsaber");
-        setTranslationKey(Tags.MODID + ".lightsaber");
+    public ItemLightsaber(String registryName, LightsaberHilt baseHilt) {
+        this.baseHilt = baseHilt;
+        this.defaultColor = baseHilt.getDefaultColor();
+        setRegistryName(Tags.MODID, registryName);
+        setTranslationKey(Tags.MODID + ".lightsaber." + baseHilt.getSerializedName());
         setCreativeTab(DrTechMain.DrTechTab);
         setMaxStackSize(1);
-        setHasSubtypes(true);
         setMaxDamage(0);
         setFull3D();
     }
 
     @Override
     public String getTranslationKey(ItemStack stack) {
-        return super.getTranslationKey() + "." + getColor(stack).getSerializedName();
+        return super.getTranslationKey();
     }
 
     @Override
@@ -118,20 +124,85 @@ public class ItemLightsaber extends Item {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
         tooltip.add(I18n.format(isActive(stack) ? "tooltip.drtech.lightsaber.active" : "tooltip.drtech.lightsaber.inactive"));
+        for (LightsaberPartType type : LightsaberPartType.values()) {
+            tooltip.add(I18n.format("tooltip.drtech.lightsaber.part." + type.getTextureName(), getPart(stack, type).getDisplayName()));
+        }
+        int focusingCrystals = getFocusingCrystalMask(stack);
+        if (focusingCrystals != 0) {
+            for (FocusingCrystal crystal : FocusingCrystal.values()) {
+                if ((focusingCrystals & crystal.getMask()) != 0) {
+                    tooltip.add(I18n.format("tooltip.drtech.lightsaber.focusing_crystal",
+                            I18n.format("item.drtech.focusing_crystal." + crystal.getSerializedName() + ".name")));
+                }
+            }
+        }
         tooltip.add(I18n.format("tooltip.drtech.lightsaber.controls"));
     }
 
     @Override
     public void getSubItems(CreativeTabs tab, net.minecraft.util.NonNullList<ItemStack> items) {
         if (isInCreativeTab(tab)) {
-            for (LightsaberColor color : LightsaberColor.values()) {
-                items.add(new ItemStack(this, 1, color.getMetadata()));
-            }
+            items.add(new ItemStack(this));
         }
     }
 
     public static LightsaberColor getColor(ItemStack stack) {
-        return LightsaberColor.byMetadata(stack.getMetadata());
+        if (!stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().hasKey(BLADE_COLOR_TAG)) {
+            return LightsaberColor.byMetadata(stack.getTagCompound().getInteger(BLADE_COLOR_TAG));
+        }
+        if (!stack.isEmpty() && stack.getItem() instanceof ItemLightsaber) {
+            ItemLightsaber item = (ItemLightsaber) stack.getItem();
+            if (item.baseHilt == LightsaberHilt.GRAFLEX && stack.getMetadata() > 0) {
+                return LightsaberColor.byMetadata(stack.getMetadata());
+            }
+            return item.defaultColor;
+        }
+        return LightsaberColor.DEEP_BLUE;
+    }
+
+    public static ItemStack create(LightsaberColor color, LightsaberHilt emitter, LightsaberHilt switchSection,
+                                   LightsaberHilt body, LightsaberHilt pommel, int focusingCrystals) {
+        ItemStack stack = new ItemStack(com.drppp.drtech.common.Items.ItemsInit.getLightsaber(emitter));
+        getOrCreateTag(stack).setInteger(BLADE_COLOR_TAG, color.getMetadata());
+        setParts(stack, emitter, switchSection, body, pommel);
+        setFocusingCrystalMask(stack, focusingCrystals);
+        return stack;
+    }
+
+    public static LightsaberHilt getPart(ItemStack stack, LightsaberPartType type) {
+        if (!stack.isEmpty() && stack.hasTagCompound()) {
+            int[] parts = stack.getTagCompound().getIntArray(PARTS_TAG);
+            if (parts.length == LightsaberPartType.values().length) {
+                return LightsaberHilt.byMetadata(parts[type.ordinal()]);
+            }
+        }
+        return !stack.isEmpty() && stack.getItem() instanceof ItemLightsaber
+                ? ((ItemLightsaber) stack.getItem()).baseHilt : LightsaberHilt.GRAFLEX;
+    }
+
+    public LightsaberHilt getBaseHilt() {
+        return baseHilt;
+    }
+
+    public LightsaberColor getDefaultColor() {
+        return defaultColor;
+    }
+
+    public static void setParts(ItemStack stack, LightsaberHilt emitter, LightsaberHilt switchSection,
+                                LightsaberHilt body, LightsaberHilt pommel) {
+        NBTTagCompound tag = getOrCreateTag(stack);
+        tag.setIntArray(PARTS_TAG, new int[] {
+                emitter.getMetadata(), switchSection.getMetadata(), body.getMetadata(), pommel.getMetadata()
+        });
+    }
+
+    public static int getFocusingCrystalMask(ItemStack stack) {
+        return !stack.isEmpty() && stack.hasTagCompound()
+                ? stack.getTagCompound().getInteger(FOCUSING_CRYSTALS_TAG) : 0;
+    }
+
+    public static void setFocusingCrystalMask(ItemStack stack, int focusingCrystals) {
+        getOrCreateTag(stack).setInteger(FOCUSING_CRYSTALS_TAG, focusingCrystals);
     }
 
     public static boolean isActive(ItemStack stack) {
@@ -142,13 +213,15 @@ public class ItemLightsaber extends Item {
         if (stack.isEmpty()) {
             return;
         }
+        getOrCreateTag(stack).setBoolean(ACTIVE_TAG, active);
+    }
 
+    private static NBTTagCompound getOrCreateTag(ItemStack stack) {
         NBTTagCompound tag = stack.getTagCompound();
         if (tag == null) {
             tag = new NBTTagCompound();
             stack.setTagCompound(tag);
         }
-
-        tag.setBoolean(ACTIVE_TAG, active);
+        return tag;
     }
 }

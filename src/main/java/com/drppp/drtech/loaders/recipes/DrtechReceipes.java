@@ -57,6 +57,9 @@ public final class DrtechReceipes {
             .sound(GTSoundEvents.ASSEMBLER)
             .build();
 
+    public static final RecipeMap<SimpleRecipeBuilder> LIGHTSABER_ASSEMBLER_RECIPES =
+            new LightsaberAssemblerRecipeMap();
+
     public static final RecipeMap<DronePadRecipeBuilder> DRONE_PAD = new RecipeMapBuilder<>("drone_pad",
             new DronePadRecipeBuilder())
             .itemInputs(3)

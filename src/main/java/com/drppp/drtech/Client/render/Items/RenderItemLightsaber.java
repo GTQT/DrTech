@@ -27,6 +27,20 @@ public class RenderItemLightsaber extends TileEntityItemStackRenderer {
         RENDER_ENTITY.set(entity);
     }
 
+    static ItemCameraTransforms.TransformType getTransformType() {
+        return TRANSFORM_TYPE.get();
+    }
+
+    @Nullable
+    static EntityLivingBase getRenderEntity() {
+        return RENDER_ENTITY.get();
+    }
+
+    static void clearRenderContext() {
+        TRANSFORM_TYPE.remove();
+        RENDER_ENTITY.remove();
+    }
+
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
         ItemCameraTransforms.TransformType type = TRANSFORM_TYPE.get();
@@ -57,20 +71,19 @@ public class RenderItemLightsaber extends TileEntityItemStackRenderer {
                 GL11.glRotatef(180.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
                 GL11.glScalef(0.3F, 0.3F, 0.3F);
-                GL11.glTranslatef(0.0F, -LightsaberRenderHelper.getHiltHeight() / 48.0F, 0.0F);
+                GL11.glTranslatef(0.0F, -LightsaberRenderHelper.getHiltHeight(stack) / 48.0F, 0.0F);
                 applyNameFlip(stack, 180.0F);
-                LightsaberRenderHelper.renderLightsaberHilt();
+                LightsaberRenderHelper.renderLightsaberHilt(stack);
             } else if (type == ItemCameraTransforms.TransformType.GUI) {
                 renderInventoryPreview(stack);
             } else {
                 GL11.glTranslatef(0.5F, 0.5F, 0.5F);
                 GL11.glScalef(0.22F, 0.22F, 0.22F);
-                LightsaberRenderHelper.renderLightsaberHilt();
+                LightsaberRenderHelper.renderLightsaberHilt(stack);
             }
         } finally {
             GlStateManager.popMatrix();
-            TRANSFORM_TYPE.remove();
-            RENDER_ENTITY.remove();
+            clearRenderContext();
         }
     }
 
@@ -88,7 +101,7 @@ public class RenderItemLightsaber extends TileEntityItemStackRenderer {
         applyNameFlip(stack, 180.0F);
         GL11.glTranslatef(0.0F, 0.05F, 0.0F);
         GL11.glScalef(0.3125F, 0.3125F, 0.3125F);
-        LightsaberRenderHelper.renderLightsaberHilt();
+        LightsaberRenderHelper.renderLightsaberHilt(stack);
     }
 
     private void applyLegacyEquippedTransform() {
@@ -127,6 +140,20 @@ public class RenderItemLightsaber extends TileEntityItemStackRenderer {
         buffer.pos(0.0F, 0.0F, 0.0F).endVertex();
         buffer.pos(0.0F, size, 0.0F).endVertex();
         tessellator.draw();
+        if ((ItemLightsaber.getFocusingCrystalMask(stack)
+                & com.drppp.drtech.common.Items.lightsaber.FocusingCrystal.INVERTING.getMask()) != 0) {
+            float inner = size / 1.5F;
+            GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glPushMatrix();
+            GL11.glTranslatef(inner / 8.0F, inner / 8.0F, 0.0F);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+            buffer.pos(inner / 2.0F, inner / 2.0F, 0.0F).endVertex();
+            buffer.pos(inner, 0.0F, 0.0F).endVertex();
+            buffer.pos(0.0F, 0.0F, 0.0F).endVertex();
+            buffer.pos(0.0F, inner, 0.0F).endVertex();
+            tessellator.draw();
+            GL11.glPopMatrix();
+        }
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

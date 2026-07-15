@@ -5,6 +5,7 @@ import com.drppp.drtech.Client.Particle.EntityParticleSpray;
 import com.drppp.drtech.Client.Particle.InstantParticleRender;
 import com.drppp.drtech.Client.Particle.ParticleRenderer;
 import com.drppp.drtech.Client.render.Items.LightsaberBakedModel;
+import com.drppp.drtech.Client.render.Items.LightsaberPartBakedModel;
 import com.drppp.drtech.Client.render.BulletRenderer;
 import com.drppp.drtech.Client.render.PlasmaBulletRenderer;
 import com.drppp.drtech.Client.render.TachyonRenderer;
@@ -50,6 +51,14 @@ public final class DrTechModelRegister {
         ModelResourceLocation location = new ModelResourceLocation(Tags.MODID + ":lightsaber", "inventory");
         if (event.getModelRegistry().getObject(location) != null) {
             event.getModelRegistry().putObject(location, new LightsaberBakedModel(event.getModelRegistry().getObject(location)));
+        }
+        for (Item item : new Item[] { ItemsInit.LIGHTSABER_EMITTER, ItemsInit.LIGHTSABER_SWITCH,
+                ItemsInit.LIGHTSABER_GRIP, ItemsInit.LIGHTSABER_POMMEL }) {
+            ModelResourceLocation partLocation = new ModelResourceLocation(item.getRegistryName(), "inventory");
+            if (event.getModelRegistry().getObject(partLocation) != null) {
+                event.getModelRegistry().putObject(partLocation,
+                        new LightsaberPartBakedModel(event.getModelRegistry().getObject(partLocation)));
+            }
         }
     }
 
