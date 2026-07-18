@@ -3,6 +3,7 @@ package com.drppp.drtech.loaders.recipes;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.lightsaber.FocusingCrystal;
 import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
 import com.drppp.drtech.common.Items.lightsaber.LightsaberColor;
 import com.drppp.drtech.common.Items.lightsaber.LightsaberHilt;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
@@ -22,6 +23,8 @@ public final class LightsaberRecipes {
     public static void init() {
         registerComponents();
         registerAssemblyExamples();
+        registerFocusingCrystalInstallationExamples();
+        registerDisassemblyExamples();
         registerMachineRecipe();
     }
 
@@ -118,6 +121,42 @@ public final class LightsaberRecipes {
                     .EUt(GTValues.VA[GTValues.LV])
                     .buildAndRegister();
         }
+    }
+
+    private static void registerFocusingCrystalInstallationExamples() {
+        for (FocusingCrystal crystal : FocusingCrystal.values()) {
+            ItemStack lightsaber = new ItemStack(ItemsInit.getLightsaber(LightsaberHilt.GRAFLEX));
+            ItemStack output = lightsaber.copy();
+            ItemLightsaber.setFocusingCrystalMask(output, crystal.getMask());
+            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+                    .inputs(lightsaber)
+                    .inputs(new ItemStack(ItemsInit.FOCUSING_CRYSTAL, 1, crystal.getMetadata()))
+                    .outputs(output)
+                    .duration(100)
+                    .EUt(GTValues.VA[GTValues.LV])
+                    .buildAndRegister();
+        }
+    }
+
+    private static void registerDisassemblyExamples() {
+        for (LightsaberHilt hilt : LightsaberHilt.values()) {
+            ItemStack lightsaber = new ItemStack(ItemsInit.getLightsaber(hilt));
+            DrtechReceipes.DISASSEMBLER_RECIPES.recipeBuilder()
+                    .inputs(lightsaber)
+                    .outputs(LightsaberDisassemblerRecipeMap.getDisassemblyOutputs(lightsaber))
+                    .duration(200)
+                    .EUt(GTValues.VA[GTValues.LV])
+                    .buildAndRegister();
+        }
+
+        ItemStack mauler = new ItemStack(ItemsInit.getLightsaber(LightsaberHilt.MAULER));
+        ItemStack doubleLightsaber = ItemDoubleLightsaber.create(mauler, mauler);
+        DrtechReceipes.DISASSEMBLER_RECIPES.recipeBuilder()
+                .inputs(doubleLightsaber)
+                .outputs(LightsaberDisassemblerRecipeMap.getDisassemblyOutputs(doubleLightsaber))
+                .duration(400)
+                .EUt(GTValues.VA[GTValues.LV])
+                .buildAndRegister();
     }
 
     private static void registerMachineRecipe() {

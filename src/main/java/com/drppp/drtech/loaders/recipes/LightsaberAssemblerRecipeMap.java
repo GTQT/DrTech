@@ -24,10 +24,11 @@ import java.util.List;
 
 public final class LightsaberAssemblerRecipeMap extends RecipeMap<SimpleRecipeBuilder> {
     public LightsaberAssemblerRecipeMap() {
+        // MUI2 lays out eight inputs as a complete 3x3 grid and requires a ninth backing slot.
         super("lightsaber_assembler", new SimpleRecipeBuilder(),
-                map -> new RecipeMapUI<>(map, false, false, false, false), 8, 1, 0, 0);
+                map -> new RecipeMapUI<>(map, false, false, false, false), 9, 1, 0, 0);
         setSound(GTSoundEvents.ASSEMBLER);
-        getRecipeMapUI().setProgressBarTexture(GTGuiTextures.PROGRESS_BAR_CIRCUIT);
+        getRecipeMapUI().buildMui2(builder -> builder.progressBar(GTGuiTextures.PROGRESS_BAR_CIRCUIT));
     }
 
     @Override
@@ -35,6 +36,10 @@ public final class LightsaberAssemblerRecipeMap extends RecipeMap<SimpleRecipeBu
                              boolean exactVoltage) {
         boolean hasFluids = fluidInputs != null
                 && fluidInputs.stream().anyMatch(stack -> stack != null && stack.amount > 0);
+        FocusingUpgradeInput focusingInput = hasFluids ? null : FocusingUpgradeInput.parse(itemInputs);
+        if (focusingInput != null) {
+            return createFocusingUpgradeRecipe(voltage, focusingInput);
+        }
         DoubleAssemblyInput doubleInput = hasFluids ? null : DoubleAssemblyInput.parse(itemInputs);
         if (doubleInput != null) {
             return createDoubleAssemblyRecipe(voltage, doubleInput);
@@ -59,6 +64,20 @@ public final class LightsaberAssemblerRecipeMap extends RecipeMap<SimpleRecipeBu
                 .inputs(input.consumedStacks.toArray(new ItemStack[0]))
                 .outputs(output)
                 .duration(200)
+                .EUt(GTValues.VA[GTValues.LV])
+                .build()
+                .getResult();
+        return recipe != null && voltage >= Math.abs(recipe.getEUt()) ? recipe : null;
+    }
+
+    private Recipe createFocusingUpgradeRecipe(long voltage, FocusingUpgradeInput input) {
+        ItemStack output = input.lightsaber.copy();
+        ItemLightsaber.setFocusingCrystalMask(output, input.resultMask);
+        ItemLightsaber.setActive(output, false);
+        Recipe recipe = recipeBuilder()
+                .inputs(input.consumedStacks.toArray(new ItemStack[0]))
+                .outputs(output)
+                .duration(100 * input.crystalCount)
                 .EUt(GTValues.VA[GTValues.LV])
                 .build()
                 .getResult();
@@ -125,6 +144,63 @@ public final class LightsaberAssemblerRecipeMap extends RecipeMap<SimpleRecipeBu
             ItemStack copy = stack.copy();
             copy.setCount(1);
             return copy;
+        }
+    }
+
+    private static final class FocusingUpgradeInput {
+        private final ItemStack lightsaber;
+        private final List<ItemStack> consumedStacks;
+        private final int resultMask;
+        private final int crystalCount;
+
+        private FocusingUpgradeInput(ItemStack lightsaber, List<ItemStack> consumedStacks,
+                                     int resultMask, int crystalCount) {
+            this.lightsaber = lightsaber;
+            this.consumedStacks = consumedStacks;
+            this.resultMask = resultMask;
+            this.crystalCount = crystalCount;
+        }
+
+        private static FocusingUpgradeInput parse(List<ItemStack> stacks) {
+            if (stacks == null) {
+                return null;
+            }
+            ItemStack lightsaber = ItemStack.EMPTY;
+            List<ItemStack> consumedStacks = new ArrayList<>();
+            int addedMask = 0;
+            int crystalCount = 0;
+            for (ItemStack stack : stacks) {
+                if (stack == null || stack.isEmpty()) {
+                    continue;
+                }
+                ItemStack consumed = stack.copy();
+                consumed.setCount(1);
+                if (stack.getItem() instanceof ItemLightsaber) {
+                    if (!lightsaber.isEmpty()) {
+                        return null;
+                    }
+                    lightsaber = consumed;
+                } else if (stack.getItem() instanceof ItemFocusingCrystal) {
+                    FocusingCrystal crystal = FocusingCrystal.byMetadata(stack.getMetadata());
+                    if ((addedMask & crystal.getMask()) != 0) {
+                        return null;
+                    }
+                    addedMask |= crystal.getMask();
+                    crystalCount++;
+                } else {
+                    return null;
+                }
+                consumedStacks.add(consumed);
+            }
+            if (lightsaber.isEmpty() || crystalCount == 0) {
+                return null;
+            }
+            int existingMask = ItemLightsaber.getFocusingCrystalMask(lightsaber);
+            if ((existingMask & addedMask) != 0 || Integer.bitCount(existingMask | addedMask) > 2) {
+                return null;
+            }
+            return new FocusingUpgradeInput(lightsaber, consumedStacks,
+                    existingMask | addedMask, crystalCount);
         }
     }
 

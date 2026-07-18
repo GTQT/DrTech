@@ -47,15 +47,8 @@ public final class DrtechReceipes {
             .sound(GTSoundEvents.CHEMICAL_REACTOR)
             .build();
 
-    public static final RecipeMap<SimpleRecipeBuilder> DISASSEMBLER_RECIPES = new RecipeMapBuilder<>("disassembler",
-            new SimpleRecipeBuilder())
-            .itemInputs(1)
-            .itemOutputs(9)
-            .uiBuilder(builder -> builder
-                    .itemSlotOverlay(GTGuiTextures.CIRCUIT_OVERLAY, false)
-                    .progressBar(GTGuiTextures.PROGRESS_BAR_CIRCUIT))
-            .sound(GTSoundEvents.ASSEMBLER)
-            .build();
+    public static final RecipeMap<SimpleRecipeBuilder> DISASSEMBLER_RECIPES =
+            new LightsaberDisassemblerRecipeMap();
 
     public static final RecipeMap<SimpleRecipeBuilder> LIGHTSABER_ASSEMBLER_RECIPES =
             new LightsaberAssemblerRecipeMap();

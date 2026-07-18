@@ -37,7 +37,9 @@ public final class LightsaberCombatHandler {
         }
 
         event.setCanceled(true);
-        float damage = ItemLightsaber.rollAttackDamage(player.getRNG());
+        float damage = dual
+                ? ItemDoubleLightsaber.rollAttackDamage(player.getRNG())
+                : ItemLightsaber.rollAttackDamage(player.getRNG());
         DamageSource source = DamageSource.causePlayerDamage(player);
         boolean hit = dual
                 ? attackDoubleLightsaberTargets(player, source, damage)
@@ -51,9 +53,8 @@ public final class LightsaberCombatHandler {
     }
 
     private static boolean attackDoubleLightsaberTargets(EntityPlayer player, DamageSource source, float damage) {
-        float width = player.width * 2.0F;
         List<EntityLivingBase> targets = player.world.getEntitiesWithinAABB(EntityLivingBase.class,
-                player.getEntityBoundingBox().grow(width, 0.0D, width), entity -> entity != player);
+                player.getEntityBoundingBox().grow(ItemDoubleLightsaber.ATTACK_RANGE), entity -> entity != player);
         boolean hit = false;
         for (EntityLivingBase target : targets) {
             hit |= attackTarget(target, player, source, damage);

@@ -26,8 +26,13 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 public class ItemDoubleLightsaber extends Item {
+    public static final int MIN_ATTACK_DAMAGE = 60;
+    public static final int MAX_ATTACK_DAMAGE = 80;
+    public static final double ATTACK_DAMAGE = MIN_ATTACK_DAMAGE - 1.0D;
+    public static final double ATTACK_RANGE = 4.0D;
     private static final String ACTIVE_TAG = "active";
     private static final String UPPER_TAG = "UpperLightsaber";
     private static final String LOWER_TAG = "LowerLightsaber";
@@ -99,7 +104,7 @@ public class ItemDoubleLightsaber extends Item {
         if (slot == EntityEquipmentSlot.MAINHAND && isActive(stack)) {
             modifiers.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
                     new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier",
-                            ItemLightsaber.ATTACK_DAMAGE, 0));
+                            ATTACK_DAMAGE, 0));
             modifiers.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
                     new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4D, 0));
         }
@@ -112,7 +117,7 @@ public class ItemDoubleLightsaber extends Item {
         tooltip.add(I18n.format(isActive(stack)
                 ? "tooltip.drtech.lightsaber.active" : "tooltip.drtech.lightsaber.inactive"));
         tooltip.add(I18n.format("tooltip.drtech.lightsaber.damage",
-                ItemLightsaber.MIN_ATTACK_DAMAGE, ItemLightsaber.MAX_ATTACK_DAMAGE));
+                MIN_ATTACK_DAMAGE, MAX_ATTACK_DAMAGE));
         tooltip.add(I18n.format("tooltip.drtech.double_lightsaber.upper", getUpper(stack).getDisplayName()));
         tooltip.add(I18n.format("tooltip.drtech.double_lightsaber.lower", getLower(stack).getDisplayName()));
         tooltip.add(I18n.format("tooltip.drtech.lightsaber.controls"));
@@ -143,6 +148,10 @@ public class ItemDoubleLightsaber extends Item {
         if (!stack.isEmpty()) {
             getOrCreateTag(stack).setBoolean(ACTIVE_TAG, active);
         }
+    }
+
+    public static float rollAttackDamage(Random random) {
+        return MIN_ATTACK_DAMAGE + random.nextInt(MAX_ATTACK_DAMAGE - MIN_ATTACK_DAMAGE + 1);
     }
 
     private static ItemStack getBlade(ItemStack stack, String key) {

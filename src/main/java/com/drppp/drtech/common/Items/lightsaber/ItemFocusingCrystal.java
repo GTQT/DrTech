@@ -2,10 +2,17 @@ package com.drppp.drtech.common.Items.lightsaber;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ItemFocusingCrystal extends Item {
     public ItemFocusingCrystal() {
@@ -28,5 +35,14 @@ public class ItemFocusingCrystal extends Item {
                 items.add(new ItemStack(this, 1, crystal.getMetadata()));
             }
         }
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
+        FocusingCrystal crystal = FocusingCrystal.byMetadata(stack.getMetadata());
+        tooltip.add(TextFormatting.GRAY + I18n.format(
+                "tooltip.drtech.focusing_crystal.effect." + crystal.getSerializedName()));
+        tooltip.add(TextFormatting.AQUA + I18n.format("tooltip.drtech.focusing_crystal.install"));
+        tooltip.add(TextFormatting.DARK_GRAY + I18n.format("tooltip.drtech.focusing_crystal.limit"));
     }
 }
