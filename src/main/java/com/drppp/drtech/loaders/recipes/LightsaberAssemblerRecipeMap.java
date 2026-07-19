@@ -110,6 +110,7 @@ public final class LightsaberAssemblerRecipeMap extends RecipeMap<SimpleRecipeBu
             }
             ItemStack upper = ItemStack.EMPTY;
             ItemStack lower = ItemStack.EMPTY;
+            // The handler list follows the 3x3 GUI slot order. The earlier occupied slot is the upper end.
             for (ItemStack stack : stacks) {
                 if (stack == null || stack.isEmpty()) {
                     continue;

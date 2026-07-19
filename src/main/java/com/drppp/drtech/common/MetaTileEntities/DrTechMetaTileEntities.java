@@ -13,6 +13,7 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEnti
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLaserPipeBending;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLightsaberAssembler;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
 import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.GTValues;
@@ -22,6 +23,7 @@ import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntity;
+import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntities;
 import static gregtech.common.metatileentities.MetaTileEntities.registerSimpleMetaTileEntity;
 
 public class DrTechMetaTileEntities {
@@ -79,10 +81,12 @@ public class DrTechMetaTileEntities {
         }
 
         registerSimpleMetaTileEntity(DISASSEMBLY, 110, "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
-        registerSimpleMetaTileEntity(LIGHTSABER_ASSEMBLER, 120, "lightsaber_assembler",
-                DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES,
-                gregtech.client.renderer.texture.Textures.ASSEMBLER_OVERLAY, true,
-                DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerMetaTileEntities(LIGHTSABER_ASSEMBLER, 120, "lightsaber_assembler", (tier, tierName) ->
+                new MetaTileEntityLightsaberAssembler(
+                        DrtechUtils.getRL(String.format("lightsaber_assembler.%s", tierName)),
+                        DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES,
+                        gregtech.client.renderer.texture.Textures.ASSEMBLER_OVERLAY,
+                        tier, true, GTUtility.hvCappedTankSizeFunction));
 
         //激光折弯
         for (int i = 0; i < 10; i++) {
