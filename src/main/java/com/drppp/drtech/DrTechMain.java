@@ -6,6 +6,7 @@ import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Client.render.TileEntityRendererConnector;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
+import com.drppp.drtech.Client.render.wings.WingsClientHandler;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
@@ -26,6 +27,9 @@ import com.drppp.drtech.hooked.HookCapability;
 import com.drppp.drtech.hooked.HookClientHooks;
 import com.drppp.drtech.hooked.HookNetwork;
 import com.drppp.drtech.hooked.HookTickHandler;
+import com.drppp.drtech.wings.WingsFlightCapability;
+import com.drppp.drtech.wings.WingsNetwork;
+import com.drppp.drtech.wings.WingsBaublesCompat;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.meowmel.cropQT.api.CropInitHandler;
 import com.meowmel.cropQT.client.CropStickTESR;
@@ -108,6 +112,9 @@ public class DrTechMain {
         DrMetaItems.MetaItemsInit();
         DrtechCapInit.init();
         HookCapability.init();
+        WingsFlightCapability.init();
+        WingsNetwork.init();
+        WingsBaublesCompat.init();
         Textures.init();
         drtMetaEntities.init();
         TileEntityUIFactory.INSTANCE.init();
@@ -147,6 +154,7 @@ public class DrTechMain {
         TexturesInit();
         drtMetaEntities.initRenderers();
         HookClientHooks.init();
+        WingsClientHandler.init();
 
     }
 
@@ -208,6 +216,7 @@ public class DrTechMain {
         SyncInit.init();
         drtMetaEntities.initRenderers();
         CropInitHandler.clienInit();
+        WingsClientHandler.initRenderLayers();
     }
 
     @EventHandler

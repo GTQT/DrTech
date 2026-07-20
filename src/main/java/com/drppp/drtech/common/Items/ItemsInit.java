@@ -19,6 +19,8 @@ import com.drppp.drtech.common.Items.foods.ItemXpBerry;
 import com.drppp.drtech.hooked.HookComponentType;
 import com.drppp.drtech.hooked.HookRegistry;
 import com.drppp.drtech.hooked.HookType;
+import com.drppp.drtech.wings.ItemWings;
+import com.drppp.drtech.wings.WingType;
 import com.meowmel.cropQT.item.ItemCropAnalyzer;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemWeedingShears;
@@ -75,6 +77,10 @@ public class ItemsInit {
     public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
     public static ItemHappyGhastHarness HAPPY_GHAST_HARNESS = new ItemHappyGhastHarness();
+    public static final ItemSimpleDrTech WING_FAIRY_DUST = new ItemSimpleDrTech("fairy_dust");
+    public static final ItemSimpleDrTech WING_AMETHYST = new ItemSimpleDrTech("amethyst");
+    public static final ItemSimpleDrTech BAT_BLOOD = createBatBlood();
+    public static final ItemWings[] WINGS = createWings();
     public static final ItemLightsaber[] LIGHTSABERS = createLightsabers();
     public static final ItemLightsaber LIGHTSABER = LIGHTSABERS[LightsaberHilt.GRAFLEX.getMetadata()];
     public static final ItemDoubleLightsaber DOUBLE_LIGHTSABER = new ItemDoubleLightsaber();
@@ -129,6 +135,10 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(HAPPY_GHAST_HARNESS);
+        event.getRegistry().register(WING_FAIRY_DUST);
+        event.getRegistry().register(WING_AMETHYST);
+        event.getRegistry().register(BAT_BLOOD);
+        event.getRegistry().registerAll(WINGS);
         event.getRegistry().registerAll(LIGHTSABERS);
         event.getRegistry().register(DOUBLE_LIGHTSABER);
         event.getRegistry().register(LIGHTSABER_CIRCUITRY);
@@ -178,6 +188,12 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(HAPPY_GHAST_HARNESS, 0, new ModelResourceLocation(HAPPY_GHAST_HARNESS.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(WING_FAIRY_DUST, 0, new ModelResourceLocation(WING_FAIRY_DUST.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(WING_AMETHYST, 0, new ModelResourceLocation(WING_AMETHYST.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(BAT_BLOOD, 0, new ModelResourceLocation(BAT_BLOOD.getRegistryName(), "inventory"));
+        for (ItemWings wings : WINGS) {
+            ModelLoader.setCustomModelResourceLocation(wings, 0, new ModelResourceLocation(wings.getRegistryName(), "inventory"));
+        }
         ModelResourceLocation lightsaberModel = new ModelResourceLocation(Tags.MODID + ":lightsaber", "inventory");
         for (ItemLightsaber lightsaber : LIGHTSABERS) {
             lightsaber.setTileEntityItemStackRenderer(new RenderItemLightsaber());
@@ -252,5 +268,24 @@ public class ItemsInit {
             lightsabers[hilt.getMetadata()] = new ItemLightsaber(registryName, hilt);
         }
         return lightsabers;
+    }
+
+    public static ItemWings getWings(WingType type) {
+        return WINGS[type.ordinal()];
+    }
+
+    private static ItemWings[] createWings() {
+        WingType[] types = WingType.values();
+        ItemWings[] wings = new ItemWings[types.length];
+        for (WingType type : types) {
+            wings[type.ordinal()] = new ItemWings(type);
+        }
+        return wings;
+    }
+
+    private static ItemSimpleDrTech createBatBlood() {
+        ItemSimpleDrTech batBlood = new ItemSimpleDrTech("bat_blood");
+        batBlood.setContainerItem(net.minecraft.init.Items.GLASS_BOTTLE);
+        return batBlood;
     }
 }
