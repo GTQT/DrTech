@@ -5,9 +5,10 @@
   "target": "@env(DEFAULT)",
   "minVersion": "0.8.3",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
-    "MixinEntityLivingBaseWings"
-  ],
+  "mixins": [],
   "server": [],
-  "client": []
+  "client": [
+    "MixinRenderLivingBaseWings",
+    "MixinModelPlayerWings"
+  ]
 }

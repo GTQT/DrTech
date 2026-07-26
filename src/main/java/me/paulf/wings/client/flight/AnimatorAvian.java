@@ -287,17 +287,23 @@ public final class AnimatorAvian implements Animator {
 
 		@Override
 		public Vec3d getWingRotation(final int index, final float delta) {
-			return this.lerpRotation(index, delta, Movement::getWingRotation);
+			return this.lerpRotation(
+				this.start.getWingRotation(index, delta),
+				this.end.getWingRotation(index, delta),
+				delta
+			);
 		}
 
 		@Override
 		public Vec3d getFeatherRotation(final int index, final float delta) {
-			return this.lerpRotation(index, delta, Movement::getFeatherRotation);
+			return this.lerpRotation(
+				this.start.getFeatherRotation(index, delta),
+				this.end.getFeatherRotation(index, delta),
+				delta
+			);
 		}
 
-		private Vec3d lerpRotation(final int index, final float delta, final RotationGetter getter) {
-			final Vec3d startRot = getter.get(this.start, index, delta);
-			final Vec3d endRot = getter.get(this.end, index, delta);
+		private Vec3d lerpRotation(final Vec3d startRot, final Vec3d endRot, final float delta) {
 			final float t = Mth.easeInOut(Mth.lerp(this.lastTime, this.time, delta) / this.duration);
 			return new Vec3d(
 				Mth.lerpDegrees(startRot.x, endRot.x, t),
@@ -324,11 +330,6 @@ public final class AnimatorAvian implements Animator {
 		public void onEnd() {
 			this.isActive = false;
 		}
-	}
-
-	@FunctionalInterface
-	private interface RotationGetter {
-		Vec3d get(Movement movement, int index, float delta);
 	}
 
 	private static final class WingPose {

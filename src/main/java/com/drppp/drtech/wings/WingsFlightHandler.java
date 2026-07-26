@@ -8,7 +8,6 @@ import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumActionResult;
@@ -63,15 +62,8 @@ public final class WingsFlightHandler {
         data.setFlying(allowed);
         if (!player.capabilities.isCreativeMode) {
             player.capabilities.allowFlying = allowed;
-            player.capabilities.isFlying = allowed;
-            if (allowed && player.onGround) {
-                // Wings originally delegates the no-gravity state to its core patch.
-                // Use the vanilla flight state here and lift off once so R works from level ground.
-                player.motionY = Math.max(player.motionY, 0.15D);
-                player.onGround = false;
-            }
-            if (player instanceof EntityPlayerMP) {
-                ((EntityPlayerMP) player).connection.sendPacket(new SPacketPlayerAbilities(player.capabilities));
+            if (!allowed) {
+                player.capabilities.isFlying = false;
             }
         }
         WingsNetwork.sync(player);
@@ -98,12 +90,17 @@ public final class WingsFlightHandler {
             return;
         }
 
+        boolean usable = canFly(player);
+        if (!player.world.isRemote && data.isFlying() && !usable) {
+            setFlying(player, false);
+        }
+        if (data.isFlying() && usable) {
+            // Client prediction keeps normal movement packets from erasing server-applied wing thrust.
+            applyFlightMotion(player);
+        }
+
         if (!player.world.isRemote) {
-            if (data.isFlying() && !canFly(player)) {
-                setFlying(player, false);
-            }
             if (data.isFlying()) {
-                applyFlightMotion(player);
                 if (data.incrementDurabilityTimer() >= 20) {
                     data.resetDurabilityTimer();
                     wings.damageItem(1, player);
@@ -147,7 +144,7 @@ public final class WingsFlightHandler {
         player.motionZ += motionZ * horizontal * speed;
         int distance = Math.round((float) Math.sqrt(player.motionX * player.motionX + player.motionY * player.motionY
                 + player.motionZ * player.motionZ) * 100.0F);
-        if (distance > 0) {
+        if (!player.world.isRemote && distance > 0) {
             player.addExhaustion(distance * 0.001F);
         }
     }

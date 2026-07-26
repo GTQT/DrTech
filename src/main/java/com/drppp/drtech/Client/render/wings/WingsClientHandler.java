@@ -13,6 +13,7 @@ import me.paulf.wings.client.flight.AnimatorAvian;
 import me.paulf.wings.client.flight.AnimatorInsectoid;
 import me.paulf.wings.client.model.ModelWingsAvian;
 import me.paulf.wings.client.model.ModelWingsInsectoid;
+import me.paulf.wings.util.Mth;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
@@ -22,6 +23,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -92,6 +94,29 @@ public final class WingsClientHandler {
         for (net.minecraft.entity.player.EntityPlayer player : minecraft.world.playerEntities) {
             updateAnimator(player);
         }
+    }
+
+    @SubscribeEvent
+    public static void onCameraSetup(EntityViewRenderEvent.CameraSetup event) {
+        if (!(event.getEntity() instanceof net.minecraft.entity.player.EntityPlayer)) {
+            return;
+        }
+        net.minecraft.entity.player.EntityPlayer player =
+                (net.minecraft.entity.player.EntityPlayer) event.getEntity();
+        WingsFlightData flight = WingsFlightCapability.get(player);
+        if (flight == null) {
+            return;
+        }
+        float partialTicks = (float) event.getRenderPartialTicks();
+        float amount = flight.getFlyingAmount(partialTicks);
+        if (amount <= 0.0F) {
+            return;
+        }
+        float roll = Mth.lerpDegrees(
+                player.prevRenderYawOffset - player.prevRotationYaw,
+                player.renderYawOffset - player.rotationYaw,
+                partialTicks);
+        event.setRoll(Mth.lerpDegrees(0.0F, -roll * 0.25F, amount));
     }
 
     static void renderWings(AbstractClientPlayer player, RenderPlayer renderer, float partialTicks) {

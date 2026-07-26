@@ -1,8 +1,11 @@
 package com.drppp.drtech.wings;
 
+import me.paulf.wings.util.CubicBezier;
 import net.minecraft.nbt.NBTTagCompound;
 
 public final class WingsFlightData {
+    private static final CubicBezier FLY_AMOUNT_CURVE = new CubicBezier(0.37F, 0.13F, 0.3F, 1.12F);
+
     private boolean flying;
     private int timeFlying;
     private int previousTimeFlying;
@@ -42,7 +45,7 @@ public final class WingsFlightData {
 
     public float getFlyingAmount(float partialTicks) {
         float progress = (previousTimeFlying + (timeFlying - previousTimeFlying) * partialTicks) / 20.0F;
-        return Math.max(0.0F, Math.min(1.0F, progress));
+        return FLY_AMOUNT_CURVE.eval(Math.max(0.0F, Math.min(1.0F, progress)));
     }
 
     public void copyFrom(WingsFlightData other) {
