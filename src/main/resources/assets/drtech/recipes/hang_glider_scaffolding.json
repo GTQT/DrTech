@@ -1,0 +1,5 @@
+{
+  "type": "forge:ore_shaped", "pattern": [" i ", "i i", "iii"],
+  "key": { "i": { "type": "forge:ore_dict", "ore": "ingotIron" } },
+  "result": { "item": "drtech:hang_glider_part", "data": 2 }
+}

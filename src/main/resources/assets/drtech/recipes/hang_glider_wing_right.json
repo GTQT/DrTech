@@ -1,0 +1,5 @@
+{
+  "type": "forge:ore_shaped", "pattern": ["ls ", "lls", "lll"], "mirrored": false,
+  "key": { "s": { "type": "forge:ore_dict", "ore": "stickWood" }, "l": { "type": "forge:ore_dict", "ore": "leather" } },
+  "result": { "item": "drtech:hang_glider_part", "data": 1 }
+}

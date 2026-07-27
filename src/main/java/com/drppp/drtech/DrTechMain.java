@@ -7,6 +7,7 @@ import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Client.render.TileEntityRendererConnector;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Client.render.wings.WingsClientHandler;
+import com.drppp.drtech.Client.render.glider.GliderClientHandler;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
@@ -29,6 +30,8 @@ import com.drppp.drtech.hooked.HookNetwork;
 import com.drppp.drtech.hooked.HookTickHandler;
 import com.drppp.drtech.wings.WingsFlightCapability;
 import com.drppp.drtech.wings.WingsNetwork;
+import com.drppp.drtech.glider.GliderFlightCapability;
+import com.drppp.drtech.glider.GliderNetwork;
 import com.drppp.drtech.wings.WingsBaublesCompat;
 import com.drppp.drtech.intergations.top.TopInit;
 import com.meowmel.cropQT.api.CropInitHandler;
@@ -114,6 +117,8 @@ public class DrTechMain {
         HookCapability.init();
         WingsFlightCapability.init();
         WingsNetwork.init();
+        GliderFlightCapability.init();
+        GliderNetwork.init();
         WingsBaublesCompat.init();
         Textures.init();
         drtMetaEntities.init();
@@ -217,6 +222,7 @@ public class DrTechMain {
         drtMetaEntities.initRenderers();
         CropInitHandler.clienInit();
         WingsClientHandler.initRenderLayers();
+        GliderClientHandler.initRenderLayers();
     }
 
     @EventHandler

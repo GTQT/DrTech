@@ -1,0 +1,8 @@
+{
+  "parent": "item/generated",
+  "textures": { "layer0": "drtech:items/hang_glider_advanced" },
+  "overrides": [
+    { "predicate": { "status": 1 }, "model": "drtech:item/advanced_hang_glider_deployed" },
+    { "predicate": { "status": 2 }, "model": "drtech:item/advanced_hang_glider_broken" }
+  ]
+}

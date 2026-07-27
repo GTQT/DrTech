@@ -21,6 +21,8 @@ import com.drppp.drtech.hooked.HookRegistry;
 import com.drppp.drtech.hooked.HookType;
 import com.drppp.drtech.wings.ItemWings;
 import com.drppp.drtech.wings.WingType;
+import com.drppp.drtech.glider.ItemHangGlider;
+import com.drppp.drtech.glider.ItemHangGliderPart;
 import com.meowmel.cropQT.item.ItemCropAnalyzer;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemWeedingShears;
@@ -81,6 +83,9 @@ public class ItemsInit {
     public static final ItemSimpleDrTech WING_AMETHYST = new ItemSimpleDrTech("amethyst");
     public static final ItemSimpleDrTech BAT_BLOOD = createBatBlood();
     public static final ItemWings[] WINGS = createWings();
+    public static final ItemHangGliderPart HANG_GLIDER_PART = new ItemHangGliderPart();
+    public static final ItemHangGlider HANG_GLIDER = new ItemHangGlider("hang_glider", false);
+    public static final ItemHangGlider ADVANCED_HANG_GLIDER = new ItemHangGlider("advanced_hang_glider", true);
     public static final ItemLightsaber[] LIGHTSABERS = createLightsabers();
     public static final ItemLightsaber LIGHTSABER = LIGHTSABERS[LightsaberHilt.GRAFLEX.getMetadata()];
     public static final ItemDoubleLightsaber DOUBLE_LIGHTSABER = new ItemDoubleLightsaber();
@@ -139,6 +144,9 @@ public class ItemsInit {
         event.getRegistry().register(WING_AMETHYST);
         event.getRegistry().register(BAT_BLOOD);
         event.getRegistry().registerAll(WINGS);
+        event.getRegistry().register(HANG_GLIDER_PART);
+        event.getRegistry().register(HANG_GLIDER);
+        event.getRegistry().register(ADVANCED_HANG_GLIDER);
         event.getRegistry().registerAll(LIGHTSABERS);
         event.getRegistry().register(DOUBLE_LIGHTSABER);
         event.getRegistry().register(LIGHTSABER_CIRCUITRY);
@@ -193,6 +201,14 @@ public class ItemsInit {
         ModelLoader.setCustomModelResourceLocation(BAT_BLOOD, 0, new ModelResourceLocation(BAT_BLOOD.getRegistryName(), "inventory"));
         for (ItemWings wings : WINGS) {
             ModelLoader.setCustomModelResourceLocation(wings, 0, new ModelResourceLocation(wings.getRegistryName(), "inventory"));
+        }
+        ModelLoader.setCustomModelResourceLocation(HANG_GLIDER, 0,
+                new ModelResourceLocation(HANG_GLIDER.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ADVANCED_HANG_GLIDER, 0,
+                new ModelResourceLocation(ADVANCED_HANG_GLIDER.getRegistryName(), "inventory"));
+        for (int meta = 0; meta < ItemHangGliderPart.NAMES.length; meta++) {
+            ModelLoader.setCustomModelResourceLocation(HANG_GLIDER_PART, meta,
+                    new ModelResourceLocation(Tags.MODID + ":" + ItemHangGliderPart.NAMES[meta], "inventory"));
         }
         ModelResourceLocation lightsaberModel = new ModelResourceLocation(Tags.MODID + ":lightsaber", "inventory");
         for (ItemLightsaber lightsaber : LIGHTSABERS) {

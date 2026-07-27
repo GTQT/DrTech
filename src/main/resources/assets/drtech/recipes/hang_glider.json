@@ -1,0 +1,5 @@
+{
+  "type": "forge:ore_shaped", "pattern": ["   ", "lsr", "   "], "mirrored": false,
+  "key": { "l": { "item": "drtech:hang_glider_part", "data": 0 }, "s": { "item": "drtech:hang_glider_part", "data": 2 }, "r": { "item": "drtech:hang_glider_part", "data": 1 } },
+  "result": { "item": "drtech:hang_glider" }
+}

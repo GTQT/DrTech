@@ -1,0 +1,5 @@
+{
+  "type": "forge:ore_shaped", "pattern": [" e ", "lsr", " e "], "mirrored": false,
+  "key": { "l": { "item": "drtech:hang_glider_part", "data": 0 }, "s": { "item": "drtech:hang_glider" }, "r": { "item": "drtech:hang_glider_part", "data": 1 }, "e": { "item": "minecraft:elytra" } },
+  "result": { "item": "drtech:advanced_hang_glider" }
+}
