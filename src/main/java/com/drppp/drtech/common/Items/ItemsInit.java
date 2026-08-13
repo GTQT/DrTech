@@ -14,6 +14,11 @@ import com.drppp.drtech.common.Items.lightsaber.LightsaberColor;
 import com.drppp.drtech.common.Items.lightsaber.LightsaberHilt;
 import com.drppp.drtech.common.Items.lightsaber.LightsaberPartType;
 import com.drppp.drtech.common.Items.lightsaber.FocusingCrystal;
+import com.drppp.drtech.common.drone.item.ItemDroneProgramCard;
+import com.drppp.drtech.common.drone.item.ItemProgrammableDrone;
+import com.drppp.drtech.common.drone.hardware.DroneChassisTier;
+import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
+import com.drppp.drtech.common.drone.hardware.ItemDroneUpgradeModule;
 import com.drppp.drtech.common.Items.foods.ItemSoarXpBerry;
 import com.drppp.drtech.common.Items.foods.ItemXpBerry;
 import com.drppp.drtech.hooked.HookComponentType;
@@ -102,6 +107,9 @@ public class ItemsInit {
             new ItemLightsaberPart("lightsaber_pommel", LightsaberPartType.POMMEL);
     public static final Item HOOK_ITEM = HookRegistry.HOOK_ITEM;
     public static final Item HOOK_COMPONENT_ITEM = HookRegistry.COMPONENT_ITEM;
+    public static final ItemProgrammableDrone PROGRAMMABLE_DRONE = new ItemProgrammableDrone();
+    public static final ItemDroneProgramCard DRONE_PROGRAM_CARD = new ItemDroneProgramCard();
+    public static final ItemDroneUpgradeModule DRONE_UPGRADE_MODULE = new ItemDroneUpgradeModule();
 
     public static void init(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
@@ -158,6 +166,9 @@ public class ItemsInit {
         event.getRegistry().register(LIGHTSABER_POMMEL);
         event.getRegistry().register(HOOK_ITEM);
         event.getRegistry().register(HOOK_COMPONENT_ITEM);
+        event.getRegistry().register(PROGRAMMABLE_DRONE);
+        event.getRegistry().register(DRONE_PROGRAM_CARD);
+        event.getRegistry().register(DRONE_UPGRADE_MODULE);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
         registerOreDicts();
     }
@@ -242,6 +253,18 @@ public class ItemsInit {
         for (HookComponentType type : HookComponentType.values()) {
             ModelLoader.setCustomModelResourceLocation(HOOK_COMPONENT_ITEM, type.ordinal(),
                     new ModelResourceLocation(Tags.MODID + ":" + type.name().toLowerCase(), "inventory"));
+        }
+        for (DroneChassisTier chassis : DroneChassisTier.values()) {
+            ModelLoader.setCustomModelResourceLocation(PROGRAMMABLE_DRONE, chassis.getMetadata(),
+                    new ModelResourceLocation(Tags.MODID + ":programmable_drone_"
+                            + chassis.name().toLowerCase(), "inventory"));
+        }
+        ModelLoader.setCustomModelResourceLocation(DRONE_PROGRAM_CARD, 0,
+                new ModelResourceLocation(DRONE_PROGRAM_CARD.getRegistryName(), "inventory"));
+        for (DroneUpgradeType type : DroneUpgradeType.values()) {
+            ModelLoader.setCustomModelResourceLocation(DRONE_UPGRADE_MODULE, type.getMetadata(),
+                    new ModelResourceLocation(Tags.MODID + ":drone_upgrade_"
+                            + type.getSerializedName(), "inventory"));
         }
     }
 

@@ -4,6 +4,7 @@ import com.drppp.drtech.Client.render.Entity.EntityRemderFactory;
 import com.drppp.drtech.Client.render.Entity.RenderHappyGhast;
 import com.drppp.drtech.Client.render.Entity.RenderThrownLightsaber;
 import com.drppp.drtech.Client.render.Entity.RenderUTiGolem;
+import com.drppp.drtech.Client.render.Entity.RenderProgrammableDrone;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
@@ -12,6 +13,8 @@ import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
 import com.drppp.drtech.common.Entity.moster.EntityHappyGhast;
 import com.drppp.drtech.common.Entity.moster.EntityUTiGolem;
+import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -20,7 +23,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class drtMetaEntities {
 
-    public static void init() {
+    private static boolean initialized;
+    private static boolean renderersInitialized;
+
+    public static synchronized void init() {
+        if (initialized) return;
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "uti_golem"), EntityUTiGolem.class,"UTi Golem",4,DrTechMain.instance,64,3,true);
         EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "uti_golem"),0x48e06e, 0x199038);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "happy_ghast"), EntityHappyGhast.class, "happy_ghast", 5, DrTechMain.instance, 96, 3, true);
@@ -29,13 +36,19 @@ public class drtMetaEntities {
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "plasma_bullet"), EntityPlasmaBullet.class, "plasma_bullet", 7, DrTechMain.instance, 64, 1, true);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "tachyon_bullet"), EntityTachyonBullet.class, "tachyon_bullet", 8, DrTechMain.instance, 64, 1, true);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "thrown_lightsaber"), EntityThrownLightsaber.class, "thrown_lightsaber", 9, DrTechMain.instance, 64, 10, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "programmable_drone"),
+                EntityProgrammableDrone.class, "programmable_drone", 10, DrTechMain.instance, 96, 3, true);
+        initialized = true;
     }
 
     @SideOnly(Side.CLIENT)
-    public static void initRenderers() {
+    public static synchronized void initRenderers() {
+        if (renderersInitialized) return;
         RenderingRegistry.registerEntityRenderingHandler(EntityUTiGolem.class,new EntityRemderFactory<>(RenderUTiGolem.class));
         RenderingRegistry.registerEntityRenderingHandler(EntityHappyGhast.class, RenderHappyGhast::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityThrownLightsaber.class, RenderThrownLightsaber::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityProgrammableDrone.class, RenderProgrammableDrone::new);
+        renderersInitialized = true;
     }
 
 }
