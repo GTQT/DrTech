@@ -14,21 +14,34 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import com.drppp.drtech.Client.drone.DroneProgramCanvasWidget;
+import com.drppp.drtech.Client.drone.DroneDiagnosticScrollWidget;
+import com.drppp.drtech.Client.drone.DronePropertyChoiceWidget;
+import com.drppp.drtech.Client.drone.DroneAreaPreviewWidget;
+import com.drppp.drtech.Client.drone.DroneMultilineTextWidget;
 import com.drppp.drtech.common.drone.item.DroneItemData;
+import com.drppp.drtech.common.drone.hardware.DroneUpgradeDataCodec;
+import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
 import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
+import com.drppp.drtech.common.drone.network.DroneDockNetwork;
+import com.drppp.drtech.common.drone.network.DroneDockRecord;
 import com.drppp.drtech.common.drone.item.ItemDroneProgramCard;
 import com.drppp.drtech.common.drone.item.ItemProgrammableDrone;
 import com.drppp.drtech.common.drone.program.codec.DroneProgramFormatException;
 import com.drppp.drtech.common.drone.program.codec.DroneProgramNbtCodec;
 import com.drppp.drtech.common.drone.program.compile.DroneDiagnosticSeverity;
 import com.drppp.drtech.common.drone.program.compile.DroneProgramDiagnostic;
+import com.drppp.drtech.common.drone.program.compile.DroneProgramHardwareValidator;
 import com.drppp.drtech.common.drone.program.edit.DroneGraphCommandCodec;
 import com.drppp.drtech.common.drone.program.edit.DroneGraphEditCommand;
 import com.drppp.drtech.common.drone.program.edit.DroneGraphEditResult;
 import com.drppp.drtech.common.drone.program.model.DroneProgramEdge;
 import com.drppp.drtech.common.drone.program.model.DroneProgramGraph;
 import com.drppp.drtech.common.drone.program.model.DroneProgramNode;
+import com.drppp.drtech.common.drone.program.model.DroneNodeDefinition;
+import com.drppp.drtech.common.drone.program.library.DroneProgramLibrary;
+import com.drppp.drtech.common.drone.program.library.DroneProgramLibraryRecord;
 import com.drppp.drtech.common.drone.program.registry.DrTechDroneNodes;
+import com.drppp.drtech.common.drone.program.registry.DroneNodeRegistry;
 import com.drppp.drtech.common.drone.program.edit.DroneProgramEditSession;
 import com.drppp.drtech.common.drone.program.runtime.DrTechDroneExecutors;
 import com.drppp.drtech.common.drone.program.runtime.DrTechDroneValueEvaluators;
@@ -41,18 +54,23 @@ import gregtech.api.metatileentity.TieredMetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.mui.GTGuis;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.oredict.OreDictionary;
+import org.lwjgl.input.Keyboard;
 
 import java.util.UUID;
 import java.util.ArrayList;
@@ -69,9 +87,19 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     private static final String EDIT_ACTION = "drone_graph_edit";
     private static final String WRITE_DRONE_ACTION = "drone_write_program";
     private static final String REMOTE_CONTROL_ACTION = "drone_remote_control";
+    private static final String NODE_LIBRARY_ACTION = "drone_node_library";
     private static final int MAX_EDIT_DISTANCE_SQUARED = 64;
     private static final int MAX_REMOTE_DEBUG_RANGE = 512;
     private static final long PROGRAM_WRITE_EU = 8_192L;
+    private static final DroneNodeRegistry NODE_LIBRARY = DrTechDroneNodes.createDefaultRegistry();
+    /** Fits the editor toolbar (ending at y=266) plus the 76px player inventory and 3px safety gap. */
+    private static final int PROGRAMMER_PANEL_HEIGHT = 352;
+    private static final int LIBRARY_PAGE_COUNT = 9;
+    private static final int FAVORITES_PAGE = 7;
+    private static final int RECENT_PAGE = 8;
+    private static final int MAX_NODE_LIBRARY_ENTRIES = 18;
+    private static final String NODE_FAVORITES_TAG = "DroneNodeFavorites";
+    private static final String NODE_RECENT_TAG = "DroneNodeRecent";
 
     private DroneProgramEditSession editSession;
     private int loadedCardFingerprint = Integer.MIN_VALUE;
@@ -85,18 +113,40 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     private int clientErrors;
     private int clientWarnings;
     private final List<String> clientDiagnosticLines = new ArrayList<>();
+    private final List<ClientDiagnostic> clientDiagnostics = new ArrayList<>();
     private final Set<UUID> clientDiagnosticNodeIds = new HashSet<>();
     private UUID clientActiveNodeId;
     private String clientRuntimeStatus = "NOT RUN";
     private boolean clientRemoteConnected;
     private String clientRemoteInfo = "Wireless: disconnected";
+    private BlockPos clientRemotePosition;
     private int clientLibraryPage;
     private int clientInspectorPage;
+    private int clientDiagnosticFilter;
+    private int clientDiagnosticPage;
     private String clientNodeSearch = "";
+    private List<ResourceLocation> clientFavoriteNodeTypes = Collections.emptyList();
+    private List<ResourceLocation> clientRecentNodeTypes = Collections.emptyList();
     private String clientFluidSearch = "";
     private int clientFluidResultIndex;
     private String clientFluidCacheQuery;
     private List<String> clientFluidResults = Collections.emptyList();
+    private String clientItemSearch = "";
+    private int clientItemResultIndex;
+    private boolean clientItemOreMode;
+    private String clientItemCacheQuery;
+    private boolean clientItemCacheOreMode;
+    private List<ClientItemResult> clientItemResults = Collections.emptyList();
+    private String clientEntitySearch = "";
+    private int clientEntityResultIndex;
+    private String clientEntityCacheQuery;
+    private List<ClientEntityResult> clientEntityResults = Collections.emptyList();
+    private String clientDockSearch = "";
+    private int clientDockResultIndex;
+    private List<ClientDockResult> clientDockDirectory = Collections.emptyList();
+    private String clientLibraryProgramSearch = "";
+    private int clientLibraryProgramResultIndex;
+    private List<ClientLibraryProgramResult> clientProgramDirectory = Collections.emptyList();
     private String clientProgramName = "";
     private boolean clientProgramNameDirty;
 
@@ -151,15 +201,18 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 packet -> writeProgramToDrone(guiData.getPlayer()));
         syncManager.registerSyncedAction(REMOTE_CONTROL_ACTION, false, true,
                 packet -> receiveRemoteControl(guiData.getPlayer(), packet.readString(24)));
+        syncManager.registerSyncedAction(NODE_LIBRARY_ACTION, false, true,
+                packet -> receiveNodeLibraryAction(guiData.getPlayer(), packet.readString(64), packet.readBoolean()));
         syncManager.addOpenListener(this::onEditorOpened);
         syncManager.addCloseListener(this::onEditorClosed);
 
         DroneProgramCanvasWidget canvas = new DroneProgramCanvasWidget(this::getClientGraph,
                 command -> sendEditCommand(syncManager, command), () -> clientEditable,
-                this::getClientDiagnosticNodeIds, () -> clientActiveNodeId)
+                this::getClientDiagnosticNodeIds, () -> clientActiveNodeId,
+                this::getClientDockCapturePosition, this::getClientRemoteCapturePosition)
                 .pos(91, 24).size(281, 222);
 
-        return GTGuis.createPanel(this, 520, 376)
+        return GTGuis.createPanel(this, 520, PROGRAMMER_PANEL_HEIGHT)
                 .child(IKey.lang(getMetaFullName()).asWidget().pos(5, 5))
                 .child(IKey.lang("drtech.drone.programmer.program_name").asWidget().pos(91, 8).size(34, 10))
                 .child(new TextFieldWidget().pos(126, 4).size(190, 16).setMaxLength(64)
@@ -178,7 +231,15 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .pos(49, 24))
                 .child(new ButtonWidget<>().pos(5, 45).size(81, 16)
                         .overlay(IKey.lang("drtech.drone.programmer.write_drone"))
-                        .onMousePressed(mouse -> { syncManager.callSyncedAction(WRITE_DRONE_ACTION); return true; }))
+                        .onMousePressed(mouse -> {
+                            if (clientErrors > 0) {
+                                clientInspectorPage = 2;
+                                clientDiagnosticFilter = 1;
+                                clientDiagnosticPage = 0;
+                            }
+                            syncManager.callSyncedAction(WRITE_DRONE_ACTION);
+                            return true;
+                        }))
                 .child(IKey.lang("drtech.drone.programmer.search").asWidget().pos(5, 68).size(20, 10))
                 .child(new TextFieldWidget().pos(27, 65).size(59, 16).setMaxLength(32)
                         .value(new StringValue.Dynamic(() -> clientNodeSearch, value -> clientNodeSearch = value)))
@@ -197,6 +258,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(pagedSmallNodeButton(0, DrTechDroneNodes.BIND_DOCK, 5, 188, syncManager))
                 .child(pagedSmallNodeButton(0, DrTechDroneNodes.UNBIND_DOCK, 47, 188, syncManager))
                 .child(pagedSmallNodeButton(0, DrTechDroneNodes.CONFIGURE_SAFETY, 5, 203, syncManager))
+                .child(pagedSmallNodeButton(0, DrTechDroneNodes.COMMENT, 47, 203, syncManager))
 
                 .child(pagedSmallNodeButton(1, DrTechDroneNodes.BREAK_BLOCK_AT, 5, 83, syncManager))
                 .child(pagedSmallNodeButton(1, DrTechDroneNodes.PLACE_BLOCK, 47, 83, syncManager))
@@ -215,6 +277,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(pagedSmallNodeButton(1, DrTechDroneNodes.IMPORT_EU, 5, 188, syncManager))
                 .child(pagedSmallNodeButton(1, DrTechDroneNodes.EXPORT_EU, 47, 188, syncManager))
                 .child(pagedSmallNodeButton(1, DrTechDroneNodes.CHARGE_TARGET_PERCENT, 5, 203, syncManager))
+                .child(pagedSmallNodeButton(1, DrTechDroneNodes.CRAFT_ITEMS, 47, 203, syncManager))
 
                 .child(pagedSmallNodeButton(4, DrTechDroneNodes.IMPORT_FLUID, 5, 83, syncManager))
                 .child(pagedSmallNodeButton(4, DrTechDroneNodes.EXPORT_FLUID, 47, 83, syncManager))
@@ -225,6 +288,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(pagedSmallNodeButton(4, DrTechDroneNodes.CONTAINER_FLUID_AMOUNT, 5, 128, syncManager))
                 .child(pagedSmallNodeButton(4, DrTechDroneNodes.FIND_FLUID_CONTAINER, 47, 128, syncManager))
                 .child(pagedSmallNodeButton(4, DrTechDroneNodes.WAIT_FOR_FLUID_AMOUNT, 5, 143, syncManager))
+                .child(pagedSmallNodeButton(4, DrTechDroneNodes.GROUP, 47, 143, syncManager))
 
                 .child(pagedSmallNodeButton(2, DrTechDroneNodes.NUMBER, 5, 83, syncManager))
                 .child(pagedSmallNodeButton(2, DrTechDroneNodes.BOOLEAN, 47, 83, syncManager))
@@ -240,6 +304,10 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(pagedSmallNodeButton(2, DrTechDroneNodes.SET_NUMBER_VARIABLE, 47, 158, syncManager))
                 .child(pagedSmallNodeButton(2, DrTechDroneNodes.ADD_NUMBER_VARIABLE, 5, 173, syncManager))
                 .child(pagedSmallNodeButton(2, DrTechDroneNodes.ENERGY_LEVEL, 47, 173, syncManager))
+                .child(pagedSmallNodeButton(2, DrTechDroneNodes.CAN_CRAFT, 5, 188, syncManager))
+                .child(pagedSmallNodeButton(2, DrTechDroneNodes.CRAFTABLE_COUNT, 47, 188, syncManager))
+                .child(pagedSmallNodeButton(2, DrTechDroneNodes.ENTITY_FILTER, 5, 203, syncManager))
+                .child(pagedSmallNodeButton(2, DrTechDroneNodes.DOCK_REFERENCE, 47, 203, syncManager))
 
                 .child(pagedSmallNodeButton(5, DrTechDroneNodes.SPHERE_AREA, 5, 83, syncManager))
                 .child(pagedSmallNodeButton(5, DrTechDroneNodes.CYLINDER_AREA, 47, 83, syncManager))
@@ -251,6 +319,23 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(pagedSmallNodeButton(5, DrTechDroneNodes.AREA_CONTAINS, 47, 128, syncManager))
                 .child(pagedSmallNodeButton(5, DrTechDroneNodes.AREA_VOLUME, 5, 143, syncManager))
                 .child(pagedSmallNodeButton(5, DrTechDroneNodes.PLANE_AREA, 47, 143, syncManager))
+                .child(pagedSmallNodeButton(5, DrTechDroneNodes.AREA_EXPAND, 5, 158, syncManager))
+                .child(pagedSmallNodeButton(5, DrTechDroneNodes.AREA_INSET, 47, 158, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.CRAFT_GRID, 5, 83, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.SET_MACHINE_WORKING, 47, 83, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.WAIT_MACHINE_IDLE, 5, 98, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_ACTIVE, 47, 98, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_ENABLED, 5, 113, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_PROGRESS, 47, 113, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.WAIT_MACHINE_CYCLE, 5, 128, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_WAITING_INPUT, 47, 128, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_OUTPUT_BLOCKED, 5, 143, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_LOW_ENERGY, 47, 143, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_DIAGNOSTIC, 5, 158, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.REPAIR_MACHINE, 47, 158, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_NEEDS_MAINTENANCE, 5, 173, syncManager))
+                .child(pagedSmallNodeButton(6, DrTechDroneNodes.MACHINE_MAINTENANCE_PROBLEMS, 47, 173, syncManager))
+                .child(pagedNodeButton(6, DrTechDroneNodes.PROGRAM_REFERENCE, 5, 188, syncManager))
                 .child(pagedSmallNodeButton(3, DrTechDroneNodes.CARGO_ITEM_COUNT, 5, 83, syncManager))
                 .child(pagedSmallNodeButton(3, DrTechDroneNodes.CARGO_FREE_SLOTS, 47, 83, syncManager))
                 .child(pagedSmallNodeButton(3, DrTechDroneNodes.CARGO_USED_PERCENT, 5, 98, syncManager))
@@ -268,8 +353,47 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(pagedSmallNodeButton(3, DrTechDroneNodes.TARGET_ENERGY, 5, 188, syncManager))
                 .child(pagedSmallNodeButton(3, DrTechDroneNodes.TARGET_ENERGY_CAPACITY, 47, 188, syncManager))
                 .child(pagedSmallNodeButton(3, DrTechDroneNodes.TARGET_ENERGY_PERCENT, 5, 203, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 0, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 1, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 2, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 3, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 4, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 5, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 6, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 7, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 8, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 9, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 10, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 11, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 12, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 13, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 14, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 15, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 16, syncManager))
+                .child(quickNodeButton(FAVORITES_PAGE, 17, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 0, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 1, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 2, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 3, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 4, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 5, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 6, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 7, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 8, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 9, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 10, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 11, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 12, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 13, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 14, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 15, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 16, syncManager))
+                .child(quickNodeButton(RECENT_PAGE, 17, syncManager))
                 .child(new ButtonWidget<>().pos(5, 225).size(23, 16).overlay(IKey.str("<"))
-                        .onMousePressed(mouse -> { clientLibraryPage = (clientLibraryPage + 5) % 6; return true; }))
+                        .onMousePressed(mouse -> {
+                            clientLibraryPage = (clientLibraryPage + LIBRARY_PAGE_COUNT - 1) % LIBRARY_PAGE_COUNT;
+                            return true;
+                        }))
                 .child(IKey.lang("drtech.drone.programmer.page.flow").asWidget().pos(31, 229).size(29, 10)
                         .setEnabledIf(widget -> clientLibraryPage == 0))
                 .child(IKey.lang("drtech.drone.programmer.page.world").asWidget().pos(31, 229).size(29, 10)
@@ -282,33 +406,61 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .setEnabledIf(widget -> clientLibraryPage == 4))
                 .child(IKey.lang("drtech.drone.programmer.page.areas").asWidget().pos(31, 229).size(29, 10)
                         .setEnabledIf(widget -> clientLibraryPage == 5))
+                .child(IKey.lang("drtech.drone.programmer.page.machines").asWidget().pos(31, 229).size(29, 10)
+                        .setEnabledIf(widget -> clientLibraryPage == 6))
+                .child(IKey.lang("drtech.drone.programmer.page.favorites").asWidget().pos(31, 229).size(29, 10)
+                        .setEnabledIf(widget -> clientLibraryPage == FAVORITES_PAGE))
+                .child(IKey.lang("drtech.drone.programmer.page.recent").asWidget().pos(31, 229).size(29, 10)
+                        .setEnabledIf(widget -> clientLibraryPage == RECENT_PAGE))
                 .child(new ButtonWidget<>().pos(63, 225).size(23, 16).overlay(IKey.str(">"))
-                        .onMousePressed(mouse -> { clientLibraryPage = (clientLibraryPage + 1) % 6; return true; }))
-                .child(new ButtonWidget<>().pos(91, 250).size(37, 16).overlay(IKey.lang("drtech.drone.programmer.delete"))
+                        .onMousePressed(mouse -> {
+                            clientLibraryPage = (clientLibraryPage + 1) % LIBRARY_PAGE_COUNT;
+                            return true;
+                        }))
+                .child(new ButtonWidget<>().pos(91, 250).size(30, 16).overlay(IKey.lang("drtech.drone.programmer.delete"))
                         .onMousePressed(mouse -> { canvas.deleteSelected(); return true; }))
-                .child(new ButtonWidget<>().pos(131, 250).size(37, 16).overlay(IKey.lang("drtech.drone.programmer.reset"))
-                        .onMousePressed(mouse -> { canvas.resetView(); return true; }))
-                .child(new ButtonWidget<>().pos(171, 250).size(37, 16).overlay(IKey.lang("drtech.drone.programmer.undo"))
+                .child(new ButtonWidget<>().pos(122, 250).size(30, 16).overlay(IKey.lang("drtech.drone.programmer.reset"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.reset.help")))
+                        .onMousePressed(mouse -> { canvas.resetViewOrAutoLayout(); return true; }))
+                .child(new ButtonWidget<>().pos(153, 250).size(30, 16).overlay(IKey.lang("drtech.drone.programmer.undo"))
                         .onMousePressed(mouse -> { sendHistoryCommand(syncManager, true); return true; }))
-                .child(new ButtonWidget<>().pos(211, 250).size(37, 16).overlay(IKey.lang("drtech.drone.programmer.redo"))
+                .child(new ButtonWidget<>().pos(184, 250).size(30, 16).overlay(IKey.lang("drtech.drone.programmer.redo"))
                         .onMousePressed(mouse -> { sendHistoryCommand(syncManager, false); return true; }))
-                .child(new ButtonWidget<>().pos(251, 250).size(37, 16).overlay(IKey.lang("drtech.drone.programmer.copy"))
+                .child(new ButtonWidget<>().pos(215, 250).size(30, 16).overlay(IKey.lang("drtech.drone.programmer.copy"))
                         .onMousePressed(mouse -> { canvas.copySelected(); return true; }))
-                .child(new ButtonWidget<>().pos(291, 250).size(37, 16).overlay(IKey.lang("drtech.drone.programmer.paste"))
+                .child(new ButtonWidget<>().pos(246, 250).size(30, 16).overlay(IKey.lang("drtech.drone.programmer.paste"))
                         .setEnabledIf(widget -> canvas.hasCopiedNode())
                         .onMousePressed(mouse -> { canvas.pasteCopiedNode(); return true; }))
-                .child(new ButtonWidget<>().pos(331, 250).size(41, 16).overlay(IKey.lang("drtech.drone.programmer.fit_all"))
-                        .onMousePressed(mouse -> { canvas.fitAll(); return true; }))
-                .child(new ButtonWidget<>().pos(379, 24).size(65, 16)
+                .child(new ButtonWidget<>().pos(277, 250).size(30, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.align_horizontal"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.align_horizontal.help")))
+                        .setEnabledIf(widget -> clientEditable && canvas.getSelectionCount() > 1)
+                        .onMousePressed(mouse -> { canvas.alignSelectedHorizontal(); return true; }))
+                .child(new ButtonWidget<>().pos(308, 250).size(30, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.align_vertical"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.align_vertical.help")))
+                        .setEnabledIf(widget -> clientEditable && canvas.getSelectionCount() > 1)
+                        .onMousePressed(mouse -> { canvas.alignSelectedVertical(); return true; }))
+                .child(new ButtonWidget<>().pos(339, 250).size(33, 16)
+                        .overlay(IKey.dynamic(() -> I18n.format(canvas.getSelectionCount() > 0
+                                ? "drtech.drone.programmer.fit_selection" : "drtech.drone.programmer.fit_all")))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.fit.help")))
+                        .onMousePressed(mouse -> { canvas.fitSelectionOrAll(); return true; }))
+                .child(new ButtonWidget<>().pos(379, 24).size(42, 16)
                         .overlay(IKey.dynamic(() -> I18n.format(clientInspectorPage == 0
-                                ? "drtech.drone.programmer.inspector.active"
-                                : "drtech.drone.programmer.inspector")))
+                                ? "drtech.drone.programmer.inspector.short_active"
+                                : "drtech.drone.programmer.inspector.short")))
                         .onMousePressed(mouse -> { clientInspectorPage = 0; return true; }))
-                .child(new ButtonWidget<>().pos(447, 24).size(65, 16)
+                .child(new ButtonWidget<>().pos(423, 24).size(43, 16)
                         .overlay(IKey.dynamic(() -> I18n.format(clientInspectorPage == 1
-                                ? "drtech.drone.programmer.remote.active"
-                                : "drtech.drone.programmer.remote")))
+                                ? "drtech.drone.programmer.remote.short_active"
+                                : "drtech.drone.programmer.remote.short")))
                         .onMousePressed(mouse -> { clientInspectorPage = 1; return true; }))
+                .child(new ButtonWidget<>().pos(468, 24).size(44, 16)
+                        .overlay(IKey.dynamic(() -> I18n.format(clientInspectorPage == 2
+                                ? "drtech.drone.programmer.diagnostics.active"
+                                : "drtech.drone.programmer.diagnostics")))
+                        .onMousePressed(mouse -> { clientInspectorPage = 2; return true; }))
                 .child(IKey.dynamic(canvas::getSelectedDescription).asWidget().pos(379, 44).size(133, 25)
                         .setEnabledIf(widget -> clientInspectorPage == 0))
                 .child(IKey.dynamic(canvas::getSelectedPropertySummary).asWidget().pos(379, 72).size(134, 24)
@@ -317,6 +469,12 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .setEnabledIf(widget -> clientInspectorPage == 0))
                 .child(actionButton(">", 416, 99, canvas::selectNextProperty)
                         .setEnabledIf(widget -> clientInspectorPage == 0))
+                .child(new ButtonWidget<>().pos(454, 99).size(59, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.property_reset_default"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(
+                                IKey.lang("drtech.drone.programmer.property_reset_default.help")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canResetSelectedProperty())
+                        .onMousePressed(mouse -> { canvas.resetSelectedPropertyToDefault(); return true; }))
                 .child(actionButton("-", 379, 118, () -> canvas.adjustSelectedProperty(-1))
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedPropertyNumeric()))
                 .child(actionButton("+", 416, 118, () -> canvas.adjustSelectedProperty(1))
@@ -324,22 +482,52 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(new ButtonWidget<>().pos(379, 137).size(35, 16)
                         .overlay(IKey.dynamic(canvas::getSelectedPropertyActionLabel))
                         .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()
+                                && !canvas.isSelectedItemSelector() && !canvas.isSelectedEntitySelector()
+                                && !canvas.isSelectedDockReference()
+                                && !canvas.isSelectedProgramReference()
+                                && !canvas.isSelectedBlockSelector()
+                                && !canvas.isSelectedChoiceProperty()
+                                && !canvas.isSelectedLongTextProperty()
                                 && canvas.canActivateSelectedProperty())
                         .onMousePressed(mouse -> { canvas.activateSelectedProperty(); return true; }))
                 .child(actionButton(IKey.lang("drtech.drone.programmer.clear"), 416, 137,
                         canvas::clearSelectedProperty)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()
+                                && !canvas.isSelectedItemSelector() && !canvas.isSelectedEntitySelector()
+                                && !canvas.isSelectedDockReference()
+                                && !canvas.isSelectedProgramReference()
+                                && !canvas.isSelectedBlockSelector()
+                                && !canvas.isSelectedChoiceProperty()
+                                && !canvas.isSelectedLongTextProperty()))
                 .child(new TextFieldWidget().pos(379, 156).size(134, 16).setMaxLength(128)
-                        .setEnabledIf(widget -> clientInspectorPage == 0
-                                && canvas.isSelectedPropertyTextEditable() && !canvas.isSelectedFluidSelector())
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedInlineTextProperty())
                         .value(new StringValue.Dynamic(canvas::getSelectedPropertyInputText,
                                 canvas::setSelectedPropertyInputText)))
+                .child(IKey.dynamic(canvas::getSelectedPropertyValidationMessage).asWidget().pos(379, 175).size(134, 16)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedInlineTextProperty()))
+                .child(new DroneMultilineTextWidget(canvas::getSelectedPropertyInputText,
+                        canvas::setSelectedPropertyInputText, 1024, 32)
+                        .pos(379, 118).size(134, 73)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedLongTextProperty()))
+                .child(new ButtonWidget<>().pos(379, 195).size(65, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.apply"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedLongTextProperty())
+                        .onMousePressed(mouse -> { canvas.activateSelectedProperty(); return true; }))
+                .child(new ButtonWidget<>().pos(448, 195).size(65, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.clear"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedLongTextProperty())
+                        .onMousePressed(mouse -> { canvas.clearSelectedProperty(); return true; }))
+                .child(IKey.lang("drtech.drone.programmer.multiline_help").asWidget()
+                        .pos(379, 214).size(134, 27)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedLongTextProperty()))
                 .child(actionButton(IKey.lang("drtech.drone.programmer.filter_mode"), 379, 175,
                         canvas::toggleSelectedItemFilterMode)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemFilter()))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemFilter()
+                                && !canvas.isSelectedItemSelector() && !canvas.isSelectedBlockSelector()))
                 .child(actionButton(IKey.lang("drtech.drone.programmer.remove_rule"), 416, 175,
                         canvas::removeLastSelectedItemFilterRule)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemFilter()))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemFilter()
+                                && !canvas.isSelectedItemSelector() && !canvas.isSelectedBlockSelector()))
                 .child(IKey.lang("drtech.drone.programmer.fluid_search").asWidget().pos(379, 122).size(24, 10)
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedFluidSelector()))
                 .child(new TextFieldWidget().pos(404, 118).size(109, 16).setMaxLength(64)
@@ -369,17 +557,212 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(IKey.lang("drtech.drone.programmer.fluid_selector_help").asWidget()
                         .pos(379, 195).size(134, 45)
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedFluidSelector()))
+                .child(IKey.dynamic(() -> I18n.format(clientItemOreMode
+                        ? "drtech.drone.programmer.ore_search"
+                        : "drtech.drone.programmer.item_search")).asWidget().pos(379, 122).size(24, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector()))
+                .child(new TextFieldWidget().pos(404, 118).size(109, 16).setMaxLength(96)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector())
+                        .value(new StringValue.Dynamic(this::getClientItemSearch, this::setClientItemSearch)))
+                .child(new ButtonWidget<>().pos(379, 137).size(134, 16)
+                        .overlay(IKey.dynamic(this::getClientItemResultLabel))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(this::getClientItemResultTooltip)))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector())
+                        .onMousePressed(mouse -> { selectClientItemResult(canvas); return true; }))
+                .child(actionButton("<", 379, 156, () -> moveClientItemResult(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector()
+                                && hasClientItemResult()))
+                .child(actionButton(">", 416, 156, () -> moveClientItemResult(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector()
+                                && hasClientItemResult()))
+                .child(IKey.dynamic(this::getClientItemResultPage).asWidget().pos(454, 160).size(59, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector()))
+                .child(new ButtonWidget<>().pos(379, 175).size(72, 16)
+                        .overlay(IKey.dynamic(() -> I18n.format(clientItemOreMode
+                                ? "drtech.drone.programmer.mode_ore"
+                                : "drtech.drone.programmer.mode_registry")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector())
+                        .onMousePressed(mouse -> { toggleClientItemSearchMode(); return true; }))
+                .child(new ButtonWidget<>().pos(453, 175).size(60, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.remove_rule"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector())
+                        .onMousePressed(mouse -> { canvas.removeLastSelectedItemFilterRule(); return true; }))
+                .child(new ButtonWidget<>().pos(379, 195).size(72, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.held_item"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector())
+                        .onMousePressed(mouse -> { canvas.activateSelectedProperty(); return true; }))
+                .child(new ButtonWidget<>().pos(453, 195).size(60, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.clear"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector())
+                        .onMousePressed(mouse -> { canvas.clearSelectedProperty(); return true; }))
+                .child(IKey.lang("drtech.drone.programmer.item_selector_help").asWidget()
+                        .pos(379, 214).size(134, 27)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedItemSelector()))
+                .child(IKey.lang("drtech.drone.programmer.entity_search").asWidget().pos(379, 122).size(24, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(new TextFieldWidget().pos(404, 118).size(109, 16).setMaxLength(96)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
+                        .value(new StringValue.Dynamic(this::getClientEntitySearch, this::setClientEntitySearch)))
+                .child(new ButtonWidget<>().pos(379, 137).size(134, 16)
+                        .overlay(IKey.dynamic(this::getClientEntityResultLabel))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(this::getClientEntityResultTooltip)))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
+                        .onMousePressed(mouse -> { selectClientEntityResult(canvas); return true; }))
+                .child(actionButton("<", 379, 156, () -> moveClientEntityResult(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()
+                                && hasClientEntityResult()))
+                .child(actionButton(">", 416, 156, () -> moveClientEntityResult(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()
+                                && hasClientEntityResult()))
+                .child(IKey.dynamic(this::getClientEntityResultPage).asWidget().pos(454, 160).size(59, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(new ButtonWidget<>().pos(379, 175).size(72, 16)
+                        .overlay(IKey.dynamic(canvas::getSelectedEntityFilterModeLabel))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
+                        .onMousePressed(mouse -> { canvas.toggleSelectedEntityFilterMode(); return true; }))
+                .child(new ButtonWidget<>().pos(453, 175).size(60, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.remove_rule"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
+                        .onMousePressed(mouse -> { canvas.removeLastSelectedEntityFilterRule(); return true; }))
+                .child(new ButtonWidget<>().pos(379, 195).size(134, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.clear"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
+                        .onMousePressed(mouse -> { canvas.clearSelectedProperty(); return true; }))
+                .child(IKey.lang("drtech.drone.programmer.entity_selector_help").asWidget()
+                        .pos(379, 214).size(134, 27)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(IKey.lang("drtech.drone.programmer.dock_search").asWidget().pos(379, 122).size(24, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference()))
+                .child(new TextFieldWidget().pos(404, 118).size(109, 16).setMaxLength(96)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference())
+                        .value(new StringValue.Dynamic(this::getClientDockSearch, this::setClientDockSearch)))
+                .child(new ButtonWidget<>().pos(379, 137).size(134, 16)
+                        .overlay(IKey.dynamic(this::getClientDockResultLabel))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(this::getClientDockResultTooltip)))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference())
+                        .onMousePressed(mouse -> { selectClientDockResult(canvas); return true; }))
+                .child(actionButton("<", 379, 156, () -> moveClientDockResult(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference()
+                                && hasClientDockResult()))
+                .child(actionButton(">", 416, 156, () -> moveClientDockResult(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference()
+                                && hasClientDockResult()))
+                .child(IKey.dynamic(this::getClientDockResultPage).asWidget().pos(454, 160).size(59, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference()))
+                .child(IKey.dynamic(() -> getClientDockResultStatus(canvas)).asWidget().pos(379, 175).size(134, 16)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference()))
+                .child(new ButtonWidget<>().pos(379, 195).size(134, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.clear"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference())
+                        .onMousePressed(mouse -> { canvas.clearSelectedProperty(); return true; }))
+                .child(IKey.lang("drtech.drone.programmer.dock_selector_help").asWidget()
+                        .pos(379, 214).size(134, 27)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference()))
+                .child(IKey.lang("drtech.drone.programmer.program_search").asWidget().pos(379, 122).size(24, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference()))
+                .child(new TextFieldWidget().pos(404, 118).size(109, 16).setMaxLength(96)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference())
+                        .value(new StringValue.Dynamic(this::getClientLibraryProgramSearch,
+                                this::setClientLibraryProgramSearch)))
+                .child(new ButtonWidget<>().pos(379, 137).size(134, 16)
+                        .overlay(IKey.dynamic(this::getClientLibraryProgramResultLabel))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(this::getClientLibraryProgramTooltip)))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference())
+                        .onMousePressed(mouse -> { selectClientLibraryProgramResult(canvas); return true; }))
+                .child(actionButton("<", 379, 156, () -> moveClientLibraryProgramResult(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference()
+                                && hasClientLibraryProgramResult()))
+                .child(actionButton(">", 416, 156, () -> moveClientLibraryProgramResult(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference()
+                                && hasClientLibraryProgramResult()))
+                .child(IKey.dynamic(this::getClientLibraryProgramPage).asWidget().pos(454, 160).size(59, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference()))
+                .child(IKey.dynamic(() -> getClientLibraryProgramStatus(canvas)).asWidget()
+                        .pos(379, 175).size(134, 16)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference()))
+                .child(new ButtonWidget<>().pos(379, 195).size(134, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.clear"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference())
+                        .onMousePressed(mouse -> { canvas.clearSelectedProperty(); return true; }))
+                .child(IKey.lang("drtech.drone.programmer.program_selector_help").asWidget()
+                        .pos(379, 214).size(134, 27)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedProgramReference()))
+                .child(new ButtonWidget<>().pos(379, 118).size(72, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.target_block"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector())
+                        .onMousePressed(mouse -> { canvas.activateSelectedProperty(); return true; }))
+                .child(new ButtonWidget<>().pos(453, 118).size(60, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.clear"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector())
+                        .onMousePressed(mouse -> { canvas.clearSelectedProperty(); return true; }))
+                .child(new ButtonWidget<>().pos(379, 137).size(134, 16)
+                        .overlay(IKey.dynamic(canvas::getSelectedBlockStatePropertyLabel))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.block_state_cycle_help")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector())
+                        .onMousePressed(mouse -> { canvas.cycleSelectedBlockStatePropertyValue(); return true; }))
+                .child(actionButton("<", 379, 156, () -> canvas.moveSelectedBlockStateProperty(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector()
+                                && canvas.hasSelectedBlockStateProperty()))
+                .child(actionButton(">", 416, 156, () -> canvas.moveSelectedBlockStateProperty(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector()
+                                && canvas.hasSelectedBlockStateProperty()))
+                .child(IKey.dynamic(canvas::getSelectedBlockStatePropertyPage).asWidget().pos(454, 160).size(59, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector()))
+                .child(new ButtonWidget<>().pos(379, 175).size(72, 16)
+                        .overlay(IKey.dynamic(canvas::getSelectedBlockFilterModeLabel))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector())
+                        .onMousePressed(mouse -> { canvas.toggleSelectedItemFilterMode(); return true; }))
+                .child(new ButtonWidget<>().pos(453, 175).size(60, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.remove_rule"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector())
+                        .onMousePressed(mouse -> { canvas.removeLastSelectedItemFilterRule(); return true; }))
+                .child(IKey.lang("drtech.drone.programmer.block_state_selector_help").asWidget()
+                        .pos(379, 195).size(134, 46)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedBlockSelector()))
                 .child(IKey.lang("drtech.drone.programmer.node_label").asWidget().pos(379, 195)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()
+                                && !canvas.isSelectedItemSelector() && !canvas.isSelectedEntitySelector()
+                                && !canvas.isSelectedBlockSelector()
+                                && !canvas.isSelectedAreaPreviewNode()
+                                && !canvas.isSelectedChoiceProperty()
+                                && !canvas.isSelectedCoordinateCaptureTarget()))
                 .child(new TextFieldWidget().pos(379, 206).size(134, 16).setMaxLength(32)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector())
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()
+                                && !canvas.isSelectedItemSelector() && !canvas.isSelectedEntitySelector()
+                                && !canvas.isSelectedBlockSelector()
+                                && !canvas.isSelectedAreaPreviewNode()
+                                && !canvas.isSelectedChoiceProperty()
+                                && !canvas.isSelectedCoordinateCaptureTarget())
                         .value(new StringValue.Dynamic(canvas::getSelectedNodeLabel, canvas::setSelectedNodeLabel)))
                 .child(new ButtonWidget<>().pos(379, 225).size(134, 16)
                         .overlay(IKey.lang("drtech.drone.programmer.breakpoint"))
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector())
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()
+                                && !canvas.isSelectedItemSelector() && !canvas.isSelectedEntitySelector()
+                                && !canvas.isSelectedBlockSelector() && !canvas.isSelectedAreaPreviewNode()
+                                && !canvas.isSelectedCoordinateCaptureTarget())
                         .onMousePressed(mouse -> { canvas.toggleSelectedBreakpoint(); return true; }))
-                .child(IKey.dynamic(this::getDiagnosticsText).asWidget().pos(379, 244).size(134, 22)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && !canvas.isSelectedFluidSelector()))
+                .child(new ButtonWidget<>().pos(379, 195).size(65, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.capture_player"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_help")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCapturePlayerCoordinate())
+                        .onMousePressed(mouse -> { canvas.capturePlayerCoordinate(); return true; }))
+                .child(new ButtonWidget<>().pos(448, 195).size(65, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.capture_target"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_help")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureTargetedCoordinate())
+                        .onMousePressed(mouse -> { canvas.captureTargetedCoordinate(); return true; }))
+                .child(new ButtonWidget<>().pos(379, 213).size(65, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.capture_dock"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_dock.help")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureDockCoordinate())
+                        .onMousePressed(mouse -> { canvas.captureDockCoordinate(); return true; }))
+                .child(new ButtonWidget<>().pos(448, 213).size(65, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.capture_drone"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_drone.help")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureDroneCoordinate())
+                        .onMousePressed(mouse -> { canvas.captureDroneCoordinate(); return true; }))
+                .child(IKey.lang("drtech.drone.programmer.capture_area_corner_help").asWidget().pos(379, 232).size(134, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedCoordinateCaptureTarget()))
                 .child(IKey.dynamic(this::getRemoteDebugText).asWidget().pos(379, 44).size(134, 197)
                         .setEnabledIf(widget -> clientInspectorPage == 1))
                 .child(remoteButton(IKey.lang("drtech.drone.controller.pause"), "PAUSE", 379, 250, syncManager)
@@ -388,8 +771,36 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .setEnabledIf(widget -> clientInspectorPage == 1))
                 .child(remoteButton(IKey.lang("drtech.drone.controller.step"), "STEP", 429, 250, syncManager)
                         .setEnabledIf(widget -> clientInspectorPage == 1))
-                .child(SlotGroupWidget.playerInventory(false).left(7).bottom(7))
-                .child(canvas);
+                .child(IKey.dynamic(this::getDiagnosticSummary).asWidget().pos(379, 45).size(134, 16)
+                        .setEnabledIf(widget -> clientInspectorPage == 2))
+                .child(diagnosticFilterButton(0, 379))
+                .child(diagnosticFilterButton(1, 413))
+                .child(diagnosticFilterButton(2, 447))
+                .child(diagnosticFilterButton(3, 481))
+                .child(new DroneDiagnosticScrollWidget(this::moveDiagnosticPage).pos(379, 82).size(134, 110)
+                        .setEnabledIf(widget -> clientInspectorPage == 2))
+                .child(diagnosticRowButton(canvas, 0, 84))
+                .child(diagnosticRowButton(canvas, 1, 121))
+                .child(diagnosticRowButton(canvas, 2, 158))
+                .child(actionButton("<", 379, 197, () -> moveDiagnosticPage(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 2 && getDiagnosticPageCount() > 1))
+                .child(actionButton(">", 416, 197, () -> moveDiagnosticPage(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 2 && getDiagnosticPageCount() > 1))
+                .child(IKey.dynamic(this::getDiagnosticPageLabel).asWidget().pos(454, 201).size(59, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 2))
+                .child(IKey.lang("drtech.drone.diagnostic.click_to_locate").asWidget().pos(379, 219).size(134, 42)
+                        .setEnabledIf(widget -> clientInspectorPage == 2))
+                .child(SlotGroupWidget.playerInventory(false).disableSortButtons().left(7).bottom(7))
+                .child(canvas)
+                .child(IKey.dynamic(canvas::getSelectedAreaPreviewStatus).asWidget().pos(379, 174).size(134, 10)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedAreaPreviewNode()))
+                .child(new DroneAreaPreviewWidget(canvas::getSelectedAreaPreview,
+                        canvas::getSelectedAreaPreviewStatus).pos(379, 185).size(134, 56)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedAreaPreviewNode()))
+                .child(new DronePropertyChoiceWidget(canvas::getSelectedChoiceValues,
+                        canvas::getSelectedChoiceValue, canvas::isSelectedDirectionProperty,
+                        canvas::selectPropertyChoice).pos(379, 118).size(134, 88)
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedChoiceProperty()));
     }
 
     private String getClientFluidSearch() {
@@ -473,22 +884,418 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         }
     }
 
+    private String getClientItemSearch() {
+        return clientItemSearch;
+    }
+
+    private void setClientItemSearch(String value) {
+        clientItemSearch = value == null ? "" : value;
+        clientItemResultIndex = 0;
+        clientItemCacheQuery = null;
+    }
+
+    private void toggleClientItemSearchMode() {
+        clientItemOreMode = !clientItemOreMode;
+        clientItemResultIndex = 0;
+        clientItemCacheQuery = null;
+    }
+
+    private List<ClientItemResult> getClientItemResults() {
+        String query = clientItemSearch == null ? ""
+                : clientItemSearch.trim().toLowerCase(Locale.ROOT);
+        if (query.equals(clientItemCacheQuery) && clientItemOreMode == clientItemCacheOreMode) {
+            return clientItemResults;
+        }
+        List<ClientItemResult> matches = new ArrayList<>();
+        if (clientItemOreMode) {
+            for (String oreName : OreDictionary.getOreNames()) {
+                if (query.isEmpty() || oreName.toLowerCase(Locale.ROOT).contains(query)) {
+                    matches.add(new ClientItemResult(oreName, getOreDisplayName(oreName), true));
+                }
+            }
+        } else {
+            for (Item item : Item.REGISTRY) {
+                ResourceLocation id = item.getRegistryName();
+                if (id == null) continue;
+                String localized = getLocalizedItemName(item);
+                if (query.isEmpty() || id.toString().toLowerCase(Locale.ROOT).contains(query)
+                        || localized.toLowerCase(Locale.ROOT).contains(query)) {
+                    matches.add(new ClientItemResult(id.toString(), localized, false));
+                }
+            }
+        }
+        matches.sort((left, right) -> String.CASE_INSENSITIVE_ORDER.compare(left.value, right.value));
+        clientItemCacheQuery = query;
+        clientItemCacheOreMode = clientItemOreMode;
+        clientItemResults = Collections.unmodifiableList(matches);
+        if (matches.isEmpty()) clientItemResultIndex = 0;
+        else clientItemResultIndex = Math.floorMod(clientItemResultIndex, matches.size());
+        return clientItemResults;
+    }
+
+    private boolean hasClientItemResult() {
+        return !getClientItemResults().isEmpty();
+    }
+
+    private ClientItemResult getClientItemResult() {
+        List<ClientItemResult> results = getClientItemResults();
+        return results.isEmpty() ? null
+                : results.get(Math.floorMod(clientItemResultIndex, results.size()));
+    }
+
+    private String getClientItemResultLabel() {
+        ClientItemResult result = getClientItemResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.item_no_results");
+        String label = result.ore ? result.value : result.displayName;
+        if (label == null || label.isEmpty()) label = result.value;
+        return label.length() > 20 ? label.substring(0, 19) + "..." : label;
+    }
+
+    private String getClientItemResultTooltip() {
+        ClientItemResult result = getClientItemResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.item_no_results");
+        if (result.ore) return result.value + (result.displayName.isEmpty() ? "" : " | " + result.displayName);
+        return result.displayName + " | " + result.value;
+    }
+
+    private String getClientItemResultPage() {
+        List<ClientItemResult> results = getClientItemResults();
+        return results.isEmpty() ? "0/0" : (clientItemResultIndex + 1) + "/" + results.size();
+    }
+
+    private void moveClientItemResult(int delta) {
+        List<ClientItemResult> results = getClientItemResults();
+        if (!results.isEmpty()) clientItemResultIndex = Math.floorMod(clientItemResultIndex + delta, results.size());
+    }
+
+    private void selectClientItemResult(DroneProgramCanvasWidget canvas) {
+        ClientItemResult result = getClientItemResult();
+        if (result == null) return;
+        if (result.ore) canvas.selectOreDictionaryProperty(result.value);
+        else canvas.selectRegistryItemProperty(result.value);
+    }
+
+    private static String getLocalizedItemName(Item item) {
+        try {
+            return new ItemStack(item).getDisplayName();
+        } catch (RuntimeException ignored) {
+            ResourceLocation id = item.getRegistryName();
+            return id == null ? "" : id.toString();
+        }
+    }
+
+    private static String getOreDisplayName(String oreName) {
+        List<ItemStack> ores = OreDictionary.getOres(oreName, false);
+        if (ores.isEmpty()) return "";
+        ItemStack sample = ores.get(0);
+        try {
+            return sample.isEmpty() ? "" : sample.getDisplayName();
+        } catch (RuntimeException ignored) {
+            return "";
+        }
+    }
+
+    private static final class ClientItemResult {
+        private final String value;
+        private final String displayName;
+        private final boolean ore;
+
+        private ClientItemResult(String value, String displayName, boolean ore) {
+            this.value = value;
+            this.displayName = displayName == null ? "" : displayName;
+            this.ore = ore;
+        }
+    }
+
+    private String getClientEntitySearch() {
+        return clientEntitySearch;
+    }
+
+    private void setClientEntitySearch(String value) {
+        clientEntitySearch = value == null ? "" : value;
+        clientEntityResultIndex = 0;
+        clientEntityCacheQuery = null;
+    }
+
+    private List<ClientEntityResult> getClientEntityResults() {
+        String query = clientEntitySearch == null ? ""
+                : clientEntitySearch.trim().toLowerCase(Locale.ROOT);
+        if (query.equals(clientEntityCacheQuery)) return clientEntityResults;
+        List<ClientEntityResult> matches = new ArrayList<>();
+        for (ResourceLocation id : EntityList.getEntityNameList()) {
+            String displayName = getLocalizedEntityName(id);
+            if (query.isEmpty() || id.toString().toLowerCase(Locale.ROOT).contains(query)
+                    || displayName.toLowerCase(Locale.ROOT).contains(query)) {
+                matches.add(new ClientEntityResult(id.toString(), displayName));
+            }
+        }
+        matches.sort((left, right) -> String.CASE_INSENSITIVE_ORDER.compare(left.entityId, right.entityId));
+        clientEntityCacheQuery = query;
+        clientEntityResults = Collections.unmodifiableList(matches);
+        if (matches.isEmpty()) clientEntityResultIndex = 0;
+        else clientEntityResultIndex = Math.floorMod(clientEntityResultIndex, matches.size());
+        return clientEntityResults;
+    }
+
+    private boolean hasClientEntityResult() {
+        return !getClientEntityResults().isEmpty();
+    }
+
+    private ClientEntityResult getClientEntityResult() {
+        List<ClientEntityResult> results = getClientEntityResults();
+        return results.isEmpty() ? null
+                : results.get(Math.floorMod(clientEntityResultIndex, results.size()));
+    }
+
+    private String getClientEntityResultLabel() {
+        ClientEntityResult result = getClientEntityResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.entity_no_results");
+        String label = result.displayName.isEmpty() ? result.entityId : result.displayName;
+        return label.length() > 20 ? label.substring(0, 19) + "..." : label;
+    }
+
+    private String getClientEntityResultTooltip() {
+        ClientEntityResult result = getClientEntityResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.entity_no_results");
+        return result.displayName + " | " + result.entityId;
+    }
+
+    private String getClientEntityResultPage() {
+        List<ClientEntityResult> results = getClientEntityResults();
+        return results.isEmpty() ? "0/0" : (clientEntityResultIndex + 1) + "/" + results.size();
+    }
+
+    private void moveClientEntityResult(int delta) {
+        List<ClientEntityResult> results = getClientEntityResults();
+        if (!results.isEmpty()) {
+            clientEntityResultIndex = Math.floorMod(clientEntityResultIndex + delta, results.size());
+        }
+    }
+
+    private void selectClientEntityResult(DroneProgramCanvasWidget canvas) {
+        ClientEntityResult result = getClientEntityResult();
+        if (result != null) canvas.selectEntityProperty(result.entityId);
+    }
+
+    private static String getLocalizedEntityName(ResourceLocation id) {
+        String translationName = EntityList.getTranslationName(id);
+        if (translationName == null || translationName.isEmpty()) return id.toString();
+        String key = "entity." + translationName + ".name";
+        String translated = I18n.format(key);
+        return key.equals(translated) ? id.toString() : translated;
+    }
+
+    private static final class ClientEntityResult {
+        private final String entityId;
+        private final String displayName;
+
+        private ClientEntityResult(String entityId, String displayName) {
+            this.entityId = entityId;
+            this.displayName = displayName == null ? "" : displayName;
+        }
+    }
+
+    private String getClientDockSearch() {
+        return clientDockSearch;
+    }
+
+    private void setClientDockSearch(String value) {
+        clientDockSearch = value == null ? "" : value;
+        clientDockResultIndex = 0;
+    }
+
+    private List<ClientDockResult> getClientDockResults() {
+        String query = clientDockSearch == null ? "" : clientDockSearch.trim().toLowerCase(Locale.ROOT);
+        if (query.isEmpty()) return clientDockDirectory;
+        List<ClientDockResult> matches = new ArrayList<>();
+        for (ClientDockResult dock : clientDockDirectory) {
+            String coordinates = dock.position.getX() + "," + dock.position.getY() + "," + dock.position.getZ();
+            if (dock.name.toLowerCase(Locale.ROOT).contains(query)
+                    || dock.dockId.toString().toLowerCase(Locale.ROOT).contains(query)
+                    || coordinates.contains(query)) matches.add(dock);
+        }
+        return matches;
+    }
+
+    private boolean hasClientDockResult() {
+        return !getClientDockResults().isEmpty();
+    }
+
+    private ClientDockResult getClientDockResult() {
+        List<ClientDockResult> results = getClientDockResults();
+        if (results.isEmpty()) return null;
+        clientDockResultIndex = Math.floorMod(clientDockResultIndex, results.size());
+        return results.get(clientDockResultIndex);
+    }
+
+    /** The current directory result is already owner- and dimension-filtered by the server. */
+    private BlockPos getClientDockCapturePosition() {
+        ClientDockResult result = getClientDockResult();
+        return result == null ? null : result.position;
+    }
+
+    /** Only supplied by the server while a wireless-debugged drone is in this programmer's dimension. */
+    private BlockPos getClientRemoteCapturePosition() {
+        return clientRemoteConnected ? clientRemotePosition : null;
+    }
+
+    private String getClientDockResultLabel() {
+        ClientDockResult result = getClientDockResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.dock_no_results");
+        String label = result.name.isEmpty() ? result.dockId.toString() : result.name;
+        return label.length() > 20 ? label.substring(0, 19) + "..." : label;
+    }
+
+    private String getClientDockResultTooltip() {
+        ClientDockResult result = getClientDockResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.dock_no_results");
+        return result.name + " | " + result.dockId + " | " + result.position.getX() + ", "
+                + result.position.getY() + ", " + result.position.getZ();
+    }
+
+    private String getClientDockResultPage() {
+        List<ClientDockResult> results = getClientDockResults();
+        return results.isEmpty() ? "0/0" : (Math.floorMod(clientDockResultIndex, results.size()) + 1)
+                + "/" + results.size();
+    }
+
+    private String getClientDockResultStatus(DroneProgramCanvasWidget canvas) {
+        UUID selectedId = canvas.getSelectedDockReferenceId();
+        if (selectedId != null && clientDockDirectory.stream().noneMatch(dock -> dock.dockId.equals(selectedId))) {
+            return I18n.format("drtech.drone.programmer.dock_reference_stale");
+        }
+        ClientDockResult result = getClientDockResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.dock_directory_empty");
+        return I18n.format(result.online ? "drtech.drone.programmer.dock_online"
+                : "drtech.drone.programmer.dock_offline", result.position.getX(), result.position.getY(),
+                result.position.getZ(), result.availableEu);
+    }
+
+    private void moveClientDockResult(int delta) {
+        List<ClientDockResult> results = getClientDockResults();
+        if (!results.isEmpty()) clientDockResultIndex = Math.floorMod(clientDockResultIndex + delta, results.size());
+    }
+
+    private void selectClientDockResult(DroneProgramCanvasWidget canvas) {
+        ClientDockResult result = getClientDockResult();
+        if (result != null) canvas.selectDockReference(result.dockId, result.name, result.dimension, result.position);
+    }
+
+    private static final class ClientDockResult {
+        private final UUID dockId;
+        private final String name;
+        private final int dimension;
+        private final BlockPos position;
+        private final boolean online;
+        private final long availableEu;
+
+        private ClientDockResult(UUID dockId, String name, int dimension, BlockPos position, boolean online,
+                long availableEu) {
+            this.dockId = dockId;
+            this.name = name == null ? "" : name;
+            this.dimension = dimension;
+            this.position = position;
+            this.online = online;
+            this.availableEu = availableEu;
+        }
+    }
+
+    private String getClientLibraryProgramSearch() { return clientLibraryProgramSearch; }
+
+    private void setClientLibraryProgramSearch(String value) {
+        clientLibraryProgramSearch = value == null ? "" : value;
+        clientLibraryProgramResultIndex = 0;
+    }
+
+    private List<ClientLibraryProgramResult> getClientLibraryProgramResults() {
+        String query = clientLibraryProgramSearch == null ? ""
+                : clientLibraryProgramSearch.trim().toLowerCase(Locale.ROOT);
+        if (query.isEmpty()) return clientProgramDirectory;
+        List<ClientLibraryProgramResult> matches = new ArrayList<>();
+        for (ClientLibraryProgramResult program : clientProgramDirectory) {
+            if (program.name.toLowerCase(Locale.ROOT).contains(query)
+                    || program.programId.toString().toLowerCase(Locale.ROOT).contains(query)
+                    || Long.toString(program.revision).contains(query)) matches.add(program);
+        }
+        return matches;
+    }
+
+    private boolean hasClientLibraryProgramResult() { return !getClientLibraryProgramResults().isEmpty(); }
+
+    private ClientLibraryProgramResult getClientLibraryProgramResult() {
+        List<ClientLibraryProgramResult> results = getClientLibraryProgramResults();
+        if (results.isEmpty()) return null;
+        clientLibraryProgramResultIndex = Math.floorMod(clientLibraryProgramResultIndex, results.size());
+        return results.get(clientLibraryProgramResultIndex);
+    }
+
+    private String getClientLibraryProgramResultLabel() {
+        ClientLibraryProgramResult result = getClientLibraryProgramResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.program_no_results");
+        String label = result.name.isEmpty() ? result.programId.toString() : result.name;
+        return label.length() > 20 ? label.substring(0, 19) + "..." : label;
+    }
+
+    private String getClientLibraryProgramTooltip() {
+        ClientLibraryProgramResult result = getClientLibraryProgramResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.program_no_results");
+        return result.name + " | " + result.programId + " | revision " + result.revision
+                + " | " + result.nodeCount + " nodes / " + result.edgeCount + " edges";
+    }
+
+    private String getClientLibraryProgramPage() {
+        List<ClientLibraryProgramResult> results = getClientLibraryProgramResults();
+        return results.isEmpty() ? "0/0" : (Math.floorMod(clientLibraryProgramResultIndex, results.size()) + 1)
+                + "/" + results.size();
+    }
+
+    private String getClientLibraryProgramStatus(DroneProgramCanvasWidget canvas) {
+        UUID selectedId = canvas.getSelectedProgramReferenceId();
+        long selectedRevision = canvas.getSelectedProgramReferenceRevision();
+        if (selectedId != null && clientProgramDirectory.stream().noneMatch(program ->
+                program.programId.equals(selectedId) && program.revision == selectedRevision)) {
+            return I18n.format("drtech.drone.programmer.program_reference_stale");
+        }
+        ClientLibraryProgramResult result = getClientLibraryProgramResult();
+        if (result == null) return I18n.format("drtech.drone.programmer.program_directory_empty");
+        return I18n.format("drtech.drone.programmer.program_result_status", result.revision,
+                result.nodeCount, result.edgeCount);
+    }
+
+    private void moveClientLibraryProgramResult(int delta) {
+        List<ClientLibraryProgramResult> results = getClientLibraryProgramResults();
+        if (!results.isEmpty()) {
+            clientLibraryProgramResultIndex = Math.floorMod(clientLibraryProgramResultIndex + delta, results.size());
+        }
+    }
+
+    private void selectClientLibraryProgramResult(DroneProgramCanvasWidget canvas) {
+        ClientLibraryProgramResult result = getClientLibraryProgramResult();
+        if (result != null) canvas.selectProgramReference(result.programId, result.name, result.revision);
+    }
+
+    private static final class ClientLibraryProgramResult {
+        private final UUID programId;
+        private final String name;
+        private final long revision;
+        private final int nodeCount;
+        private final int edgeCount;
+
+        private ClientLibraryProgramResult(UUID programId, String name, long revision, int nodeCount, int edgeCount) {
+            this.programId = programId;
+            this.name = name == null ? "" : name;
+            this.revision = revision;
+            this.nodeCount = nodeCount;
+            this.edgeCount = edgeCount;
+        }
+    }
+
     private ButtonWidget<?> nodeButton(ResourceLocation nodeType, int x, int y,
             PanelSyncManager syncManager) {
         return new ButtonWidget<>().pos(x, y).size(81, 14)
                 .overlay(compactNodeLabel(nodeType))
-                .tooltipStatic(tooltip -> tooltip
-                        .addLine(IKey.lang("drtech.drone.node." + nodeType.getPath()))
-                        .addLine(IKey.lang("drtech.drone.programmer.add_node_hint")))
-                .onMousePressed(mouse -> {
-                    DroneProgramGraph graph = getClientGraph();
-                    if (graph != null && clientEditable) {
-                        int offset = graph.getNodes().size() * 12;
-                        sendEditCommand(syncManager, DroneGraphEditCommand.addNode(graph.getRevision(), UUID.randomUUID(),
-                                nodeType, 40 + offset, 40 + offset, defaultConfiguration(nodeType)));
-                    }
-                    return true;
-                });
+                .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(() -> getNodeLibraryTooltip(nodeType))))
+                .onMousePressed(mouse -> { handleNodeLibraryClick(syncManager, nodeType); return true; });
     }
 
     private ButtonWidget<?> pagedNodeButton(int page, ResourceLocation nodeType, int x, int y,
@@ -501,18 +1308,8 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             PanelSyncManager syncManager) {
         return new ButtonWidget<>().pos(x, y).size(39, 14)
                 .overlay(compactNodeLabel(nodeType))
-                .tooltipStatic(tooltip -> tooltip
-                        .addLine(IKey.lang("drtech.drone.node." + nodeType.getPath()))
-                        .addLine(IKey.lang("drtech.drone.programmer.add_node_hint")))
-                .onMousePressed(mouse -> {
-                    DroneProgramGraph graph = getClientGraph();
-                    if (graph != null && clientEditable) {
-                        int offset = graph.getNodes().size() * 12;
-                        sendEditCommand(syncManager, DroneGraphEditCommand.addNode(graph.getRevision(), UUID.randomUUID(),
-                                nodeType, 40 + offset, 40 + offset, defaultConfiguration(nodeType)));
-                    }
-                    return true;
-                });
+                .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(() -> getNodeLibraryTooltip(nodeType))))
+                .onMousePressed(mouse -> { handleNodeLibraryClick(syncManager, nodeType); return true; });
     }
 
     private ButtonWidget<?> pagedSmallNodeButton(int page, ResourceLocation nodeType, int x, int y,
@@ -521,22 +1318,129 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .setEnabledIf(widget -> clientLibraryPage == page && matchesNodeSearch(nodeType));
     }
 
+    /** Reuses the ordinary two-column cards for persistent Favorites and most-recent nodes. */
+    private ButtonWidget<?> quickNodeButton(int page, int index, PanelSyncManager syncManager) {
+        int column = index % 2;
+        int row = index / 2;
+        return new ButtonWidget<>().pos(5 + column * 42, 83 + row * 15).size(39, 14)
+                .overlay(IKey.dynamic(() -> {
+                    ResourceLocation nodeType = quickNodeAt(page, index);
+                    return nodeType == null ? "" : compactNodeText(nodeType);
+                }))
+                .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(() -> {
+                    ResourceLocation nodeType = quickNodeAt(page, index);
+                    return nodeType == null ? "" : getNodeLibraryTooltip(nodeType);
+                })))
+                .setEnabledIf(widget -> {
+                    ResourceLocation nodeType = quickNodeAt(page, index);
+                    return clientLibraryPage == page && nodeType != null && matchesNodeSearch(nodeType);
+                })
+                .onMousePressed(mouse -> {
+                    ResourceLocation nodeType = quickNodeAt(page, index);
+                    if (nodeType != null) handleNodeLibraryClick(syncManager, nodeType);
+                    return true;
+                });
+    }
+
+    private ResourceLocation quickNodeAt(int page, int index) {
+        List<ResourceLocation> source = page == FAVORITES_PAGE ? clientFavoriteNodeTypes
+                : page == RECENT_PAGE ? clientRecentNodeTypes : Collections.emptyList();
+        return index >= 0 && index < source.size() ? source.get(index) : null;
+    }
+
+    private void handleNodeLibraryClick(PanelSyncManager syncManager, ResourceLocation nodeType) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            boolean favorite = !clientFavoriteNodeTypes.contains(nodeType);
+            updateClientFavorite(nodeType, favorite);
+            syncManager.callSyncedAction(NODE_LIBRARY_ACTION, packet -> {
+                packet.writeString(nodeType.toString());
+                packet.writeBoolean(favorite);
+            });
+            return;
+        }
+        DroneProgramGraph graph = getClientGraph();
+        if (graph == null || !clientEditable) return;
+        int offset = graph.getNodes().size() * 12;
+        sendEditCommand(syncManager, DroneGraphEditCommand.addNode(graph.getRevision(), UUID.randomUUID(),
+                nodeType, 40 + offset, 40 + offset, defaultConfiguration(nodeType)));
+        updateClientRecent(nodeType);
+    }
+
+    private void updateClientFavorite(ResourceLocation nodeType, boolean favorite) {
+        List<ResourceLocation> result = new ArrayList<>(clientFavoriteNodeTypes);
+        result.remove(nodeType);
+        if (favorite) result.add(0, nodeType);
+        if (result.size() > MAX_NODE_LIBRARY_ENTRIES) result = result.subList(0, MAX_NODE_LIBRARY_ENTRIES);
+        clientFavoriteNodeTypes = Collections.unmodifiableList(new ArrayList<>(result));
+    }
+
+    private void updateClientRecent(ResourceLocation nodeType) {
+        List<ResourceLocation> result = new ArrayList<>(clientRecentNodeTypes);
+        result.remove(nodeType);
+        result.add(0, nodeType);
+        if (result.size() > MAX_NODE_LIBRARY_ENTRIES) result = result.subList(0, MAX_NODE_LIBRARY_ENTRIES);
+        clientRecentNodeTypes = Collections.unmodifiableList(new ArrayList<>(result));
+    }
+
     private boolean matchesNodeSearch(ResourceLocation nodeType) {
         String query = clientNodeSearch == null ? "" : clientNodeSearch.trim().toLowerCase(java.util.Locale.ROOT);
         if (query.isEmpty()) return true;
         String label = I18n.format("drtech.drone.node." + nodeType.getPath()).toLowerCase(java.util.Locale.ROOT);
-        return nodeType.getPath().contains(query) || label.contains(query);
+        DroneNodeDefinition definition = NODE_LIBRARY.get(nodeType);
+        String category = definition == null ? "" : definition.getCategory();
+        String categoryLabel = I18n.format("drtech.drone.programmer.node_category." + category)
+                .toLowerCase(java.util.Locale.ROOT);
+        String alias = nodeType.getPath().replace('_', ' ');
+        return nodeType.getPath().contains(query) || alias.contains(query) || label.contains(query)
+                || category.contains(query) || categoryLabel.contains(query);
+    }
+
+    /** Builds a compact, dynamic node-card tooltip without changing the program schema. */
+    private String getNodeLibraryTooltip(ResourceLocation nodeType) {
+        DroneNodeDefinition definition = NODE_LIBRARY.get(nodeType);
+        StringBuilder tooltip = new StringBuilder(I18n.format("drtech.drone.node." + nodeType.getPath()));
+        if (definition != null) {
+            String category = definition.getCategory();
+            tooltip.append('\n').append(I18n.format("drtech.drone.programmer.node_library.category",
+                    I18n.format("drtech.drone.programmer.node_category." + category)));
+            tooltip.append('\n').append(I18n.format("drtech.drone.programmer.node_library.ports",
+                    definition.getPorts().size()));
+        }
+        List<DroneUpgradeType> requirements = DroneProgramHardwareValidator.getRequiredUpgrades(nodeType);
+        if (requirements.isEmpty()) {
+            tooltip.append('\n').append(I18n.format("drtech.drone.programmer.node_library.no_module"));
+        } else {
+            List<String> names = new ArrayList<>();
+            boolean ready = true;
+            for (DroneUpgradeType type : requirements) {
+                names.add(I18n.format("drtech.drone.upgrade." + type.getSerializedName()));
+                ready &= targetDroneHasUpgrade(type);
+            }
+            tooltip.append('\n').append(I18n.format(ready
+                    ? "drtech.drone.programmer.node_library.module_ready"
+                    : "drtech.drone.programmer.node_library.module_missing", String.join("、", names)));
+        }
+        tooltip.append('\n').append(I18n.format("drtech.drone.programmer.node_library.minimum_tier", "HV"));
+        tooltip.append('\n').append(I18n.format("drtech.drone.programmer.add_node_hint"));
+        tooltip.append('\n').append(I18n.format("drtech.drone.programmer.node_library.favorite_hint"));
+        return tooltip.toString();
+    }
+
+    private boolean targetDroneHasUpgrade(DroneUpgradeType type) {
+        ItemStack target = importItems.getStackInSlot(1);
+        return !target.isEmpty() && target.getItem() instanceof ItemProgrammableDrone
+                && DroneUpgradeDataCodec.getLevel(DroneItemData.getUpgrades(target), type) > 0;
     }
 
     /** Keeps the two-column library readable while node cards retain their full localized titles. */
     private static IKey compactNodeLabel(ResourceLocation nodeType) {
-        return IKey.dynamic(() -> {
-            String compactKey = "drtech.drone.node.short." + nodeType.getPath();
-            String compact = I18n.format(compactKey);
-            return compactKey.equals(compact)
-                    ? I18n.format("drtech.drone.node." + nodeType.getPath())
-                    : compact;
-        });
+        return IKey.dynamic(() -> compactNodeText(nodeType));
+    }
+
+    private static String compactNodeText(ResourceLocation nodeType) {
+        String compactKey = "drtech.drone.node.short." + nodeType.getPath();
+        String compact = I18n.format(compactKey);
+        return compactKey.equals(compact) ? I18n.format("drtech.drone.node." + nodeType.getPath()) : compact;
     }
 
     private ButtonWidget<?> actionButton(String label, int x, int y, Runnable action) {
@@ -546,6 +1450,39 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     private ButtonWidget<?> actionButton(IKey label, int x, int y, Runnable action) {
         return new ButtonWidget<>().pos(x, y).size(35, 16).overlay(label)
                 .onMousePressed(mouse -> { action.run(); return true; });
+    }
+
+    private ButtonWidget<?> diagnosticFilterButton(int filter, int x) {
+        return new ButtonWidget<>().pos(x, 64).size(32, 16)
+                .overlay(IKey.dynamic(() -> getDiagnosticFilterLabel(filter)))
+                .setEnabledIf(widget -> clientInspectorPage == 2)
+                .onMousePressed(mouse -> {
+                    clientDiagnosticFilter = filter;
+                    clientDiagnosticPage = 0;
+                    return true;
+                });
+    }
+
+    private ButtonWidget<?> diagnosticRowButton(DroneProgramCanvasWidget canvas, int row, int y) {
+        return new ButtonWidget<>().pos(379, y).size(134, 34)
+                .overlay(IKey.dynamic(() -> getDiagnosticRowLabel(row)))
+                .tooltipStatic(tooltip -> {
+                    tooltip.addLine(IKey.dynamic(() -> getDiagnosticRowTooltip(row)));
+                    tooltip.addLine(IKey.dynamic(() -> getDiagnosticRepairTooltip(row)));
+                })
+                .setEnabledIf(widget -> clientInspectorPage == 2 && getDiagnosticAtRow(row) != null)
+                .onMousePressed(mouse -> {
+                    ClientDiagnostic diagnostic = getDiagnosticAtRow(row);
+                    if (diagnostic != null && diagnostic.nodeId != null) {
+                        if (!diagnostic.property.isEmpty()
+                                && canvas.focusNodeProperty(diagnostic.nodeId, diagnostic.property)) {
+                            clientInspectorPage = 0;
+                        } else {
+                            canvas.focusNode(diagnostic.nodeId);
+                        }
+                    }
+                    return true;
+                });
     }
 
     private ButtonWidget<?> remoteButton(String label, String command, int x, int y,
@@ -566,6 +1503,14 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private static NBTTagCompound defaultConfiguration(ResourceLocation nodeType) {
         NBTTagCompound configuration = new NBTTagCompound();
+        if (nodeType.equals(DrTechDroneNodes.COMMENT)) configuration.setString("Text", "");
+        if (nodeType.equals(DrTechDroneNodes.GROUP)) {
+            configuration.setString("Title", "");
+            configuration.setInteger("Width", 320);
+            configuration.setInteger("Height", 200);
+            configuration.setString("Color", "BLUE");
+            configuration.setBoolean("Collapsed", false);
+        }
         if (nodeType.equals(DrTechDroneNodes.WAIT)) configuration.setInteger("Ticks", 20);
         if (nodeType.equals(DrTechDroneNodes.CHARGE_UNTIL)) configuration.setDouble("Percent", 100.0D);
         if (nodeType.equals(DrTechDroneNodes.CONFIGURE_SAFETY)) {
@@ -608,10 +1553,34 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             configuration.setInteger("Amount", 1_000);
             configuration.setString("Operator", "AT_LEAST");
         }
+        if (nodeType.equals(DrTechDroneNodes.CRAFT_ITEMS)) {
+            configuration.setInteger("Count", 1);
+            configuration.setInteger("ReserveCount", 0);
+            configuration.setString("Mode", "EXACT");
+            configuration.setBoolean("Simulate", false);
+        }
+        if (nodeType.equals(DrTechDroneNodes.CRAFT_GRID)) {
+            configuration.setInteger("Count", 1);
+            configuration.setInteger("ReserveCount", 0);
+            configuration.setString("Mode", "EXACT");
+        }
+        if (nodeType.equals(DrTechDroneNodes.SET_MACHINE_WORKING)) configuration.setBoolean("Enabled", true);
+        if (nodeType.equals(DrTechDroneNodes.REPAIR_MACHINE)) configuration.setBoolean("RequireAll", true);
+        if (nodeType.equals(DrTechDroneNodes.CAN_CRAFT)) {
+            configuration.setInteger("Count", 1);
+            configuration.setInteger("ReserveCount", 0);
+        }
+        if (nodeType.equals(DrTechDroneNodes.CRAFTABLE_COUNT)) {
+            configuration.setInteger("Limit", 64);
+            configuration.setInteger("ReserveCount", 0);
+        }
         if (nodeType.equals(DrTechDroneNodes.AREA)) {
             configuration.setInteger("X2", 2);
             configuration.setInteger("Z2", 2);
         }
+        if (nodeType.equals(DrTechDroneNodes.FOR_EACH_COORDINATE)) configuration.setString("Order", "SERPENTINE");
+        if (nodeType.equals(DrTechDroneNodes.AREA_EXPAND)
+                || nodeType.equals(DrTechDroneNodes.AREA_INSET)) configuration.setInteger("Radius", 1);
         if (nodeType.equals(DrTechDroneNodes.REPEAT)) configuration.setInteger("Count", 3);
         if (nodeType.equals(DrTechDroneNodes.WAIT_FOR_OWNER)) configuration.setDouble("Radius", 16.0D);
         if (nodeType.equals(DrTechDroneNodes.NUMBER_MATH)) configuration.setString("Operator", "+");
@@ -674,9 +1643,11 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         }
         try {
             NBTTagCompound commandTag = packet.readCompoundTag();
-            DroneGraphEditResult result = editSession.apply(DroneGraphCommandCodec.read(commandTag));
+            DroneGraphEditCommand command = DroneGraphCommandCodec.read(commandTag);
+            DroneGraphEditResult result = editSession.apply(command);
             if (result.isAccepted()) {
                 saveSessionToCard();
+                recordNodeLibraryUse(command);
                 serverStatus = result.getDiagnostics().isEmpty() ? "Saved"
                         : "Saved with " + countErrors(result) + " error(s)";
             } else {
@@ -711,6 +1682,29 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         }
     }
 
+    /** Saves a card-local node favourite after the regular editor lock and distance checks. */
+    private void receiveNodeLibraryAction(EntityPlayer player, String rawNodeType, boolean favorite) {
+        if (getWorld() == null || getWorld().isRemote || player.getDistanceSq(getPos()) > MAX_EDIT_DISTANCE_SQUARED) {
+            return;
+        }
+        refreshCardSession();
+        if (editorOwner == null || !editorOwner.equals(player.getUniqueID()) || editSession == null) return;
+        ResourceLocation nodeType;
+        try {
+            nodeType = new ResourceLocation(rawNodeType);
+        } catch (RuntimeException ignored) {
+            return;
+        }
+        if (NODE_LIBRARY.get(nodeType) == null) return;
+        List<ResourceLocation> favorites = readNodeLibraryEntries(NODE_FAVORITES_TAG);
+        favorites.remove(nodeType);
+        if (favorite) favorites.add(0, nodeType);
+        writeNodeLibraryEntries(NODE_FAVORITES_TAG, favorites);
+        loadedCardFingerprint = fingerprint(importItems.getStackInSlot(0));
+        serverStatus = favorite ? "Node added to favorites" : "Node removed from favorites";
+        markDirty();
+    }
+
     private void writeProgramToDrone(EntityPlayer player) {
         if (getWorld() == null || getWorld().isRemote || player.getDistanceSq(getPos()) > MAX_EDIT_DISTANCE_SQUARED) return;
         refreshCardSession();
@@ -725,7 +1719,9 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         DroneExecutorRegistry executors = DrTechDroneExecutors.createDefaultRegistry();
         DroneValueEvaluatorRegistry evaluators = DrTechDroneValueEvaluators.createDefaultRegistry();
         for (DroneProgramNode node : editSession.getGraph().getNodes()) {
-            boolean builtIn = node.getType().equals(DrTechDroneNodes.START) || node.getType().equals(DrTechDroneNodes.END);
+            boolean builtIn = node.getType().equals(DrTechDroneNodes.START)
+                    || node.getType().equals(DrTechDroneNodes.END)
+                    || DrTechDroneNodes.isEditorOnly(node.getType());
             if (!builtIn && executors.get(node.getType()) == null && evaluators.get(node.getType()) == null) {
                 serverStatus = "Cannot write: node has no runtime implementation: " + node.getType().getPath();
                 return;
@@ -736,13 +1732,23 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             serverStatus = "Insert a programmable drone in the second slot";
             return;
         }
+        List<DroneProgramDiagnostic> hardwareDiagnostics = DroneProgramHardwareValidator.validate(
+                editSession.getGraph(), drone, getWorld());
+        if (hardwareDiagnostics.stream()
+                .anyMatch(diagnostic -> diagnostic.getSeverity() == DroneDiagnosticSeverity.ERROR)) {
+            serverStatus = "Cannot write: target drone hardware incompatible";
+            return;
+        }
         if (energyContainer.getEnergyStored() < PROGRAM_WRITE_EU) {
             serverStatus = "Cannot write: requires " + PROGRAM_WRITE_EU + " EU";
             return;
         }
         energyContainer.removeEnergy(PROGRAM_WRITE_EU);
         DroneItemData.setProgram(drone, DroneProgramNbtCodec.write(editSession.getGraph()));
-        serverStatus = "Program written to drone";
+        boolean catalogued = DroneProgramLibrary.get(getWorld()).register(player.getUniqueID(),
+                editSession.getGraph(), getWorld().getTotalWorldTime());
+        serverStatus = catalogued ? "Program written to drone and program library"
+                : "Program written to drone; program library is full";
         markDirty();
     }
 
@@ -795,20 +1801,112 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         markDirty();
     }
 
+    private void recordNodeLibraryUse(DroneGraphEditCommand command) {
+        if (command == null) return;
+        if (command.getType() == com.drppp.drtech.common.drone.program.edit.DroneGraphCommandType.BATCH) {
+            for (DroneGraphEditCommand child : command.getCommands()) recordNodeLibraryUse(child);
+            return;
+        }
+        if (command.getType() != com.drppp.drtech.common.drone.program.edit.DroneGraphCommandType.ADD_NODE
+                || command.getNodeType() == null || NODE_LIBRARY.get(command.getNodeType()) == null) return;
+        List<ResourceLocation> recent = readNodeLibraryEntries(NODE_RECENT_TAG);
+        recent.remove(command.getNodeType());
+        recent.add(0, command.getNodeType());
+        writeNodeLibraryEntries(NODE_RECENT_TAG, recent);
+        loadedCardFingerprint = fingerprint(importItems.getStackInSlot(0));
+    }
+
+    private List<ResourceLocation> readNodeLibraryEntries(String key) {
+        ItemStack card = importItems.getStackInSlot(0);
+        if (card.isEmpty() || !(card.getItem() instanceof ItemDroneProgramCard)) return new ArrayList<>();
+        NBTTagCompound root = card.getTagCompound();
+        if (root == null) return new ArrayList<>();
+        NBTTagList entries = root.getTagList(key, 8);
+        List<ResourceLocation> result = new ArrayList<>();
+        for (int index = 0; index < entries.tagCount() && result.size() < MAX_NODE_LIBRARY_ENTRIES; index++) {
+            try {
+                ResourceLocation nodeType = new ResourceLocation(entries.getStringTagAt(index));
+                if (NODE_LIBRARY.get(nodeType) != null && !result.contains(nodeType)) result.add(nodeType);
+            } catch (RuntimeException ignored) {}
+        }
+        return result;
+    }
+
+    private NBTTagList writeNodeLibraryEntriesTag(List<ResourceLocation> entries) {
+        NBTTagList result = new NBTTagList();
+        for (int index = 0; entries != null && index < entries.size() && index < MAX_NODE_LIBRARY_ENTRIES; index++) {
+            ResourceLocation nodeType = entries.get(index);
+            if (nodeType != null && NODE_LIBRARY.get(nodeType) != null) {
+                result.appendTag(new NBTTagString(nodeType.toString()));
+            }
+        }
+        return result;
+    }
+
+    private void writeNodeLibraryEntries(String key, List<ResourceLocation> entries) {
+        ItemStack card = importItems.getStackInSlot(0);
+        if (card.isEmpty() || !(card.getItem() instanceof ItemDroneProgramCard)) return;
+        NBTTagCompound root = card.getTagCompound();
+        if (root == null) {
+            root = new NBTTagCompound();
+            card.setTagCompound(root);
+        }
+        root.setTag(key, writeNodeLibraryEntriesTag(entries));
+    }
+
     private NBTTagCompound createEditorState(EntityPlayer viewer) {
         refreshCardSession();
         NBTTagCompound state = new NBTTagCompound();
         state.setBoolean("Editable", editorOwner != null && editorOwner.equals(viewer.getUniqueID()));
         state.setString("Status", serverStatus);
+        NBTTagList docks = new NBTTagList();
+        if (getWorld() != null) {
+            List<DroneDockRecord> visibleDocks = DroneDockNetwork.get(getWorld()).listForOwner(
+                    viewer.getUniqueID(), getWorld().provider.getDimension());
+            long worldTime = getWorld().getTotalWorldTime();
+            for (int index = 0; index < Math.min(256, visibleDocks.size()); index++) {
+                DroneDockRecord record = visibleDocks.get(index);
+                NBTTagCompound dock = record.writeToNbt();
+                dock.setBoolean("Online", DroneDockNetwork.isRecordOnline(record, worldTime));
+                docks.appendTag(dock);
+            }
+        }
+        state.setTag("Docks", docks);
+        NBTTagList programs = new NBTTagList();
+        if (getWorld() != null) {
+            List<DroneProgramLibraryRecord> visiblePrograms = DroneProgramLibrary.get(getWorld())
+                    .listForOwner(viewer.getUniqueID());
+            for (int index = 0; index < Math.min(128, visiblePrograms.size()); index++) {
+                DroneProgramLibraryRecord record = visiblePrograms.get(index);
+                NBTTagCompound program = new NBTTagCompound();
+                program.setString("ProgramId", record.getProgramId().toString());
+                program.setString("Name", record.getName());
+                program.setLong("Revision", record.getRevision());
+                program.setInteger("Nodes", record.getNodeCount());
+                program.setInteger("Edges", record.getEdgeCount());
+                programs.appendTag(program);
+            }
+        }
+        state.setTag("Programs", programs);
+        state.setTag("NodeFavorites", writeNodeLibraryEntriesTag(readNodeLibraryEntries(NODE_FAVORITES_TAG)));
+        state.setTag("NodeRecent", writeNodeLibraryEntriesTag(readNodeLibraryEntries(NODE_RECENT_TAG)));
         if (editSession == null) return state;
         state.setTag("Program", DroneProgramNbtCodec.write(editSession.getGraph()));
         NBTTagList diagnostics = new NBTTagList();
-        for (DroneProgramDiagnostic diagnostic : editSession.getLastCompileResult().getDiagnostics()) {
+        List<DroneProgramDiagnostic> editorDiagnostics = new ArrayList<>(
+                editSession.getLastCompileResult().getDiagnostics());
+        editorDiagnostics.addAll(DroneProgramHardwareValidator.validate(editSession.getGraph(),
+                importItems.getStackInSlot(1), getWorld()));
+        for (DroneProgramDiagnostic diagnostic : editorDiagnostics) {
             NBTTagCompound tag = new NBTTagCompound();
             tag.setString("Severity", diagnostic.getSeverity().name());
             tag.setString("Code", diagnostic.getCode().name());
             if (diagnostic.getNodeId() != null) tag.setString("Node", diagnostic.getNodeId().toString());
             if (diagnostic.getPortId() != null) tag.setString("Port", diagnostic.getPortId());
+            if (diagnostic.getPropertyId() != null) tag.setString("Property", diagnostic.getPropertyId());
+            for (int argument = 0; argument < Math.min(3, diagnostic.getArguments().size()); argument++) {
+                tag.setString("Detail" + argument, diagnostic.getArguments().get(argument));
+            }
             diagnostics.appendTag(tag);
         }
         state.setTag("Diagnostics", diagnostics);
@@ -825,11 +1923,45 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         clientErrors = 0;
         clientWarnings = 0;
         clientDiagnosticLines.clear();
+        clientDiagnostics.clear();
         clientDiagnosticNodeIds.clear();
         clientActiveNodeId = null;
         clientRuntimeStatus = "NOT RUN";
         clientRemoteConnected = false;
         clientRemoteInfo = I18n.format("drtech.drone.remote.disconnected");
+        clientRemotePosition = null;
+        List<ClientDockResult> dockDirectory = new ArrayList<>();
+        NBTTagList docks = state.getTagList("Docks", 10);
+        for (int index = 0; index < docks.tagCount(); index++) {
+            NBTTagCompound dock = docks.getCompoundTagAt(index);
+            if (!dock.hasKey("DockId", 8) || !dock.hasKey("Position", 4)) continue;
+            try {
+                dockDirectory.add(new ClientDockResult(UUID.fromString(dock.getString("DockId")),
+                        dock.getString("Name"), dock.getInteger("Dimension"),
+                        BlockPos.fromLong(dock.getLong("Position")), dock.getBoolean("Online"),
+                        dock.getLong("AvailableEU")));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        clientDockDirectory = Collections.unmodifiableList(dockDirectory);
+        if (clientDockDirectory.isEmpty()) clientDockResultIndex = 0;
+        else clientDockResultIndex = Math.floorMod(clientDockResultIndex, clientDockDirectory.size());
+        List<ClientLibraryProgramResult> programDirectory = new ArrayList<>();
+        NBTTagList programs = state.getTagList("Programs", 10);
+        for (int index = 0; index < programs.tagCount(); index++) {
+            NBTTagCompound program = programs.getCompoundTagAt(index);
+            if (!program.hasKey("ProgramId", 8) || !program.hasKey("Revision", 99)) continue;
+            try {
+                programDirectory.add(new ClientLibraryProgramResult(
+                        UUID.fromString(program.getString("ProgramId")), program.getString("Name"),
+                        program.getLong("Revision"), program.getInteger("Nodes"), program.getInteger("Edges")));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        clientProgramDirectory = Collections.unmodifiableList(programDirectory);
+        if (clientProgramDirectory.isEmpty()) clientLibraryProgramResultIndex = 0;
+        else clientLibraryProgramResultIndex = Math.floorMod(clientLibraryProgramResultIndex,
+                clientProgramDirectory.size());
+        clientFavoriteNodeTypes = readClientNodeLibraryEntries(state.getTagList("NodeFavorites", 8));
+        clientRecentNodeTypes = readClientNodeLibraryEntries(state.getTagList("NodeRecent", 8));
         NBTTagList diagnostics = state.getTagList("Diagnostics", 10);
         for (int i = 0; i < diagnostics.tagCount(); i++) {
             String severity = diagnostics.getCompoundTagAt(i).getString("Severity");
@@ -838,16 +1970,26 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             NBTTagCompound diagnostic = diagnostics.getCompoundTagAt(i);
             String node = diagnostic.getString("Node");
             String port = diagnostic.getString("Port");
+            String property = diagnostic.getString("Property");
+            String detail = diagnostic.getString("Detail0");
+            String detail2 = diagnostic.getString("Detail1");
+            String detail3 = diagnostic.getString("Detail2");
             String localizedSeverity = localizeDiagnosticSeverity(severity);
-            String localizedCode = localizeDiagnosticCode(diagnostic.getString("Code"));
+            String code = diagnostic.getString("Code");
+            String localizedCode = localizeDiagnosticCode(code);
             String localizedPort = port.isEmpty() ? "" : " [" + localizePort(port) + "]";
             clientDiagnosticLines.add(localizedSeverity + "：" + localizedCode + localizedPort);
+            UUID nodeId = null;
             if (!node.isEmpty()) {
                 try {
-                    clientDiagnosticNodeIds.add(UUID.fromString(node));
+                    nodeId = UUID.fromString(node);
+                    clientDiagnosticNodeIds.add(nodeId);
                 } catch (IllegalArgumentException ignored) {}
             }
+            clientDiagnostics.add(new ClientDiagnostic(severity, code, nodeId, port, property,
+                    detail, detail2, detail3));
         }
+        clampDiagnosticPage();
         if (state.hasKey("Runtime", 10)) {
             NBTTagCompound runtime = state.getCompoundTag("Runtime");
             clientRuntimeStatus = runtime.getString("Status");
@@ -860,6 +2002,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         if (state.hasKey("Remote", 10)) {
             NBTTagCompound remote = state.getCompoundTag("Remote");
             clientRemoteConnected = true;
+            if (remote.hasKey("Position", 4)) clientRemotePosition = BlockPos.fromLong(remote.getLong("Position"));
             String effectiveStatus = remote.hasKey("EffectiveStatus", 8)
                     ? remote.getString("EffectiveStatus") : remote.getString("Status");
             clientRuntimeStatus = localizeRuntimeStatus(effectiveStatus);
@@ -879,6 +2022,9 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             }
             info.append('\n').append(localizeNodePath(remote.getString("Node")))
                     .append(progress.isEmpty() ? "" : " " + progress)
+                    .append(clientRemotePosition == null ? "" : '\n' + I18n.format(
+                            "drtech.drone.programmer.capture_drone_position", clientRemotePosition.getX(),
+                            clientRemotePosition.getY(), clientRemotePosition.getZ()))
                     .append('\n').append(variables)
                     .append('\n').append(I18n.format("drtech.drone.remote.modules", modules))
                     .append('\n').append(I18n.format("drtech.drone.remote.fluid",
@@ -904,6 +2050,17 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             clientGraph = null;
             clientStatus = I18n.format("drtech.drone.programmer.status.sync_error", exception.getMessage());
         }
+    }
+
+    private List<ResourceLocation> readClientNodeLibraryEntries(NBTTagList entries) {
+        List<ResourceLocation> result = new ArrayList<>();
+        for (int index = 0; index < entries.tagCount() && result.size() < MAX_NODE_LIBRARY_ENTRIES; index++) {
+            try {
+                ResourceLocation nodeType = new ResourceLocation(entries.getStringTagAt(index));
+                if (NODE_LIBRARY.get(nodeType) != null && !result.contains(nodeType)) result.add(nodeType);
+            } catch (RuntimeException ignored) {}
+        }
+        return Collections.unmodifiableList(result);
     }
 
     private String getStatusLine() {
@@ -948,6 +2105,113 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         return builder.toString();
     }
 
+    private String getDiagnosticSummary() {
+        return I18n.format("drtech.drone.diagnostic.summary", clientErrors, clientWarnings,
+                filteredDiagnostics().size());
+    }
+
+    private String getDiagnosticFilterLabel(int filter) {
+        String name = I18n.format("drtech.drone.diagnostic.filter." + switch (filter) {
+            case 1 -> "errors";
+            case 2 -> "warnings";
+            case 3 -> "info";
+            default -> "all";
+        } + ".short");
+        return clientDiagnosticFilter == filter ? "[" + name + "]" : name;
+    }
+
+    private List<ClientDiagnostic> filteredDiagnostics() {
+        if (clientDiagnosticFilter == 0) return clientDiagnostics;
+        String severity = switch (clientDiagnosticFilter) {
+            case 1 -> DroneDiagnosticSeverity.ERROR.name();
+            case 2 -> DroneDiagnosticSeverity.WARNING.name();
+            case 3 -> DroneDiagnosticSeverity.INFO.name();
+            default -> "";
+        };
+        List<ClientDiagnostic> filtered = new ArrayList<>();
+        for (ClientDiagnostic diagnostic : clientDiagnostics) {
+            if (severity.equals(diagnostic.severity)) filtered.add(diagnostic);
+        }
+        return filtered;
+    }
+
+    private ClientDiagnostic getDiagnosticAtRow(int row) {
+        List<ClientDiagnostic> diagnostics = filteredDiagnostics();
+        int index = clientDiagnosticPage * 3 + row;
+        return index >= 0 && index < diagnostics.size() ? diagnostics.get(index) : null;
+    }
+
+    private String getDiagnosticRowLabel(int row) {
+        ClientDiagnostic diagnostic = getDiagnosticAtRow(row);
+        if (diagnostic == null) return "";
+        int number = clientDiagnosticPage * 3 + row + 1;
+        String severity = localizeDiagnosticSeverity(diagnostic.severity);
+        String code = localizeDiagnosticCode(diagnostic.code);
+        String node = diagnostic.nodeId == null ? "" : " · " + diagnosticNodeLabel(diagnostic.nodeId);
+        return number + ". " + severity + " · " + shorten(code, 14) + shorten(node, 10);
+    }
+
+    private String getDiagnosticRowTooltip(int row) {
+        ClientDiagnostic diagnostic = getDiagnosticAtRow(row);
+        if (diagnostic == null) return "";
+        StringBuilder text = new StringBuilder(localizeDiagnosticSeverity(diagnostic.severity))
+                .append("：").append(localizeDiagnosticCode(diagnostic.code));
+        if (diagnostic.nodeId != null) {
+            text.append(" | ").append(I18n.format("drtech.drone.diagnostic.node",
+                    diagnosticNodeLabel(diagnostic.nodeId)));
+        }
+        if (!diagnostic.port.isEmpty()) {
+            text.append(" | ").append(I18n.format("drtech.drone.diagnostic.port",
+                    localizePort(diagnostic.port)));
+        }
+        if (!diagnostic.property.isEmpty()) {
+            text.append(" | ").append(I18n.format("drtech.drone.diagnostic.property",
+                    localizeOrFallback("drtech.drone.property."
+                            + diagnostic.property.toLowerCase(java.util.Locale.ROOT), diagnostic.property)));
+        }
+        if (!diagnostic.detail.isEmpty()) {
+            text.append(" | ").append(I18n.format("drtech.drone.diagnostic.detail",
+                    localizeDiagnosticDetail(diagnostic)));
+        }
+        return text.toString();
+    }
+
+    private String getDiagnosticRepairTooltip(int row) {
+        ClientDiagnostic diagnostic = getDiagnosticAtRow(row);
+        if (diagnostic == null || diagnostic.code.isEmpty()) return "";
+        String key = "drtech.drone.diagnostic.fix." + diagnostic.code.toLowerCase(java.util.Locale.ROOT);
+        return localizeOrFallback(key, I18n.format("drtech.drone.diagnostic.fix.default"));
+    }
+
+    private String diagnosticNodeLabel(UUID nodeId) {
+        DroneProgramNode node = clientGraph == null ? null : clientGraph.getNode(nodeId);
+        if (node == null) return nodeId.toString().substring(0, 8);
+        String alias = node.getConfiguration().getString("Label");
+        return alias.isEmpty() ? localizeNodePath(node.getType().toString()) : alias;
+    }
+
+    private int getDiagnosticPageCount() {
+        return Math.max(1, (filteredDiagnostics().size() + 2) / 3);
+    }
+
+    private String getDiagnosticPageLabel() {
+        return I18n.format("drtech.drone.diagnostic.page", clientDiagnosticPage + 1, getDiagnosticPageCount());
+    }
+
+    private void moveDiagnosticPage(int delta) {
+        int pages = getDiagnosticPageCount();
+        clientDiagnosticPage = (clientDiagnosticPage + delta + pages) % pages;
+    }
+
+    private void clampDiagnosticPage() {
+        clientDiagnosticPage = Math.max(0, Math.min(clientDiagnosticPage, getDiagnosticPageCount() - 1));
+    }
+
+    private static String shorten(String value, int maxLength) {
+        if (value == null || value.length() <= maxLength) return value == null ? "" : value;
+        return value.substring(0, Math.max(1, maxLength - 1)) + "…";
+    }
+
     private String getRemoteDebugText() {
         return clientRemoteInfo;
     }
@@ -987,6 +2251,22 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         return localizeOrFallback("drtech.drone.port." + port.toLowerCase(java.util.Locale.ROOT), port);
     }
 
+    private static String localizeDiagnosticDetail(ClientDiagnostic diagnostic) {
+        if ("REQUIRED_UPGRADE_MISSING".equals(diagnostic.code)) {
+            return localizeOrFallback("drtech.drone.upgrade." + diagnostic.detail, diagnostic.detail);
+        }
+        if ("CHASSIS_TIER_RECOMMENDED".equals(diagnostic.code)) {
+            return I18n.format("drtech.drone.diagnostic.detail.chassis", diagnostic.detail,
+                    diagnostic.detail3, diagnostic.detail2);
+        }
+        if ("VOLTAGE_TIER_MISMATCH".equals(diagnostic.code)) {
+            return I18n.format("drtech.drone.diagnostic.detail.voltage", diagnostic.detail,
+                    diagnostic.detail2, localizeOrFallback("drtech.drone.diagnostic.voltage."
+                            + diagnostic.detail3, diagnostic.detail3));
+        }
+        return diagnostic.detail;
+    }
+
     private static String localizeOrFallback(String key, String fallback) {
         String localized = I18n.format(key);
         return key.equals(localized) ? fallback : localized;
@@ -1008,9 +2288,15 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 return I18n.format("drtech.drone.programmer.status.remote_rejected");
             case "Cannot write: fix all compile errors first":
                 return I18n.format("drtech.drone.programmer.status.fix_errors");
+            case "Cannot write: target drone hardware incompatible":
+                return I18n.format("drtech.drone.programmer.status.hardware_incompatible");
             case "Insert a programmable drone in the second slot":
                 return I18n.format("drtech.drone.programmer.status.insert_drone");
             case "Program written to drone": return I18n.format("drtech.drone.programmer.status.written");
+            case "Program written to drone and program library":
+                return I18n.format("drtech.drone.programmer.status.written_library");
+            case "Program written to drone; program library is full":
+                return I18n.format("drtech.drone.programmer.status.written_library_full");
             case "Editor lock acquired": return I18n.format("drtech.drone.programmer.status.lock_acquired");
             case "Ready": return I18n.format("drtech.drone.programmer.status.ready");
             default:
@@ -1077,6 +2363,29 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         int result = 31 * Item.getIdFromItem(stack.getItem()) + stack.getMetadata();
         NBTTagCompound tag = stack.getTagCompound();
         return 31 * result + (tag == null ? 0 : tag.hashCode());
+    }
+
+    private static final class ClientDiagnostic {
+        private final String severity;
+        private final String code;
+        private final UUID nodeId;
+        private final String port;
+        private final String property;
+        private final String detail;
+        private final String detail2;
+        private final String detail3;
+
+        private ClientDiagnostic(String severity, String code, UUID nodeId, String port, String property,
+                String detail, String detail2, String detail3) {
+            this.severity = severity == null ? "" : severity;
+            this.code = code == null ? "" : code;
+            this.nodeId = nodeId;
+            this.port = port == null ? "" : port;
+            this.property = property == null ? "" : property;
+            this.detail = detail == null ? "" : detail;
+            this.detail2 = detail2 == null ? "" : detail2;
+            this.detail3 = detail3 == null ? "" : detail3;
+        }
     }
 
     @Override

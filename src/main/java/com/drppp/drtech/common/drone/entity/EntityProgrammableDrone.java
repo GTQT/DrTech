@@ -20,6 +20,7 @@ import com.drppp.drtech.common.drone.action.DroneTransferRequest;
 import com.drppp.drtech.common.drone.action.DroneInteractionRequest;
 import com.drppp.drtech.common.drone.action.DroneItemWorldRequest;
 import com.drppp.drtech.common.drone.filter.DroneBlockFilterSpec;
+import com.drppp.drtech.common.drone.filter.DroneFilterMode;
 import com.drppp.drtech.common.drone.filter.DroneFluidFilterSpec;
 import com.drppp.drtech.common.drone.energy.DroneEnergyStorage;
 import com.drppp.drtech.common.drone.energy.DroneEuEndpoint;
@@ -33,6 +34,7 @@ import com.drppp.drtech.common.drone.hardware.DroneUpgradeDataCodec;
 import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
 import com.drppp.drtech.common.drone.hardware.ItemDroneUpgradeModule;
 import com.drppp.drtech.common.drone.inventory.DroneItemFilter;
+import com.drppp.drtech.common.drone.inventory.DroneCraftingPlanner;
 import com.drppp.drtech.common.drone.inventory.DroneItemTransfer;
 import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
 import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneRedstoneEmitter;
@@ -60,8 +62,14 @@ import com.drppp.drtech.common.drone.program.runtime.DroneRuntimeStatus;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneSensorService;
 import com.google.common.base.Optional;
 import gregtech.api.capability.GregtechCapabilities;
+import gregtech.api.capability.GregtechTileCapabilities;
+import gregtech.api.capability.IWorkable;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.IElectricItem;
+import gregtech.api.capability.impl.AbstractRecipeLogic;
+import gregtech.api.items.toolitem.ToolHelper;
+import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.metatileentity.multiblock.IMaintenance;
 import net.minecraft.entity.EntityFlying;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -76,8 +84,12 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.world.World;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.WorldServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -99,6 +111,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class EntityProgrammableDrone extends EntityFlying implements IGuiHolder<EntityGuiData> {
 
@@ -133,6 +147,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     private boolean executionEnabled = true;
     private boolean loopProgram;
     private boolean pickupActionThisTick;
+    private int lastFluidEffectTick = Integer.MIN_VALUE / 2;
     private int dockRecoveryCooldown;
     private final DroneSafetyFirmware safetyFirmware = new DroneSafetyFirmware();
     private DroneRuntimeEnvironment safetyNavigation;
@@ -296,6 +311,35 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         return selected != null && bindToDockPosition(selected);
     }
 
+    /** Emits a short, rate-limited colored transfer trace visible to nearby players. */
+    private void emitFluidTransferEffect(BlockPos target, FluidStack fluid, boolean importing) {
+        if (!(world instanceof WorldServer) || fluid == null || fluid.getFluid() == null
+                || ticksExisted - lastFluidEffectTick < 4) return;
+        lastFluidEffectTick = ticksExisted;
+        int color = fluid.getFluid().getColor(fluid);
+        double red = Math.max(0.01D, ((color >> 16) & 0xFF) / 255.0D);
+        double green = Math.max(0.01D, ((color >> 8) & 0xFF) / 255.0D);
+        double blue = Math.max(0.01D, (color & 0xFF) / 255.0D);
+        double targetX = target.getX() + 0.5D;
+        double targetY = target.getY() + 0.65D;
+        double targetZ = target.getZ() + 0.5D;
+        double droneX = posX;
+        double droneY = posY + height * 0.45D;
+        double droneZ = posZ;
+        WorldServer server = (WorldServer) world;
+        for (int step = 1; step <= 4; step++) {
+            double progress = step / 5.0D;
+            if (!importing) progress = 1.0D - progress;
+            server.spawnParticle(EnumParticleTypes.SPELL_MOB,
+                    targetX + (droneX - targetX) * progress,
+                    targetY + (droneY - targetY) * progress,
+                    targetZ + (droneZ - targetZ) * progress,
+                    0, red, green, blue, 1.0D);
+        }
+        world.playSound(null, target, importing ? SoundEvents.ITEM_BUCKET_FILL : SoundEvents.ITEM_BUCKET_EMPTY,
+                SoundCategory.BLOCKS, 0.35F, 1.15F + rand.nextFloat() * 0.15F);
+    }
+
     @Nullable
     private BlockPos findNearestNetworkDock(boolean requireAccepting) {
         DroneDockNetwork network = DroneDockNetwork.get(world);
@@ -364,6 +408,56 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
             @Override public boolean outputsEnergy() { return endpoint.outputsEnergy(side); }
             @Override public long changeEnergy(long delta) { return endpoint.changeEnergy(delta); }
         };
+    }
+
+    @Nullable
+    private IWorkable findMachineWorkable(BlockPos target) {
+        if (target == null || !world.isBlockLoaded(target)) return null;
+        TileEntity tile = world.getTileEntity(target);
+        if (tile == null) return null;
+        IWorkable workable = tile.getCapability(GregtechTileCapabilities.CAPABILITY_WORKABLE, null);
+        if (workable != null) return workable;
+        for (EnumFacing side : EnumFacing.values()) {
+            workable = tile.getCapability(GregtechTileCapabilities.CAPABILITY_WORKABLE, side);
+            if (workable != null) return workable;
+        }
+        return null;
+    }
+
+    @Nullable
+    private AbstractRecipeLogic findMachineRecipeLogic(BlockPos target) {
+        if (target == null || !world.isBlockLoaded(target)) return null;
+        TileEntity tile = world.getTileEntity(target);
+        if (tile == null) return null;
+        AbstractRecipeLogic logic = tile.getCapability(GregtechTileCapabilities.CAPABILITY_RECIPE_LOGIC, null);
+        if (logic != null) return logic;
+        for (EnumFacing side : EnumFacing.values()) {
+            logic = tile.getCapability(GregtechTileCapabilities.CAPABILITY_RECIPE_LOGIC, side);
+            if (logic != null) return logic;
+        }
+        return null;
+    }
+
+    @Nullable
+    private IMaintenance findMachineMaintenance(BlockPos target) {
+        if (target == null || !world.isBlockLoaded(target)) return null;
+        TileEntity tile = world.getTileEntity(target);
+        if (tile == null) return null;
+        IMaintenance maintenance = tile.getCapability(GregtechTileCapabilities.CAPABILITY_MAINTENANCE, null);
+        if (maintenance != null) return maintenance;
+        if (tile instanceof IGregTechTileEntity) {
+            MetaTileEntity metaTileEntity = ((IGregTechTileEntity) tile).getMetaTileEntity();
+            if (metaTileEntity instanceof IMaintenance) return (IMaintenance) metaTileEntity;
+        }
+        return null;
+    }
+
+    private static boolean isOutputDiagnostic(String diagnostic) {
+        if (diagnostic == null || diagnostic.isEmpty()) return false;
+        return diagnostic.contains("输出仓已满")
+                || diagnostic.contains("物品输出条件")
+                || diagnostic.contains("流体输出条件")
+                || diagnostic.contains("输出数量超过机器限制");
     }
 
     private DroneExecutionResult transferEu(DroneEuTransfer.Result result, boolean importing) {
@@ -573,7 +667,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
                 DroneUpgradeType type = ItemDroneUpgradeModule.getType(stack);
-                return type != null && type.getMetadata() == slot;
+                return type != null && DroneHardwareStats.findUpgradeSlot(this, type, slot) < 0;
             }
 
             @Override
@@ -605,15 +699,19 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
 
     private boolean canRemoveUpgrade(int slot) {
         if (slot < 0 || slot >= upgrades.getSlots() || upgrades.getStackInSlot(slot).isEmpty()) return true;
-        DroneUpgradeType type = DroneUpgradeType.fromMetadata(slot);
-        if (type == DroneUpgradeType.BATTERY && energy.getStored() > chassis.getBaseCapacity()) return false;
+        DroneUpgradeType type = ItemDroneUpgradeModule.getType(upgrades.getStackInSlot(slot));
+        return type == null || !isUpgradeRemovalLocked(type);
+    }
+
+    private boolean isUpgradeRemovalLocked(DroneUpgradeType type) {
+        if (type == DroneUpgradeType.BATTERY && energy.getStored() > chassis.getBaseCapacity()) return true;
         if (type == DroneUpgradeType.CARGO) {
             for (int cargoSlot = chassis.getBaseCargoSlots(); cargoSlot < inventory.getSlots(); cargoSlot++) {
-                if (!inventory.getStackInSlot(cargoSlot).isEmpty()) return false;
+                if (!inventory.getStackInSlot(cargoSlot).isEmpty()) return true;
             }
         }
-        if (type == DroneUpgradeType.FLUID_CARGO && fluidTank.getFluidAmount() > 0) return false;
-        return true;
+        if (type == DroneUpgradeType.FLUID_CARGO && fluidTank.getFluidAmount() > 0) return true;
+        return false;
     }
 
     private long getConfiguredCapacity() {
@@ -663,7 +761,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 .child(IKey.lang("drtech.drone.controller.title").asWidget().pos(7, 6))
                 .child(IKey.lang("drtech.drone.controller.cargo").asWidget().pos(8, 16))
                 .child(IKey.lang("drtech.drone.controller.upgrades").asWidget().pos(8, 83))
-                .child(IKey.dynamic(this::getClientHardwareLine).asWidget().pos(8, 124).size(116, 48))
+                .child(IKey.lang("drtech.drone.controller.upgrade_hint").asWidget().pos(8, 114).size(116, 20))
+                .child(IKey.dynamic(this::getClientHardwareLine).asWidget().pos(8, 138).size(116, 88))
                 .child(IKey.dynamic(this::getClientEnergyLine).asWidget().pos(132, 24).size(170, 12))
                 .child(IKey.dynamic(this::getClientProgramLine).asWidget().pos(132, 39).size(170, 12))
                 .child(IKey.dynamic(this::getClientStatusLine).asWidget().pos(132, 54).size(170, 12))
@@ -776,6 +875,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     public NBTTagCompound createRemoteDebugSnapshot() {
         NBTTagCompound snapshot = new NBTTagCompound();
         snapshot.setInteger("EntityId", getEntityId());
+        snapshot.setLong("Position", new BlockPos(posX, posY, posZ).toLong());
         snapshot.setInteger("EnergyPercent", getEnergyPercent());
         snapshot.setString("Chassis", chassis.name());
         snapshot.setInteger("WirelessRange", getWirelessRange());
@@ -785,8 +885,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         snapshot.setString("FluidName", fluidTank.getFluid() == null ? "" : fluidTank.getFluid().getLocalizedName());
         snapshot.setString("SafetyState", safetyFirmware.getState().name());
         snapshot.setBoolean("ProgramSuspended", safetyFirmware.getState() != DroneSafetyState.PROGRAM);
-        snapshot.setBoolean("BatteryLocked", !canRemoveUpgrade(DroneUpgradeType.BATTERY.getMetadata()));
-        snapshot.setBoolean("CargoLocked", !canRemoveUpgrade(DroneUpgradeType.CARGO.getMetadata()));
+        snapshot.setBoolean("BatteryLocked", isUpgradeRemovalLocked(DroneUpgradeType.BATTERY));
+        snapshot.setBoolean("CargoLocked", isUpgradeRemovalLocked(DroneUpgradeType.CARGO));
         if (runtime == null) {
             snapshot.setString("Status", "NO PROGRAM");
             snapshot.setString("Node", "-");
@@ -816,8 +916,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         snapshot.setInteger("FluidAmount", fluidTank.getFluidAmount());
         snapshot.setInteger("FluidCapacity", fluidTank.getCapacity());
         snapshot.setString("FluidName", fluidTank.getFluid() == null ? "" : fluidTank.getFluid().getLocalizedName());
-        snapshot.setBoolean("BatteryLocked", !canRemoveUpgrade(DroneUpgradeType.BATTERY.getMetadata()));
-        snapshot.setBoolean("CargoLocked", !canRemoveUpgrade(DroneUpgradeType.CARGO.getMetadata()));
+        snapshot.setBoolean("BatteryLocked", isUpgradeRemovalLocked(DroneUpgradeType.BATTERY));
+        snapshot.setBoolean("CargoLocked", isUpgradeRemovalLocked(DroneUpgradeType.CARGO));
         snapshot.setFloat("Health", getHealth());
         snapshot.setFloat("MaxHealth", getMaxHealth());
         snapshot.setBoolean("Loop", loopProgram);
@@ -1378,6 +1478,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     remainder.amount -= stored;
                     remote.fill(remainder, true);
                 }
+                if (stored > 0) emitFluidTransferEffect(target, drained, true);
                 return stored > 0 ? DroneExecutionResult.running(stored)
                         : DroneExecutionResult.error("Fluid import committed no fluid");
             }
@@ -1412,6 +1513,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     remainder.amount -= moved;
                     fluidTank.fill(remainder, true);
                 }
+                if (moved > 0) emitFluidTransferEffect(target, drained, false);
                 return moved > 0 ? DroneExecutionResult.running(moved)
                         : DroneExecutionResult.error("Fluid export committed no fluid");
             }
@@ -1422,6 +1524,9 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 if (stored == null || !filter.matches(stored)) return DroneExecutionResult.failure(
                         DroneActionStatus.NO_RESOURCE, "failed", "Drone fluid cargo contains no matching fluid");
                 FluidStack drained = fluidTank.drain(Math.max(1, maximumAmount), true);
+                if (drained != null && drained.amount > 0) {
+                    emitFluidTransferEffect(new BlockPos(EntityProgrammableDrone.this), drained, false);
+                }
                 return drained == null ? DroneExecutionResult.failure(DroneActionStatus.NO_RESOURCE,
                         "failed", "Drone fluid cargo is empty") : DroneExecutionResult.running(drained.amount);
             }
@@ -1518,6 +1623,240 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 int dropped = dropCargoItems(filter, request.getMaximumAmount());
                 return dropped > 0 ? DroneExecutionResult.success(dropped)
                         : DroneExecutionResult.error("Items changed while dropping");
+            }
+
+            @Override
+            public DroneExecutionResult craftItems(DroneItemFilter outputFilter, int maximumCrafts,
+                    boolean simulate, boolean requireExactCount, DroneItemFilter reserveFilter, int reserveAmount) {
+                if (!DroneHardwareStats.hasUpgrade(upgrades, DroneUpgradeType.CRAFTING)) {
+                    return DroneExecutionResult.failure(DroneActionStatus.DENIED, "failed",
+                            "Drone crafting module is not installed");
+                }
+                if (outputFilter == null || outputFilter.getSpec().getMode() != DroneFilterMode.WHITELIST
+                        || outputFilter.getSpec().getRules().isEmpty()) {
+                    return DroneExecutionResult.failure(DroneActionStatus.INVALID_TARGET, "failed",
+                            "Crafting requires a non-empty output whitelist");
+                }
+                int requested = Math.max(1, Math.min(DroneCraftingPlanner.MAX_CRAFTS_PER_ACTION, maximumCrafts));
+                int possible = DroneCraftingPlanner.craft(inventory, getActiveCargoSlots(), world,
+                        outputFilter, requested, true, reserveFilter, reserveAmount);
+                if (possible <= 0 || requireExactCount && possible < requested) {
+                    return DroneExecutionResult.failure(DroneActionStatus.NO_RESOURCE, "failed",
+                            "Cargo lacks ingredients or output space for the requested recipe");
+                }
+                int crafts = requireExactCount ? requested : possible;
+                if (simulate) return DroneExecutionResult.success(crafts);
+                long energyCost = Math.min(Long.MAX_VALUE / 2L,
+                        DroneEnergyCosts.ENTITY_INTERACTION * (long) crafts);
+                if (!consumeEnergy(energyCost)) return DroneExecutionResult.running();
+                int crafted = DroneCraftingPlanner.craft(inventory, getActiveCargoSlots(), world,
+                        outputFilter, crafts, false, reserveFilter, reserveAmount);
+                return crafted > 0 ? DroneExecutionResult.success(crafted)
+                        : DroneExecutionResult.error("Cargo changed while committing the crafting plan");
+            }
+
+            @Override
+            public int getCraftableCount(DroneItemFilter outputFilter, int limit,
+                    DroneItemFilter reserveFilter, int reserveAmount) {
+                if (!DroneHardwareStats.hasUpgrade(upgrades, DroneUpgradeType.CRAFTING)) return 0;
+                return DroneCraftingPlanner.craft(inventory, getActiveCargoSlots(), world, outputFilter,
+                        Math.max(1, Math.min(DroneCraftingPlanner.MAX_CRAFTS_PER_ACTION, limit)), true,
+                        reserveFilter, reserveAmount);
+            }
+
+            @Override
+            public DroneExecutionResult craftGrid(DroneItemFilter outputFilter, DroneItemFilter[] gridFilters,
+                    int maximumCrafts, boolean requireExactCount,
+                    DroneItemFilter reserveFilter, int reserveAmount) {
+                if (!DroneHardwareStats.hasUpgrade(upgrades, DroneUpgradeType.CRAFTING)) {
+                    return DroneExecutionResult.failure(DroneActionStatus.DENIED, "failed",
+                            "Drone crafting module is not installed");
+                }
+                if (outputFilter == null || outputFilter.getSpec().getMode() != DroneFilterMode.WHITELIST
+                        || outputFilter.getSpec().getRules().isEmpty()) {
+                    return DroneExecutionResult.failure(DroneActionStatus.INVALID_TARGET, "failed",
+                            "Explicit crafting requires a non-empty output whitelist");
+                }
+                int requested = Math.max(1, Math.min(DroneCraftingPlanner.MAX_CRAFTS_PER_ACTION, maximumCrafts));
+                int possible = DroneCraftingPlanner.craftGrid(inventory, getActiveCargoSlots(), world,
+                        outputFilter, gridFilters, requested, true, reserveFilter, reserveAmount);
+                if (possible <= 0 || requireExactCount && possible < requested) {
+                    return DroneExecutionResult.failure(DroneActionStatus.NO_RESOURCE, "failed",
+                            "Cargo, output space, reserve floor, or explicit 3x3 recipe does not match");
+                }
+                int crafts = requireExactCount ? requested : possible;
+                long energyCost = Math.min(Long.MAX_VALUE / 2L,
+                        DroneEnergyCosts.ENTITY_INTERACTION * (long) crafts);
+                if (!consumeEnergy(energyCost)) return DroneExecutionResult.running();
+                int crafted = DroneCraftingPlanner.craftGrid(inventory, getActiveCargoSlots(), world,
+                        outputFilter, gridFilters, crafts, false, reserveFilter, reserveAmount);
+                return crafted > 0 ? DroneExecutionResult.success(crafted)
+                        : DroneExecutionResult.error("Cargo changed while committing the explicit crafting plan");
+            }
+
+            @Override
+            public DroneExecutionResult setMachineWorking(BlockPos target, boolean enabled) {
+                if (!world.isBlockLoaded(target)) return DroneExecutionResult.failure(DroneActionStatus.UNLOADED,
+                        "failed", "GregTech machine target is not loaded");
+                IWorkable workable = findMachineWorkable(target);
+                if (workable == null) return DroneExecutionResult.failure(DroneActionStatus.INVALID_TARGET,
+                        "failed", "Target exposes no GregTech workable capability");
+                DroneExecutionResult movement = approach(target);
+                if (movement.getState() != DroneActionState.SUCCESS) return movement;
+                if (!consumeEnergy(DroneEnergyCosts.BLOCK_INTERACTION)) return DroneExecutionResult.running();
+                workable.setWorkingEnabled(enabled);
+                return DroneExecutionResult.success();
+            }
+
+            @Override
+            public DroneExecutionResult waitForMachineIdle(BlockPos target) {
+                if (!world.isBlockLoaded(target)) return DroneExecutionResult.failure(DroneActionStatus.UNLOADED,
+                        "failed", "GregTech machine target is not loaded");
+                IWorkable workable = findMachineWorkable(target);
+                if (workable == null) return DroneExecutionResult.failure(DroneActionStatus.INVALID_TARGET,
+                        "failed", "Target exposes no GregTech workable capability");
+                DroneExecutionResult movement = approach(target);
+                if (movement.getState() != DroneActionState.SUCCESS) return movement;
+                return workable.isActive() ? DroneExecutionResult.running() : DroneExecutionResult.success();
+            }
+
+            @Override
+            public DroneExecutionResult waitForMachineCycle(BlockPos target, boolean observedActive,
+                    double previousProgressPercent) {
+                if (!world.isBlockLoaded(target)) return DroneExecutionResult.failure(DroneActionStatus.UNLOADED,
+                        "failed", "GregTech machine target is not loaded");
+                IWorkable workable = findMachineWorkable(target);
+                if (workable == null) return DroneExecutionResult.failure(DroneActionStatus.INVALID_TARGET,
+                        "failed", "Target exposes no GregTech workable capability");
+                DroneExecutionResult movement = approach(target);
+                if (movement.getState() != DroneActionState.SUCCESS) return movement;
+                if (!observedActive || previousProgressPercent < 0.0D) return DroneExecutionResult.running();
+
+                double currentProgress = getMachineProgressPercent(target);
+                AbstractRecipeLogic logic = findMachineRecipeLogic(target);
+                boolean lowEnergy = logic != null && logic.isHasNotEnoughEnergy();
+                boolean completedToIdle = previousProgressPercent > 0.0D && currentProgress <= 0.0D
+                        && !workable.isActive();
+                boolean startedNextRecipe = previousProgressPercent >= 75.0D
+                        && currentProgress + 0.001D < previousProgressPercent && workable.isActive();
+                return workable.isWorkingEnabled() && !lowEnergy && (completedToIdle || startedNextRecipe)
+                        ? DroneExecutionResult.success() : DroneExecutionResult.running();
+            }
+
+            @Override
+            public boolean isMachineActive(BlockPos target) {
+                IWorkable workable = findMachineWorkable(target);
+                return workable != null && workable.isActive();
+            }
+
+            @Override
+            public boolean isMachineWorkingEnabled(BlockPos target) {
+                IWorkable workable = findMachineWorkable(target);
+                return workable != null && workable.isWorkingEnabled();
+            }
+
+            @Override
+            public double getMachineProgressPercent(BlockPos target) {
+                IWorkable workable = findMachineWorkable(target);
+                if (workable == null) return -1.0D;
+                int maximum = workable.getMaxProgress();
+                return maximum <= 0 ? 0.0D : Math.min(100.0D, workable.getProgress() * 100.0D / maximum);
+            }
+
+            @Override
+            public boolean isMachineWaitingForInput(BlockPos target) {
+                AbstractRecipeLogic logic = findMachineRecipeLogic(target);
+                if (logic == null || logic.isActive() || !logic.isWorkingEnabled()) return false;
+                String diagnostic = logic.getWhyFailed();
+                return "NoneRecipes".equals(diagnostic)
+                        || (diagnostic != null && diagnostic.contains("输入可能被"));
+            }
+
+            @Override
+            public boolean isMachineOutputBlocked(BlockPos target) {
+                AbstractRecipeLogic logic = findMachineRecipeLogic(target);
+                return logic != null && isOutputDiagnostic(logic.getWhyFailed());
+            }
+
+            @Override
+            public boolean isMachineLowEnergy(BlockPos target) {
+                AbstractRecipeLogic logic = findMachineRecipeLogic(target);
+                return logic != null && logic.isHasNotEnoughEnergy();
+            }
+
+            @Override
+            public String getMachineDiagnostic(BlockPos target) {
+                AbstractRecipeLogic logic = findMachineRecipeLogic(target);
+                if (logic == null) return "目标不是支持配方诊断的 GregTech 机器";
+                String diagnostic = logic.getWhyFailed();
+                if (diagnostic == null || diagnostic.isEmpty()) return "";
+                return "NoneRecipes".equals(diagnostic)
+                        ? "没有匹配的配方（通常是输入不足或输入不匹配）" : diagnostic;
+            }
+
+            @Override
+            public DroneExecutionResult repairMachine(BlockPos target, boolean requireAllTools) {
+                if (!world.isBlockLoaded(target)) return DroneExecutionResult.failure(DroneActionStatus.UNLOADED,
+                        "failed", "GT 机器维修目标区块未加载");
+                IMaintenance maintenance = findMachineMaintenance(target);
+                if (maintenance == null) return DroneExecutionResult.failure(DroneActionStatus.INVALID_TARGET,
+                        "failed", "目标不是支持维护能力的 GT 多方块控制器");
+                if (!maintenance.hasMaintenanceMechanics() || !maintenance.hasMaintenanceProblems()) {
+                    return DroneExecutionResult.success(0L);
+                }
+                DroneExecutionResult movement = approach(target);
+                if (movement.getState() != DroneActionState.SUCCESS) return movement;
+
+                List<int[]> matches = new ArrayList<>();
+                Set<Integer> usedSlots = new HashSet<>();
+                int required = maintenance.getToolsForMaintenance().size();
+                for (it.unimi.dsi.fastutil.ints.Int2ObjectMap.Entry<String> problem
+                        : maintenance.getToolsForMaintenance()) {
+                    int matchedSlot = -1;
+                    for (int slot = 0; slot < getActiveCargoSlots(); slot++) {
+                        if (usedSlots.contains(slot)) continue;
+                        ItemStack stack = inventory.getStackInSlot(slot);
+                        if (!stack.isEmpty() && ToolHelper.isTool(stack, problem.getValue())) {
+                            matchedSlot = slot;
+                            break;
+                        }
+                    }
+                    if (matchedSlot >= 0) {
+                        matches.add(new int[] { problem.getIntKey(), matchedSlot });
+                        usedSlots.add(matchedSlot);
+                    }
+                }
+                if ((requireAllTools && matches.size() < required) || matches.isEmpty()) {
+                    return DroneExecutionResult.failure(DroneActionStatus.NO_RESOURCE, "failed",
+                            "无人机货舱缺少当前维护故障所需的 GT 工具");
+                }
+                long energyCost = DroneEnergyCosts.BLOCK_INTERACTION * matches.size();
+                if (!consumeEnergy(energyCost)) return DroneExecutionResult.running();
+                int repaired = 0;
+                for (int[] match : matches) {
+                    ItemStack stack = inventory.getStackInSlot(match[1]);
+                    if (stack.isEmpty()) continue;
+                    ToolHelper.damageItemWhenCrafting(stack, EntityProgrammableDrone.this);
+                    inventory.setStackInSlot(match[1], stack);
+                    maintenance.setMaintenanceFixed(match[0]);
+                    repaired++;
+                }
+                if (repaired > 0) {
+                    world.playSound(null, target, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 0.55F, 1.25F);
+                }
+                return DroneExecutionResult.success(repaired);
+            }
+
+            @Override
+            public boolean needsMachineMaintenance(BlockPos target) {
+                IMaintenance maintenance = findMachineMaintenance(target);
+                return maintenance != null && maintenance.hasMaintenanceProblems();
+            }
+
+            @Override
+            public int getMachineMaintenanceProblemCount(BlockPos target) {
+                IMaintenance maintenance = findMachineMaintenance(target);
+                return maintenance == null ? 0 : maintenance.getNumMaintenanceProblems();
             }
 
             @Override

@@ -17,12 +17,16 @@ public final class DrTechDroneNodes {
 
     public static final ResourceLocation START = id("start");
     public static final ResourceLocation END = id("end");
+    public static final ResourceLocation COMMENT = id("comment");
+    public static final ResourceLocation GROUP = id("group");
     public static final ResourceLocation WAIT = id("wait");
     public static final ResourceLocation BRANCH = id("branch");
     public static final ResourceLocation MOVE_TO = id("move_to");
     public static final ResourceLocation RETURN_TO_DOCK = id("return_to_dock");
     public static final ResourceLocation CHARGE_UNTIL = id("charge_until");
     public static final ResourceLocation FIND_NEAREST_DOCK = id("find_nearest_dock");
+    public static final ResourceLocation DOCK_REFERENCE = id("dock_reference");
+    public static final ResourceLocation PROGRAM_REFERENCE = id("program_reference");
     public static final ResourceLocation BIND_DOCK = id("bind_dock");
     public static final ResourceLocation UNBIND_DOCK = id("unbind_dock");
     public static final ResourceLocation CONFIGURE_SAFETY = id("configure_safety");
@@ -45,6 +49,7 @@ public final class DrTechDroneNodes {
     public static final ResourceLocation ITEM_FILTER = id("item_filter");
     public static final ResourceLocation BLOCK_FILTER = id("block_filter");
     public static final ResourceLocation FLUID_FILTER = id("fluid_filter");
+    public static final ResourceLocation ENTITY_FILTER = id("entity_filter");
     public static final ResourceLocation ENERGY_LEVEL = id("energy_level");
     public static final ResourceLocation TARGET_ENERGY = id("target_energy");
     public static final ResourceLocation TARGET_ENERGY_CAPACITY = id("target_energy_capacity");
@@ -58,6 +63,23 @@ public final class DrTechDroneNodes {
     public static final ResourceLocation CONTAINER_FLUID_AMOUNT = id("container_fluid_amount");
     public static final ResourceLocation FIND_FLUID_CONTAINER = id("find_fluid_container");
     public static final ResourceLocation WAIT_FOR_FLUID_AMOUNT = id("wait_for_fluid_amount");
+    public static final ResourceLocation CRAFT_ITEMS = id("craft_items");
+    public static final ResourceLocation CAN_CRAFT = id("can_craft");
+    public static final ResourceLocation CRAFTABLE_COUNT = id("craftable_count");
+    public static final ResourceLocation CRAFT_GRID = id("craft_grid");
+    public static final ResourceLocation SET_MACHINE_WORKING = id("set_machine_working");
+    public static final ResourceLocation WAIT_MACHINE_IDLE = id("wait_machine_idle");
+    public static final ResourceLocation MACHINE_ACTIVE = id("machine_active");
+    public static final ResourceLocation MACHINE_ENABLED = id("machine_enabled");
+    public static final ResourceLocation MACHINE_PROGRESS = id("machine_progress");
+    public static final ResourceLocation WAIT_MACHINE_CYCLE = id("wait_machine_cycle");
+    public static final ResourceLocation MACHINE_WAITING_INPUT = id("machine_waiting_input");
+    public static final ResourceLocation MACHINE_OUTPUT_BLOCKED = id("machine_output_blocked");
+    public static final ResourceLocation MACHINE_LOW_ENERGY = id("machine_low_energy");
+    public static final ResourceLocation MACHINE_DIAGNOSTIC = id("machine_diagnostic");
+    public static final ResourceLocation REPAIR_MACHINE = id("repair_machine");
+    public static final ResourceLocation MACHINE_NEEDS_MAINTENANCE = id("machine_needs_maintenance");
+    public static final ResourceLocation MACHINE_MAINTENANCE_PROBLEMS = id("machine_maintenance_problems");
     public static final ResourceLocation REDSTONE_STRENGTH = id("redstone_strength");
     public static final ResourceLocation LIGHT_LEVEL = id("light_level");
     public static final ResourceLocation LAST_ACTION_STATUS = id("last_action_status");
@@ -95,6 +117,8 @@ public final class DrTechDroneNodes {
     public static final ResourceLocation AREA_INTERSECTION = id("area_intersection");
     public static final ResourceLocation AREA_DIFFERENCE = id("area_difference");
     public static final ResourceLocation AREA_OFFSET = id("area_offset");
+    public static final ResourceLocation AREA_EXPAND = id("area_expand");
+    public static final ResourceLocation AREA_INSET = id("area_inset");
     public static final ResourceLocation AREA_CONTAINS = id("area_contains");
     public static final ResourceLocation AREA_VOLUME = id("area_volume");
     public static final ResourceLocation PLANE_AREA = id("plane_area");
@@ -117,6 +141,19 @@ public final class DrTechDroneNodes {
                 .category("flow")
                 .port(DronePortDefinition.input("in", DronePortType.FLOW, true))
                 .build());
+        registry.register(DroneNodeDefinition.builder(COMMENT, DroneNodeDefinition.FlowRole.VALUE)
+                .category("flow")
+                .property(DroneNodePropertyDefinition.string("Text", 1024))
+                .build());
+        registry.register(DroneNodeDefinition.builder(GROUP, DroneNodeDefinition.FlowRole.VALUE)
+                .category("flow")
+                .property(DroneNodePropertyDefinition.string("Title", 32))
+                .property(DroneNodePropertyDefinition.integer("Width", 128, 1600))
+                .property(DroneNodePropertyDefinition.integer("Height", 64, 1600))
+                .property(DroneNodePropertyDefinition.enumeration("Color",
+                        "BLUE", "GREEN", "ORANGE", "PURPLE", "RED", "GRAY"))
+                .property(DroneNodePropertyDefinition.bool("Collapsed"))
+                .build());
         registry.register(action(WAIT, "flow")
                 .port(DronePortDefinition.input("duration", DronePortType.NUMBER, false))
                 .property(DroneNodePropertyDefinition.integer("Ticks", 1, 20 * 60 * 60))
@@ -135,6 +172,8 @@ public final class DrTechDroneNodes {
                 .port(DronePortDefinition.output("body", DronePortType.FLOW, true))
                 .port(DronePortDefinition.output("done", DronePortType.FLOW, true))
                 .port(DronePortDefinition.output("coordinate", DronePortType.COORDINATE, false))
+                .property(DroneNodePropertyDefinition.enumeration("Order", "SERPENTINE", "REVERSE", "TOP_DOWN",
+                        "RANDOMIZED"))
                 .build());
 
         registry.register(action(MOVE_TO, "movement")
@@ -150,6 +189,13 @@ public final class DrTechDroneNodes {
         registry.register(DroneNodeDefinition.builder(FIND_NEAREST_DOCK, DroneNodeDefinition.FlowRole.VALUE)
                 .category("dock")
                 .port(DronePortDefinition.output("value", DronePortType.COORDINATE, false))
+                .build());
+        registry.register(valueBuilder(DOCK_REFERENCE, "dock", "value", DronePortType.DOCK_REFERENCE)
+                .property(DroneNodePropertyDefinition.selector("Dock", DroneNodePropertyType.DOCK_REFERENCE).required())
+                .build());
+        registry.register(valueBuilder(PROGRAM_REFERENCE, "program", "value", DronePortType.PROGRAM_REFERENCE)
+                .property(DroneNodePropertyDefinition.selector("Program", DroneNodePropertyType.PROGRAM_REFERENCE)
+                        .required())
                 .build());
         registry.register(action(BIND_DOCK, "dock")
                 .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
@@ -260,6 +306,113 @@ public final class DrTechDroneNodes {
                 .property(DroneNodePropertyDefinition.integer("Amount", 0, 1_000_000))
                 .property(DroneNodePropertyDefinition.enumeration("Operator", "AT_LEAST", "AT_MOST"))
                 .build());
+        registry.register(action(CRAFT_ITEMS, "items")
+                .port(DronePortDefinition.input("output", DronePortType.ITEM_FILTER, true))
+                .port(DronePortDefinition.input("count", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.input("reserve_filter", DronePortType.ITEM_FILTER, false))
+                .port(DronePortDefinition.input("reserve_count", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.output("crafted", DronePortType.NUMBER, false))
+                .property(DroneNodePropertyDefinition.integer("Count", 1, 64))
+                .property(DroneNodePropertyDefinition.integer("ReserveCount", 0, 64))
+                .property(DroneNodePropertyDefinition.enumeration("Mode", "EXACT", "AS_MANY_AS_POSSIBLE"))
+                .property(DroneNodePropertyDefinition.bool("Simulate"))
+                .build());
+        DroneNodeDefinition.Builder craftGrid = action(CRAFT_GRID, "items")
+                .port(DronePortDefinition.input("output", DronePortType.ITEM_FILTER, true));
+        for (int slot = 1; slot <= 9; slot++) {
+            craftGrid.port(DronePortDefinition.input("slot_" + slot, DronePortType.ITEM_FILTER, false));
+        }
+        registry.register(craftGrid
+                .port(DronePortDefinition.input("count", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.input("reserve_filter", DronePortType.ITEM_FILTER, false))
+                .port(DronePortDefinition.input("reserve_count", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.output("crafted", DronePortType.NUMBER, false))
+                .property(DroneNodePropertyDefinition.integer("Count", 1, 64))
+                .property(DroneNodePropertyDefinition.integer("ReserveCount", 0, 64))
+                .property(DroneNodePropertyDefinition.enumeration("Mode", "EXACT", "AS_MANY_AS_POSSIBLE"))
+                .build());
+        registry.register(DroneNodeDefinition.builder(CAN_CRAFT, DroneNodeDefinition.FlowRole.VALUE)
+                .category("conditions")
+                .port(DronePortDefinition.input("output", DronePortType.ITEM_FILTER, true))
+                .port(DronePortDefinition.input("count", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.input("reserve_filter", DronePortType.ITEM_FILTER, false))
+                .port(DronePortDefinition.input("reserve_count", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.output("result", DronePortType.BOOLEAN, false))
+                .property(DroneNodePropertyDefinition.integer("Count", 1, 64))
+                .property(DroneNodePropertyDefinition.integer("ReserveCount", 0, 64))
+                .build());
+        registry.register(DroneNodeDefinition.builder(CRAFTABLE_COUNT, DroneNodeDefinition.FlowRole.VALUE)
+                .category("sensors")
+                .port(DronePortDefinition.input("output", DronePortType.ITEM_FILTER, true))
+                .port(DronePortDefinition.input("reserve_filter", DronePortType.ITEM_FILTER, false))
+                .port(DronePortDefinition.input("reserve_count", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.output("value", DronePortType.NUMBER, false))
+                .property(DroneNodePropertyDefinition.integer("Limit", 1, 64))
+                .property(DroneNodePropertyDefinition.integer("ReserveCount", 0, 64))
+                .build());
+        registry.register(action(SET_MACHINE_WORKING, "machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.input("enabled", DronePortType.BOOLEAN, false))
+                .property(DroneNodePropertyDefinition.bool("Enabled"))
+                .build());
+        registry.register(action(WAIT_MACHINE_IDLE, "machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_ACTIVE, DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("result", DronePortType.BOOLEAN, false))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_ENABLED, DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("result", DronePortType.BOOLEAN, false))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_PROGRESS, DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("value", DronePortType.NUMBER, false))
+                .build());
+        registry.register(action(WAIT_MACHINE_CYCLE, "machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_WAITING_INPUT, DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("result", DronePortType.BOOLEAN, false))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_OUTPUT_BLOCKED, DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("result", DronePortType.BOOLEAN, false))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_LOW_ENERGY, DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("result", DronePortType.BOOLEAN, false))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_DIAGNOSTIC, DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("value", DronePortType.STRING, false))
+                .build());
+        registry.register(action(REPAIR_MACHINE, "machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("repaired", DronePortType.NUMBER, false))
+                .property(DroneNodePropertyDefinition.bool("RequireAll"))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_NEEDS_MAINTENANCE,
+                        DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("result", DronePortType.BOOLEAN, false))
+                .build());
+        registry.register(DroneNodeDefinition.builder(MACHINE_MAINTENANCE_PROBLEMS,
+                        DroneNodeDefinition.FlowRole.VALUE)
+                .category("machines")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("value", DronePortType.NUMBER, false))
+                .build());
         registry.register(action(INTERACT_BLOCK, "blocks")
                 .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
                 .property(DroneNodePropertyDefinition.enumeration("Direction", "AUTO", "DOWN", "UP", "NORTH",
@@ -317,6 +470,9 @@ public final class DrTechDroneNodes {
         registry.register(valueBuilder(FLUID_FILTER, "filters", "filter", DronePortType.FLUID_FILTER)
                 .property(DroneNodePropertyDefinition.selector("Fluid", DroneNodePropertyType.FLUID_SELECTOR))
                 .property(DroneNodePropertyDefinition.enumeration("Mode", "WHITELIST", "BLACKLIST"))
+                .build());
+        registry.register(valueBuilder(ENTITY_FILTER, "filters", "filter", DronePortType.ENTITY_FILTER)
+                .property(DroneNodePropertyDefinition.selector("FilterSpec", DroneNodePropertyType.ENTITY_SELECTOR))
                 .build());
         registry.register(value(ENERGY_LEVEL, "conditions", "value", DronePortType.NUMBER));
         registry.register(DroneNodeDefinition.builder(TARGET_ENERGY, DroneNodeDefinition.FlowRole.VALUE)
@@ -521,6 +677,20 @@ public final class DrTechDroneNodes {
                 .property(DroneNodePropertyDefinition.integer("Y", -32, 32))
                 .property(DroneNodePropertyDefinition.integer("Z", -32, 32))
                 .build());
+        registry.register(DroneNodeDefinition.builder(AREA_EXPAND, DroneNodeDefinition.FlowRole.VALUE)
+                .category("values")
+                .port(DronePortDefinition.input("area", DronePortType.AREA, true))
+                .port(DronePortDefinition.input("radius", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.output("value", DronePortType.AREA, false))
+                .property(DroneNodePropertyDefinition.integer("Radius", 0, 4))
+                .build());
+        registry.register(DroneNodeDefinition.builder(AREA_INSET, DroneNodeDefinition.FlowRole.VALUE)
+                .category("values")
+                .port(DronePortDefinition.input("area", DronePortType.AREA, true))
+                .port(DronePortDefinition.input("radius", DronePortType.NUMBER, false))
+                .port(DronePortDefinition.output("value", DronePortType.AREA, false))
+                .property(DroneNodePropertyDefinition.integer("Radius", 0, 4))
+                .build());
         registry.register(DroneNodeDefinition.builder(AREA_CONTAINS, DroneNodeDefinition.FlowRole.VALUE)
                 .category("conditions")
                 .port(DronePortDefinition.input("area", DronePortType.AREA, true))
@@ -546,6 +716,10 @@ public final class DrTechDroneNodes {
                 .port(DronePortDefinition.output("body", DronePortType.FLOW, true))
                 .port(DronePortDefinition.output("done", DronePortType.FLOW, true))
                 .build());
+    }
+
+    public static boolean isEditorOnly(ResourceLocation type) {
+        return COMMENT.equals(type) || GROUP.equals(type);
     }
 
     private static DroneNodeDefinition.Builder action(ResourceLocation id, String category) {

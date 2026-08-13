@@ -7,10 +7,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /** One atomic editor mutation. Commands carry the client's expected source revision. */
 public final class DroneGraphEditCommand {
+
+    public static final int MAX_BATCH_COMMANDS = 1024;
 
     private final DroneGraphCommandType type;
     private final long expectedRevision;
@@ -24,10 +29,18 @@ public final class DroneGraphEditCommand {
     private final int x;
     private final int y;
     private final NBTTagCompound configuration;
+    private final List<DroneGraphEditCommand> commands;
 
     private DroneGraphEditCommand(DroneGraphCommandType type, long expectedRevision, UUID objectId,
             UUID sourceNodeId, UUID targetNodeId, ResourceLocation nodeType, String sourcePort, String targetPort,
             String text, int x, int y, NBTTagCompound configuration) {
+        this(type, expectedRevision, objectId, sourceNodeId, targetNodeId, nodeType, sourcePort, targetPort,
+                text, x, y, configuration, Collections.emptyList());
+    }
+
+    private DroneGraphEditCommand(DroneGraphCommandType type, long expectedRevision, UUID objectId,
+            UUID sourceNodeId, UUID targetNodeId, ResourceLocation nodeType, String sourcePort, String targetPort,
+            String text, int x, int y, NBTTagCompound configuration, List<DroneGraphEditCommand> commands) {
         this.type = Objects.requireNonNull(type, "type");
         this.expectedRevision = expectedRevision;
         this.objectId = objectId;
@@ -40,6 +53,7 @@ public final class DroneGraphEditCommand {
         this.x = x;
         this.y = y;
         this.configuration = configuration == null ? null : configuration.copy();
+        this.commands = Collections.unmodifiableList(new ArrayList<>(commands));
     }
 
     public static DroneGraphEditCommand addNode(long revision, UUID nodeId, ResourceLocation nodeType, int x, int y,
@@ -77,6 +91,25 @@ public final class DroneGraphEditCommand {
                 null, null, name, 0, 0, null);
     }
 
+    /** Creates one revision-checked, undoable transaction from several primitive graph mutations. */
+    public static DroneGraphEditCommand batch(long revision, List<DroneGraphEditCommand> commands) {
+        if (commands == null || commands.isEmpty()) {
+            throw new IllegalArgumentException("Batch command is empty");
+        }
+        if (commands.size() > MAX_BATCH_COMMANDS) {
+            throw new IllegalArgumentException("Batch command limit exceeded");
+        }
+        for (DroneGraphEditCommand command : commands) {
+            if (command == null || command.getType() == DroneGraphCommandType.BATCH
+                    || command.getType() == DroneGraphCommandType.UNDO
+                    || command.getType() == DroneGraphCommandType.REDO) {
+                throw new IllegalArgumentException("Batch contains an unsupported command");
+            }
+        }
+        return new DroneGraphEditCommand(DroneGraphCommandType.BATCH, revision, null, null, null, null,
+                null, null, null, 0, 0, null, commands);
+    }
+
     public static DroneGraphEditCommand undo(long revision) {
         return simple(DroneGraphCommandType.UNDO, revision, null);
     }
@@ -102,7 +135,7 @@ public final class DroneGraphEditCommand {
                     require(targetNodeId, "target node"), requireText(targetPort, "target port")));
             case REMOVE_EDGE -> graph.removeEdge(require(objectId, "edge id"));
             case RENAME_PROGRAM -> graph.rename(text == null ? "" : text);
-            case UNDO, REDO -> throw new IllegalStateException(type + " must be handled by the edit session");
+            case BATCH, UNDO, REDO -> throw new IllegalStateException(type + " must be handled by the edit session");
         }
     }
 
@@ -162,5 +195,9 @@ public final class DroneGraphEditCommand {
 
     public String getText() {
         return text;
+    }
+
+    public List<DroneGraphEditCommand> getCommands() {
+        return commands;
     }
 }

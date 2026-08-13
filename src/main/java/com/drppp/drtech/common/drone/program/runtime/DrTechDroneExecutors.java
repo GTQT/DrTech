@@ -68,6 +68,58 @@ public final class DrTechDroneExecutors {
         registry.register(DrTechDroneNodes.DRAIN_FLUID, context -> tickFluidTransfer(context, 2));
         registry.register(DrTechDroneNodes.FIND_FLUID_CONTAINER, DrTechDroneExecutors::findFluidContainer);
         registry.register(DrTechDroneNodes.WAIT_FOR_FLUID_AMOUNT, DrTechDroneExecutors::waitForFluidAmount);
+        registry.register(DrTechDroneNodes.CRAFT_ITEMS, context -> {
+            Number input = context.getOptionalInput("count", Number.class);
+            int count = input == null ? context.getConfiguration().hasKey("Count", 99)
+                    ? context.getConfiguration().getInteger("Count") : 1 : input.intValue();
+            count = Math.max(1, Math.min(64, count));
+            DroneItemFilter output = context.requireInput("output", DroneItemFilter.class);
+            DroneItemFilter reserve = context.getOptionalInput("reserve_filter", DroneItemFilter.class);
+            Number reserveInput = context.getOptionalInput("reserve_count", Number.class);
+            int reserveCount = reserveInput == null ? context.getConfiguration().getInteger("ReserveCount")
+                    : reserveInput.intValue();
+            boolean exact = !"AS_MANY_AS_POSSIBLE".equals(context.getConfiguration().getString("Mode"));
+            DroneExecutionResult result = context.getEnvironment().craftItems(output, count,
+                    context.getConfiguration().getBoolean("Simulate"), exact, reserve,
+                    Math.max(0, Math.min(64, reserveCount)));
+            context.getMemory().setActionAmount(context.getNode().getId(), result.getAmount());
+            return result;
+        });
+        registry.register(DrTechDroneNodes.CRAFT_GRID, context -> {
+            DroneItemFilter[] grid = new DroneItemFilter[9];
+            for (int slot = 0; slot < grid.length; slot++) {
+                grid[slot] = context.getOptionalInput("slot_" + (slot + 1), DroneItemFilter.class);
+            }
+            Number countInput = context.getOptionalInput("count", Number.class);
+            int count = countInput == null ? context.getConfiguration().getInteger("Count") : countInput.intValue();
+            Number reserveInput = context.getOptionalInput("reserve_count", Number.class);
+            int reserveCount = reserveInput == null ? context.getConfiguration().getInteger("ReserveCount")
+                    : reserveInput.intValue();
+            DroneExecutionResult result = context.getEnvironment().craftGrid(
+                    context.requireInput("output", DroneItemFilter.class), grid,
+                    Math.max(1, Math.min(64, count)),
+                    !"AS_MANY_AS_POSSIBLE".equals(context.getConfiguration().getString("Mode")),
+                    context.getOptionalInput("reserve_filter", DroneItemFilter.class),
+                    Math.max(0, Math.min(64, reserveCount)));
+            context.getMemory().setActionAmount(context.getNode().getId(), result.getAmount());
+            return result;
+        });
+        registry.register(DrTechDroneNodes.SET_MACHINE_WORKING, context -> {
+            Boolean input = context.getOptionalInput("enabled", Boolean.class);
+            boolean enabled = input == null ? context.getConfiguration().getBoolean("Enabled") : input;
+            return context.getEnvironment().setMachineWorking(
+                    context.requireInput("target", BlockPos.class), enabled);
+        });
+        registry.register(DrTechDroneNodes.WAIT_MACHINE_IDLE, context ->
+                context.getEnvironment().waitForMachineIdle(context.requireInput("target", BlockPos.class)));
+        registry.register(DrTechDroneNodes.WAIT_MACHINE_CYCLE, DrTechDroneExecutors::tickWaitMachineCycle);
+        registry.register(DrTechDroneNodes.REPAIR_MACHINE, context -> {
+            DroneExecutionResult result = context.getEnvironment().repairMachine(
+                    context.requireInput("target", BlockPos.class),
+                    context.getConfiguration().getBoolean("RequireAll"));
+            context.getMemory().setActionAmount(context.getNode().getId(), result.getAmount());
+            return result;
+        });
         registry.register(DrTechDroneNodes.INTERACT_BLOCK, context -> interactBlock(context, false));
         registry.register(DrTechDroneNodes.USE_ITEM_ON_BLOCK, context -> interactBlock(context, true));
         registry.register(DrTechDroneNodes.PICKUP_DROPPED_ITEMS, context -> itemWorldAction(context, true));
@@ -328,6 +380,24 @@ public final class DrTechDroneExecutors {
         int remaining = state.getInteger("Remaining") - 1;
         state.setInteger("Remaining", remaining);
         return remaining <= 0 ? DroneExecutionResult.success() : DroneExecutionResult.running();
+    }
+
+    private static DroneExecutionResult tickWaitMachineCycle(DroneNodeExecutionContext context) {
+        BlockPos target = context.requireInput("target", BlockPos.class);
+        NBTTagCompound state = context.getState();
+        boolean observedActive = state.getBoolean("ObservedActive");
+        double previousProgress = state.hasKey("PreviousProgress", 99)
+                ? state.getDouble("PreviousProgress") : -1.0D;
+        DroneExecutionResult result = context.getEnvironment().waitForMachineCycle(
+                target, observedActive, previousProgress);
+        if (result.getState() == DroneActionState.RUNNING) {
+            double currentProgress = context.getEnvironment().getMachineProgressPercent(target);
+            if (context.getEnvironment().isMachineActive(target) || currentProgress > 0.0D) {
+                state.setBoolean("ObservedActive", true);
+            }
+            if (currentProgress >= 0.0D) state.setDouble("PreviousProgress", currentProgress);
+        }
+        return result;
     }
 
     private static DroneExecutionResult tickRepeat(DroneNodeExecutionContext context) {

@@ -8,6 +8,7 @@ public enum DroneGraphCommandType {
     ADD_EDGE,
     REMOVE_EDGE,
     RENAME_PROGRAM,
+    BATCH,
     UNDO,
     REDO
 }

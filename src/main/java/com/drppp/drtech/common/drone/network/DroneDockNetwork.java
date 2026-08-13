@@ -76,6 +76,27 @@ public final class DroneDockNetwork extends WorldSavedData {
         return Optional.ofNullable(records.get(dockId));
     }
 
+    /**
+     * Returns a stable, read-only snapshot for editor selectors. Ownership and dimension are filtered on the
+     * server so a client cannot enumerate another player's dock directory.
+     */
+    public List<DroneDockRecord> listForOwner(@Nullable UUID ownerId, int dimension) {
+        List<DroneDockRecord> result = new ArrayList<>();
+        for (DroneDockRecord record : records.values()) {
+            if (record.getDimension() == dimension && Objects.equals(ownerId, record.getOwnerId())) {
+                result.add(record);
+            }
+        }
+        result.sort(Comparator.comparingInt(DroneDockRecord::getPriority).reversed()
+                .thenComparing(DroneDockRecord::getName, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(record -> record.getDockId().toString()));
+        return java.util.Collections.unmodifiableList(result);
+    }
+
+    public static boolean isRecordOnline(DroneDockRecord record, long worldTime) {
+        return record != null && isOnline(record, worldTime);
+    }
+
     public int size() {
         return records.size();
     }

@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -51,6 +52,24 @@ class DroneDockNetworkTest {
 
         assertEquals(1, restored.size());
         assertTrue(restored.getRecord(current.getDockId()).isPresent());
+    }
+
+    @Test
+    void editorDirectoryFiltersOwnerAndDimensionAndUsesStablePriorityOrder() {
+        UUID owner = UUID.randomUUID();
+        DroneDockNetwork network = new DroneDockNetwork();
+        DroneDockRecord lower = record(owner, new BlockPos(1, 64, 1), 3, 1, 1_000L, true);
+        DroneDockRecord higher = record(owner, new BlockPos(2, 64, 2), 3, 9, 1_000L, true);
+        network.heartbeat(lower);
+        network.heartbeat(higher);
+        network.heartbeat(record(UUID.randomUUID(), new BlockPos(3, 64, 3), 3, 100, 1_000L, true));
+        network.heartbeat(new DroneDockRecord(UUID.randomUUID(), 1, BlockPos.ORIGIN, owner, "Other Dimension",
+                3, 100, 1_000L, true, 0, 10_000L, true, true));
+
+        List<DroneDockRecord> visible = network.listForOwner(owner, 0);
+        assertEquals(2, visible.size());
+        assertEquals(higher.getDockId(), visible.get(0).getDockId());
+        assertEquals(lower.getDockId(), visible.get(1).getDockId());
     }
 
     private static DroneDockRecord record(UUID owner, BlockPos position, int tier, int priority,

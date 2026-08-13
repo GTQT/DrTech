@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.HashSet;
+import java.util.Set;
+
 class DroneAreaTest {
 
     @Test
@@ -84,5 +87,35 @@ class DroneAreaTest {
         assertTrue(plane.contains(new BlockPos(1, 1, 1)));
         assertTrue(plane.contains(new BlockPos(2, 2, 2)));
         assertFalse(plane.contains(new BlockPos(1, 1, 0)));
+    }
+
+    @Test
+    void expandsAndInsetsAreasWithoutExceedingRuntimeLimits() {
+        DroneArea single = DroneArea.between(BlockPos.ORIGIN, BlockPos.ORIGIN);
+        DroneArea expanded = single.expand(1);
+        DroneArea inset = expanded.inset(1);
+
+        assertEquals(27L, expanded.getVolume());
+        assertEquals(new BlockPos(-1, -1, -1), expanded.getMin());
+        assertEquals(new BlockPos(1, 1, 1), expanded.getMax());
+        assertEquals(single, inset);
+        assertEquals(0L, single.inset(1).getVolume());
+        assertThrows(IllegalArgumentException.class,
+                () -> DroneArea.between(BlockPos.ORIGIN, new BlockPos(31, 0, 0)).expand(1));
+    }
+
+    @Test
+    void supportsDeterministicAlternativeTraversalOrders() {
+        DroneArea area = DroneArea.between(BlockPos.ORIGIN, new BlockPos(1, 1, 0));
+
+        assertEquals(new BlockPos(0, 1, 0), area.positionAt(0, DroneArea.TraversalOrder.REVERSE));
+        assertEquals(new BlockPos(1, 1, 0), area.positionAt(0, DroneArea.TraversalOrder.TOP_DOWN));
+        Set<BlockPos> randomized = new HashSet<>();
+        for (int index = 0; index < area.getVolume(); index++) {
+            BlockPos first = area.positionAt(index, DroneArea.TraversalOrder.RANDOMIZED);
+            assertEquals(first, area.positionAt(index, DroneArea.TraversalOrder.RANDOMIZED));
+            randomized.add(first);
+        }
+        assertEquals(area.getVolume(), randomized.size());
     }
 }

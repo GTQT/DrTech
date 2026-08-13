@@ -60,7 +60,8 @@ class DroneHardwareStatsTest {
         assertEquals(64_000, DroneHardwareStats.fluidCapacity(DroneChassisTier.EV, true));
         assertEquals(256_000, DroneHardwareStats.fluidCapacity(DroneChassisTier.IV, true));
         assertEquals(5, DroneUpgradeType.FLUID_CARGO.getMetadata());
-        assertEquals(6, DroneHardwareStats.UPGRADE_SLOTS);
+        assertEquals(6, DroneUpgradeType.CRAFTING.getMetadata());
+        assertEquals(7, DroneHardwareStats.UPGRADE_SLOTS);
     }
 
     @Test
@@ -74,4 +75,5 @@ class DroneHardwareStatsTest {
         };
         assertEquals(0, DroneHardwareStats.upgradeMask(empty));
     }
+
 }

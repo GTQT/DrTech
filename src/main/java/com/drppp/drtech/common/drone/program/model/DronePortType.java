@@ -27,6 +27,10 @@ public enum DronePortType {
         if (this == sourceType) {
             return true;
         }
+        // A dock reference evaluates to its saved BlockPos snapshot, so it is a safe coordinate source.
+        if (this == COORDINATE && sourceType == DOCK_REFERENCE) {
+            return true;
+        }
         return this == ANY_DATA && sourceType != FLOW;
     }
 }

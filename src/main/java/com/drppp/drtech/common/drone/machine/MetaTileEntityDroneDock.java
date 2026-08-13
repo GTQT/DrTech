@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.utils.serialization.ByteBufAdapters;
+import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
@@ -63,6 +65,14 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     private boolean autoRecover = true;
     private boolean pendingResume;
     private int priority;
+
+    /**
+     * UI snapshots.  The dock logic always uses the server fields above; these copies only exist so the client can
+     * show the real, current control state instead of a misleading static pair of toggle buttons.
+     */
+    private boolean clientDockEnabled = true;
+    private boolean clientAutoLaunch;
+    private boolean clientLaunchReady;
 
     /** Compatibility constructor retained for the original fixed ID 901 HV dock. */
     public MetaTileEntityDroneDock(ResourceLocation metaTileEntityId) {
@@ -326,6 +336,7 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     @Override
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         if (getWorld() != null && !getWorld().isRemote) canControl(guiData.getPlayer());
+        registerControlStateSync(syncManager);
         syncManager.registerSlotGroup("drone", 2);
         syncManager.registerSyncedAction(CONTROL_ACTION, false, true, packet -> {
             String command = packet.readString(16);
@@ -334,12 +345,14 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
             else if ("AUTO".equals(command) && canControl(guiData.getPlayer())) {
                 autoLaunch = !autoLaunch;
                 markDirty();
+                updateNetworkHeartbeat();
             } else if ("ENABLE".equals(command) && canControl(guiData.getPlayer())) {
                 enabled = !enabled;
                 markDirty();
+                updateNetworkHeartbeat();
             }
         });
-        return GTGuis.createPanel(this, 176, 188)
+        return GTGuis.createPanel(this, 176, 230)
                 .child(IKey.lang(getMetaFullName()).asWidget().pos(5, 5))
                 .child(IKey.lang("drtech.drone.dock.charge_slot").asWidget().pos(25, 31))
                 .child(IKey.lang("drtech.drone.dock.program_slot").asWidget().pos(101, 31))
@@ -349,18 +362,71 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
                         .slotGroup("drone").accessibility(true, true)).pos(112, 48))
                 .child(controlButton("drtech.drone.dock.launch", "LAUNCH", 8, 73, syncManager))
                 .child(controlButton("drtech.drone.dock.recall", "RECALL", 62, 73, syncManager))
-                .child(controlButton("drtech.drone.dock.auto", "AUTO", 116, 73, syncManager))
-                .child(controlButton("drtech.drone.dock.enable", "ENABLE", 62, 92, syncManager))
+                .child(controlButton(IKey.lang(this::getAutoLaunchToggleKey), "AUTO", 116, 73, 52, syncManager))
+                .child(controlButton(IKey.lang(this::getDockEnableToggleKey), "ENABLE", 8, 92, 160, syncManager))
+                .child(IKey.lang(this::getDockEnabledStatusKey).asWidget().pos(8, 112))
+                .child(IKey.lang(this::getAutoLaunchStatusKey).asWidget().pos(8, 123))
+                .child(IKey.lang(this::getLaunchReadinessStatusKey).asWidget().pos(8, 134))
                 .child(SlotGroupWidget.playerInventory(false).left(7).bottom(7));
     }
 
     private ButtonWidget<?> controlButton(String translation, String command, int x, int y,
             PanelSyncManager syncManager) {
-        return new ButtonWidget<>().pos(x, y).size(52, 16).overlay(IKey.lang(translation))
+        return controlButton(IKey.lang(translation), command, x, y, 52, syncManager);
+    }
+
+    private ButtonWidget<?> controlButton(IKey label, String command, int x, int y, int width,
+            PanelSyncManager syncManager) {
+        return new ButtonWidget<>().pos(x, y).size(width, 16).overlay(label)
                 .onMousePressed(mouse -> {
                     syncManager.callSyncedAction(CONTROL_ACTION, packet -> packet.writeString(command));
                     return true;
                 });
+    }
+
+    /** Registers compact server-to-client state values used by the dock control/status area. */
+    private void registerControlStateSync(PanelSyncManager syncManager) {
+        syncManager.syncValue("dock_enabled", 0, GenericSyncValue.builder(Boolean.class)
+                .getter(() -> enabled)
+                .setter(value -> clientDockEnabled = value)
+                .adapter(ByteBufAdapters.BOOL)
+                .copyImmutable()
+                .build());
+        syncManager.syncValue("dock_auto_launch", 0, GenericSyncValue.builder(Boolean.class)
+                .getter(() -> autoLaunch)
+                .setter(value -> clientAutoLaunch = value)
+                .adapter(ByteBufAdapters.BOOL)
+                .copyImmutable()
+                .build());
+        syncManager.syncValue("dock_launch_ready", 0, GenericSyncValue.builder(Boolean.class)
+                .getter(this::canLaunchStoredDrone)
+                .setter(value -> clientLaunchReady = value)
+                .adapter(ByteBufAdapters.BOOL)
+                .copyImmutable()
+                .build());
+    }
+
+    private String getDockEnableToggleKey() {
+        return clientDockEnabled ? "drtech.drone.dock.enable.disable" : "drtech.drone.dock.enable.enable";
+    }
+
+    private String getAutoLaunchToggleKey() {
+        return clientAutoLaunch ? "drtech.drone.dock.auto.disable" : "drtech.drone.dock.auto.enable";
+    }
+
+    private String getDockEnabledStatusKey() {
+        return clientDockEnabled ? "drtech.drone.dock.status.enabled" : "drtech.drone.dock.status.disabled";
+    }
+
+    private String getAutoLaunchStatusKey() {
+        return clientAutoLaunch ? "drtech.drone.dock.auto.status.enabled"
+                : "drtech.drone.dock.auto.status.disabled";
+    }
+
+    private String getLaunchReadinessStatusKey() {
+        if (!clientDockEnabled) return "drtech.drone.dock.status.launch.disabled";
+        return clientLaunchReady ? "drtech.drone.dock.status.launch.ready"
+                : "drtech.drone.dock.status.launch.charging";
     }
 
     @Override

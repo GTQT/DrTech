@@ -10,7 +10,8 @@ public enum DroneUpgradeType {
     EFFICIENCY(2, "efficiency"),
     CARGO(3, "cargo"),
     WIRELESS(4, "wireless"),
-    FLUID_CARGO(5, "fluid_cargo");
+    FLUID_CARGO(5, "fluid_cargo"),
+    CRAFTING(6, "crafting");
 
     private final int metadata;
     private final String serializedName;

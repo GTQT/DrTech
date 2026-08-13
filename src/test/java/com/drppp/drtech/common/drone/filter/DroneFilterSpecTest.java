@@ -1,14 +1,23 @@
 package com.drppp.drtech.common.drone.filter;
 
 import com.drppp.drtech.common.drone.inventory.DroneItemFilter;
+import com.drppp.drtech.common.drone.program.model.DroneNodePropertyType;
+import com.drppp.drtech.common.drone.program.model.DronePortType;
+import com.drppp.drtech.common.drone.program.model.DroneNodeDefinition;
+import com.drppp.drtech.common.drone.program.registry.DrTechDroneNodes;
+import com.drppp.drtech.common.drone.program.runtime.DrTechDroneValueEvaluators;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DroneFilterSpecTest {
@@ -59,5 +68,50 @@ class DroneFilterSpecTest {
 
         assertEquals("minecraft:stone", decoded.getRules().get(0).getBlockId().toString());
         assertEquals(-1, decoded.getRules().get(0).getMetadata());
+    }
+
+    @Test
+    void blockFilterRoundTripsReadableBlockStatePredicatesWithoutBreakingLegacyMetadata() {
+        Map<String, String> properties = new LinkedHashMap<>();
+        properties.put("facing", "north");
+        properties.put("half", "top");
+        DroneBlockFilterSpec source = new DroneBlockFilterSpec(DroneFilterMode.BLACKLIST,
+                Arrays.asList(new DroneBlockFilterSpec.Rule(new ResourceLocation("minecraft", "stairs"),
+                                -1, properties),
+                        new DroneBlockFilterSpec.Rule(new ResourceLocation("minecraft", "wool"), 14)));
+
+        DroneBlockFilterSpec decoded = DroneBlockFilterSpec.readFromNbt(source.writeToNbt());
+
+        assertEquals(DroneFilterMode.BLACKLIST, decoded.getMode());
+        assertEquals("north", decoded.getRules().get(0).getStateProperties().get("facing"));
+        assertEquals("top", decoded.getRules().get(0).getStateProperties().get("half"));
+        assertEquals(14, decoded.getRules().get(1).getMetadata());
+        assertTrue(decoded.getRules().get(1).getStateProperties().isEmpty());
+    }
+
+    @Test
+    void searchableItemRulesPreserveRegistryWildcardAndPureOreSelectors() {
+        DroneItemFilterSpec source = new DroneItemFilterSpec(DroneFilterMode.WHITELIST, Arrays.asList(
+                new DroneItemFilterSpec.Rule(new ResourceLocation("minecraft", "wool"), -1,
+                        "", "", false, null),
+                new DroneItemFilterSpec.Rule(null, -1, "ingotIron", "", false, null)));
+
+        DroneItemFilterSpec decoded = DroneItemFilterSpec.readFromNbt(source.writeToNbt());
+
+        assertEquals("minecraft:wool", decoded.getRules().get(0).getItemId().toString());
+        assertEquals(-1, decoded.getRules().get(0).getMetadata());
+        assertNull(decoded.getRules().get(1).getItemId());
+        assertEquals("ingotIron", decoded.getRules().get(1).getOreDictionary());
+    }
+
+    @Test
+    void entityFilterIsAUsableTypedValueNodeWithRuntimeEvaluator() {
+        DroneNodeDefinition definition = DrTechDroneNodes.createDefaultRegistry().get(DrTechDroneNodes.ENTITY_FILTER);
+
+        assertNotNull(definition);
+        assertEquals(DronePortType.ENTITY_FILTER, definition.getPorts().iterator().next().getType());
+        assertEquals(DroneNodePropertyType.ENTITY_SELECTOR,
+                definition.getProperties().iterator().next().getType());
+        assertNotNull(DrTechDroneValueEvaluators.createDefaultRegistry().get(DrTechDroneNodes.ENTITY_FILTER));
     }
 }

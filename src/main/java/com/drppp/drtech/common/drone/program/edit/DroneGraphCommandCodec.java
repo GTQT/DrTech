@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.drone.program.edit;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.UUID;
@@ -26,10 +27,22 @@ public final class DroneGraphCommandCodec {
         tag.setInteger("X", command.getX());
         tag.setInteger("Y", command.getY());
         if (command.getConfiguration() != null) tag.setTag("Config", command.getConfiguration());
+        if (command.getType() == DroneGraphCommandType.BATCH) {
+            NBTTagList commands = new NBTTagList();
+            for (DroneGraphEditCommand child : command.getCommands()) commands.appendTag(write(child));
+            tag.setTag("Commands", commands);
+        }
         return tag;
     }
 
     public static DroneGraphEditCommand read(NBTTagCompound tag) {
+        if (tag == null || tag.getInteger("Schema") != SCHEMA_VERSION) {
+            throw new IllegalArgumentException("Unsupported graph command schema");
+        }
+        return read(tag, true);
+    }
+
+    private static DroneGraphEditCommand read(NBTTagCompound tag, boolean allowBatch) {
         if (tag == null || tag.getInteger("Schema") != SCHEMA_VERSION) {
             throw new IllegalArgumentException("Unsupported graph command schema");
         }
@@ -54,9 +67,22 @@ public final class DroneGraphCommandCodec {
                     readUuid(tag, "TargetNode"), readText(tag, "TargetPort", 64));
             case REMOVE_EDGE -> DroneGraphEditCommand.removeEdge(revision, readUuid(tag, "ObjectId"));
             case RENAME_PROGRAM -> DroneGraphEditCommand.rename(revision, bounded(tag.getString("Text"), 64, "Text"));
+            case BATCH -> readBatch(tag, revision, allowBatch);
             case UNDO -> DroneGraphEditCommand.undo(revision);
             case REDO -> DroneGraphEditCommand.redo(revision);
         };
+    }
+
+    private static DroneGraphEditCommand readBatch(NBTTagCompound tag, long revision, boolean allowBatch) {
+        if (!allowBatch) throw new IllegalArgumentException("Nested batch commands are not supported");
+        NBTTagList list = tag.getTagList("Commands", 10);
+        int size = list.tagCount();
+        if (size == 0 || size > DroneGraphEditCommand.MAX_BATCH_COMMANDS) {
+            throw new IllegalArgumentException("Invalid batch command size");
+        }
+        java.util.List<DroneGraphEditCommand> commands = new java.util.ArrayList<>(size);
+        for (int i = 0; i < size; i++) commands.add(read(list.getCompoundTagAt(i), false));
+        return DroneGraphEditCommand.batch(revision, commands);
     }
 
     private static void setUuid(NBTTagCompound tag, String key, UUID value) {

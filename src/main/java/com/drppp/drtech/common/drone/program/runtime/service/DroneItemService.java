@@ -32,4 +32,28 @@ public interface DroneItemService {
     default DroneExecutionResult dropItems(DroneItemWorldRequest request) {
         return DroneExecutionResult.error("Item dropping is unavailable in this runtime environment");
     }
+
+    default DroneExecutionResult craftItems(DroneItemFilter outputFilter, int maximumCrafts,
+            boolean simulate, boolean requireExactCount) {
+        return DroneExecutionResult.error("Cargo crafting is unavailable in this runtime environment");
+    }
+
+    default DroneExecutionResult craftItems(DroneItemFilter outputFilter, int maximumCrafts,
+            boolean simulate, boolean requireExactCount, DroneItemFilter reserveFilter, int reserveAmount) {
+        return craftItems(outputFilter, maximumCrafts, simulate, requireExactCount);
+    }
+
+    default int getCraftableCount(DroneItemFilter outputFilter, int limit) {
+        return 0;
+    }
+
+    default int getCraftableCount(DroneItemFilter outputFilter, int limit,
+            DroneItemFilter reserveFilter, int reserveAmount) {
+        return getCraftableCount(outputFilter, limit);
+    }
+
+    default DroneExecutionResult craftGrid(DroneItemFilter outputFilter, DroneItemFilter[] gridFilters,
+            int maximumCrafts, boolean requireExactCount, DroneItemFilter reserveFilter, int reserveAmount) {
+        return DroneExecutionResult.error("Explicit cargo crafting is unavailable in this runtime environment");
+    }
 }

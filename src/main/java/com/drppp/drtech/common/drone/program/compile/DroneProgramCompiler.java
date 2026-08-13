@@ -59,6 +59,7 @@ public final class DroneProgramCompiler {
         validateTransferTargets(graph, connectionCounts, diagnostics);
         if (entryNodeId != null) {
             validateReachability(graph, definitions, entryNodeId, diagnostics);
+            validateControlFlowCycles(graph, definitions, entryNodeId, diagnostics);
         }
 
         boolean hasErrors = diagnostics.stream()
@@ -94,8 +95,8 @@ public final class DroneProgramCompiler {
             for (DroneNodePropertyDefinition property : definition.getProperties()) {
                 String reason = property.validate(config);
                 if (reason != null) {
-                    error(diagnostics, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION, node.getId(), null,
-                            reason, property.getType().name());
+                    propertyError(diagnostics, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION, node.getId(),
+                            property.getId(), reason, property.getType().name());
                 }
             }
             if (node.getType().equals(DrTechDroneNodes.AREA)) {
@@ -103,16 +104,19 @@ public final class DroneProgramCompiler {
                         new BlockPos(config.getInteger("X1"), config.getInteger("Y1"), config.getInteger("Z1")),
                         new BlockPos(config.getInteger("X2"), config.getInteger("Y2"), config.getInteger("Z2")));
                 if (!area.isWithinRuntimeLimits()) {
-                    error(diagnostics, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION, node.getId(), null,
-                            "area_too_large", Long.toString(area.getVolume()), Integer.toString(DroneArea.MAX_BLOCKS));
+                    propertyError(diagnostics, DroneDiagnosticCode.AREA_LIMIT_EXCEEDED, node.getId(),
+                            areaFocusProperty(area), Integer.toString(area.getSizeX()),
+                            Integer.toString(area.getSizeY()), Integer.toString(area.getSizeZ()),
+                            Long.toString(area.getVolume()), Integer.toString(DroneArea.MAX_AXIS_LENGTH),
+                            Integer.toString(DroneArea.MAX_BLOCKS));
                 }
             }
             if (isVariableNode(node)) {
                 String name = config.getString("Name");
                 if (name.isEmpty()) name = "value";
                 if (!DroneRuntimeMemory.isValidName(name)) {
-                    error(diagnostics, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION, node.getId(), null,
-                            "invalid_variable_name", name);
+                    propertyError(diagnostics, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION, node.getId(),
+                            "Name", "invalid_variable_name", name);
                 }
             }
         }
@@ -122,6 +126,14 @@ public final class DroneProgramCompiler {
         return node.getType().equals(DrTechDroneNodes.GET_NUMBER_VARIABLE)
                 || node.getType().equals(DrTechDroneNodes.SET_NUMBER_VARIABLE)
                 || node.getType().equals(DrTechDroneNodes.ADD_NUMBER_VARIABLE);
+    }
+
+    private static String areaFocusProperty(DroneArea area) {
+        if (area.getSizeX() > DroneArea.MAX_AXIS_LENGTH) return "X2";
+        if (area.getSizeY() > DroneArea.MAX_AXIS_LENGTH) return "Y2";
+        if (area.getSizeZ() > DroneArea.MAX_AXIS_LENGTH) return "Z2";
+        if (area.getSizeX() >= area.getSizeY() && area.getSizeX() >= area.getSizeZ()) return "X2";
+        return area.getSizeY() >= area.getSizeZ() ? "Y2" : "Z2";
     }
 
     private UUID validateEntryNode(DroneProgramGraph graph, Map<UUID, DroneNodeDefinition> definitions,
@@ -277,16 +289,117 @@ public final class DroneProgramCompiler {
         } while (changed);
 
         for (DroneProgramNode node : graph.getNodes()) {
-            if (definitions.containsKey(node.getId()) && !reachable.contains(node.getId())) {
+            if (definitions.containsKey(node.getId()) && !DrTechDroneNodes.isEditorOnly(node.getType())
+                    && !reachable.contains(node.getId())) {
                 diagnostics.add(new DroneProgramDiagnostic(DroneDiagnosticSeverity.WARNING,
                         DroneDiagnosticCode.UNREACHABLE_NODE, node.getId(), null));
             }
         }
     }
 
+    /**
+     * Finds reachable strongly connected flow components. A closed component can never finish and is an error;
+     * an open, non-bounded component can finish only through a runtime condition and is therefore a warning.
+     */
+    private void validateControlFlowCycles(DroneProgramGraph graph, Map<UUID, DroneNodeDefinition> definitions,
+            UUID entryNodeId, List<DroneProgramDiagnostic> diagnostics) {
+        Map<UUID, Set<UUID>> outgoing = new HashMap<>();
+        Map<UUID, Set<UUID>> incoming = new HashMap<>();
+        for (UUID nodeId : definitions.keySet()) {
+            outgoing.put(nodeId, new HashSet<>());
+            incoming.put(nodeId, new HashSet<>());
+        }
+        for (DroneProgramEdge edge : graph.getEdges()) {
+            DroneNodeDefinition source = definitions.get(edge.getSourceNodeId());
+            DroneNodeDefinition target = definitions.get(edge.getTargetNodeId());
+            if (source == null || target == null) continue;
+            DronePortDefinition sourcePort = source.getPort(edge.getSourcePortId());
+            DronePortDefinition targetPort = target.getPort(edge.getTargetPortId());
+            if (sourcePort == null || targetPort == null || sourcePort.getType() != DronePortType.FLOW
+                    || targetPort.getType() != DronePortType.FLOW
+                    || sourcePort.getDirection() != DronePortDirection.OUTPUT
+                    || targetPort.getDirection() != DronePortDirection.INPUT) continue;
+            outgoing.get(edge.getSourceNodeId()).add(edge.getTargetNodeId());
+            incoming.get(edge.getTargetNodeId()).add(edge.getSourceNodeId());
+        }
+
+        Set<UUID> reachable = traverse(entryNodeId, outgoing);
+        Set<UUID> remaining = new HashSet<>(reachable);
+        while (!remaining.isEmpty()) {
+            UUID seed = remaining.iterator().next();
+            Set<UUID> forward = traverse(seed, outgoing);
+            Set<UUID> backward = traverse(seed, incoming);
+            forward.retainAll(backward);
+            forward.retainAll(reachable);
+            Set<UUID> component = forward;
+            remaining.removeAll(component);
+            boolean cyclic = component.size() > 1 || outgoing.getOrDefault(seed, java.util.Collections.emptySet())
+                    .contains(seed);
+            if (!cyclic) continue;
+
+            boolean hasExit = false;
+            for (UUID nodeId : component) {
+                for (UUID target : outgoing.getOrDefault(nodeId, java.util.Collections.emptySet())) {
+                    if (!component.contains(target)) {
+                        hasExit = true;
+                        break;
+                    }
+                }
+                if (hasExit) break;
+            }
+            UUID focus = cycleFocusNode(graph, component);
+            if (!hasExit) {
+                diagnostics.add(new DroneProgramDiagnostic(DroneDiagnosticSeverity.ERROR,
+                        DroneDiagnosticCode.NO_EXIT_LOOP, focus, null, Integer.toString(component.size())));
+            } else if (!isBoundedLoopComponent(graph, component)) {
+                diagnostics.add(new DroneProgramDiagnostic(DroneDiagnosticSeverity.WARNING,
+                        DroneDiagnosticCode.POSSIBLE_INFINITE_LOOP, focus, null,
+                        Integer.toString(component.size())));
+            }
+        }
+    }
+
+    private static Set<UUID> traverse(UUID start, Map<UUID, Set<UUID>> edges) {
+        Set<UUID> visited = new HashSet<>();
+        Deque<UUID> queue = new ArrayDeque<>();
+        if (start != null && edges.containsKey(start)) {
+            visited.add(start);
+            queue.add(start);
+        }
+        while (!queue.isEmpty()) {
+            for (UUID target : edges.getOrDefault(queue.removeFirst(), java.util.Collections.emptySet())) {
+                if (visited.add(target)) queue.addLast(target);
+            }
+        }
+        return visited;
+    }
+
+    private static UUID cycleFocusNode(DroneProgramGraph graph, Set<UUID> component) {
+        for (UUID nodeId : component) {
+            DroneProgramNode node = graph.getNode(nodeId);
+            if (node != null && node.getType().equals(DrTechDroneNodes.WHILE)) return nodeId;
+        }
+        return component.iterator().next();
+    }
+
+    private static boolean isBoundedLoopComponent(DroneProgramGraph graph, Set<UUID> component) {
+        for (UUID nodeId : component) {
+            DroneProgramNode node = graph.getNode(nodeId);
+            if (node != null && (node.getType().equals(DrTechDroneNodes.REPEAT)
+                    || node.getType().equals(DrTechDroneNodes.FOR_EACH_COORDINATE))) return true;
+        }
+        return false;
+    }
+
     private static void error(List<DroneProgramDiagnostic> diagnostics, DroneDiagnosticCode code, UUID nodeId,
             String portId, String... arguments) {
         diagnostics.add(new DroneProgramDiagnostic(DroneDiagnosticSeverity.ERROR, code, nodeId, portId, arguments));
+    }
+
+    private static void propertyError(List<DroneProgramDiagnostic> diagnostics, DroneDiagnosticCode code, UUID nodeId,
+            String propertyId, String... arguments) {
+        diagnostics.add(DroneProgramDiagnostic.withProperty(DroneDiagnosticSeverity.ERROR, code, nodeId, null,
+                propertyId, arguments));
     }
 
     private static final class PortKey {

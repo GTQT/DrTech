@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import java.util.UUID;
 
 class DroneNodePropertyDefinitionTest {
 
@@ -40,5 +41,24 @@ class DroneNodePropertyDefinitionTest {
         assertNull(fluid.validate(configuration));
         configuration.setString("Fluid", new String(new char[129]).replace('\0', 'x'));
         assertNotNull(fluid.validate(configuration));
+    }
+
+    @Test
+    void programReferenceRequiresStableUuidAndNonNegativeRevision() {
+        DroneNodePropertyDefinition reference = DroneNodePropertyDefinition.selector("Program",
+                DroneNodePropertyType.PROGRAM_REFERENCE).required();
+        NBTTagCompound configuration = new NBTTagCompound();
+        assertNotNull(reference.validate(configuration));
+
+        NBTTagCompound program = new NBTTagCompound();
+        program.setString("ProgramId", "not-a-uuid");
+        program.setLong("Revision", 1L);
+        configuration.setTag("Program", program);
+        assertNotNull(reference.validate(configuration));
+
+        program.setString("ProgramId", UUID.randomUUID().toString());
+        assertNull(reference.validate(configuration));
+        program.setLong("Revision", -1L);
+        assertNotNull(reference.validate(configuration));
     }
 }

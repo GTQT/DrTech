@@ -11,15 +11,27 @@ public final class DroneProgramDiagnostic {
     private final DroneDiagnosticCode code;
     private final UUID nodeId;
     private final String portId;
+    private final String propertyId;
     private final List<String> arguments;
 
     public DroneProgramDiagnostic(DroneDiagnosticSeverity severity, DroneDiagnosticCode code, UUID nodeId,
             String portId, String... arguments) {
+        this(severity, code, nodeId, portId, null, Arrays.asList(arguments));
+    }
+
+    public static DroneProgramDiagnostic withProperty(DroneDiagnosticSeverity severity, DroneDiagnosticCode code,
+            UUID nodeId, String portId, String propertyId, String... arguments) {
+        return new DroneProgramDiagnostic(severity, code, nodeId, portId, propertyId, Arrays.asList(arguments));
+    }
+
+    private DroneProgramDiagnostic(DroneDiagnosticSeverity severity, DroneDiagnosticCode code, UUID nodeId,
+            String portId, String propertyId, List<String> arguments) {
         this.severity = severity;
         this.code = code;
         this.nodeId = nodeId;
         this.portId = portId;
-        this.arguments = Collections.unmodifiableList(Arrays.asList(arguments));
+        this.propertyId = propertyId;
+        this.arguments = Collections.unmodifiableList(arguments);
     }
 
     public DroneDiagnosticSeverity getSeverity() {
@@ -36,6 +48,10 @@ public final class DroneProgramDiagnostic {
 
     public String getPortId() {
         return portId;
+    }
+
+    public String getPropertyId() {
+        return propertyId;
     }
 
     public List<String> getArguments() {

@@ -7,13 +7,14 @@ import com.drppp.drtech.common.drone.program.runtime.service.DroneEntityService;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneFluidService;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneItemService;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneMovementService;
+import com.drppp.drtech.common.drone.program.runtime.service.DroneMachineService;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneSensorService;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneSafetyService;
 import net.minecraft.util.math.BlockPos;
 
 public interface DroneRuntimeEnvironment extends DroneMovementService, DroneBlockActionService, DroneItemService,
         DroneFluidService, DroneEnergyService, DroneEntityService, DroneSensorService, DroneDockService,
-        DroneSafetyService {
+        DroneSafetyService, DroneMachineService {
 
     DroneRuntimeEnvironment EMPTY = new DroneRuntimeEnvironment() {
         @Override

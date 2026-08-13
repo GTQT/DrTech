@@ -130,6 +130,15 @@ public class CraftingReceipe {
                 'U', MetaItems.ELECTRIC_PUMP_HV,
                 'C', new UnificationEntry(circuit, MarkerMaterials.Tier.HV));
 
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_crafting",
+                droneUpgrade(DroneUpgradeType.CRAFTING),
+                "PGP", "RCR", "PMP",
+                'P', new UnificationEntry(plate, Titanium),
+                'G', Blocks.CRAFTING_TABLE,
+                'R', MetaItems.ROBOT_ARM_HV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
+                'M', MetaItems.ELECTRIC_MOTOR_HV);
+
         ModHandler.addShapedRecipe("drtech_drone_programmer", DrTechMetaTileEntities.DRONE_PROGRAMMER.getStackForm(),
                 "SCS", "RHR", "WCW",
                 'S', MetaItems.SENSOR_EV,

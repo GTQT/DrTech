@@ -8,10 +8,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.Comparator;
 import java.util.function.Predicate;
 
 /** Immutable bounded coordinate region shared by the compiler, editor and runtime. */
 public final class DroneArea {
+
+    public enum TraversalOrder {
+        SERPENTINE,
+        REVERSE,
+        TOP_DOWN,
+        RANDOMIZED
+    }
 
     public static final int MAX_AXIS_LENGTH = 32;
     public static final int MAX_BLOCKS = 4_096;
@@ -23,6 +31,7 @@ public final class DroneArea {
     private final int sizeZ;
     private final long volume;
     private final List<BlockPos> positions;
+    private final List<BlockPos> topDownPositions;
 
     private DroneArea(BlockPos first, BlockPos second) {
         Objects.requireNonNull(first, "first");
@@ -36,6 +45,7 @@ public final class DroneArea {
         sizeZ = max.getZ() - min.getZ() + 1;
         volume = (long) sizeX * sizeY * sizeZ;
         positions = null;
+        topDownPositions = null;
     }
 
     private DroneArea(BlockPos first, BlockPos second, Predicate<BlockPos> includes) {
@@ -54,6 +64,7 @@ public final class DroneArea {
             if (includes.test(candidate)) selected.add(candidate);
         }
         positions = Collections.unmodifiableList(selected);
+        topDownPositions = orderedTopDown(positions);
         volume = positions.size();
     }
 
@@ -61,6 +72,7 @@ public final class DroneArea {
         Set<BlockPos> unique = new LinkedHashSet<>();
         for (BlockPos position : orderedPositions) unique.add(position.toImmutable());
         positions = Collections.unmodifiableList(new ArrayList<>(unique));
+        topDownPositions = orderedTopDown(positions);
         volume = positions.size();
         if (positions.isEmpty()) {
             min = BlockPos.ORIGIN;
@@ -230,6 +242,64 @@ public final class DroneArea {
         return new DroneArea(shifted);
     }
 
+    /** Expands the area by a Chebyshev radius, equivalent to adding a cube around every selected coordinate. */
+    public DroneArea expand(int radius) {
+        if (radius < 0 || radius > 4) throw new IllegalArgumentException("Area expansion radius must be 0..4");
+        if (radius == 0 || volume == 0L) return this;
+        if (positions == null) {
+            DroneArea result = between(checkedAdd(min, -radius, -radius, -radius),
+                    checkedAdd(max, radius, radius, radius));
+            if (!result.isWithinRuntimeLimits()) throw new IllegalArgumentException("Expanded area exceeds runtime limits");
+            return result;
+        }
+        Set<BlockPos> expanded = new LinkedHashSet<>((int) Math.min(MAX_BLOCKS + 1L,
+                volume * (long) (radius * 2 + 1) * (radius * 2 + 1) * (radius * 2 + 1)));
+        for (BlockPos position : positions) {
+            for (int x = -radius; x <= radius; x++) {
+                for (int y = -radius; y <= radius; y++) {
+                    for (int z = -radius; z <= radius; z++) {
+                        expanded.add(checkedAdd(position, x, y, z));
+                        if (expanded.size() > MAX_BLOCKS) {
+                            throw new IllegalArgumentException("Expanded area exceeds runtime limits");
+                        }
+                    }
+                }
+            }
+        }
+        DroneArea result = new DroneArea(new ArrayList<>(expanded));
+        if (!result.isWithinRuntimeLimits()) throw new IllegalArgumentException("Expanded area exceeds runtime limits");
+        return result;
+    }
+
+    /** Removes coordinates that do not have a complete cube of neighbours inside the source area. */
+    public DroneArea inset(int radius) {
+        if (radius < 0 || radius > 4) throw new IllegalArgumentException("Area inset radius must be 0..4");
+        if (radius == 0 || volume == 0L) return this;
+        if (positions == null) {
+            if (sizeX <= radius * 2 || sizeY <= radius * 2 || sizeZ <= radius * 2) {
+                return new DroneArea(Collections.emptyList());
+            }
+            return between(min.add(radius, radius, radius), max.add(-radius, -radius, -radius));
+        }
+        Set<BlockPos> source = new LinkedHashSet<>(positions);
+        List<BlockPos> inset = new ArrayList<>();
+        for (BlockPos position : positions) {
+            boolean keep = true;
+            for (int x = -radius; x <= radius && keep; x++) {
+                for (int y = -radius; y <= radius && keep; y++) {
+                    for (int z = -radius; z <= radius; z++) {
+                        if (!source.contains(position.add(x, y, z))) {
+                            keep = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (keep) inset.add(position);
+        }
+        return new DroneArea(inset);
+    }
+
     public boolean contains(BlockPos position) {
         if (position == null || volume == 0L) return false;
         if (positions != null) return positions.contains(position);
@@ -247,6 +317,14 @@ public final class DroneArea {
     private static void requireMaterializable(DroneArea area) {
         Objects.requireNonNull(area, "area");
         if (!area.isWithinRuntimeLimits()) throw new IllegalArgumentException("Area exceeds runtime limits");
+    }
+
+    private static List<BlockPos> orderedTopDown(List<BlockPos> source) {
+        List<BlockPos> ordered = new ArrayList<>(source);
+        ordered.sort(Comparator.comparingInt(BlockPos::getY).reversed()
+                .thenComparingInt(BlockPos::getZ)
+                .thenComparingInt(BlockPos::getX));
+        return Collections.unmodifiableList(ordered);
     }
 
     private static BlockPos checkedAdd(BlockPos position, int x, int y, int z) {
@@ -293,6 +371,41 @@ public final class DroneArea {
     public BlockPos positionAt(int index) {
         if (index < 0 || index >= volume) throw new IndexOutOfBoundsException("Area index " + index);
         return positions == null ? cuboidPositionAt(index) : positions.get(index);
+    }
+
+    /** Returns a coordinate using a deterministic traversal strategy without mutating the area. */
+    public BlockPos positionAt(int index, TraversalOrder order) {
+        if (index < 0 || index >= volume) throw new IndexOutOfBoundsException("Area index " + index);
+        TraversalOrder checked = order == null ? TraversalOrder.SERPENTINE : order;
+        int size = (int) volume;
+        switch (checked) {
+            case REVERSE:
+                return positionAt(size - 1 - index);
+            case TOP_DOWN:
+                if (positions != null) return topDownPositions.get(index);
+                int layerSize = sizeX * sizeZ;
+                int sourceLayer = sizeY - 1 - index / layerSize;
+                int layerIndex = index % layerSize;
+                return cuboidPositionAt(sourceLayer * layerSize + layerIndex);
+            case RANDOMIZED:
+                int step = Math.max(1, size / 2 + 1);
+                while (greatestCommonDivisor(step, size) != 1) step++;
+                int offset = Math.floorMod(hashCode(), size);
+                return positionAt((int) ((offset + (long) index * step) % size));
+            default:
+                return positionAt(index);
+        }
+    }
+
+    private static int greatestCommonDivisor(int first, int second) {
+        int a = Math.abs(first);
+        int b = Math.abs(second);
+        while (b != 0) {
+            int remainder = a % b;
+            a = b;
+            b = remainder;
+        }
+        return a;
     }
 
     private BlockPos cuboidPositionAt(int index) {

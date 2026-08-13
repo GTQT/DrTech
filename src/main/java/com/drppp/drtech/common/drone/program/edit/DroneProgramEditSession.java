@@ -40,14 +40,25 @@ public final class DroneProgramEditSession {
         }
         if (command.getType() == DroneGraphCommandType.UNDO) return undo();
         if (command.getType() == DroneGraphCommandType.REDO) return redo();
-        String validationError = validatePayload(command);
-        if (validationError != null) {
-            return rejected(DroneGraphEditStatus.INVALID_COMMAND, validationError);
-        }
-
         DroneProgramGraph candidate = graph.copy();
         try {
-            command.apply(candidate);
+            if (command.getType() == DroneGraphCommandType.BATCH) {
+                for (DroneGraphEditCommand child : command.getCommands()) {
+                    String validationError = validatePayload(child, candidate);
+                    if (validationError != null) {
+                        return rejected(DroneGraphEditStatus.INVALID_COMMAND, validationError);
+                    }
+                    child.apply(candidate);
+                }
+                // A batch is one editor transaction even though it contains several graph mutations.
+                candidate = candidate.copyWithRevision(graph.getRevision() + 1L);
+            } else {
+                String validationError = validatePayload(command, candidate);
+                if (validationError != null) {
+                    return rejected(DroneGraphEditStatus.INVALID_COMMAND, validationError);
+                }
+                command.apply(candidate);
+            }
         } catch (RuntimeException exception) {
             return rejected(DroneGraphEditStatus.INVALID_COMMAND, exception.getMessage());
         }
@@ -92,7 +103,7 @@ public final class DroneProgramEditSession {
         while (history.size() > MAX_HISTORY) history.removeFirst();
     }
 
-    private String validatePayload(DroneGraphEditCommand command) {
+    private String validatePayload(DroneGraphEditCommand command, DroneProgramGraph targetGraph) {
         if (Math.abs((long) command.getX()) > MAX_ABS_COORDINATE
                 || Math.abs((long) command.getY()) > MAX_ABS_COORDINATE) {
             return "Node coordinate is outside the editor limit";
@@ -104,11 +115,11 @@ public final class DroneProgramEditSession {
         if ((command.getType() == DroneGraphCommandType.REMOVE_NODE
                 || command.getType() == DroneGraphCommandType.MOVE_NODE
                 || command.getType() == DroneGraphCommandType.CONFIGURE_NODE)
-                && graph.getNode(command.getObjectId()) == null) {
+                && targetGraph.getNode(command.getObjectId()) == null) {
             return "Unknown node " + command.getObjectId();
         }
         if (command.getType() == DroneGraphCommandType.REMOVE_EDGE
-                && graph.getEdge(command.getObjectId()) == null) {
+                && targetGraph.getEdge(command.getObjectId()) == null) {
             return "Unknown edge " + command.getObjectId();
         }
         if (command.getConfiguration() != null

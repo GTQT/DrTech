@@ -846,6 +846,294 @@ class DroneProgramRuntimeTest {
         assertEquals(5L, restored.getActionAmount(transfer.getId()));
     }
 
+    @Test
+    void dispatchesCargoCraftingWithConfiguredModeAndCount() {
+        DroneProgramGraph graph = new DroneProgramGraph("cargo crafting");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        NBTTagCompound craftConfiguration = new NBTTagCompound();
+        craftConfiguration.setInteger("Count", 3);
+        craftConfiguration.setInteger("ReserveCount", 2);
+        craftConfiguration.setString("Mode", "EXACT");
+        craftConfiguration.setBoolean("Simulate", false);
+        DroneProgramNode craft = DroneProgramNode.create(DrTechDroneNodes.CRAFT_ITEMS, 100, 0)
+                .withConfiguration(craftConfiguration);
+        DroneProgramNode output = itemFilter("minecraft:stick", 0);
+        DroneProgramNode reserve = itemFilter("minecraft:bucket", 0);
+        DroneProgramNode end = DroneProgramNode.create(DrTechDroneNodes.END, 220, 0);
+        for (DroneProgramNode node : new DroneProgramNode[] { start, craft, output, reserve, end }) graph.addNode(node);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", craft.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(output.getId(), "filter", craft.getId(), "output"));
+        graph.addEdge(DroneProgramEdge.create(reserve.getId(), "filter", craft.getId(), "reserve_filter"));
+        graph.addEdge(DroneProgramEdge.create(craft.getId(), "next", end.getId(), "in"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals("minecraft:stick", environment.craftFilter.getItemId().toString());
+        assertEquals(3, environment.requestedCrafts);
+        assertEquals(false, environment.simulatedCraft);
+        assertEquals(true, environment.exactCraft);
+        assertEquals("minecraft:bucket", environment.craftReserveFilter.getItemId().toString());
+        assertEquals(2, environment.craftReserveAmount);
+    }
+
+    @Test
+    void evaluatesCanCraftConditionFromCargoPlanner() {
+        DroneProgramGraph graph = new DroneProgramGraph("can craft");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        DroneProgramNode branch = DroneProgramNode.create(DrTechDroneNodes.BRANCH, 100, 0);
+        NBTTagCompound canCraftConfiguration = new NBTTagCompound();
+        canCraftConfiguration.setInteger("Count", 4);
+        DroneProgramNode canCraft = DroneProgramNode.create(DrTechDroneNodes.CAN_CRAFT, 80, 80)
+                .withConfiguration(canCraftConfiguration);
+        DroneProgramNode output = itemFilter("minecraft:stick", 0);
+        DroneProgramNode trueEnd = DroneProgramNode.create(DrTechDroneNodes.END, 220, 0);
+        DroneProgramNode falseEnd = DroneProgramNode.create(DrTechDroneNodes.END, 220, 80);
+        for (DroneProgramNode node : new DroneProgramNode[] {
+                start, branch, canCraft, output, trueEnd, falseEnd }) graph.addNode(node);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", branch.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(output.getId(), "filter", canCraft.getId(), "output"));
+        graph.addEdge(DroneProgramEdge.create(canCraft.getId(), "result", branch.getId(), "condition"));
+        graph.addEdge(DroneProgramEdge.create(branch.getId(), "true", trueEnd.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(branch.getId(), "false", falseEnd.getId(), "in"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        environment.craftableCount = 4;
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals(trueEnd.getId(), runtime.getCurrentNodeId());
+        assertEquals(4, environment.craftableLimit);
+    }
+
+    @Test
+    void dispatchesExplicitCraftingGridWithoutGuessingIngredientLayout() {
+        DroneProgramGraph graph = new DroneProgramGraph("explicit crafting");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        NBTTagCompound configuration = new NBTTagCompound();
+        configuration.setInteger("Count", 2);
+        configuration.setInteger("ReserveCount", 0);
+        configuration.setString("Mode", "EXACT");
+        DroneProgramNode craft = DroneProgramNode.create(DrTechDroneNodes.CRAFT_GRID, 100, 0)
+                .withConfiguration(configuration);
+        DroneProgramNode output = itemFilter("minecraft:stick", 0);
+        DroneProgramNode topCenter = itemFilter("minecraft:planks", -1);
+        DroneProgramNode center = itemFilter("minecraft:planks", -1);
+        DroneProgramNode end = DroneProgramNode.create(DrTechDroneNodes.END, 220, 0);
+        for (DroneProgramNode node : new DroneProgramNode[] { start, craft, output, topCenter, center, end }) {
+            graph.addNode(node);
+        }
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", craft.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(output.getId(), "filter", craft.getId(), "output"));
+        graph.addEdge(DroneProgramEdge.create(topCenter.getId(), "filter", craft.getId(), "slot_2"));
+        graph.addEdge(DroneProgramEdge.create(center.getId(), "filter", craft.getId(), "slot_5"));
+        graph.addEdge(DroneProgramEdge.create(craft.getId(), "next", end.getId(), "in"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals(2, environment.requestedGridCrafts);
+        assertEquals(null, environment.craftGrid[0]);
+        assertEquals("minecraft:planks", environment.craftGrid[1].getItemId().toString());
+        assertEquals("minecraft:planks", environment.craftGrid[4].getItemId().toString());
+    }
+
+    @Test
+    void controlsGregTechMachineThenWaitsForIdle() {
+        DroneProgramGraph graph = new DroneProgramGraph("machine task");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        NBTTagCompound configuration = new NBTTagCompound();
+        configuration.setBoolean("Enabled", true);
+        DroneProgramNode enable = DroneProgramNode.create(DrTechDroneNodes.SET_MACHINE_WORKING, 100, 0)
+                .withConfiguration(configuration);
+        DroneProgramNode wait = DroneProgramNode.create(DrTechDroneNodes.WAIT_MACHINE_IDLE, 200, 0);
+        DroneProgramNode enableTarget = coordinate(8, 64, 8);
+        DroneProgramNode waitTarget = coordinate(8, 64, 8);
+        DroneProgramNode end = DroneProgramNode.create(DrTechDroneNodes.END, 300, 0);
+        for (DroneProgramNode node : new DroneProgramNode[] {
+                start, enable, wait, enableTarget, waitTarget, end }) graph.addNode(node);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", enable.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(enable.getId(), "next", wait.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(wait.getId(), "next", end.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(enableTarget.getId(), "value", enable.getId(), "target"));
+        graph.addEdge(DroneProgramEdge.create(waitTarget.getId(), "value", wait.getId(), "target"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals(new BlockPos(8, 64, 8), environment.machineTarget);
+        assertEquals(true, environment.machineEnabled);
+        assertEquals(1, environment.machineWaitCalls);
+    }
+
+    @Test
+    void waitsForAnObservedGregTechRecipeCycleInsteadOfPassingWhileIdle() {
+        DroneProgramGraph graph = new DroneProgramGraph("machine cycle");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        DroneProgramNode wait = DroneProgramNode.create(DrTechDroneNodes.WAIT_MACHINE_CYCLE, 100, 0);
+        DroneProgramNode target = coordinate(12, 64, 12);
+        DroneProgramNode end = DroneProgramNode.create(DrTechDroneNodes.END, 200, 0);
+        for (DroneProgramNode node : new DroneProgramNode[] { start, wait, target, end }) graph.addNode(node);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", wait.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(target.getId(), "value", wait.getId(), "target"));
+        graph.addEdge(DroneProgramEdge.create(wait.getId(), "next", end.getId(), "in"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+        assertEquals(DroneRuntimeStatus.RUNNING, runtime.getStatus());
+        runtime.tick();
+        assertEquals(DroneRuntimeStatus.RUNNING, runtime.getStatus());
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals(Arrays.asList(false, true, true), environment.machineCycleObserved);
+        assertEquals(-1.0D, environment.machineCyclePrevious.get(0), 0.001D);
+        assertEquals(50.0D, environment.machineCyclePrevious.get(1), 0.001D);
+        assertEquals(90.0D, environment.machineCyclePrevious.get(2), 0.001D);
+    }
+
+    @Test
+    void branchesOnGregTechOutputBlockageDiagnostic() {
+        DroneProgramGraph graph = new DroneProgramGraph("machine output diagnostic");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        DroneProgramNode branch = DroneProgramNode.create(DrTechDroneNodes.BRANCH, 100, 0);
+        DroneProgramNode blocked = DroneProgramNode.create(DrTechDroneNodes.MACHINE_OUTPUT_BLOCKED, 50, 80);
+        DroneProgramNode target = coordinate(4, 64, 4);
+        DroneProgramNode success = DroneProgramNode.create(DrTechDroneNodes.END, 220, 0);
+        NBTTagCompound waitConfiguration = new NBTTagCompound();
+        waitConfiguration.setInteger("Ticks", 20);
+        DroneProgramNode wrongPath = DroneProgramNode.create(DrTechDroneNodes.WAIT, 220, 80)
+                .withConfiguration(waitConfiguration);
+        DroneProgramNode wrongEnd = DroneProgramNode.create(DrTechDroneNodes.END, 320, 80);
+        for (DroneProgramNode node : new DroneProgramNode[] {
+                start, branch, blocked, target, success, wrongPath, wrongEnd }) graph.addNode(node);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", branch.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(blocked.getId(), "result", branch.getId(), "condition"));
+        graph.addEdge(DroneProgramEdge.create(target.getId(), "value", blocked.getId(), "target"));
+        graph.addEdge(DroneProgramEdge.create(branch.getId(), "true", success.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(branch.getId(), "false", wrongPath.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(wrongPath.getId(), "next", wrongEnd.getId(), "in"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals(new BlockPos(4, 64, 4), environment.machineDiagnosticTarget);
+    }
+
+    @Test
+    void dispatchesAtomicGregTechMachineMaintenance() {
+        DroneProgramGraph graph = new DroneProgramGraph("machine maintenance");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        NBTTagCompound configuration = new NBTTagCompound();
+        configuration.setBoolean("RequireAll", true);
+        DroneProgramNode repair = DroneProgramNode.create(DrTechDroneNodes.REPAIR_MACHINE, 100, 0)
+                .withConfiguration(configuration);
+        DroneProgramNode target = coordinate(16, 70, -4);
+        DroneProgramNode end = DroneProgramNode.create(DrTechDroneNodes.END, 220, 0);
+        for (DroneProgramNode node : new DroneProgramNode[] { start, repair, target, end }) graph.addNode(node);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", repair.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(target.getId(), "value", repair.getId(), "target"));
+        graph.addEdge(DroneProgramEdge.create(repair.getId(), "next", end.getId(), "in"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals(new BlockPos(16, 70, -4), environment.machineRepairTarget);
+        assertTrue(environment.machineRepairRequiredAll);
+    }
+
+    @Test
+    void combinesGregTechMaintenanceSensorsForBranching() {
+        DroneProgramGraph graph = new DroneProgramGraph("maintenance sensors");
+        DroneProgramNode start = DroneProgramNode.create(DrTechDroneNodes.START, 0, 0);
+        DroneProgramNode branch = DroneProgramNode.create(DrTechDroneNodes.BRANCH, 240, 0);
+        DroneProgramNode needs = DroneProgramNode.create(DrTechDroneNodes.MACHINE_NEEDS_MAINTENANCE, 40, 80);
+        DroneProgramNode problems = DroneProgramNode.create(DrTechDroneNodes.MACHINE_MAINTENANCE_PROBLEMS, 40, 140);
+        NBTTagCompound compareConfiguration = new NBTTagCompound();
+        compareConfiguration.setString("Operator", ">");
+        DroneProgramNode compare = DroneProgramNode.create(DrTechDroneNodes.COMPARE_NUMBER, 130, 140)
+                .withConfiguration(compareConfiguration);
+        NBTTagCompound zeroConfiguration = new NBTTagCompound();
+        zeroConfiguration.setDouble("Value", 0.0D);
+        DroneProgramNode zero = DroneProgramNode.create(DrTechDroneNodes.NUMBER, 40, 200)
+                .withConfiguration(zeroConfiguration);
+        NBTTagCompound logicConfiguration = new NBTTagCompound();
+        logicConfiguration.setString("Operator", "AND");
+        DroneProgramNode logic = DroneProgramNode.create(DrTechDroneNodes.BOOLEAN_LOGIC, 200, 100)
+                .withConfiguration(logicConfiguration);
+        DroneProgramNode needsTarget = coordinate(6, 70, 6);
+        DroneProgramNode problemsTarget = coordinate(6, 70, 6);
+        DroneProgramNode success = DroneProgramNode.create(DrTechDroneNodes.END, 340, 0);
+        NBTTagCompound waitConfiguration = new NBTTagCompound();
+        waitConfiguration.setInteger("Ticks", 20);
+        DroneProgramNode wrongPath = DroneProgramNode.create(DrTechDroneNodes.WAIT, 340, 80)
+                .withConfiguration(waitConfiguration);
+        DroneProgramNode wrongEnd = DroneProgramNode.create(DrTechDroneNodes.END, 440, 80);
+        for (DroneProgramNode node : new DroneProgramNode[] { start, branch, needs, problems, compare, zero, logic,
+                needsTarget, problemsTarget, success, wrongPath, wrongEnd }) graph.addNode(node);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", branch.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(needsTarget.getId(), "value", needs.getId(), "target"));
+        graph.addEdge(DroneProgramEdge.create(problemsTarget.getId(), "value", problems.getId(), "target"));
+        graph.addEdge(DroneProgramEdge.create(problems.getId(), "value", compare.getId(), "left"));
+        graph.addEdge(DroneProgramEdge.create(zero.getId(), "value", compare.getId(), "right"));
+        graph.addEdge(DroneProgramEdge.create(needs.getId(), "result", logic.getId(), "left"));
+        graph.addEdge(DroneProgramEdge.create(compare.getId(), "result", logic.getId(), "right"));
+        graph.addEdge(DroneProgramEdge.create(logic.getId(), "result", branch.getId(), "condition"));
+        graph.addEdge(DroneProgramEdge.create(branch.getId(), "true", success.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(branch.getId(), "false", wrongPath.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(wrongPath.getId(), "next", wrongEnd.getId(), "in"));
+        CompiledDroneProgram compiled = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry())
+                .compile(graph).getProgram().orElseThrow(AssertionError::new);
+        RecordingEnvironment environment = new RecordingEnvironment();
+        DroneProgramRuntime runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
+                DrTechDroneValueEvaluators.createDefaultRegistry(), environment);
+
+        runtime.tick();
+
+        assertEquals(DroneRuntimeStatus.COMPLETED, runtime.getStatus());
+        assertEquals(new BlockPos(6, 70, 6), environment.machineMaintenanceSensorTarget);
+    }
+
+    private static DroneProgramNode itemFilter(String itemId, int metadata) {
+        NBTTagCompound configuration = new NBTTagCompound();
+        configuration.setString("Item", itemId);
+        configuration.setInteger("Meta", metadata);
+        return DroneProgramNode.create(DrTechDroneNodes.ITEM_FILTER, 0, 100).withConfiguration(configuration);
+    }
+
     private static DroneProgramNode coordinate(int x, int y, int z) {
         NBTTagCompound configuration = new NBTTagCompound();
         configuration.setInteger("X", x);
@@ -951,6 +1239,25 @@ class DroneProgramRuntimeTest {
         private long exportedEu;
         private double targetChargePercent;
         private int chargeTargetTicks;
+        private DroneItemFilter craftFilter;
+        private int requestedCrafts;
+        private boolean simulatedCraft;
+        private boolean exactCraft;
+        private DroneItemFilter craftReserveFilter;
+        private int craftReserveAmount;
+        private int craftableCount;
+        private int craftableLimit;
+        private DroneItemFilter[] craftGrid;
+        private int requestedGridCrafts;
+        private BlockPos machineTarget;
+        private boolean machineEnabled;
+        private int machineWaitCalls;
+        private final List<Boolean> machineCycleObserved = new ArrayList<>();
+        private final List<Double> machineCyclePrevious = new ArrayList<>();
+        private BlockPos machineDiagnosticTarget;
+        private BlockPos machineRepairTarget;
+        private boolean machineRepairRequiredAll;
+        private BlockPos machineMaintenanceSensorTarget;
 
         @Override
         public double getEnergyPercent() {
@@ -1061,6 +1368,100 @@ class DroneProgramRuntimeTest {
         public DroneExecutionResult exportItems(DroneTransferRequest request) {
             exportRequest = request;
             return exportItems(request.getTarget(), DroneItemFilter.fromSpec(request.getFilter()));
+        }
+
+        @Override
+        public DroneExecutionResult craftItems(DroneItemFilter outputFilter, int maximumCrafts,
+                boolean simulate, boolean requireExactCount) {
+            craftFilter = outputFilter;
+            requestedCrafts = maximumCrafts;
+            simulatedCraft = simulate;
+            exactCraft = requireExactCount;
+            return DroneExecutionResult.success(maximumCrafts);
+        }
+
+        @Override
+        public DroneExecutionResult craftItems(DroneItemFilter outputFilter, int maximumCrafts,
+                boolean simulate, boolean requireExactCount, DroneItemFilter reserveFilter, int reserveAmount) {
+            craftReserveFilter = reserveFilter;
+            craftReserveAmount = reserveAmount;
+            return craftItems(outputFilter, maximumCrafts, simulate, requireExactCount);
+        }
+
+        @Override
+        public int getCraftableCount(DroneItemFilter outputFilter, int limit) {
+            craftFilter = outputFilter;
+            craftableLimit = limit;
+            return Math.min(craftableCount, limit);
+        }
+
+        @Override
+        public DroneExecutionResult craftGrid(DroneItemFilter outputFilter, DroneItemFilter[] gridFilters,
+                int maximumCrafts, boolean requireExactCount,
+                DroneItemFilter reserveFilter, int reserveAmount) {
+            craftFilter = outputFilter;
+            craftGrid = Arrays.copyOf(gridFilters, gridFilters.length);
+            requestedGridCrafts = maximumCrafts;
+            return DroneExecutionResult.success(maximumCrafts);
+        }
+
+        @Override
+        public DroneExecutionResult setMachineWorking(BlockPos target, boolean enabled) {
+            machineTarget = target;
+            machineEnabled = enabled;
+            return DroneExecutionResult.success();
+        }
+
+        @Override
+        public DroneExecutionResult waitForMachineIdle(BlockPos target) {
+            machineTarget = target;
+            machineWaitCalls++;
+            return DroneExecutionResult.success();
+        }
+
+        @Override
+        public DroneExecutionResult waitForMachineCycle(BlockPos target, boolean observedActive,
+                double previousProgressPercent) {
+            machineTarget = target;
+            machineCycleObserved.add(observedActive);
+            machineCyclePrevious.add(previousProgressPercent);
+            return observedActive && previousProgressPercent >= 75.0D
+                    ? DroneExecutionResult.success() : DroneExecutionResult.running();
+        }
+
+        @Override
+        public boolean isMachineActive(BlockPos target) {
+            return true;
+        }
+
+        @Override
+        public double getMachineProgressPercent(BlockPos target) {
+            return machineCycleObserved.size() <= 1 ? 50.0D : 90.0D;
+        }
+
+        @Override
+        public boolean isMachineOutputBlocked(BlockPos target) {
+            machineDiagnosticTarget = target;
+            return true;
+        }
+
+        @Override
+        public DroneExecutionResult repairMachine(BlockPos target, boolean requireAllTools) {
+            machineRepairTarget = target;
+            machineRepairRequiredAll = requireAllTools;
+            return DroneExecutionResult.success(3L);
+        }
+
+        @Override
+        public boolean needsMachineMaintenance(BlockPos target) {
+            machineMaintenanceSensorTarget = target;
+            return true;
+        }
+
+        @Override
+        public int getMachineMaintenanceProblemCount(BlockPos target) {
+            machineMaintenanceSensorTarget = target;
+            return 2;
         }
 
         @Override

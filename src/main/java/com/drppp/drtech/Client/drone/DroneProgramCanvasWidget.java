@@ -8,12 +8,18 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.Widget;
 import com.drppp.drtech.common.drone.program.edit.DroneGraphEditCommand;
+import com.drppp.drtech.common.drone.program.edit.DroneGraphAutoLayout;
+import com.drppp.drtech.common.drone.program.edit.DroneEdgePresentation;
+import com.drppp.drtech.common.drone.program.edit.DroneDragPreviewPolicy;
+import com.drppp.drtech.common.drone.program.edit.DroneGroupLayout;
+import com.drppp.drtech.common.drone.program.edit.DronePropertyChoices;
 import com.drppp.drtech.common.drone.program.model.DroneNodeDefinition;
 import com.drppp.drtech.common.drone.program.model.DroneNodePropertyDefinition;
 import com.drppp.drtech.common.drone.program.model.DroneNodePropertyType;
 import com.drppp.drtech.common.drone.filter.DroneFilterMode;
 import com.drppp.drtech.common.drone.filter.DroneItemFilterSpec;
 import com.drppp.drtech.common.drone.filter.DroneBlockFilterSpec;
+import com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec;
 import com.drppp.drtech.common.drone.program.model.DroneArea;
 import com.drppp.drtech.common.drone.program.model.DronePortDefinition;
 import com.drppp.drtech.common.drone.program.model.DronePortDirection;
@@ -24,20 +30,33 @@ import com.drppp.drtech.common.drone.program.model.DroneProgramNode;
 import com.drppp.drtech.common.drone.program.registry.DroneNodeRegistry;
 import com.drppp.drtech.common.drone.program.registry.DrTechDroneNodes;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.EntityList;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
+import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.List;
 import java.util.UUID;
@@ -54,21 +73,37 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     private static final int PORT_SIZE = 5;
     private static final int PORT_START_Y = 17;
     private static final int PORT_STEP_Y = 9;
+    private static final int MINIMAP_WIDTH = 64;
+    private static final int MINIMAP_HEIGHT = 46;
+    private static final int CONTEXT_MENU_WIDTH = 94;
+    private static final int CONTEXT_MENU_ROW_HEIGHT = 14;
+    private static final long DRAG_ACK_TIMEOUT_MS = 3_000L;
 
     private final Supplier<DroneProgramGraph> graphSupplier;
     private final Consumer<DroneGraphEditCommand> commandSink;
     private final BooleanSupplier editableSupplier;
     private final Supplier<Set<UUID>> diagnosticNodesSupplier;
     private final Supplier<UUID> activeNodeSupplier;
+    private final Supplier<BlockPos> dockCoordinateSupplier;
+    private final Supplier<BlockPos> droneCoordinateSupplier;
     private final DroneNodeRegistry registry = DrTechDroneNodes.createDefaultRegistry();
     private final Map<UUID, PreviewPosition> previews = new HashMap<>();
 
     private UUID selectedNodeId;
-    private DroneProgramNode copiedNode;
+    private final Set<UUID> selectedNodeIds = new LinkedHashSet<>();
+    private ClipboardGraph clipboard;
+    private int clipboardPasteCount;
     private PendingPort pendingPort;
     private UUID draggingNodeId;
-    private int dragOffsetX;
-    private int dragOffsetY;
+    private final Map<UUID, PreviewPosition> dragOrigins = new LinkedHashMap<>();
+    private int dragStartMouseX;
+    private int dragStartMouseY;
+    private boolean marqueeSelecting;
+    private boolean marqueeAdditive;
+    private int marqueeStartX;
+    private int marqueeStartY;
+    private int marqueeEndX;
+    private int marqueeEndY;
     private boolean panning;
     private int lastMouseX;
     private int lastMouseY;
@@ -77,26 +112,57 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     private int zoomPercent = 100;
     private int selectedAreaCorner = 1;
     private int selectedPropertyIndex;
+    private int selectedBlockStatePropertyIndex;
     private UUID propertyDraftNodeId;
     private String propertyDraftId = "";
     private String propertyDraft = "";
+    private boolean propertyDraftDirty;
+    private UUID lastPropertyChangeNodeId;
+    private String lastPropertyChangeId = "";
+    private String lastPropertyBefore = "";
+    private String lastPropertyAfter = "";
+    private long areaPreviewRevision = Long.MIN_VALUE;
+    private UUID areaPreviewNodeId;
+    private DroneArea cachedAreaPreview;
+    private String areaPreviewStatusKey = "drtech.drone.programmer.area_preview_missing";
     private String connectionHint = "";
     private long connectionHintUntil;
     private int connectionHintColor = 0xFFFFA0A0;
+    private ContextMenu contextMenu;
 
     public DroneProgramCanvasWidget(Supplier<DroneProgramGraph> graphSupplier,
             Consumer<DroneGraphEditCommand> commandSink, BooleanSupplier editableSupplier,
             Supplier<Set<UUID>> diagnosticNodesSupplier, Supplier<UUID> activeNodeSupplier) {
+        this(graphSupplier, commandSink, editableSupplier, diagnosticNodesSupplier, activeNodeSupplier,
+                () -> null, () -> null);
+    }
+
+    public DroneProgramCanvasWidget(Supplier<DroneProgramGraph> graphSupplier,
+            Consumer<DroneGraphEditCommand> commandSink, BooleanSupplier editableSupplier,
+            Supplier<Set<UUID>> diagnosticNodesSupplier, Supplier<UUID> activeNodeSupplier,
+            Supplier<BlockPos> dockCoordinateSupplier, Supplier<BlockPos> droneCoordinateSupplier) {
         this.graphSupplier = graphSupplier;
         this.commandSink = commandSink;
         this.editableSupplier = editableSupplier;
         this.diagnosticNodesSupplier = diagnosticNodesSupplier;
         this.activeNodeSupplier = activeNodeSupplier;
+        this.dockCoordinateSupplier = dockCoordinateSupplier;
+        this.droneCoordinateSupplier = droneCoordinateSupplier;
         background();
     }
 
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+        CanvasScissor scissor = CanvasScissor.begin(context, getArea().w(), getArea().h());
+        try {
+            drawClippedCanvas(context);
+        } finally {
+            scissor.close();
+        }
+    }
+
+    /** All graph primitives stay inside the canvas; foreground tooltips are deliberately drawn afterwards. */
+    private void drawClippedCanvas(ModularGuiContext context) {
         int width = getArea().w();
         int height = getArea().h();
         GuiDraw.drawRect(0, 0, width, height, 0xFF151A21);
@@ -106,9 +172,11 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             GuiDraw.drawText(I18n.format("drtech.drone.programmer.insert_card"), 10, 10, 1.0F, 0xFFB9C2CF, false);
             return;
         }
-        for (DroneProgramEdge edge : graph.getEdges()) {
-            drawEdge(graph, edge);
-        }
+        reconcileAcknowledgedDragPreviews(graph);
+        drawGroupFrames(graph);
+        Set<UUID> hiddenNodes = DroneGroupLayout.hiddenByCollapsedGroups(graph);
+        PortHit hoveredPort = findPort(graph, context.getMouseX(), context.getMouseY());
+        drawEdges(graph, hiddenNodes, hoveredPort);
         if (pendingPort != null) {
             Point from = portPoint(graph.getNode(pendingPort.nodeId), pendingPort.portId, DronePortDirection.OUTPUT);
             if (from != null) {
@@ -116,12 +184,108 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                         colorForType(pendingPort.type));
             }
         }
-        PortHit hoveredPort = findPort(graph, context.getMouseX(), context.getMouseY());
         for (DroneProgramNode node : graph.getNodes()) {
+            if (DroneGroupLayout.isGroup(node) || hiddenNodes.contains(node.getId())) continue;
             drawNode(graph, node, hoveredPort);
         }
+        drawMarquee();
+        drawMiniMap(graph, width);
         drawConnectionGuide(width, height);
         GuiDraw.drawText(zoomPercent + "%", width - 30, height - 10, 0.7F, 0xFF8291A5, false);
+        drawContextMenu(context.getMouseX(), context.getMouseY());
+    }
+
+    /** Draw focused port connections last so crossing lines cannot hide the route being inspected. */
+    private void drawEdges(DroneProgramGraph graph, Set<UUID> hiddenNodes, PortHit hoveredPort) {
+        List<DroneProgramEdge> ordered = DroneEdgePresentation.dataThenFlow(graph, registry);
+        if (hoveredPort == null) {
+            for (DroneProgramEdge edge : ordered) drawVisibleEdge(graph, hiddenNodes, edge, null);
+            return;
+        }
+        for (DroneProgramEdge edge : ordered) {
+            if (!touchesHoveredPort(edge, hoveredPort)) drawVisibleEdge(graph, hiddenNodes, edge, hoveredPort);
+        }
+        for (DroneProgramEdge edge : ordered) {
+            if (touchesHoveredPort(edge, hoveredPort)) drawVisibleEdge(graph, hiddenNodes, edge, hoveredPort);
+        }
+    }
+
+    private void drawVisibleEdge(DroneProgramGraph graph, Set<UUID> hiddenNodes, DroneProgramEdge edge,
+            PortHit hoveredPort) {
+        if (!hiddenNodes.contains(edge.getSourceNodeId()) && !hiddenNodes.contains(edge.getTargetNodeId())) {
+            drawEdge(graph, edge, hoveredPort);
+        }
+    }
+
+    private static boolean touchesHoveredPort(DroneProgramEdge edge, PortHit hoveredPort) {
+        return hoveredPort != null && DroneEdgePresentation.touchesPort(edge, hoveredPort.node.getId(),
+                hoveredPort.port.getId());
+    }
+
+    /** Preserves and intersects an existing OpenGL scissor so this widget is safe inside other clipped views. */
+    private static final class CanvasScissor implements AutoCloseable {
+
+        private final boolean previouslyEnabled;
+        private final int previousX;
+        private final int previousY;
+        private final int previousWidth;
+        private final int previousHeight;
+
+        private CanvasScissor(boolean previouslyEnabled, int previousX, int previousY,
+                int previousWidth, int previousHeight) {
+            this.previouslyEnabled = previouslyEnabled;
+            this.previousX = previousX;
+            this.previousY = previousY;
+            this.previousWidth = previousWidth;
+            this.previousHeight = previousHeight;
+        }
+
+        private static CanvasScissor begin(ModularGuiContext context, int width, int height) {
+            Minecraft minecraft = Minecraft.getMinecraft();
+            ScaledResolution resolution = new ScaledResolution(minecraft);
+            int scale = resolution.getScaleFactor();
+            int left = Math.min(context.transformX(0, 0), context.transformX(width, height)) * scale;
+            int right = Math.max(context.transformX(0, 0), context.transformX(width, height)) * scale;
+            int top = Math.min(context.transformY(0, 0), context.transformY(width, height)) * scale;
+            int bottom = Math.max(context.transformY(0, 0), context.transformY(width, height)) * scale;
+            int x = left;
+            int y = minecraft.displayHeight - bottom;
+            int scissorWidth = Math.max(0, right - left);
+            int scissorHeight = Math.max(0, bottom - top);
+
+            boolean enabled = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
+            int oldX = 0;
+            int oldY = 0;
+            int oldWidth = 0;
+            int oldHeight = 0;
+            if (enabled) {
+                IntBuffer box = BufferUtils.createIntBuffer(4);
+                GL11.glGetInteger(GL11.GL_SCISSOR_BOX, box);
+                oldX = box.get(0);
+                oldY = box.get(1);
+                oldWidth = box.get(2);
+                oldHeight = box.get(3);
+                int clippedRight = Math.min(x + scissorWidth, oldX + oldWidth);
+                int clippedTop = Math.min(y + scissorHeight, oldY + oldHeight);
+                x = Math.max(x, oldX);
+                y = Math.max(y, oldY);
+                scissorWidth = Math.max(0, clippedRight - x);
+                scissorHeight = Math.max(0, clippedTop - y);
+            } else {
+                GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            }
+            GL11.glScissor(x, y, scissorWidth, scissorHeight);
+            return new CanvasScissor(enabled, oldX, oldY, oldWidth, oldHeight);
+        }
+
+        @Override
+        public void close() {
+            if (previouslyEnabled) {
+                GL11.glScissor(previousX, previousY, previousWidth, previousHeight);
+            } else {
+                GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            }
+        }
     }
 
     private void drawGrid(int width, int height) {
@@ -132,7 +296,129 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         for (int y = startY; y < height; y += spacing) GuiDraw.drawRect(0, y, width, 1, 0xFF202833);
     }
 
-    private void drawEdge(DroneProgramGraph graph, DroneProgramEdge edge) {
+    private void drawGroupFrames(DroneProgramGraph graph) {
+        for (DroneProgramNode group : graph.getNodes()) {
+            if (!DroneGroupLayout.isGroup(group)) continue;
+            Point point = nodePoint(group);
+            boolean collapsed = DroneGroupLayout.isCollapsed(group);
+            int width = scaled(DroneGroupLayout.width(group));
+            int height = scaled(collapsed ? DroneGroupLayout.HEADER_HEIGHT : DroneGroupLayout.height(group));
+            int color = groupColor(group.getConfiguration().getString("Color"));
+            int fill = (collapsed ? 0x66000000 : 0x24000000) | (color & 0x00FFFFFF);
+            GuiDraw.drawRect(point.x, point.y, width, Math.max(scaled(DroneGroupLayout.HEADER_HEIGHT), height), fill);
+            GuiDraw.drawRect(point.x, point.y, width, scaled(DroneGroupLayout.HEADER_HEIGHT),
+                    0x88000000 | (color & 0x00FFFFFF));
+            int border = selectedNodeIds.contains(group.getId()) ? 0xFFB8DEFF : color;
+            GuiDraw.drawBorderInsideXYWH(point.x, point.y, width,
+                    Math.max(scaled(DroneGroupLayout.HEADER_HEIGHT), height), border);
+            String title = group.getConfiguration().getString("Title").trim();
+            if (title.isEmpty()) title = I18n.format("drtech.drone.group.default_title");
+            GuiDraw.drawText((collapsed ? "+ " : "- ") + title, point.x + scaled(4), point.y + scaled(3),
+                    Math.max(0.5F, zoomPercent / 150.0F), 0xFFF4F7FA, false);
+        }
+    }
+
+    private static int groupColor(String color) {
+        if ("GREEN".equals(color)) return 0xFF55B887;
+        if ("ORANGE".equals(color)) return 0xFFE39A52;
+        if ("PURPLE".equals(color)) return 0xFFA37DDA;
+        if ("RED".equals(color)) return 0xFFD96868;
+        if ("GRAY".equals(color)) return 0xFF8291A5;
+        return 0xFF4F9EDB;
+    }
+
+    private void drawContextMenu(int mouseX, int mouseY) {
+        if (contextMenu == null) return;
+        int height = contextMenu.actions.size() * CONTEXT_MENU_ROW_HEIGHT + 2;
+        GuiDraw.drawRect(contextMenu.x, contextMenu.y, CONTEXT_MENU_WIDTH, height, 0xF01B222C);
+        GuiDraw.drawBorderInsideXYWH(contextMenu.x, contextMenu.y, CONTEXT_MENU_WIDTH, height, 0xFF6F8195);
+        for (int index = 0; index < contextMenu.actions.size(); index++) {
+            MenuAction action = contextMenu.actions.get(index);
+            int y = contextMenu.y + 1 + index * CONTEXT_MENU_ROW_HEIGHT;
+            boolean hovered = mouseX >= contextMenu.x && mouseX < contextMenu.x + CONTEXT_MENU_WIDTH
+                    && mouseY >= y && mouseY < y + CONTEXT_MENU_ROW_HEIGHT;
+            if (hovered && isMenuActionEnabled(action)) {
+                GuiDraw.drawRect(contextMenu.x + 1, y, CONTEXT_MENU_WIDTH - 2, CONTEXT_MENU_ROW_HEIGHT, 0xFF36516D);
+            }
+            int color = isMenuActionEnabled(action) ? 0xFFE7EDF5 : 0xFF6F7883;
+            GuiDraw.drawText(I18n.format(action.translationKey), contextMenu.x + 5, y + 3, 0.65F, color, false);
+        }
+    }
+
+    private void openContextMenu(int mouseX, int mouseY, boolean onNode) {
+        List<MenuAction> actions = new ArrayList<>();
+        if (onNode) {
+            Collections.addAll(actions, MenuAction.COPY, MenuAction.DUPLICATE, MenuAction.DELETE,
+                    MenuAction.DISCONNECT, MenuAction.FOCUS, MenuAction.ALIGN_HORIZONTAL,
+                    MenuAction.ALIGN_VERTICAL, MenuAction.AUTO_LAYOUT, MenuAction.GROUP_SELECTION,
+                    MenuAction.ADD_COMMENT);
+        } else {
+            Collections.addAll(actions, MenuAction.PASTE, MenuAction.ADD_COMMENT, MenuAction.GROUP_SELECTION,
+                    MenuAction.AUTO_LAYOUT, MenuAction.FIT_ALL);
+        }
+        int menuHeight = actions.size() * CONTEXT_MENU_ROW_HEIGHT + 2;
+        int x = Math.max(0, Math.min(mouseX, getArea().w() - CONTEXT_MENU_WIDTH));
+        int y = Math.max(0, Math.min(mouseY, getArea().h() - menuHeight));
+        contextMenu = new ContextMenu(x, y, unscale(mouseX) - panX, unscale(mouseY) - panY, actions);
+    }
+
+    private boolean handleContextMenuClick(int mouseX, int mouseY) {
+        if (contextMenu == null || mouseX < contextMenu.x || mouseX >= contextMenu.x + CONTEXT_MENU_WIDTH
+                || mouseY < contextMenu.y || mouseY >= contextMenu.y + contextMenu.actions.size()
+                        * CONTEXT_MENU_ROW_HEIGHT + 2) return false;
+        int index = (mouseY - contextMenu.y - 1) / CONTEXT_MENU_ROW_HEIGHT;
+        if (index < 0 || index >= contextMenu.actions.size()) return true;
+        MenuAction action = contextMenu.actions.get(index);
+        int graphX = contextMenu.graphX;
+        int graphY = contextMenu.graphY;
+        contextMenu = null;
+        if (isMenuActionEnabled(action)) executeMenuAction(action, graphX, graphY);
+        return true;
+    }
+
+    private boolean isMenuActionEnabled(MenuAction action) {
+        boolean editable = editableSupplier.getAsBoolean();
+        switch (action) {
+            case COPY:
+            case FOCUS:
+            case FIT_ALL:
+                return action == MenuAction.FIT_ALL || !selectedNodeIds.isEmpty();
+            case PASTE:
+                return editable && clipboard != null;
+            case ALIGN_HORIZONTAL:
+            case ALIGN_VERTICAL:
+                return editable && selectedNodeIds.size() >= 2;
+            case DUPLICATE:
+            case DELETE:
+            case DISCONNECT:
+                return editable && !selectedNodeIds.isEmpty();
+            case GROUP_SELECTION:
+            case ADD_COMMENT:
+            case AUTO_LAYOUT:
+                return editable;
+            default:
+                return false;
+        }
+    }
+
+    private void executeMenuAction(MenuAction action, int graphX, int graphY) {
+        switch (action) {
+            case COPY: copySelected(); break;
+            case PASTE: pasteCopiedNodeAt(graphX, graphY); break;
+            case DUPLICATE: copySelected(); pasteCopiedNode(); break;
+            case DELETE: deleteSelected(); break;
+            case DISCONNECT: disconnectSelected(); break;
+            case FOCUS: fitSelectionOrAll(); break;
+            case ALIGN_HORIZONTAL: alignSelectedHorizontal(); break;
+            case ALIGN_VERTICAL: alignSelectedVertical(); break;
+            case AUTO_LAYOUT: autoLayoutSelectedOrAll(); break;
+            case GROUP_SELECTION: createGroupForSelection(graphX, graphY); break;
+            case ADD_COMMENT: addCommentAt(graphX, graphY); break;
+            case FIT_ALL: clearSelection(); fitAll(); break;
+        }
+    }
+
+    private void drawEdge(DroneProgramGraph graph, DroneProgramEdge edge, PortHit hoveredPort) {
         DroneProgramNode source = graph.getNode(edge.getSourceNodeId());
         DroneProgramNode target = graph.getNode(edge.getTargetNodeId());
         Point from = portPoint(source, edge.getSourcePortId(), DronePortDirection.OUTPUT);
@@ -140,15 +426,111 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         if (from == null || to == null) return;
         DroneNodeDefinition definition = source == null ? null : registry.get(source.getType());
         DronePortDefinition port = definition == null ? null : definition.getPort(edge.getSourcePortId());
-        drawOrthogonalLine(from.x, from.y, to.x, to.y, colorForType(port == null ? DronePortType.ANY_DATA : port.getType()));
+        DronePortType type = port == null ? DronePortType.ANY_DATA : port.getType();
+        boolean flow = type == DronePortType.FLOW;
+        boolean portFocused = touchesHoveredPort(edge, hoveredPort);
+        boolean related = hoveredPort == null
+                ? DroneEdgePresentation.touchesSelection(edge, selectedNodeIds) : portFocused;
+        int color = colorForType(type);
+        if (!related) color = dimColor(color);
+        drawRoutedEdge(from, to, edge.getId(), color, flow, portFocused);
+        if (flow && related && zoomPercent >= 75 && shouldLabelFlow(edge.getSourcePortId())) {
+            drawEdgeLabel(from, to, portLabel(edge.getSourcePortId()), color);
+        }
+        if (portFocused && zoomPercent >= 65) drawConnectionEndpointLabels(edge, from, to, color);
+    }
+
+    private void drawRoutedEdge(Point from, Point to, UUID edgeId, int color, boolean flow, boolean focused) {
+        int direction = to.x >= from.x ? 1 : -1;
+        int stub = Math.max(5, scaled(8));
+        int thickness = (zoomPercent < 80 ? 1 : 2) + (flow && zoomPercent >= 80 ? 1 : 0)
+                + (focused ? 1 : 0);
+        int laneOffset = scaled(DroneEdgePresentation.laneOffset(edgeId));
+        if (to.x - from.x > stub * 2) {
+            int middle = from.x + (to.x - from.x) / 2 + laneOffset;
+            middle = Math.max(from.x + stub, Math.min(to.x - stub, middle));
+            drawSegment(from.x, from.y, middle, from.y, thickness, color);
+            drawSegment(middle, from.y, middle, to.y, thickness, color);
+            drawSegment(middle, to.y, to.x, to.y, thickness, color);
+        } else {
+            // Backward connections leave the output to the right, route around the nodes, then enter from the left.
+            int sourceLane = from.x + stub + Math.abs(laneOffset);
+            int targetLane = to.x - stub - Math.abs(laneOffset);
+            int detour = Math.min(from.y, to.y) - Math.max(scaled(16), Math.abs(laneOffset) + scaled(10));
+            drawSegment(from.x, from.y, sourceLane, from.y, thickness, color);
+            drawSegment(sourceLane, from.y, sourceLane, detour, thickness, color);
+            drawSegment(sourceLane, detour, targetLane, detour, thickness, color);
+            drawSegment(targetLane, detour, targetLane, to.y, thickness, color);
+            drawSegment(targetLane, to.y, to.x, to.y, thickness, color);
+            direction = 1;
+        }
+        drawEndpointMarkers(from, to, direction, color, focused);
+    }
+
+    private static void drawSegment(int x1, int y1, int x2, int y2, int thickness, int color) {
+        if (x1 == x2) {
+            GuiDraw.drawRect(x1, Math.min(y1, y2), thickness, Math.max(1, Math.abs(y2 - y1)), color);
+        } else {
+            GuiDraw.drawRect(Math.min(x1, x2), y1, Math.max(1, Math.abs(x2 - x1)), thickness, color);
+        }
+    }
+
+    private void drawEndpointMarkers(Point from, Point to, int targetDirection, int color, boolean focused) {
+        int marker = Math.max(2, scaled(focused ? 5 : 3));
+        GuiDraw.drawBorderInsideXYWH(from.x - marker / 2, from.y - marker / 2, marker, marker, color);
+        int arrow = Math.max(2, scaled(focused ? 5 : 4));
+        int baseX = to.x - targetDirection * arrow;
+        GuiDraw.drawRect(baseX, to.y - arrow / 2, Math.max(1, arrow), 1, color);
+        GuiDraw.drawRect(to.x - targetDirection * 2, to.y - 1, Math.max(1, targetDirection * 2), 3, color);
+    }
+
+    private void drawConnectionEndpointLabels(DroneProgramEdge edge, Point from, Point to, int color) {
+        float scale = Math.max(0.55F, zoomPercent / 170.0F);
+        String output = I18n.format("drtech.drone.connection.output", portLabel(edge.getSourcePortId()));
+        String input = I18n.format("drtech.drone.connection.input", portLabel(edge.getTargetPortId()));
+        drawEndpointLabel(output, from.x - 3, from.y - 10, scale, color, true);
+        drawEndpointLabel(input, to.x + 3, to.y - 10, scale, color, false);
+    }
+
+    private static void drawEndpointLabel(String text, int anchorX, int y, float scale, int color, boolean rightAlign) {
+        int width = Math.round(Minecraft.getMinecraft().fontRenderer.getStringWidth(text) * scale);
+        int x = rightAlign ? anchorX - width : anchorX;
+        GuiDraw.drawRect(x - 2, y - 1, width + 4, Math.max(7, Math.round(9 * scale)), 0xE0151A21);
+        GuiDraw.drawText(text, x, y, scale, color, false);
     }
 
     private void drawOrthogonalLine(int x1, int y1, int x2, int y2, int color) {
+        drawOrthogonalLine(x1, y1, x2, y2, color, false);
+    }
+
+    private void drawOrthogonalLine(int x1, int y1, int x2, int y2, int color, boolean flow) {
         int middle = x1 + (x2 - x1) / 2;
-        int thickness = zoomPercent < 80 ? 1 : 2;
+        int thickness = (zoomPercent < 80 ? 1 : 2) + (flow && zoomPercent >= 80 ? 1 : 0);
         GuiDraw.drawRect(Math.min(x1, middle), y1, Math.max(1, Math.abs(middle - x1)), thickness, color);
         GuiDraw.drawRect(middle, Math.min(y1, y2), thickness, Math.max(1, Math.abs(y2 - y1)), color);
         GuiDraw.drawRect(Math.min(middle, x2), y2, Math.max(1, Math.abs(x2 - middle)), thickness, color);
+    }
+
+    private void drawEdgeLabel(Point from, Point to, String label, int color) {
+        float textScale = Math.max(0.5F, zoomPercent / 175.0F);
+        int textWidth = Math.round(Minecraft.getMinecraft().fontRenderer.getStringWidth(label) * textScale);
+        int middleX = from.x + (to.x - from.x) / 2;
+        int middleY = from.y + (to.y - from.y) / 2;
+        int x = middleX - textWidth / 2;
+        int y = middleY - 5;
+        GuiDraw.drawRect(x - 2, y - 1, textWidth + 4, Math.max(7, Math.round(9 * textScale)), 0xE0151A21);
+        GuiDraw.drawText(label, x, y, textScale, color, false);
+    }
+
+    private static boolean shouldLabelFlow(String portId) {
+        return !"next".equals(portId);
+    }
+
+    private static int dimColor(int color) {
+        int red = ((color >> 16) & 0xFF) * 35 / 100;
+        int green = ((color >> 8) & 0xFF) * 35 / 100;
+        int blue = (color & 0xFF) * 35 / 100;
+        return 0xFF000000 | red << 16 | green << 8 | blue;
     }
 
     private void drawNode(DroneProgramGraph graph, DroneProgramNode node, PortHit hoveredPort) {
@@ -156,11 +538,13 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         DroneNodeDefinition definition = registry.get(node.getType());
         int nodeHeight = nodeHeight(definition);
         boolean active = node.getId().equals(activeNodeSupplier.get());
-        int background = node.getId().equals(selectedNodeId) ? 0xFF314760
+        boolean selected = selectedNodeIds.contains(node.getId());
+        int background = selected ? 0xFF314760
                 : active ? 0xFF25493F : 0xFF26313E;
         GuiDraw.drawRect(point.x, point.y, scaled(NODE_WIDTH), scaled(nodeHeight), background);
         GuiDraw.drawRect(point.x, point.y, scaled(NODE_WIDTH), scaled(11), categoryColor(definition));
-        int border = node.getId().equals(selectedNodeId) ? 0xFF68B7FF
+        int border = node.getId().equals(selectedNodeId) ? 0xFF8DCAFF
+                : selected ? 0xFF4F9EDB
                 : diagnosticNodesSupplier.get().contains(node.getId()) ? 0xFFFF5A5A
                 : active ? 0xFF52E39E : 0xFF526274;
         GuiDraw.drawBorderInsideXYWH(point.x, point.y, scaled(NODE_WIDTH), scaled(nodeHeight), border);
@@ -168,13 +552,20 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             GuiDraw.drawRect(point.x + scaled(NODE_WIDTH - 7), point.y + scaled(1), scaled(5), scaled(5),
                     0xFFFF4D5A);
         }
+        // Category glyph remains recognisable when node header colours are hard to distinguish.
+        GuiDraw.drawRect(point.x + scaled(2), point.y + scaled(2), scaled(7), scaled(7), 0x880C121A);
+        GuiDraw.drawText(categorySymbol(definition), point.x + scaled(4), point.y + scaled(3),
+                Math.max(0.45F, zoomPercent / 180.0F), 0xFFF4F7FA, false);
         String customLabel = node.getConfiguration().getString("Label");
         String title = !customLabel.isEmpty() ? customLabel : definition == null
                 ? I18n.format("drtech.drone.canvas.missing_node", node.getType())
                 : I18n.format("drtech.drone.node." + node.getType().getPath());
-        GuiDraw.drawText(title, point.x + scaled(4), point.y + scaled(2), Math.max(0.5F, zoomPercent / 150.0F),
+        GuiDraw.drawText(title, point.x + scaled(11), point.y + scaled(2), Math.max(0.5F, zoomPercent / 150.0F),
                 0xFFE7EDF5, false);
         if (definition == null) return;
+        if (node.getType().equals(DrTechDroneNodes.COMMENT)) {
+            drawCommentBody(node, point);
+        }
         for (DronePortDefinition port : definition.getPorts()) {
             Point portPoint = portPoint(node, port.getId(), port.getDirection());
             if (portPoint == null) continue;
@@ -192,8 +583,62 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 GuiDraw.drawRect(portPoint.x - outlineSize / 2, portPoint.y - outlineSize / 2,
                         outlineSize, outlineSize, outline);
             }
-            GuiDraw.drawRect(portPoint.x - size / 2, portPoint.y - size / 2, size, size, colorForType(port.getType()));
+            drawPortShape(portPoint, port.getType(), size, colorForType(port.getType()));
             drawPortLabel(point, portPoint, port);
+        }
+    }
+
+    private void drawCommentBody(DroneProgramNode node, Point point) {
+        String text = node.getConfiguration().getString("Text").replace('\n', ' ').replace('\r', ' ').trim();
+        if (text.isEmpty()) text = I18n.format("drtech.drone.comment.empty");
+        String first = text.length() <= 30 ? text : text.substring(0, 30);
+        String second = text.length() <= 30 ? "" : text.substring(30, Math.min(60, text.length()));
+        if (text.length() > 60) second += "…";
+        float textScale = Math.max(0.45F, zoomPercent / 165.0F);
+        GuiDraw.drawText(first, point.x + scaled(4), point.y + scaled(16), textScale, 0xFFF3E6A1, false);
+        if (!second.isEmpty()) {
+            GuiDraw.drawText(second, point.x + scaled(4), point.y + scaled(29), textScale, 0xFFD8CC91, false);
+        }
+    }
+
+    private void drawPortShape(Point point, DronePortType type, int size, int color) {
+        int left = point.x - size / 2;
+        int top = point.y - size / 2;
+        int centerX = point.x;
+        int centerY = point.y;
+        int line = Math.max(1, size / 4);
+        switch (type) {
+            case FLOW:
+                GuiDraw.drawRect(left, centerY - line / 2, Math.max(2, size / 2 + 1), line, color);
+                for (int row = 0; row < size; row++) {
+                    int distance = Math.abs(row - size / 2);
+                    int width = Math.max(1, size / 2 + 1 - distance);
+                    GuiDraw.drawRect(centerX, top + row, width, 1, color);
+                }
+                break;
+            case BOOLEAN:
+                for (int row = 0; row < size; row++) {
+                    int distance = Math.abs(row - size / 2);
+                    int width = Math.max(1, size - distance * 2);
+                    GuiDraw.drawRect(centerX - width / 2, top + row, width, 1, color);
+                }
+                break;
+            case NUMBER:
+                for (int row = 0; row < size; row++) {
+                    int inset = row == 0 || row == size - 1 ? Math.max(1, line) : 0;
+                    GuiDraw.drawRect(left + inset, top + row, Math.max(1, size - inset * 2), 1, color);
+                }
+                break;
+            case COORDINATE:
+                GuiDraw.drawRect(left, centerY - line / 2, size, line, color);
+                GuiDraw.drawRect(centerX - line / 2, top, line, size, color);
+                GuiDraw.drawRect(centerX - line, centerY - line, line * 2, line * 2, 0xFF151A21);
+                break;
+            case AREA:
+                GuiDraw.drawBorderInsideXYWH(left, top, size, size, color);
+                break;
+            default:
+                GuiDraw.drawRect(left, top, size, size, color);
         }
     }
 
@@ -220,6 +665,9 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         } else if (pendingPort != null) {
             text = I18n.format("drtech.drone.canvas.connection.selected", portLabel(pendingPort.portId));
             color = 0xFFFFFF80;
+        } else if (selectedNodeIds.size() > 1) {
+            text = I18n.format("drtech.drone.canvas.selection.count", selectedNodeIds.size());
+            color = 0xFF8DCAFF;
         } else {
             text = I18n.format("drtech.drone.canvas.connection.guide");
             color = 0xFFAEBBC9;
@@ -228,10 +676,55 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         GuiDraw.drawText(text, 5, height - 11, 0.55F, color, false);
     }
 
+    private void drawMarquee() {
+        if (!marqueeSelecting) return;
+        int left = Math.min(marqueeStartX, marqueeEndX);
+        int top = Math.min(marqueeStartY, marqueeEndY);
+        int width = Math.max(1, Math.abs(marqueeEndX - marqueeStartX));
+        int height = Math.max(1, Math.abs(marqueeEndY - marqueeStartY));
+        GuiDraw.drawRect(left, top, width, height, 0x384C91D7);
+        GuiDraw.drawBorderInsideXYWH(left, top, width, height, 0xFF68B7FF);
+    }
+
+    private void drawMiniMap(DroneProgramGraph graph, int canvasWidth) {
+        MiniMapProjection projection = miniMapProjection(graph, canvasWidth);
+        if (projection == null) return;
+        GuiDraw.drawRect(projection.left, projection.top, MINIMAP_WIDTH, MINIMAP_HEIGHT, 0xD0192029);
+        GuiDraw.drawBorderInsideXYWH(projection.left, projection.top, MINIMAP_WIDTH, MINIMAP_HEIGHT, 0xFF526274);
+        Set<UUID> hiddenNodes = DroneGroupLayout.hiddenByCollapsedGroups(graph);
+        for (DroneProgramNode node : graph.getNodes()) {
+            if (hiddenNodes.contains(node.getId())) continue;
+            int x = projection.projectX(node.getX());
+            int y = projection.projectY(node.getY());
+            int color = node.getId().equals(selectedNodeId) ? 0xFF8DCAFF
+                    : selectedNodeIds.contains(node.getId()) ? 0xFF4F9EDB
+                    : node.getId().equals(activeNodeSupplier.get()) ? 0xFF52E39E : 0xFF8392A5;
+            int nodeWidth = DroneGroupLayout.isGroup(node) ? DroneGroupLayout.width(node) : NODE_WIDTH;
+            int nodeHeight = DroneGroupLayout.isGroup(node)
+                    ? (DroneGroupLayout.isCollapsed(node) ? DroneGroupLayout.HEADER_HEIGHT : DroneGroupLayout.height(node))
+                    : nodeHeight(registry.get(node.getType()));
+            GuiDraw.drawRect(x, y, Math.max(2, projection.projectLength(nodeWidth)),
+                    Math.max(2, projection.projectLength(nodeHeight)), color);
+        }
+        // Current viewport rectangle gives orientation while panning a large program.
+        int rawLeft = projection.projectX(-panX);
+        int rawTop = projection.projectY(-panY);
+        int rawRight = rawLeft + Math.max(2, projection.projectLength(unscale(getArea().w())));
+        int rawBottom = rawTop + Math.max(2, projection.projectLength(unscale(getArea().h())));
+        int viewLeft = Math.max(projection.left + 1, rawLeft);
+        int viewTop = Math.max(projection.top + 1, rawTop);
+        int viewRight = Math.min(projection.left + MINIMAP_WIDTH - 1, rawRight);
+        int viewBottom = Math.min(projection.top + MINIMAP_HEIGHT - 1, rawBottom);
+        if (viewRight > viewLeft && viewBottom > viewTop) {
+            GuiDraw.drawBorderInsideXYWH(viewLeft, viewTop, viewRight - viewLeft, viewBottom - viewTop, 0xFFFFFFFF);
+        }
+    }
+
     @Override
     public void drawForeground(ModularGuiContext context) {
         super.drawForeground(context);
         if (!isBelowMouseFor(0)) return;
+        if (contextMenu != null) return;
         DroneProgramGraph graph = graphSupplier.get();
         if (graph == null) return;
         PortHit hit = findPort(graph, getContext().getMouseX(), getContext().getMouseY());
@@ -258,6 +751,11 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         if (graph == null) return Result.IGNORE;
         int mouseX = getContext().getMouseX();
         int mouseY = getContext().getMouseY();
+        if (contextMenu != null) {
+            if (mouseButton == 0 && handleContextMenuClick(mouseX, mouseY)) return Result.SUCCESS;
+            contextMenu = null;
+        }
+        if (mouseButton == 0 && navigateFromMiniMap(graph, mouseX, mouseY)) return Result.SUCCESS;
         if (mouseButton == 2) {
             panning = true;
             lastMouseX = mouseX;
@@ -277,17 +775,71 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             }
         }
         DroneProgramNode node = findNode(graph, mouseX, mouseY);
+        if (mouseButton == 1) {
+            if (node != null) {
+                if (!selectedNodeIds.contains(node.getId())) {
+                    selectedNodeIds.clear();
+                    selectedNodeIds.add(node.getId());
+                }
+                selectedNodeId = node.getId();
+                selectedPropertyIndex = 0;
+                clearPropertyDraft();
+                if (DroneGroupLayout.isGroup(node)) DroneGroupLayout.expandSelectedGroups(graph, selectedNodeIds);
+            }
+            pendingPort = null;
+            openContextMenu(mouseX, mouseY, node != null);
+            return Result.SUCCESS;
+        }
+        boolean additive = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
         UUID previousSelection = selectedNodeId;
-        selectedNodeId = node == null ? null : node.getId();
+        if (node == null) {
+            if (mouseButton == 0) {
+                if (!additive) clearSelection();
+                marqueeSelecting = true;
+                marqueeAdditive = additive;
+                marqueeStartX = marqueeEndX = mouseX;
+                marqueeStartY = marqueeEndY = mouseY;
+                pendingPort = null;
+                return Result.SUCCESS;
+            }
+            selectedNodeId = null;
+        } else if (additive) {
+            if (selectedNodeIds.remove(node.getId())) {
+                if (DroneGroupLayout.isGroup(node)) selectedNodeIds.removeAll(DroneGroupLayout.members(graph, node));
+                if (node.getId().equals(selectedNodeId)) selectedNodeId = firstSelectedNodeId();
+                selectedPropertyIndex = 0;
+                clearPropertyDraft();
+                return Result.SUCCESS;
+            }
+            selectedNodeIds.add(node.getId());
+            selectedNodeId = node.getId();
+        } else if (!selectedNodeIds.contains(node.getId())) {
+            selectedNodeIds.clear();
+            selectedNodeIds.add(node.getId());
+            selectedNodeId = node.getId();
+        } else {
+            selectedNodeId = node.getId();
+        }
+        if (node != null && DroneGroupLayout.isGroup(node) && selectedNodeIds.contains(node.getId())) {
+            DroneGroupLayout.expandSelectedGroups(graph, selectedNodeIds);
+        }
         if (!java.util.Objects.equals(previousSelection, selectedNodeId)) {
             selectedPropertyIndex = 0;
             clearPropertyDraft();
         }
         if (mouseButton == 0 && node != null && editableSupplier.getAsBoolean()) {
-            Point point = nodePoint(node);
             draggingNodeId = node.getId();
-            dragOffsetX = mouseX - point.x;
-            dragOffsetY = mouseY - point.y;
+            dragStartMouseX = mouseX;
+            dragStartMouseY = mouseY;
+            dragOrigins.clear();
+            for (DroneProgramNode selected : graph.getNodes()) {
+                if (selectedNodeIds.contains(selected.getId())) {
+                    PreviewPosition existing = previews.get(selected.getId());
+                    dragOrigins.put(selected.getId(), existing == null
+                            ? new PreviewPosition(selected.getX(), selected.getY())
+                            : new PreviewPosition(existing.x, existing.y));
+                }
+            }
             return Result.SUCCESS;
         }
         pendingPort = null;
@@ -350,8 +902,19 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             lastMouseX = mouseX;
             lastMouseY = mouseY;
         } else if (draggingNodeId != null && mouseButton == 0) {
-            previews.put(draggingNodeId, new PreviewPosition(unscale(mouseX - dragOffsetX) - panX,
-                    unscale(mouseY - dragOffsetY) - panY));
+            int deltaX = unscale(mouseX - dragStartMouseX);
+            int deltaY = unscale(mouseY - dragStartMouseY);
+            boolean snap = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+            for (Map.Entry<UUID, PreviewPosition> entry : dragOrigins.entrySet()) {
+                PreviewPosition origin = entry.getValue();
+                int x = origin.x + deltaX;
+                int y = origin.y + deltaY;
+                previews.put(entry.getKey(), new PreviewPosition(snap ? snapCoordinate(x) : x,
+                        snap ? snapCoordinate(y) : y));
+            }
+        } else if (marqueeSelecting && mouseButton == 0) {
+            marqueeEndX = mouseX;
+            marqueeEndY = mouseY;
         }
     }
 
@@ -360,12 +923,31 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         panning = false;
         if (draggingNodeId != null && mouseButton == 0) {
             DroneProgramGraph graph = graphSupplier.get();
-            PreviewPosition preview = previews.remove(draggingNodeId);
-            if (graph != null && preview != null && editableSupplier.getAsBoolean()) {
-                commandSink.accept(DroneGraphEditCommand.moveNode(graph.getRevision(), draggingNodeId,
-                        preview.x, preview.y));
+            if (graph != null && editableSupplier.getAsBoolean()) {
+                List<DroneGraphEditCommand> moves = new ArrayList<>();
+                long expiresAt = System.currentTimeMillis() + DRAG_ACK_TIMEOUT_MS;
+                for (Map.Entry<UUID, PreviewPosition> entry : dragOrigins.entrySet()) {
+                    PreviewPosition preview = previews.get(entry.getKey());
+                    if (preview != null && (preview.x != entry.getValue().x || preview.y != entry.getValue().y)) {
+                        moves.add(DroneGraphEditCommand.moveNode(graph.getRevision(), entry.getKey(),
+                                preview.x, preview.y));
+                        previews.put(entry.getKey(), preview.awaiting(graph.getRevision(), expiresAt));
+                    } else {
+                        previews.remove(entry.getKey());
+                    }
+                }
+                if (!moves.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), moves));
+            } else {
+                for (UUID nodeId : dragOrigins.keySet()) previews.remove(nodeId);
             }
             draggingNodeId = null;
+            dragOrigins.clear();
+            return true;
+        }
+        if (marqueeSelecting && mouseButton == 0) {
+            DroneProgramGraph graph = graphSupplier.get();
+            if (graph != null) applyMarqueeSelection(graph);
+            marqueeSelecting = false;
             return true;
         }
         if (mouseButton == 0 && pendingPort != null) {
@@ -381,42 +963,397 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
 
     @Override
     public boolean onMouseScroll(UpOrDown direction, int amount) {
+        contextMenu = null;
         int before = zoomPercent;
         zoomPercent = Math.max(50, Math.min(150, zoomPercent + direction.modifier * 10));
         return before != zoomPercent;
     }
 
+    @Override
+    public @NotNull Result onKeyPressed(char typedChar, int keyCode) {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (keyCode == Keyboard.KEY_ESCAPE && contextMenu != null) {
+            contextMenu = null;
+            return Result.SUCCESS;
+        }
+        boolean control = Interactable.hasControlDown();
+        if (control) {
+            switch (keyCode) {
+                case Keyboard.KEY_A:
+                    selectAll();
+                    return Result.SUCCESS;
+                case Keyboard.KEY_C:
+                    copySelected();
+                    return Result.SUCCESS;
+                case Keyboard.KEY_V:
+                    pasteCopiedNode();
+                    return Result.SUCCESS;
+                case Keyboard.KEY_D:
+                    copySelected();
+                    pasteCopiedNode();
+                    return Result.SUCCESS;
+                case Keyboard.KEY_Z:
+                    if (graph != null && editableSupplier.getAsBoolean()) {
+                        commandSink.accept(DroneGraphEditCommand.undo(graph.getRevision()));
+                    }
+                    return Result.SUCCESS;
+                case Keyboard.KEY_Y:
+                    if (graph != null && editableSupplier.getAsBoolean()) {
+                        commandSink.accept(DroneGraphEditCommand.redo(graph.getRevision()));
+                    }
+                    return Result.SUCCESS;
+                case Keyboard.KEY_L:
+                    autoLayoutSelectedOrAll();
+                    return Result.SUCCESS;
+                case Keyboard.KEY_G:
+                    snapSelectedToGrid();
+                    return Result.SUCCESS;
+                default:
+                    break;
+            }
+        }
+        switch (keyCode) {
+            case Keyboard.KEY_DELETE:
+            case Keyboard.KEY_BACK:
+                deleteSelected();
+                return Result.SUCCESS;
+            case Keyboard.KEY_HOME:
+                fitSelectionOrAll();
+                return Result.SUCCESS;
+            case Keyboard.KEY_ESCAPE:
+                pendingPort = null;
+                clearSelection();
+                return Result.SUCCESS;
+            case Keyboard.KEY_LEFT:
+                nudgeSelected(-nudgeAmount(), 0);
+                return Result.SUCCESS;
+            case Keyboard.KEY_RIGHT:
+                nudgeSelected(nudgeAmount(), 0);
+                return Result.SUCCESS;
+            case Keyboard.KEY_UP:
+                nudgeSelected(0, -nudgeAmount());
+                return Result.SUCCESS;
+            case Keyboard.KEY_DOWN:
+                nudgeSelected(0, nudgeAmount());
+                return Result.SUCCESS;
+            default:
+                return Result.IGNORE;
+        }
+    }
+
     public void deleteSelected() {
         DroneProgramGraph graph = graphSupplier.get();
-        if (graph != null && selectedNodeId != null && editableSupplier.getAsBoolean()) {
-            commandSink.accept(DroneGraphEditCommand.removeNode(graph.getRevision(), selectedNodeId));
-            selectedNodeId = null;
+        if (graph != null && !selectedNodeIds.isEmpty() && editableSupplier.getAsBoolean()) {
+            List<DroneGraphEditCommand> removals = new ArrayList<>();
+            for (UUID nodeId : selectedNodeIds) {
+                if (graph.getNode(nodeId) != null) {
+                    removals.add(DroneGraphEditCommand.removeNode(graph.getRevision(), nodeId));
+                }
+            }
+            if (!removals.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), removals));
+            clearSelection();
             pendingPort = null;
         }
     }
 
-    /** Copies the selected node's type and settings. Connections are deliberately not copied. */
-    public void copySelected() {
+    public void disconnectSelected() {
         DroneProgramGraph graph = graphSupplier.get();
-        DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
-        copiedNode = node == null ? null : new DroneProgramNode(node.getId(), node.getType(), node.getX(), node.getY(),
-                node.getConfiguration());
+        if (graph == null || selectedNodeIds.isEmpty() || !editableSupplier.getAsBoolean()) return;
+        List<DroneGraphEditCommand> removals = new ArrayList<>();
+        for (DroneProgramEdge edge : graph.getEdges()) {
+            if (selectedNodeIds.contains(edge.getSourceNodeId()) || selectedNodeIds.contains(edge.getTargetNodeId())) {
+                removals.add(DroneGraphEditCommand.removeEdge(graph.getRevision(), edge.getId()));
+            }
+        }
+        if (!removals.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), removals));
     }
 
-    /** Pastes a fresh node near its source so it remains a safe, independent graph mutation. */
-    public void pasteCopiedNode() {
+    private void addCommentAt(int graphX, int graphY) {
         DroneProgramGraph graph = graphSupplier.get();
-        if (graph == null || copiedNode == null || !editableSupplier.getAsBoolean()) return;
-        UUID pastedId = UUID.randomUUID();
-        int offset = 24 + graph.getNodes().size() % 3 * 8;
-        commandSink.accept(DroneGraphEditCommand.addNode(graph.getRevision(), pastedId, copiedNode.getType(),
-                copiedNode.getX() + offset, copiedNode.getY() + offset, copiedNode.getConfiguration()));
-        selectedNodeId = pastedId;
+        if (graph == null || !editableSupplier.getAsBoolean() || graph.getNodes().size() >= 256) return;
+        net.minecraft.nbt.NBTTagCompound config = new net.minecraft.nbt.NBTTagCompound();
+        config.setString("Text", "");
+        UUID nodeId = UUID.randomUUID();
+        commandSink.accept(DroneGraphEditCommand.addNode(graph.getRevision(), nodeId, DrTechDroneNodes.COMMENT,
+                graphX, graphY, config));
+        selectedNodeIds.clear();
+        selectedNodeIds.add(nodeId);
+        selectedNodeId = nodeId;
+        selectedPropertyIndex = 0;
+    }
+
+    private void createGroupForSelection(int graphX, int graphY) {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || !editableSupplier.getAsBoolean() || graph.getNodes().size() >= 256) return;
+        DroneGroupLayout.Frame frame = DroneGroupLayout.surroundingFrame(graph, selectedNodeIds);
+        int x = frame == null ? graphX : frame.getX();
+        int y = frame == null ? graphY : frame.getY();
+        int width = frame == null ? DroneGroupLayout.DEFAULT_WIDTH : frame.getWidth();
+        int height = frame == null ? DroneGroupLayout.DEFAULT_HEIGHT : frame.getHeight();
+        net.minecraft.nbt.NBTTagCompound config = new net.minecraft.nbt.NBTTagCompound();
+        config.setString("Title", "");
+        config.setInteger("Width", width);
+        config.setInteger("Height", height);
+        config.setString("Color", "BLUE");
+        config.setBoolean("Collapsed", false);
+        UUID nodeId = UUID.randomUUID();
+        commandSink.accept(DroneGraphEditCommand.addNode(graph.getRevision(), nodeId, DrTechDroneNodes.GROUP,
+                x, y, config));
+        selectedNodeIds.add(nodeId);
+        selectedNodeId = nodeId;
+        selectedPropertyIndex = 0;
+    }
+
+    /** Copies all selected nodes plus connections whose endpoints are both inside the selection. */
+    public void copySelected() {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || selectedNodeIds.isEmpty()) {
+            clipboard = null;
+            return;
+        }
+        List<DroneProgramNode> nodes = new ArrayList<>();
+        List<DroneProgramEdge> edges = new ArrayList<>();
+        for (DroneProgramNode node : graph.getNodes()) {
+            if (selectedNodeIds.contains(node.getId())) nodes.add(new DroneProgramNode(node.getId(), node.getType(),
+                    node.getX(), node.getY(), node.getConfiguration()));
+        }
+        for (DroneProgramEdge edge : graph.getEdges()) {
+            if (selectedNodeIds.contains(edge.getSourceNodeId()) && selectedNodeIds.contains(edge.getTargetNodeId())) {
+                edges.add(edge);
+            }
+        }
+        clipboard = nodes.isEmpty() ? null : new ClipboardGraph(nodes, edges);
+        clipboardPasteCount = 0;
+    }
+
+    /** Pastes a remapped independent subgraph as one server-side transaction. */
+    public void pasteCopiedNode() {
+        pasteCopiedNodeAt(null, null);
+    }
+
+    private void pasteCopiedNodeAt(Integer targetX, Integer targetY) {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || clipboard == null || !editableSupplier.getAsBoolean()) return;
+        if (graph.getNodes().size() + clipboard.nodes.size() > 256
+                || graph.getEdges().size() + clipboard.edges.size() > 512) return;
+        int offset = 24 + (++clipboardPasteCount - 1) * 12;
+        int minX = clipboard.nodes.stream().mapToInt(DroneProgramNode::getX).min().orElse(0);
+        int minY = clipboard.nodes.stream().mapToInt(DroneProgramNode::getY).min().orElse(0);
+        int offsetX = targetX == null ? offset : targetX - minX;
+        int offsetY = targetY == null ? offset : targetY - minY;
+        Map<UUID, UUID> remapped = new LinkedHashMap<>();
+        List<DroneGraphEditCommand> commands = new ArrayList<>();
+        for (DroneProgramNode node : clipboard.nodes) {
+            UUID newId = UUID.randomUUID();
+            remapped.put(node.getId(), newId);
+            commands.add(DroneGraphEditCommand.addNode(graph.getRevision(), newId, node.getType(),
+                    node.getX() + offsetX, node.getY() + offsetY, node.getConfiguration()));
+        }
+        for (DroneProgramEdge edge : clipboard.edges) {
+            commands.add(DroneGraphEditCommand.addEdge(graph.getRevision(), UUID.randomUUID(),
+                    remapped.get(edge.getSourceNodeId()), edge.getSourcePortId(),
+                    remapped.get(edge.getTargetNodeId()), edge.getTargetPortId()));
+        }
+        commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), commands));
+        selectedNodeIds.clear();
+        selectedNodeIds.addAll(remapped.values());
+        selectedNodeId = firstSelectedNodeId();
         selectedPropertyIndex = 0;
     }
 
     public boolean hasCopiedNode() {
-        return copiedNode != null;
+        return clipboard != null;
+    }
+
+    public void alignSelectedHorizontal() {
+        if (isShiftDown()) distributeSelected(true);
+        else alignSelected(true);
+    }
+
+    public void alignSelectedVertical() {
+        if (isShiftDown()) distributeSelected(false);
+        else alignSelected(false);
+    }
+
+    public int getSelectionCount() { return selectedNodeIds.size(); }
+
+    public void selectAll() {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null) return;
+        selectedNodeIds.clear();
+        for (DroneProgramNode node : graph.getNodes()) selectedNodeIds.add(node.getId());
+        selectedNodeId = firstSelectedNodeId();
+        selectedPropertyIndex = 0;
+        clearPropertyDraft();
+    }
+
+    /** Selects and centers one graph node without mutating the server-side program. */
+    public boolean focusNode(UUID nodeId) {
+        DroneProgramGraph graph = graphSupplier.get();
+        DroneProgramNode node = graph == null || nodeId == null ? null : graph.getNode(nodeId);
+        if (node == null) return false;
+        selectedNodeIds.clear();
+        selectedNodeIds.add(nodeId);
+        selectedNodeId = nodeId;
+        selectedPropertyIndex = 0;
+        clearPropertyDraft();
+        pendingPort = null;
+        int focusWidth = DroneGroupLayout.isGroup(node) ? DroneGroupLayout.width(node) : NODE_WIDTH;
+        int focusHeight = DroneGroupLayout.isGroup(node) ? DroneGroupLayout.height(node)
+                : nodeHeight(registry.get(node.getType()));
+        panX = unscale(getArea().w() / 2) - node.getX() - focusWidth / 2;
+        panY = unscale(getArea().h() / 2) - node.getY() - focusHeight / 2;
+        return true;
+    }
+
+    /** Selects a declared property after focusing its node. Returns false for port/global diagnostics. */
+    public boolean focusNodeProperty(UUID nodeId, String propertyId) {
+        if (!focusNode(nodeId) || propertyId == null || propertyId.isEmpty()) return false;
+        DroneProgramGraph graph = graphSupplier.get();
+        DroneProgramNode node = graph == null ? null : graph.getNode(nodeId);
+        DroneNodeDefinition definition = node == null ? null : registry.get(node.getType());
+        if (definition == null) return false;
+        int index = 0;
+        for (DroneNodePropertyDefinition property : definition.getProperties()) {
+            if (propertyId.equals(property.getId())) {
+                selectedPropertyIndex = index;
+                clearPropertyDraft();
+                return true;
+            }
+            index++;
+        }
+        return false;
+    }
+
+    public void resetViewOrAutoLayout() {
+        if (isShiftDown()) autoLayoutSelectedOrAll();
+        else resetView();
+    }
+
+    public void autoLayoutSelectedOrAll() {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || !editableSupplier.getAsBoolean()) return;
+        Collection<UUID> target = selectedNodeIds.size() > 1 ? new ArrayList<>(selectedNodeIds)
+                : Collections.emptyList();
+        Map<UUID, DroneGraphAutoLayout.Position> layout = DroneGraphAutoLayout.layout(graph, target, registry);
+        List<DroneGraphEditCommand> moves = new ArrayList<>();
+        for (Map.Entry<UUID, DroneGraphAutoLayout.Position> entry : layout.entrySet()) {
+            DroneProgramNode node = graph.getNode(entry.getKey());
+            DroneGraphAutoLayout.Position position = entry.getValue();
+            if (node != null && (node.getX() != position.getX() || node.getY() != position.getY())) {
+                moves.add(DroneGraphEditCommand.moveNode(graph.getRevision(), node.getId(),
+                        position.getX(), position.getY()));
+            }
+        }
+        if (!moves.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), moves));
+    }
+
+    public void snapSelectedToGrid() {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || selectedNodeIds.isEmpty() || !editableSupplier.getAsBoolean()) return;
+        List<DroneGraphEditCommand> moves = new ArrayList<>();
+        for (UUID nodeId : selectedNodeIds) {
+            DroneProgramNode node = graph.getNode(nodeId);
+            if (node == null) continue;
+            int x = snapCoordinate(node.getX());
+            int y = snapCoordinate(node.getY());
+            if (x != node.getX() || y != node.getY()) {
+                moves.add(DroneGraphEditCommand.moveNode(graph.getRevision(), nodeId, x, y));
+            }
+        }
+        if (!moves.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), moves));
+    }
+
+    private void nudgeSelected(int deltaX, int deltaY) {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || selectedNodeIds.isEmpty() || !editableSupplier.getAsBoolean()) return;
+        List<DroneGraphEditCommand> moves = new ArrayList<>();
+        for (UUID nodeId : selectedNodeIds) {
+            DroneProgramNode node = graph.getNode(nodeId);
+            if (node != null) moves.add(DroneGraphEditCommand.moveNode(graph.getRevision(), nodeId,
+                    node.getX() + deltaX, node.getY() + deltaY));
+        }
+        if (!moves.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), moves));
+    }
+
+    private static int nudgeAmount() { return isShiftDown() ? 16 : 1; }
+
+    private void alignSelected(boolean horizontal) {
+        DroneProgramGraph graph = graphSupplier.get();
+        DroneProgramNode anchor = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
+        if (anchor == null || selectedNodeIds.size() < 2 || !editableSupplier.getAsBoolean()) return;
+        List<DroneGraphEditCommand> moves = new ArrayList<>();
+        for (UUID nodeId : selectedNodeIds) {
+            DroneProgramNode node = graph.getNode(nodeId);
+            if (node == null || node.getId().equals(anchor.getId())) continue;
+            int x = horizontal ? node.getX() : anchor.getX();
+            int y = horizontal ? anchor.getY() : node.getY();
+            if (x != node.getX() || y != node.getY()) {
+                moves.add(DroneGraphEditCommand.moveNode(graph.getRevision(), node.getId(), x, y));
+            }
+        }
+        if (!moves.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), moves));
+    }
+
+    private void distributeSelected(boolean horizontal) {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || selectedNodeIds.size() < 3 || !editableSupplier.getAsBoolean()) return;
+        List<DroneProgramNode> nodes = new ArrayList<>();
+        for (UUID nodeId : selectedNodeIds) {
+            DroneProgramNode node = graph.getNode(nodeId);
+            if (node != null) nodes.add(node);
+        }
+        if (nodes.size() < 3) return;
+        nodes.sort((left, right) -> Integer.compare(horizontal ? left.getX() : left.getY(),
+                horizontal ? right.getX() : right.getY()));
+        int first = horizontal ? nodes.get(0).getX() : nodes.get(0).getY();
+        int last = horizontal ? nodes.get(nodes.size() - 1).getX() : nodes.get(nodes.size() - 1).getY();
+        List<DroneGraphEditCommand> moves = new ArrayList<>();
+        for (int i = 1; i < nodes.size() - 1; i++) {
+            DroneProgramNode node = nodes.get(i);
+            int coordinate = first + (int) Math.round((last - first) * (double) i / (nodes.size() - 1));
+            int x = horizontal ? coordinate : node.getX();
+            int y = horizontal ? node.getY() : coordinate;
+            if (x != node.getX() || y != node.getY()) {
+                moves.add(DroneGraphEditCommand.moveNode(graph.getRevision(), node.getId(), x, y));
+            }
+        }
+        if (!moves.isEmpty()) commandSink.accept(DroneGraphEditCommand.batch(graph.getRevision(), moves));
+    }
+
+    private void applyMarqueeSelection(DroneProgramGraph graph) {
+        int left = Math.min(marqueeStartX, marqueeEndX);
+        int right = Math.max(marqueeStartX, marqueeEndX);
+        int top = Math.min(marqueeStartY, marqueeEndY);
+        int bottom = Math.max(marqueeStartY, marqueeEndY);
+        if (!marqueeAdditive) selectedNodeIds.clear();
+        for (DroneProgramNode node : graph.getNodes()) {
+            Point point = nodePoint(node);
+            int nodeRight = point.x + scaled(DroneGroupLayout.isGroup(node)
+                    ? DroneGroupLayout.width(node) : NODE_WIDTH);
+            int nodeBottom = point.y + scaled(DroneGroupLayout.isGroup(node)
+                    ? DroneGroupLayout.height(node) : nodeHeight(registry.get(node.getType())));
+            if (nodeRight >= left && point.x <= right && nodeBottom >= top && point.y <= bottom) {
+                selectedNodeIds.add(node.getId());
+            }
+        }
+        DroneGroupLayout.expandSelectedGroups(graph, selectedNodeIds);
+        if (selectedNodeId == null || !selectedNodeIds.contains(selectedNodeId)) {
+            selectedNodeId = firstSelectedNodeId();
+            selectedPropertyIndex = 0;
+            clearPropertyDraft();
+        }
+    }
+
+    private void clearSelection() {
+        selectedNodeIds.clear();
+        selectedNodeId = null;
+        selectedPropertyIndex = 0;
+        clearPropertyDraft();
+    }
+
+    private UUID firstSelectedNodeId() {
+        return selectedNodeIds.isEmpty() ? null : selectedNodeIds.iterator().next();
     }
 
     public String getSelectedNodeLabel() {
@@ -446,15 +1383,37 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             resetView();
             return;
         }
+        fitNodes(graph.getNodes());
+    }
+
+    /** Fits the current selection, or the complete graph if nothing is selected. */
+    public void fitSelectionOrAll() {
+        DroneProgramGraph graph = graphSupplier.get();
+        if (graph == null || selectedNodeIds.isEmpty()) {
+            fitAll();
+            return;
+        }
+        List<DroneProgramNode> nodes = new ArrayList<>();
+        for (UUID nodeId : selectedNodeIds) {
+            DroneProgramNode node = graph.getNode(nodeId);
+            if (node != null) nodes.add(node);
+        }
+        if (nodes.isEmpty()) fitAll();
+        else fitNodes(nodes);
+    }
+
+    private void fitNodes(Collection<DroneProgramNode> nodes) {
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
         int maxY = Integer.MIN_VALUE;
-        for (DroneProgramNode node : graph.getNodes()) {
+        for (DroneProgramNode node : nodes) {
             minX = Math.min(minX, node.getX());
             minY = Math.min(minY, node.getY());
-            maxX = Math.max(maxX, node.getX() + NODE_WIDTH);
-            maxY = Math.max(maxY, node.getY() + nodeHeight(registry.get(node.getType())));
+            maxX = Math.max(maxX, node.getX() + (DroneGroupLayout.isGroup(node)
+                    ? DroneGroupLayout.width(node) : NODE_WIDTH));
+            maxY = Math.max(maxY, node.getY() + (DroneGroupLayout.isGroup(node)
+                    ? DroneGroupLayout.height(node) : nodeHeight(registry.get(node.getType()))));
         }
         int contentWidth = Math.max(1, maxX - minX);
         int contentHeight = Math.max(1, maxY - minY);
@@ -483,9 +1442,17 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 value = Boolean.toString(config.getBoolean(property.getId()));
                 break;
             case STRING:
+                value = config.getString(property.getId());
+                if (value.length() > 42 || value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0) {
+                    value = value.replace('\n', ' ').replace('\r', ' ').trim();
+                    if (value.length() > 42) value = value.substring(0, 41) + "…";
+                }
+                break;
             case ENUM:
             case DIRECTION:
                 value = config.getString(property.getId());
+                String valueKey = "drtech.drone.value." + value.toLowerCase(java.util.Locale.ROOT);
+                if (I18n.hasKey(valueKey)) value = I18n.format(valueKey);
                 break;
             case ITEM_SELECTOR:
                 DroneItemFilterSpec spec = readItemFilter(config, property.getId());
@@ -499,18 +1466,88 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 break;
             case BLOCK_SELECTOR:
                 DroneBlockFilterSpec blockSpec = readBlockFilter(config, property.getId());
-                value = blockSpec.getRules().isEmpty() ? "any"
-                        : (blockSpec.getMode() == DroneFilterMode.WHITELIST ? "allow " : "deny ")
-                                + blockSpec.getRules().size();
+                if (blockSpec.getRules().isEmpty()) value = "any";
+                else {
+                    int stateCount = 0;
+                    for (DroneBlockFilterSpec.Rule rule : blockSpec.getRules()) {
+                        stateCount += rule.getStateProperties().size();
+                    }
+                    value = (blockSpec.getMode() == DroneFilterMode.WHITELIST ? "allow " : "deny ")
+                            + blockSpec.getRules().size() + (stateCount == 0 ? "" : " | state " + stateCount);
+                }
                 break;
             case FLUID_SELECTOR:
                 value = config.getString(property.getId());
                 if (value.isEmpty()) value = I18n.format("drtech.drone.programmer.any_fluid");
                 break;
+            case ENTITY_SELECTOR:
+                DroneEntityFilterSpec entitySpec = readEntityFilter(config, property.getId());
+                value = entitySpec.getEntityIds().isEmpty() ? "any"
+                        : (entitySpec.getMode() == DroneFilterMode.WHITELIST ? "allow " : "deny ")
+                                + entitySpec.getEntityIds().size();
+                break;
+            case DOCK_REFERENCE:
+                net.minecraft.nbt.NBTTagCompound dock = config.getCompoundTag(property.getId());
+                if (!dock.hasKey("DockId", 8) || !dock.hasKey("Position", 4)) {
+                    value = I18n.format("drtech.drone.programmer.dock_unset");
+                } else {
+                    BlockPos position = BlockPos.fromLong(dock.getLong("Position"));
+                    String name = dock.getString("Name");
+                    value = (name.isEmpty() ? dock.getString("DockId") : name) + " @ "
+                            + position.getX() + "," + position.getY() + "," + position.getZ();
+                }
+                break;
+            case PROGRAM_REFERENCE:
+                net.minecraft.nbt.NBTTagCompound program = config.getCompoundTag(property.getId());
+                if (!program.hasKey("ProgramId", 8) || !program.hasKey("Revision", 99)) {
+                    value = I18n.format("drtech.drone.programmer.program_unset");
+                } else {
+                    String name = program.getString("Name");
+                    value = (name.isEmpty() ? program.getString("ProgramId") : name)
+                            + " @ r" + program.getLong("Revision");
+                }
+                break;
             default:
                 value = config.hasKey(property.getId()) ? "configured" : "unset";
         }
-        return property.getId() + " [" + (selected.index + 1) + "/" + selected.count + "]: " + value;
+        String propertyKey = "drtech.drone.property." + property.getId().toLowerCase(java.util.Locale.ROOT);
+        String propertyName = I18n.hasKey(propertyKey) ? I18n.format(propertyKey) : property.getId();
+        String heading = propertyName + " [" + (selected.index + 1) + "/" + selected.count + "]";
+        String preview = getSelectedPropertyChangePreview();
+        return preview.isEmpty() ? heading + ": " + value : heading + "\n" + preview;
+    }
+
+    /** Shows a pending text edit, or the most recent committed edit, without exposing raw selector NBT. */
+    public String getSelectedPropertyChangePreview() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null) return "";
+        String current = compactPropertyValue(selected.property, selected.node.getConfiguration());
+        if (isSelectedPropertyTextEditable() && propertyDraftDirty) {
+            ensurePropertyDraft(selected);
+            String draft = compactDraftValue(selected.property, propertyDraft);
+            if (!current.equals(draft)) {
+                return I18n.format("drtech.drone.programmer.property_change_pending", current, draft);
+            }
+        }
+        if (selected.node.getId().equals(lastPropertyChangeNodeId)
+                && selected.property.getId().equals(lastPropertyChangeId)) {
+            return I18n.format("drtech.drone.programmer.property_change_applied",
+                    lastPropertyBefore, lastPropertyAfter);
+        }
+        return "";
+    }
+
+    public boolean canResetSelectedProperty() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null) return false;
+        net.minecraft.nbt.NBTTagCompound config = selected.node.getConfiguration();
+        return config.hasKey(selected.property.getId())
+                || (selected.property.getType() == DroneNodePropertyType.ITEM_SELECTOR
+                        && (config.hasKey("Item") || config.hasKey("Meta")));
+    }
+
+    public void resetSelectedPropertyToDefault() {
+        clearSelectedProperty();
     }
 
     public void selectPreviousProperty() { moveSelectedProperty(-1); }
@@ -529,6 +1566,34 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 || selected.property.getType() == DroneNodePropertyType.NUMBER);
     }
 
+    public boolean isSelectedChoiceProperty() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && DronePropertyChoices.isChoice(selected.property);
+    }
+
+    public boolean isSelectedDirectionProperty() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && DronePropertyChoices.isSixFaceDirection(selected.property);
+    }
+
+    public List<String> getSelectedChoiceValues() {
+        SelectedProperty selected = selectedProperty();
+        return selected == null ? Collections.emptyList() : DronePropertyChoices.visibleValues(selected.property);
+    }
+
+    public String getSelectedChoiceValue() {
+        SelectedProperty selected = selectedProperty();
+        return selected == null || !isSelectedChoiceProperty() ? ""
+                : selected.node.getConfiguration().getString(selected.property.getId());
+    }
+
+    public void selectPropertyChoice(String value) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || !DronePropertyChoices.accepts(selected.property, value)) return;
+        configureSelected((node, config) -> config.setString(selected.property.getId(), value));
+        clearPropertyDraft();
+    }
+
     public boolean isSelectedPropertyTextEditable() {
         SelectedProperty selected = selectedProperty();
         if (selected == null) return false;
@@ -537,15 +1602,422 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 || type == DroneNodePropertyType.STRING || type == DroneNodePropertyType.FLUID_SELECTOR;
     }
 
+    /** True for the compact inspector input; selector search fields and long notes use dedicated widgets. */
+    public boolean isSelectedInlineTextProperty() {
+        return isSelectedPropertyTextEditable() && !isSelectedFluidSelector()
+                && !isSelectedItemSelector() && !isSelectedEntitySelector()
+                && !isSelectedDockReference() && !isSelectedProgramReference()
+                && !isSelectedLongTextProperty();
+    }
+
+    /** Localized validation feedback for the property currently being edited. */
+    public String getSelectedPropertyValidationMessage() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || !isSelectedPropertyTextEditable()) return "";
+        ensurePropertyDraft(selected);
+        DroneNodePropertyType type = selected.property.getType();
+        if (!propertyDraftDirty) return propertyAllowedRangeMessage(selected.property);
+        String trimmed = propertyDraft == null ? "" : propertyDraft.trim();
+        if (type == DroneNodePropertyType.INTEGER) {
+            try {
+                int value = Integer.parseInt(trimmed);
+                return value < selected.property.getMinimum() || value > selected.property.getMaximum()
+                        ? propertyOutOfRangeMessage(selected.property) : propertyAllowedRangeMessage(selected.property);
+            } catch (NumberFormatException ignored) {
+                return I18n.format("drtech.drone.programmer.property_invalid_integer",
+                        formatBound(selected.property.getMinimum()), formatBound(selected.property.getMaximum()));
+            }
+        }
+        if (type == DroneNodePropertyType.NUMBER) {
+            try {
+                double value = Double.parseDouble(trimmed);
+                if (!Double.isFinite(value)) throw new NumberFormatException();
+                return value < selected.property.getMinimum() || value > selected.property.getMaximum()
+                        ? propertyOutOfRangeMessage(selected.property) : propertyAllowedRangeMessage(selected.property);
+            } catch (NumberFormatException ignored) {
+                return I18n.format("drtech.drone.programmer.property_invalid_number",
+                        formatBound(selected.property.getMinimum()), formatBound(selected.property.getMaximum()));
+            }
+        }
+        if (type == DroneNodePropertyType.FLUID_SELECTOR) {
+            return trimmed.isEmpty() || FluidRegistry.getFluid(trimmed) != null
+                    ? I18n.format("drtech.drone.programmer.property_fluid_hint")
+                    : I18n.format("drtech.drone.programmer.property_invalid_fluid", trimmed);
+        }
+        if (propertyDraft.length() > selected.property.getMaxLength()) {
+            return I18n.format("drtech.drone.programmer.property_too_long", selected.property.getMaxLength(),
+                    propertyDraft.length());
+        }
+        return propertyAllowedRangeMessage(selected.property);
+    }
+
+    private static String propertyAllowedRangeMessage(DroneNodePropertyDefinition property) {
+        switch (property.getType()) {
+            case INTEGER:
+                return I18n.format("drtech.drone.programmer.property_integer_range",
+                        formatBound(property.getMinimum()), formatBound(property.getMaximum()));
+            case NUMBER:
+                return I18n.format("drtech.drone.programmer.property_number_range",
+                        formatBound(property.getMinimum()), formatBound(property.getMaximum()));
+            case STRING:
+                return I18n.format("drtech.drone.programmer.property_string_limit", property.getMaxLength());
+            case FLUID_SELECTOR:
+                return I18n.format("drtech.drone.programmer.property_fluid_hint");
+            default:
+                return "";
+        }
+    }
+
+    private static String propertyOutOfRangeMessage(DroneNodePropertyDefinition property) {
+        return I18n.format("drtech.drone.programmer.property_out_of_range",
+                formatBound(property.getMinimum()), formatBound(property.getMaximum()));
+    }
+
+    private static String formatBound(double value) {
+        return Double.isFinite(value) && Math.abs(value) < Long.MAX_VALUE && value == Math.rint(value)
+                ? Long.toString((long) value) : Double.toString(value);
+    }
+
+    public boolean isSelectedLongTextProperty() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && selected.property.getType() == DroneNodePropertyType.STRING
+                && selected.property.getMaxLength() > 128;
+    }
+
+    /** Coordinate and two-corner area values accept complete XYZ capture presets. */
+    public boolean isSelectedCoordinateCaptureTarget() {
+        DroneProgramGraph graph = graphSupplier.get();
+        DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
+        return node != null && (node.getType().equals(DrTechDroneNodes.COORDINATE)
+                || node.getType().equals(DrTechDroneNodes.AREA));
+    }
+
+    public boolean canCapturePlayerCoordinate() {
+        return isSelectedCoordinateCaptureTarget() && Minecraft.getMinecraft().player != null;
+    }
+
+    public boolean canCaptureTargetedCoordinate() {
+        RayTraceResult hit = Minecraft.getMinecraft().objectMouseOver;
+        return isSelectedCoordinateCaptureTarget() && hit != null
+                && hit.typeOfHit == RayTraceResult.Type.BLOCK && hit.getBlockPos() != null;
+    }
+
+    public boolean canCaptureDockCoordinate() {
+        return isSelectedCoordinateCaptureTarget() && dockCoordinateSupplier.get() != null;
+    }
+
+    public boolean canCaptureDroneCoordinate() {
+        return isSelectedCoordinateCaptureTarget() && droneCoordinateSupplier.get() != null;
+    }
+
+    public void capturePlayerCoordinate() {
+        if (Minecraft.getMinecraft().player != null) captureSelectedCoordinate(Minecraft.getMinecraft().player.getPosition());
+    }
+
+    public void captureTargetedCoordinate() {
+        RayTraceResult hit = Minecraft.getMinecraft().objectMouseOver;
+        if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) captureSelectedCoordinate(hit.getBlockPos());
+    }
+
+    public void captureDockCoordinate() { captureSelectedCoordinate(dockCoordinateSupplier.get()); }
+
+    public void captureDroneCoordinate() { captureSelectedCoordinate(droneCoordinateSupplier.get()); }
+
+    private void captureSelectedCoordinate(BlockPos position) {
+        if (position == null || !isSelectedCoordinateCaptureTarget()) return;
+        int areaCorner = selectedAreaCaptureCorner();
+        configureSelected((node, config) -> {
+            if (node.getType().equals(DrTechDroneNodes.COORDINATE)) {
+                config.setInteger("X", position.getX());
+                config.setInteger("Y", position.getY());
+                config.setInteger("Z", position.getZ());
+            } else if (node.getType().equals(DrTechDroneNodes.AREA)) {
+                config.setInteger("X" + areaCorner, position.getX());
+                config.setInteger("Y" + areaCorner, position.getY());
+                config.setInteger("Z" + areaCorner, position.getZ());
+            }
+        });
+        clearPropertyDraft();
+    }
+
+    private int selectedAreaCaptureCorner() {
+        SelectedProperty property = selectedProperty();
+        if (property != null && property.node.getType().equals(DrTechDroneNodes.AREA)
+                && property.property.getId().endsWith("2")) return 2;
+        return selectedAreaCorner;
+    }
+
     public boolean isSelectedItemFilter() {
         SelectedProperty selected = selectedProperty();
         return selected != null && (selected.property.getType() == DroneNodePropertyType.ITEM_SELECTOR
                 || selected.property.getType() == DroneNodePropertyType.BLOCK_SELECTOR);
     }
 
+    public boolean isSelectedItemSelector() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && selected.property.getType() == DroneNodePropertyType.ITEM_SELECTOR;
+    }
+
+    public boolean isSelectedBlockSelector() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && selected.property.getType() == DroneNodePropertyType.BLOCK_SELECTOR;
+    }
+
+    public boolean isSelectedAreaPreviewNode() {
+        DroneProgramGraph graph = graphSupplier.get();
+        DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
+        return node != null && isAreaOutputNode(node.getType());
+    }
+
+    public DroneArea getSelectedAreaPreview() {
+        refreshAreaPreview();
+        return cachedAreaPreview;
+    }
+
+    public String getSelectedAreaPreviewStatus() {
+        refreshAreaPreview();
+        if (cachedAreaPreview == null) return I18n.format(areaPreviewStatusKey);
+        return I18n.format("drtech.drone.programmer.area_preview_summary", cachedAreaPreview.getSizeX(),
+                cachedAreaPreview.getSizeY(), cachedAreaPreview.getSizeZ(), cachedAreaPreview.getVolume());
+    }
+
+    private void refreshAreaPreview() {
+        DroneProgramGraph graph = graphSupplier.get();
+        DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
+        long revision = graph == null ? Long.MIN_VALUE : graph.getRevision();
+        if (revision == areaPreviewRevision && java.util.Objects.equals(areaPreviewNodeId, selectedNodeId)) return;
+        areaPreviewRevision = revision;
+        areaPreviewNodeId = selectedNodeId;
+        cachedAreaPreview = null;
+        areaPreviewStatusKey = "drtech.drone.programmer.area_preview_missing";
+        if (node == null || !isAreaOutputNode(node.getType())) return;
+        try {
+            DroneArea area = resolveStaticArea(graph, node, 0);
+            if (area == null) return;
+            if (!area.isWithinRuntimeLimits()) {
+                areaPreviewStatusKey = "drtech.drone.programmer.area_preview_too_large";
+                return;
+            }
+            cachedAreaPreview = area;
+            areaPreviewStatusKey = "drtech.drone.programmer.area_preview_ready";
+        } catch (PreviewUnavailableException ignored) {
+            areaPreviewStatusKey = "drtech.drone.programmer.area_preview_dynamic";
+        } catch (RuntimeException ignored) {
+            areaPreviewStatusKey = "drtech.drone.programmer.area_preview_invalid";
+        }
+    }
+
+    private DroneArea resolveStaticArea(DroneProgramGraph graph, DroneProgramNode node, int depth) {
+        if (depth > 16) return null;
+        net.minecraft.nbt.NBTTagCompound config = node.getConfiguration();
+        ResourceLocation type = node.getType();
+        if (type.equals(DrTechDroneNodes.AREA)) {
+            return DroneArea.between(new BlockPos(config.getInteger("X1"), config.getInteger("Y1"),
+                    config.getInteger("Z1")), new BlockPos(config.getInteger("X2"), config.getInteger("Y2"),
+                    config.getInteger("Z2")));
+        }
+        if (type.equals(DrTechDroneNodes.AREA_FROM_CORNERS)) {
+            BlockPos first = resolveStaticCoordinateInput(graph, node, "first", depth + 1);
+            BlockPos second = resolveStaticCoordinateInput(graph, node, "second", depth + 1);
+            return first == null || second == null ? null : DroneArea.between(first, second);
+        }
+        if (type.equals(DrTechDroneNodes.SPHERE_AREA)) {
+            BlockPos center = resolveStaticCoordinateInput(graph, node, "center", depth + 1);
+            Number radius = resolveStaticNumberInput(graph, node, "radius", depth + 1);
+            int value = radius == null ? config.getInteger("Radius") : radius.intValue();
+            return center == null ? null : DroneArea.sphere(center, Math.max(1, Math.min(9, value)),
+                    config.getBoolean("Hollow"));
+        }
+        if (type.equals(DrTechDroneNodes.CYLINDER_AREA)) {
+            BlockPos center = resolveStaticCoordinateInput(graph, node, "center", depth + 1);
+            Number radius = resolveStaticNumberInput(graph, node, "radius", depth + 1);
+            Number height = resolveStaticNumberInput(graph, node, "height", depth + 1);
+            int r = radius == null ? config.getInteger("Radius") : radius.intValue();
+            int h = height == null ? config.getInteger("Height") : height.intValue();
+            return center == null ? null : DroneArea.cylinder(center, Math.max(1, Math.min(8, r)),
+                    Math.max(1, Math.min(16, h)), config.getBoolean("Hollow"));
+        }
+        if (type.equals(DrTechDroneNodes.PATH_AREA)) {
+            BlockPos first = resolveStaticCoordinateInput(graph, node, "first", depth + 1);
+            BlockPos second = resolveStaticCoordinateInput(graph, node, "second", depth + 1);
+            Number radius = resolveStaticNumberInput(graph, node, "radius", depth + 1);
+            int value = radius == null ? config.getInteger("Radius") : radius.intValue();
+            return first == null || second == null ? null
+                    : DroneArea.path(first, second, Math.max(0, Math.min(3, value)));
+        }
+        if (type.equals(DrTechDroneNodes.PLANE_AREA)) {
+            BlockPos origin = resolveStaticCoordinateInput(graph, node, "origin", depth + 1);
+            BlockPos first = resolveStaticCoordinateInput(graph, node, "first", depth + 1);
+            BlockPos second = resolveStaticCoordinateInput(graph, node, "second", depth + 1);
+            return origin == null || first == null || second == null ? null : DroneArea.plane(origin, first, second);
+        }
+        DroneArea first = resolveStaticAreaInput(graph, node, "first", depth + 1);
+        DroneArea second = resolveStaticAreaInput(graph, node, "second", depth + 1);
+        if (type.equals(DrTechDroneNodes.AREA_UNION)) return first == null || second == null ? null : first.union(second);
+        if (type.equals(DrTechDroneNodes.AREA_INTERSECTION)) {
+            return first == null || second == null ? null : first.intersection(second);
+        }
+        if (type.equals(DrTechDroneNodes.AREA_DIFFERENCE)) {
+            return first == null || second == null ? null : first.difference(second);
+        }
+        DroneArea input = resolveStaticAreaInput(graph, node, "area", depth + 1);
+        if (type.equals(DrTechDroneNodes.AREA_OFFSET)) {
+            if (input == null) return null;
+            Number x = resolveStaticNumberInput(graph, node, "x", depth + 1);
+            Number y = resolveStaticNumberInput(graph, node, "y", depth + 1);
+            Number z = resolveStaticNumberInput(graph, node, "z", depth + 1);
+            return input.offset(x == null ? config.getInteger("X") : x.intValue(),
+                    y == null ? config.getInteger("Y") : y.intValue(),
+                    z == null ? config.getInteger("Z") : z.intValue());
+        }
+        if (type.equals(DrTechDroneNodes.AREA_EXPAND) || type.equals(DrTechDroneNodes.AREA_INSET)) {
+            if (input == null) return null;
+            Number radius = resolveStaticNumberInput(graph, node, "radius", depth + 1);
+            int value = Math.max(0, Math.min(4, radius == null ? config.getInteger("Radius") : radius.intValue()));
+            return type.equals(DrTechDroneNodes.AREA_EXPAND) ? input.expand(value) : input.inset(value);
+        }
+        return null;
+    }
+
+    private DroneArea resolveStaticAreaInput(DroneProgramGraph graph, DroneProgramNode target, String port,
+            int depth) {
+        DroneProgramNode source = sourceNodeForInput(graph, target, port);
+        return source == null ? null : resolveStaticArea(graph, source, depth);
+    }
+
+    private BlockPos resolveStaticCoordinateInput(DroneProgramGraph graph, DroneProgramNode target, String port,
+            int depth) {
+        DroneProgramNode source = sourceNodeForInput(graph, target, port);
+        if (source == null || depth > 16) return null;
+        net.minecraft.nbt.NBTTagCompound config = source.getConfiguration();
+        if (source.getType().equals(DrTechDroneNodes.COORDINATE)) {
+            return new BlockPos(config.getInteger("X"), config.getInteger("Y"), config.getInteger("Z"));
+        }
+        if (source.getType().equals(DrTechDroneNodes.COORDINATE_OFFSET)) {
+            BlockPos base = resolveStaticCoordinateInput(graph, source, "base", depth + 1);
+            if (base == null) return null;
+            Number x = resolveStaticNumberInput(graph, source, "x", depth + 1);
+            Number y = resolveStaticNumberInput(graph, source, "y", depth + 1);
+            Number z = resolveStaticNumberInput(graph, source, "z", depth + 1);
+            return base.add(x == null ? config.getInteger("X") : x.intValue(),
+                    y == null ? config.getInteger("Y") : y.intValue(),
+                    z == null ? config.getInteger("Z") : z.intValue());
+        }
+        throw new PreviewUnavailableException();
+    }
+
+    private Number resolveStaticNumberInput(DroneProgramGraph graph, DroneProgramNode target, String port,
+            int depth) {
+        DroneProgramNode source = sourceNodeForInput(graph, target, port);
+        if (source == null) return null;
+        if (depth > 16 || !source.getType().equals(DrTechDroneNodes.NUMBER)) {
+            throw new PreviewUnavailableException();
+        }
+        return source.getConfiguration().getDouble("Value");
+    }
+
+    private static DroneProgramNode sourceNodeForInput(DroneProgramGraph graph, DroneProgramNode target, String port) {
+        for (DroneProgramEdge edge : graph.getEdges()) {
+            if (edge.getTargetNodeId().equals(target.getId()) && edge.getTargetPortId().equals(port)) {
+                return graph.getNode(edge.getSourceNodeId());
+            }
+        }
+        return null;
+    }
+
+    private static boolean isAreaOutputNode(ResourceLocation type) {
+        return type.equals(DrTechDroneNodes.AREA) || type.equals(DrTechDroneNodes.AREA_FROM_CORNERS)
+                || type.equals(DrTechDroneNodes.SPHERE_AREA) || type.equals(DrTechDroneNodes.CYLINDER_AREA)
+                || type.equals(DrTechDroneNodes.PATH_AREA) || type.equals(DrTechDroneNodes.PLANE_AREA)
+                || type.equals(DrTechDroneNodes.AREA_UNION) || type.equals(DrTechDroneNodes.AREA_INTERSECTION)
+                || type.equals(DrTechDroneNodes.AREA_DIFFERENCE) || type.equals(DrTechDroneNodes.AREA_OFFSET)
+                || type.equals(DrTechDroneNodes.AREA_EXPAND) || type.equals(DrTechDroneNodes.AREA_INSET);
+    }
+
+    private static final class PreviewUnavailableException extends RuntimeException {}
+
     public boolean isSelectedFluidSelector() {
         SelectedProperty selected = selectedProperty();
         return selected != null && selected.property.getType() == DroneNodePropertyType.FLUID_SELECTOR;
+    }
+
+    public boolean isSelectedEntitySelector() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && selected.property.getType() == DroneNodePropertyType.ENTITY_SELECTOR;
+    }
+
+    public boolean isSelectedDockReference() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && selected.property.getType() == DroneNodePropertyType.DOCK_REFERENCE;
+    }
+
+    public UUID getSelectedDockReferenceId() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.DOCK_REFERENCE) return null;
+        net.minecraft.nbt.NBTTagCompound dock = selected.node.getConfiguration()
+                .getCompoundTag(selected.property.getId());
+        if (!dock.hasKey("DockId", 8)) return null;
+        try {
+            return UUID.fromString(dock.getString("DockId"));
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    public boolean isSelectedProgramReference() {
+        SelectedProperty selected = selectedProperty();
+        return selected != null && selected.property.getType() == DroneNodePropertyType.PROGRAM_REFERENCE;
+    }
+
+    public UUID getSelectedProgramReferenceId() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.PROGRAM_REFERENCE) return null;
+        net.minecraft.nbt.NBTTagCompound program = selected.node.getConfiguration()
+                .getCompoundTag(selected.property.getId());
+        if (!program.hasKey("ProgramId", 8)) return null;
+        try {
+            return UUID.fromString(program.getString("ProgramId"));
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    public long getSelectedProgramReferenceRevision() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.PROGRAM_REFERENCE) return -1L;
+        net.minecraft.nbt.NBTTagCompound program = selected.node.getConfiguration()
+                .getCompoundTag(selected.property.getId());
+        return program.hasKey("Revision", 99) ? program.getLong("Revision") : -1L;
+    }
+
+    public void selectProgramReference(UUID programId, String name, long revision) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.PROGRAM_REFERENCE
+                || programId == null || revision < 0L) return;
+        configureSelected((node, config) -> {
+            net.minecraft.nbt.NBTTagCompound program = new net.minecraft.nbt.NBTTagCompound();
+            program.setString("ProgramId", programId.toString());
+            program.setString("Name", name == null ? "" : name);
+            program.setLong("Revision", revision);
+            config.setTag(selected.property.getId(), program);
+        });
+        clearPropertyDraft();
+    }
+
+    /** Stores both the stable dock id and a coordinate snapshot used by the runtime value evaluator. */
+    public void selectDockReference(UUID dockId, String name, int dimension, BlockPos position) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.DOCK_REFERENCE
+                || dockId == null || position == null) return;
+        configureSelected((node, config) -> {
+            net.minecraft.nbt.NBTTagCompound dock = new net.minecraft.nbt.NBTTagCompound();
+            dock.setString("DockId", dockId.toString());
+            dock.setString("Name", name == null ? "" : name);
+            dock.setInteger("Dimension", dimension);
+            dock.setLong("Position", position.toLong());
+            config.setTag(selected.property.getId(), dock);
+        });
+        clearPropertyDraft();
     }
 
     /** Captures the fluid contained in the held bucket/cell without changing the held item. */
@@ -567,6 +2039,98 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         if (selected == null || selected.property.getType() != DroneNodePropertyType.FLUID_SELECTOR
                 || fluidName == null || FluidRegistry.getFluid(fluidName) == null) return;
         configureSelected((node, config) -> config.setString(selected.property.getId(), fluidName));
+        clearPropertyDraft();
+    }
+
+    /** Appends a registry item rule. Metadata is deliberately wildcarded for searchable registry results. */
+    public void selectRegistryItemProperty(String itemName) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ITEM_SELECTOR
+                || itemName == null || itemName.isEmpty()) return;
+        final ResourceLocation itemId;
+        try {
+            itemId = new ResourceLocation(itemName);
+        } catch (RuntimeException ignored) {
+            return;
+        }
+        if (!Item.REGISTRY.containsKey(itemId)) return;
+        appendSelectedItemRule(selected.property,
+                new DroneItemFilterSpec.Rule(itemId, -1, "", "", false, null));
+    }
+
+    /** Appends a pure Ore Dictionary rule, matching every registered stack carrying that ore name. */
+    public void selectOreDictionaryProperty(String oreName) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ITEM_SELECTOR
+                || oreName == null || oreName.isEmpty()
+                || !OreDictionary.doesOreNameExist(oreName)) return;
+        appendSelectedItemRule(selected.property,
+                new DroneItemFilterSpec.Rule(null, -1, oreName, "", false, null));
+    }
+
+    public void selectEntityProperty(String entityName) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ENTITY_SELECTOR
+                || entityName == null || entityName.isEmpty()) return;
+        final ResourceLocation entityId;
+        try {
+            entityId = new ResourceLocation(entityName);
+        } catch (RuntimeException ignored) {
+            return;
+        }
+        if (!EntityList.getEntityNameList().contains(entityId)) return;
+        configureSelected((node, config) -> {
+            DroneEntityFilterSpec previous = readEntityFilter(config, selected.property.getId());
+            List<ResourceLocation> rules = new ArrayList<>(previous.getEntityIds());
+            if (rules.size() >= DroneEntityFilterSpec.MAX_RULES || rules.contains(entityId)) return;
+            rules.add(entityId);
+            writeEntityFilter(config, selected.property.getId(),
+                    new DroneEntityFilterSpec(previous.getMode(), rules));
+        });
+        clearPropertyDraft();
+    }
+
+    public void toggleSelectedEntityFilterMode() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ENTITY_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneEntityFilterSpec previous = readEntityFilter(config, selected.property.getId());
+            DroneFilterMode mode = previous.getMode() == DroneFilterMode.WHITELIST
+                    ? DroneFilterMode.BLACKLIST : DroneFilterMode.WHITELIST;
+            writeEntityFilter(config, selected.property.getId(),
+                    new DroneEntityFilterSpec(mode, new ArrayList<>(previous.getEntityIds())));
+        });
+    }
+
+    public String getSelectedEntityFilterModeLabel() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ENTITY_SELECTOR) return "";
+        DroneEntityFilterSpec spec = readEntityFilter(selected.node.getConfiguration(), selected.property.getId());
+        return I18n.format(spec.getMode() == DroneFilterMode.WHITELIST
+                ? "drtech.drone.programmer.whitelist"
+                : "drtech.drone.programmer.blacklist");
+    }
+
+    public void removeLastSelectedEntityFilterRule() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ENTITY_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneEntityFilterSpec previous = readEntityFilter(config, selected.property.getId());
+            List<ResourceLocation> rules = new ArrayList<>(previous.getEntityIds());
+            if (!rules.isEmpty()) rules.remove(rules.size() - 1);
+            writeEntityFilter(config, selected.property.getId(),
+                    new DroneEntityFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    private void appendSelectedItemRule(DroneNodePropertyDefinition property, DroneItemFilterSpec.Rule rule) {
+        configureSelected((node, config) -> {
+            DroneItemFilterSpec previous = readItemFilter(config, property.getId());
+            List<DroneItemFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.size() >= DroneItemFilterSpec.MAX_RULES) return;
+            rules.add(rule);
+            writeItemFilter(config, property.getId(), new DroneItemFilterSpec(previous.getMode(), rules));
+        });
         clearPropertyDraft();
     }
 
@@ -673,6 +2237,15 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         });
     }
 
+    public String getSelectedBlockFilterModeLabel() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.BLOCK_SELECTOR) return "";
+        DroneBlockFilterSpec spec = readBlockFilter(selected.node.getConfiguration(), selected.property.getId());
+        return I18n.format(spec.getMode() == DroneFilterMode.WHITELIST
+                ? "drtech.drone.programmer.whitelist"
+                : "drtech.drone.programmer.blacklist");
+    }
+
     public void removeLastSelectedItemFilterRule() {
         SelectedProperty selected = selectedProperty();
         if (selected == null || !isSelectedItemFilter()) return;
@@ -713,20 +2286,96 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         IBlockState state = minecraft.world.getBlockState(hit.getBlockPos());
         net.minecraft.util.ResourceLocation blockId = Block.REGISTRY.getNameForObject(state.getBlock());
         if (blockId == null) return;
-        int metadata;
-        try {
-            metadata = state.getBlock().getMetaFromState(state);
-        } catch (RuntimeException ignored) {
-            metadata = -1;
+        Map<String, String> capturedProperties = new LinkedHashMap<>();
+        for (Map.Entry<IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet()) {
+            capturedProperties.put(entry.getKey().getName(), blockPropertyValueName(entry.getKey(), entry.getValue()));
         }
-        final int capturedMetadata = metadata;
         configureSelected((node, config) -> {
             DroneBlockFilterSpec previous = readBlockFilter(config, property.getId());
             List<DroneBlockFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
             if (rules.size() >= DroneBlockFilterSpec.MAX_RULES) return;
-            rules.add(new DroneBlockFilterSpec.Rule(blockId, capturedMetadata));
+            rules.add(new DroneBlockFilterSpec.Rule(blockId, -1, capturedProperties));
             writeBlockFilter(config, property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
         });
+        selectedBlockStatePropertyIndex = 0;
+    }
+
+    public boolean hasSelectedBlockStateProperty() {
+        return !getSelectedBlockStateProperties().isEmpty();
+    }
+
+    public String getSelectedBlockStatePropertyLabel() {
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        List<IProperty<?>> properties = getSelectedBlockStateProperties();
+        if (rule == null) return I18n.format("drtech.drone.programmer.block_state_no_rule");
+        if (properties.isEmpty()) return I18n.format("drtech.drone.programmer.block_state_none");
+        IProperty<?> property = properties.get(Math.floorMod(selectedBlockStatePropertyIndex, properties.size()));
+        String value = rule.getStateProperties().get(property.getName());
+        return property.getName() + "=" + (value == null
+                ? I18n.format("drtech.drone.programmer.block_state_any") : value);
+    }
+
+    public String getSelectedBlockStatePropertyPage() {
+        List<IProperty<?>> properties = getSelectedBlockStateProperties();
+        return properties.isEmpty() ? "0/0"
+                : (Math.floorMod(selectedBlockStatePropertyIndex, properties.size()) + 1) + "/" + properties.size();
+    }
+
+    public void moveSelectedBlockStateProperty(int delta) {
+        List<IProperty<?>> properties = getSelectedBlockStateProperties();
+        if (!properties.isEmpty()) {
+            selectedBlockStatePropertyIndex = Math.floorMod(selectedBlockStatePropertyIndex + delta,
+                    properties.size());
+        }
+    }
+
+    public void cycleSelectedBlockStatePropertyValue() {
+        SelectedProperty selected = selectedProperty();
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        List<IProperty<?>> properties = getSelectedBlockStateProperties();
+        if (selected == null || rule == null || properties.isEmpty()) return;
+        IProperty<?> property = properties.get(Math.floorMod(selectedBlockStatePropertyIndex, properties.size()));
+        List<String> values = new ArrayList<>();
+        values.add("");
+        for (Comparable<?> value : property.getAllowedValues()) {
+            values.add(blockPropertyValueName(property, value));
+        }
+        String current = rule.getStateProperties().getOrDefault(property.getName(), "");
+        String next = values.get((values.indexOf(current) + 1) % values.size());
+        configureSelected((node, config) -> {
+            DroneBlockFilterSpec previous = readBlockFilter(config, selected.property.getId());
+            List<DroneBlockFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            DroneBlockFilterSpec.Rule last = rules.remove(rules.size() - 1);
+            Map<String, String> stateProperties = new LinkedHashMap<>(last.getStateProperties());
+            if (next.isEmpty()) stateProperties.remove(property.getName());
+            else stateProperties.put(property.getName(), next);
+            rules.add(new DroneBlockFilterSpec.Rule(last.getBlockId(), last.getMetadata(), stateProperties));
+            writeBlockFilter(config, selected.property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    private DroneBlockFilterSpec.Rule getLastSelectedBlockRule() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.BLOCK_SELECTOR) return null;
+        List<DroneBlockFilterSpec.Rule> rules = readBlockFilter(selected.node.getConfiguration(),
+                selected.property.getId()).getRules();
+        return rules.isEmpty() ? null : rules.get(rules.size() - 1);
+    }
+
+    private List<IProperty<?>> getSelectedBlockStateProperties() {
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        if (rule == null) return Collections.emptyList();
+        Block block = Block.REGISTRY.getObject(rule.getBlockId());
+        if (block == null) return Collections.emptyList();
+        List<IProperty<?>> properties = new ArrayList<>(block.getBlockState().getProperties());
+        properties.sort(java.util.Comparator.comparing(IProperty::getName));
+        return properties;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static String blockPropertyValueName(IProperty property, Comparable value) {
+        return property.getName(value);
     }
 
     public String getSelectedPropertyInputText() {
@@ -738,9 +2387,11 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
 
     public void setSelectedPropertyInputText(String value) {
         SelectedProperty selected = selectedProperty();
-        if (selected == null || !isSelectedPropertyTextEditable() || value == null || value.length() > 128) return;
+        if (selected == null || !isSelectedPropertyTextEditable() || value == null
+                || value.length() > Math.max(128, selected.property.getMaxLength())) return;
         ensurePropertyDraft(selected);
         propertyDraft = value;
+        propertyDraftDirty = true;
     }
 
     /** Applies an exact typed number or string in one revision-checked server command. */
@@ -756,6 +2407,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             else if (type == DroneNodePropertyType.NUMBER) config.setDouble(id, Double.parseDouble(value.trim()));
             else config.setString(id, value);
         });
+        propertyDraftDirty = false;
     }
 
     private boolean isPropertyDraftValid(SelectedProperty selected) {
@@ -784,6 +2436,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         if (selected.node.getId().equals(propertyDraftNodeId) && selected.property.getId().equals(propertyDraftId)) return;
         propertyDraftNodeId = selected.node.getId();
         propertyDraftId = selected.property.getId();
+        propertyDraftDirty = false;
         net.minecraft.nbt.NBTTagCompound config = selected.node.getConfiguration();
         if (selected.property.getType() == DroneNodePropertyType.INTEGER) {
             propertyDraft = Integer.toString(config.getInteger(propertyDraftId));
@@ -798,6 +2451,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         propertyDraftNodeId = null;
         propertyDraftId = "";
         propertyDraft = "";
+        propertyDraftDirty = false;
     }
 
     private SelectedProperty selectedProperty() {
@@ -849,6 +2503,17 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         config.setTag(propertyId, spec.writeToNbt());
     }
 
+    private static DroneEntityFilterSpec readEntityFilter(net.minecraft.nbt.NBTTagCompound config,
+            String propertyId) {
+        return DroneEntityFilterSpec.readFromNbt(config.hasKey(propertyId, 10)
+                ? config.getCompoundTag(propertyId) : null);
+    }
+
+    private static void writeEntityFilter(net.minecraft.nbt.NBTTagCompound config, String propertyId,
+            DroneEntityFilterSpec spec) {
+        config.setTag(propertyId, spec.writeToNbt());
+    }
+
     public String getSelectedDescription() {
         DroneProgramGraph graph = graphSupplier.get();
         DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
@@ -871,14 +2536,15 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                     config.integer("Y", 0), config.integer("Z", 0));
         }
         if (node.getType().equals(DrTechDroneNodes.AREA)) {
+            int areaCorner = selectedAreaCaptureCorner();
             DroneArea area = DroneArea.between(
                     new net.minecraft.util.math.BlockPos(config.integer("X1", 0), config.integer("Y1", 0),
                             config.integer("Z1", 0)),
                     new net.minecraft.util.math.BlockPos(config.integer("X2", 0), config.integer("Y2", 0),
                             config.integer("Z2", 0)));
-            return I18n.format("drtech.drone.inspector.area", selectedAreaCorner == 1 ? "A" : "B",
-                    config.integer("X" + selectedAreaCorner, 0), config.integer("Y" + selectedAreaCorner, 0),
-                    config.integer("Z" + selectedAreaCorner, 0), area.getVolume());
+            return I18n.format("drtech.drone.inspector.area", areaCorner == 1 ? "A" : "B",
+                    config.integer("X" + areaCorner, 0), config.integer("Y" + areaCorner, 0),
+                    config.integer("Z" + areaCorner, 0), area.getVolume());
         }
         if (node.getType().equals(DrTechDroneNodes.ITEM_FILTER)) {
             String item = config.string("Item");
@@ -943,7 +2609,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             } else if (node.getType().equals(DrTechDroneNodes.COORDINATE_OFFSET)) {
                 config.setInteger(axis, config.getInteger(axis) + delta);
             } else if (node.getType().equals(DrTechDroneNodes.AREA)) {
-                String key = axis + selectedAreaCorner;
+                String key = axis + selectedAreaCaptureCorner();
                 config.setInteger(key, config.getInteger(key) + delta);
             }
         });
@@ -1029,22 +2695,112 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
         if (node == null || !editableSupplier.getAsBoolean()) return;
         net.minecraft.nbt.NBTTagCompound configuration = node.getConfiguration();
+        SelectedProperty selected = selectedProperty();
+        String before = selected != null && selected.node.getId().equals(node.getId())
+                ? compactPropertyValue(selected.property, configuration) : null;
+        net.minecraft.nbt.NBTBase beforeTag = selected == null ? null
+                : configuration.getTag(selected.property.getId());
         mutation.apply(node, configuration);
+        if (selected != null && selected.node.getId().equals(node.getId())) {
+            net.minecraft.nbt.NBTBase afterTag = configuration.getTag(selected.property.getId());
+            if (!java.util.Objects.equals(beforeTag, afterTag)) {
+                lastPropertyChangeNodeId = node.getId();
+                lastPropertyChangeId = selected.property.getId();
+                lastPropertyBefore = before;
+                lastPropertyAfter = compactPropertyValue(selected.property, configuration);
+            }
+        }
         commandSink.accept(DroneGraphEditCommand.configureNode(graph.getRevision(), node.getId(), configuration));
+    }
+
+    private static String compactDraftValue(DroneNodePropertyDefinition property, String draft) {
+        String value = draft == null ? "" : draft;
+        if (property.getType() == DroneNodePropertyType.INTEGER
+                || property.getType() == DroneNodePropertyType.NUMBER) value = value.trim();
+        return compactText(value);
+    }
+
+    private static String compactPropertyValue(DroneNodePropertyDefinition property,
+            net.minecraft.nbt.NBTTagCompound config) {
+        String id = property.getId();
+        if (!config.hasKey(id)) return I18n.format("drtech.drone.programmer.property_default_value");
+        switch (property.getType()) {
+            case INTEGER:
+                return Integer.toString(config.getInteger(id));
+            case NUMBER:
+                return Double.toString(config.getDouble(id));
+            case BOOLEAN:
+                return I18n.format(config.getBoolean(id)
+                        ? "drtech.drone.programmer.property_true"
+                        : "drtech.drone.programmer.property_false");
+            case STRING:
+            case FLUID_SELECTOR:
+            case ENUM:
+            case DIRECTION:
+                return compactText(config.getString(id));
+            default:
+                return I18n.format("drtech.drone.programmer.property_configured_value");
+        }
+    }
+
+    private static String compactText(String value) {
+        String compact = value == null ? "" : value.replace('\r', ' ').replace('\n', ' ').trim();
+        if (compact.isEmpty()) return I18n.format("drtech.drone.programmer.property_empty_value");
+        return compact.length() > 6 ? compact.substring(0, 5) + "..." : compact;
     }
 
     private DroneProgramNode findNode(DroneProgramGraph graph, int x, int y) {
         DroneProgramNode found = null;
+        Set<UUID> hiddenNodes = DroneGroupLayout.hiddenByCollapsedGroups(graph);
         for (DroneProgramNode node : graph.getNodes()) {
+            if (DroneGroupLayout.isGroup(node) || hiddenNodes.contains(node.getId())) continue;
             Point point = nodePoint(node);
             if (x >= point.x && x < point.x + scaled(NODE_WIDTH)
                     && y >= point.y && y < point.y + scaled(nodeHeight(registry.get(node.getType())))) found = node;
         }
+        if (found != null) return found;
+        for (DroneProgramNode group : graph.getNodes()) {
+            if (!DroneGroupLayout.isGroup(group)) continue;
+            Point point = nodePoint(group);
+            if (x >= point.x && x < point.x + scaled(DroneGroupLayout.width(group))
+                    && y >= point.y && y < point.y + scaled(DroneGroupLayout.HEADER_HEIGHT)) found = group;
+        }
         return found;
     }
 
-    private PortHit findPort(DroneProgramGraph graph, int x, int y) {
+    private boolean navigateFromMiniMap(DroneProgramGraph graph, int mouseX, int mouseY) {
+        MiniMapProjection projection = miniMapProjection(graph, getArea().w());
+        if (projection == null || mouseX < projection.left || mouseX >= projection.left + MINIMAP_WIDTH
+                || mouseY < projection.top || mouseY >= projection.top + MINIMAP_HEIGHT) return false;
+        int graphX = projection.unprojectX(mouseX);
+        int graphY = projection.unprojectY(mouseY);
+        panX = unscale(getArea().w() / 2) - graphX;
+        panY = unscale(getArea().h() / 2) - graphY;
+        return true;
+    }
+
+    private MiniMapProjection miniMapProjection(DroneProgramGraph graph, int canvasWidth) {
+        if (graph == null || graph.getNodes().isEmpty()) return null;
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
         for (DroneProgramNode node : graph.getNodes()) {
+            minX = Math.min(minX, node.getX());
+            minY = Math.min(minY, node.getY());
+            maxX = Math.max(maxX, node.getX() + (DroneGroupLayout.isGroup(node)
+                    ? DroneGroupLayout.width(node) : NODE_WIDTH));
+            maxY = Math.max(maxY, node.getY() + (DroneGroupLayout.isGroup(node)
+                    ? DroneGroupLayout.height(node) : nodeHeight(registry.get(node.getType()))));
+        }
+        return new MiniMapProjection(canvasWidth - MINIMAP_WIDTH - 4, 4, minX, minY,
+                Math.max(1, maxX - minX), Math.max(1, maxY - minY));
+    }
+
+    private PortHit findPort(DroneProgramGraph graph, int x, int y) {
+        Set<UUID> hiddenNodes = DroneGroupLayout.hiddenByCollapsedGroups(graph);
+        for (DroneProgramNode node : graph.getNodes()) {
+            if (hiddenNodes.contains(node.getId())) continue;
             DroneNodeDefinition definition = registry.get(node.getType());
             if (definition == null) continue;
             for (DronePortDefinition port : definition.getPorts()) {
@@ -1077,6 +2833,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
 
     private static int nodeHeight(DroneNodeDefinition definition) {
         if (definition == null) return NODE_HEIGHT;
+        if (definition.getId().equals(DrTechDroneNodes.COMMENT)) return 46;
         int inputs = 0;
         int outputs = 0;
         for (DronePortDefinition port : definition.getPorts()) {
@@ -1115,6 +2872,22 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         return new Point(scale(x + panX), scale(y + panY));
     }
 
+    /** Releases optimistic positions only after the synced graph confirms or rejects the move. */
+    private void reconcileAcknowledgedDragPreviews(DroneProgramGraph graph) {
+        long now = System.currentTimeMillis();
+        java.util.Iterator<Map.Entry<UUID, PreviewPosition>> iterator = previews.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, PreviewPosition> entry = iterator.next();
+            PreviewPosition preview = entry.getValue();
+            if (!preview.isAwaiting()) continue;
+            DroneProgramNode node = graph.getNode(entry.getKey());
+            if (node == null || !DroneDragPreviewPolicy.shouldKeep(graph.getRevision(), preview.sourceRevision,
+                    node.getX(), node.getY(), preview.x, preview.y, now, preview.expiresAt)) {
+                iterator.remove();
+            }
+        }
+    }
+
     private int scale(int value) {
         return value * zoomPercent / 100;
     }
@@ -1125,6 +2898,14 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
 
     private int unscale(int value) {
         return value * 100 / zoomPercent;
+    }
+
+    private static int snapCoordinate(int value) {
+        return Math.round(value / 16.0F) * 16;
+    }
+
+    private static boolean isShiftDown() {
+        return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
     }
 
     private static int floorMod(int value, int divisor) {
@@ -1150,6 +2931,23 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         };
     }
 
+    /** Stable category glyphs supplement the header colours for node-library and canvas readability. */
+    private static String categorySymbol(DroneNodeDefinition definition) {
+        if (definition == null) return "?";
+        return switch (definition.getCategory()) {
+            case "flow" -> "F";
+            case "movement" -> ">";
+            case "conditions" -> "?";
+            case "values" -> "V";
+            case "math" -> "+";
+            case "sensors" -> "S";
+            case "energy" -> "E";
+            case "dock" -> "D";
+            case "machines" -> "M";
+            default -> "•";
+        };
+    }
+
     private static int colorForType(DronePortType type) {
         return switch (type) {
             case FLOW -> 0xFFF1F3F5;
@@ -1166,6 +2964,40 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         };
     }
 
+    private enum MenuAction {
+        COPY("drtech.drone.context.copy"),
+        PASTE("drtech.drone.context.paste"),
+        DUPLICATE("drtech.drone.context.duplicate"),
+        DELETE("drtech.drone.context.delete"),
+        DISCONNECT("drtech.drone.context.disconnect"),
+        FOCUS("drtech.drone.context.focus"),
+        ALIGN_HORIZONTAL("drtech.drone.context.align_horizontal"),
+        ALIGN_VERTICAL("drtech.drone.context.align_vertical"),
+        AUTO_LAYOUT("drtech.drone.context.auto_layout"),
+        GROUP_SELECTION("drtech.drone.context.group_selection"),
+        ADD_COMMENT("drtech.drone.context.add_comment"),
+        FIT_ALL("drtech.drone.context.fit_all");
+
+        private final String translationKey;
+        MenuAction(String translationKey) { this.translationKey = translationKey; }
+    }
+
+    private static final class ContextMenu {
+        private final int x;
+        private final int y;
+        private final int graphX;
+        private final int graphY;
+        private final List<MenuAction> actions;
+
+        private ContextMenu(int x, int y, int graphX, int graphY, List<MenuAction> actions) {
+            this.x = x;
+            this.y = y;
+            this.graphX = graphX;
+            this.graphY = graphY;
+            this.actions = Collections.unmodifiableList(new ArrayList<>(actions));
+        }
+    }
+
     private static final class Point {
         private final int x;
         private final int y;
@@ -1175,7 +3007,66 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     private static final class PreviewPosition {
         private final int x;
         private final int y;
-        private PreviewPosition(int x, int y) { this.x = x; this.y = y; }
+        private final long sourceRevision;
+        private final long expiresAt;
+
+        private PreviewPosition(int x, int y) { this(x, y, -1L, 0L); }
+
+        private PreviewPosition(int x, int y, long sourceRevision, long expiresAt) {
+            this.x = x;
+            this.y = y;
+            this.sourceRevision = sourceRevision;
+            this.expiresAt = expiresAt;
+        }
+
+        private PreviewPosition awaiting(long revision, long timeout) {
+            return new PreviewPosition(x, y, revision, timeout);
+        }
+
+        private boolean isAwaiting() { return sourceRevision >= 0L; }
+    }
+
+    private static final class ClipboardGraph {
+        private final List<DroneProgramNode> nodes;
+        private final List<DroneProgramEdge> edges;
+
+        private ClipboardGraph(List<DroneProgramNode> nodes, List<DroneProgramEdge> edges) {
+            this.nodes = Collections.unmodifiableList(new ArrayList<>(nodes));
+            this.edges = Collections.unmodifiableList(new ArrayList<>(edges));
+        }
+    }
+
+    private static final class MiniMapProjection {
+        private static final int PADDING = 3;
+        private final int left;
+        private final int top;
+        private final int minX;
+        private final int minY;
+        private final double scale;
+        private final double offsetX;
+        private final double offsetY;
+
+        private MiniMapProjection(int left, int top, int minX, int minY, int width, int height) {
+            this.left = left;
+            this.top = top;
+            this.minX = minX;
+            this.minY = minY;
+            double usableWidth = MINIMAP_WIDTH - PADDING * 2.0D;
+            double usableHeight = MINIMAP_HEIGHT - PADDING * 2.0D;
+            this.scale = Math.min(usableWidth / width, usableHeight / height);
+            this.offsetX = PADDING + (usableWidth - width * scale) / 2.0D;
+            this.offsetY = PADDING + (usableHeight - height * scale) / 2.0D;
+        }
+
+        private int projectX(int x) { return left + (int) Math.round(offsetX + (x - minX) * scale); }
+
+        private int projectY(int y) { return top + (int) Math.round(offsetY + (y - minY) * scale); }
+
+        private int projectLength(int length) { return (int) Math.round(length * scale); }
+
+        private int unprojectX(int x) { return minX + (int) Math.round((x - left - offsetX) / scale); }
+
+        private int unprojectY(int y) { return minY + (int) Math.round((y - top - offsetY) / scale); }
     }
 
     private static final class SelectedProperty {

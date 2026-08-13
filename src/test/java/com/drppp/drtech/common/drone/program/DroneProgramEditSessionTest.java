@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,6 +37,60 @@ class DroneProgramEditSessionTest {
         assertEquals(target, decoded.getTargetNodeId());
         assertEquals("next", decoded.getSourcePort());
         assertEquals("in", decoded.getTargetPort());
+    }
+
+    @Test
+    void commandCodecRoundTripsBatchPayload() {
+        UUID first = UUID.randomUUID();
+        UUID second = UUID.randomUUID();
+        DroneGraphEditCommand sourceCommand = DroneGraphEditCommand.batch(12L, Arrays.asList(
+                DroneGraphEditCommand.moveNode(12L, first, 40, 80),
+                DroneGraphEditCommand.moveNode(12L, second, 120, 80)));
+
+        DroneGraphEditCommand decoded = DroneGraphCommandCodec.read(DroneGraphCommandCodec.write(sourceCommand));
+
+        assertEquals(12L, decoded.getExpectedRevision());
+        assertEquals(2, decoded.getCommands().size());
+        assertEquals(first, decoded.getCommands().get(0).getObjectId());
+        assertEquals(second, decoded.getCommands().get(1).getObjectId());
+    }
+
+    @Test
+    void batchMoveIsOneRevisionAndOneUndoStep() {
+        DroneProgramEditSession session = new DroneProgramEditSession(defaultGraph(),
+                DrTechDroneNodes.createDefaultRegistry());
+        DroneProgramNode[] nodes = session.getGraph().getNodes().toArray(new DroneProgramNode[0]);
+        long initial = session.getGraph().getRevision();
+
+        DroneGraphEditResult moved = session.apply(DroneGraphEditCommand.batch(initial, Arrays.asList(
+                DroneGraphEditCommand.moveNode(initial, nodes[0].getId(), 100, 140),
+                DroneGraphEditCommand.moveNode(initial, nodes[1].getId(), 300, 140))));
+
+        assertTrue(moved.isAccepted());
+        assertEquals(initial + 1L, moved.getRevision());
+        assertEquals(100, session.getGraph().getNode(nodes[0].getId()).getX());
+        assertEquals(300, session.getGraph().getNode(nodes[1].getId()).getX());
+
+        DroneGraphEditResult undone = session.apply(DroneGraphEditCommand.undo(moved.getRevision()));
+        assertTrue(undone.isAccepted());
+        assertEquals(20, session.getGraph().getNode(nodes[0].getId()).getX());
+        assertEquals(220, session.getGraph().getNode(nodes[1].getId()).getX());
+    }
+
+    @Test
+    void invalidBatchRollsBackEveryChildMutation() {
+        DroneProgramEditSession session = new DroneProgramEditSession(defaultGraph(),
+                DrTechDroneNodes.createDefaultRegistry());
+        DroneProgramNode node = session.getGraph().getNodes().iterator().next();
+        long initial = session.getGraph().getRevision();
+
+        DroneGraphEditResult result = session.apply(DroneGraphEditCommand.batch(initial, Arrays.asList(
+                DroneGraphEditCommand.moveNode(initial, node.getId(), 999, 999),
+                DroneGraphEditCommand.moveNode(initial, UUID.randomUUID(), 1, 1))));
+
+        assertFalse(result.isAccepted());
+        assertEquals(initial, session.getGraph().getRevision());
+        assertEquals(20, session.getGraph().getNode(node.getId()).getX());
     }
 
     @Test
@@ -124,6 +179,60 @@ class DroneProgramEditSessionTest {
         assertEquals(500, session.getGraph().getNode(end.getId()).getX());
         assertTrue(session.canUndo());
         assertFalse(session.canRedo());
+    }
+
+    @Test
+    void resettingOnePropertyIsRevisionCheckedAndUndoable() {
+        DroneProgramGraph graph = defaultGraph();
+        NBTTagCompound initialConfig = new NBTTagCompound();
+        initialConfig.setInteger("Ticks", 40);
+        initialConfig.setString("Unrelated", "keep");
+        DroneProgramNode wait = new DroneProgramNode(UUID.randomUUID(), DrTechDroneNodes.WAIT,
+                120, 140, initialConfig);
+        graph.addNode(wait);
+        DroneProgramEditSession session = new DroneProgramEditSession(graph,
+                DrTechDroneNodes.createDefaultRegistry());
+
+        NBTTagCompound resetConfig = wait.getConfiguration();
+        resetConfig.removeTag("Ticks");
+        DroneGraphEditResult reset = session.apply(DroneGraphEditCommand.configureNode(
+                graph.getRevision(), wait.getId(), resetConfig));
+
+        assertTrue(reset.isAccepted());
+        assertFalse(session.getGraph().getNode(wait.getId()).getConfiguration().hasKey("Ticks"));
+        assertEquals("keep", session.getGraph().getNode(wait.getId()).getConfiguration().getString("Unrelated"));
+
+        DroneGraphEditResult undone = session.apply(DroneGraphEditCommand.undo(reset.getRevision()));
+        assertTrue(undone.isAccepted());
+        assertEquals(40, session.getGraph().getNode(wait.getId()).getConfiguration().getInteger("Ticks"));
+    }
+
+    @Test
+    void coordinatePresetUpdatesAllAxesInOneUndoableRevision() {
+        DroneProgramGraph graph = defaultGraph();
+        DroneProgramNode coordinate = DroneProgramNode.create(DrTechDroneNodes.COORDINATE, 100, 140);
+        graph.addNode(coordinate);
+        DroneProgramEditSession session = new DroneProgramEditSession(graph,
+                DrTechDroneNodes.createDefaultRegistry());
+
+        NBTTagCompound captured = coordinate.getConfiguration();
+        captured.setInteger("X", 368);
+        captured.setInteger("Y", 5);
+        captured.setInteger("Z", -1476);
+        DroneGraphEditResult applied = session.apply(DroneGraphEditCommand.configureNode(
+                graph.getRevision(), coordinate.getId(), captured));
+
+        assertTrue(applied.isAccepted());
+        NBTTagCompound afterCapture = session.getGraph().getNode(coordinate.getId()).getConfiguration();
+        assertEquals(368, afterCapture.getInteger("X"));
+        assertEquals(5, afterCapture.getInteger("Y"));
+        assertEquals(-1476, afterCapture.getInteger("Z"));
+
+        DroneGraphEditResult undone = session.apply(DroneGraphEditCommand.undo(applied.getRevision()));
+        assertTrue(undone.isAccepted());
+        assertFalse(session.getGraph().getNode(coordinate.getId()).getConfiguration().hasKey("X"));
+        assertFalse(session.getGraph().getNode(coordinate.getId()).getConfiguration().hasKey("Y"));
+        assertFalse(session.getGraph().getNode(coordinate.getId()).getConfiguration().hasKey("Z"));
     }
 
     private static DroneProgramGraph defaultGraph() {

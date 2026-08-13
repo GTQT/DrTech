@@ -2,6 +2,8 @@ package com.drppp.drtech.common.drone.program;
 
 import com.drppp.drtech.common.drone.program.compile.DroneCompileResult;
 import com.drppp.drtech.common.drone.program.compile.DroneDiagnosticCode;
+import com.drppp.drtech.common.drone.program.compile.DroneDiagnosticSeverity;
+import com.drppp.drtech.common.drone.program.compile.DroneProgramDiagnostic;
 import com.drppp.drtech.common.drone.program.compile.DroneProgramCompiler;
 import com.drppp.drtech.common.drone.program.model.DroneProgramEdge;
 import com.drppp.drtech.common.drone.program.model.DroneProgramGraph;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DroneProgramCompilerTest {
@@ -66,6 +70,30 @@ class DroneProgramCompilerTest {
     }
 
     @Test
+    void diagnosticsKeepNodeAndPortForEditorNavigation() {
+        DroneProgramGraph graph = new DroneProgramGraph("diagnostic navigation");
+        DroneProgramNode start = node(DrTechDroneNodes.START);
+        DroneProgramNode branch = node(DrTechDroneNodes.BRANCH);
+        DroneProgramNode end = node(DrTechDroneNodes.END);
+        graph.addNode(start);
+        graph.addNode(branch);
+        graph.addNode(end);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", branch.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(branch.getId(), "true", end.getId(), "in"));
+
+        DroneCompileResult result = compiler.compile(graph);
+        DroneProgramDiagnostic diagnostic = result.getDiagnostics().stream()
+                .filter(value -> value.getCode() == DroneDiagnosticCode.REQUIRED_PORT_NOT_CONNECTED)
+                .filter(value -> branch.getId().equals(value.getNodeId()))
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+
+        assertEquals(branch.getId(), diagnostic.getNodeId());
+        assertNotNull(diagnostic.getPortId());
+        assertFalse(diagnostic.getPortId().isEmpty());
+    }
+
+    @Test
     void reportsUnknownNodeTypeWithoutCrashing() {
         DroneProgramGraph graph = new DroneProgramGraph("unknown");
         graph.addNode(new DroneProgramNode(UUID.randomUUID(), new ResourceLocation("example", "missing"), 0, 0,
@@ -97,6 +125,28 @@ class DroneProgramCompilerTest {
     }
 
     @Test
+    void commentNodePersistsAsEditorContentWithoutRuntimeReachabilityWarning() {
+        DroneProgramGraph graph = new DroneProgramGraph("documented");
+        DroneProgramNode start = node(DrTechDroneNodes.START);
+        DroneProgramNode end = node(DrTechDroneNodes.END);
+        NBTTagCompound configuration = new NBTTagCompound();
+        configuration.setString("Text", "Harvest route: keep the failed branch connected to return-to-dock.");
+        DroneProgramNode comment = node(DrTechDroneNodes.COMMENT).withConfiguration(configuration);
+        graph.addNode(start);
+        graph.addNode(end);
+        graph.addNode(comment);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", end.getId(), "in"));
+
+        DroneCompileResult result = compiler.compile(graph);
+
+        assertFalse(result.hasErrors());
+        assertTrue(result.getProgram().isPresent());
+        assertFalse(result.getDiagnostics().stream().anyMatch(value -> value.getNodeId() != null
+                && value.getNodeId().equals(comment.getId())
+                && value.getCode() == DroneDiagnosticCode.UNREACHABLE_NODE));
+    }
+
+    @Test
     void rejectsAreaThatExceedsRuntimeLimits() {
         DroneProgramGraph graph = new DroneProgramGraph("oversized area");
         DroneProgramNode start = node(DrTechDroneNodes.START);
@@ -116,7 +166,84 @@ class DroneProgramCompilerTest {
         DroneCompileResult result = compiler.compile(graph);
 
         assertTrue(result.hasErrors());
-        assertTrue(hasDiagnostic(result, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION));
+        DroneProgramDiagnostic diagnostic = diagnostic(result, DroneDiagnosticCode.AREA_LIMIT_EXCEEDED);
+        assertEquals(area.getId(), diagnostic.getNodeId());
+        assertEquals("X2", diagnostic.getPropertyId());
+    }
+
+    @Test
+    void rejectsReachableFlowCycleWithoutAnyExit() {
+        DroneProgramGraph graph = new DroneProgramGraph("closed while");
+        DroneProgramNode start = node(DrTechDroneNodes.START);
+        DroneProgramNode loop = node(DrTechDroneNodes.WHILE);
+        DroneProgramNode body = node(DrTechDroneNodes.WAIT);
+        DroneProgramNode condition = node(DrTechDroneNodes.BOOLEAN);
+        graph.addNode(start);
+        graph.addNode(loop);
+        graph.addNode(body);
+        graph.addNode(condition);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", loop.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(condition.getId(), "value", loop.getId(), "condition"));
+        graph.addEdge(DroneProgramEdge.create(loop.getId(), "body", body.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(body.getId(), "next", loop.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(loop.getId(), "done", loop.getId(), "in"));
+
+        DroneCompileResult result = compiler.compile(graph);
+
+        assertTrue(result.hasErrors());
+        DroneProgramDiagnostic diagnostic = diagnostic(result, DroneDiagnosticCode.NO_EXIT_LOOP);
+        assertEquals(loop.getId(), diagnostic.getNodeId());
+        assertEquals(DroneDiagnosticSeverity.ERROR, diagnostic.getSeverity());
+    }
+
+    @Test
+    void warnsWhenConditionalCycleHasAnExitButMayNeverTakeIt() {
+        DroneProgramGraph graph = new DroneProgramGraph("open while");
+        DroneProgramNode start = node(DrTechDroneNodes.START);
+        DroneProgramNode loop = node(DrTechDroneNodes.WHILE);
+        DroneProgramNode body = node(DrTechDroneNodes.WAIT);
+        DroneProgramNode condition = node(DrTechDroneNodes.BOOLEAN);
+        DroneProgramNode end = node(DrTechDroneNodes.END);
+        graph.addNode(start);
+        graph.addNode(loop);
+        graph.addNode(body);
+        graph.addNode(condition);
+        graph.addNode(end);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", loop.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(condition.getId(), "value", loop.getId(), "condition"));
+        graph.addEdge(DroneProgramEdge.create(loop.getId(), "body", body.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(body.getId(), "next", loop.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(loop.getId(), "done", end.getId(), "in"));
+
+        DroneCompileResult result = compiler.compile(graph);
+
+        assertFalse(result.hasErrors());
+        DroneProgramDiagnostic diagnostic = diagnostic(result, DroneDiagnosticCode.POSSIBLE_INFINITE_LOOP);
+        assertEquals(loop.getId(), diagnostic.getNodeId());
+        assertEquals(DroneDiagnosticSeverity.WARNING, diagnostic.getSeverity());
+    }
+
+    @Test
+    void doesNotWarnForBoundedRepeatBackEdge() {
+        DroneProgramGraph graph = new DroneProgramGraph("bounded repeat");
+        DroneProgramNode start = node(DrTechDroneNodes.START);
+        DroneProgramNode repeat = node(DrTechDroneNodes.REPEAT);
+        DroneProgramNode body = node(DrTechDroneNodes.WAIT);
+        DroneProgramNode end = node(DrTechDroneNodes.END);
+        graph.addNode(start);
+        graph.addNode(repeat);
+        graph.addNode(body);
+        graph.addNode(end);
+        graph.addEdge(DroneProgramEdge.create(start.getId(), "next", repeat.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(repeat.getId(), "body", body.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(body.getId(), "next", repeat.getId(), "in"));
+        graph.addEdge(DroneProgramEdge.create(repeat.getId(), "done", end.getId(), "in"));
+
+        DroneCompileResult result = compiler.compile(graph);
+
+        assertFalse(result.hasErrors());
+        assertFalse(hasDiagnostic(result, DroneDiagnosticCode.POSSIBLE_INFINITE_LOOP));
+        assertFalse(hasDiagnostic(result, DroneDiagnosticCode.NO_EXIT_LOOP));
     }
 
     @Test
@@ -135,7 +262,9 @@ class DroneProgramCompilerTest {
         DroneCompileResult result = compiler.compile(graph);
 
         assertTrue(result.hasErrors());
-        assertTrue(hasDiagnostic(result, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION));
+        DroneProgramDiagnostic diagnostic = diagnostic(result, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION);
+        assertEquals(variable.getId(), diagnostic.getNodeId());
+        assertEquals("Name", diagnostic.getPropertyId());
     }
 
     @Test
@@ -174,7 +303,9 @@ class DroneProgramCompilerTest {
         DroneCompileResult result = compiler.compile(graph);
 
         assertTrue(result.hasErrors());
-        assertTrue(hasDiagnostic(result, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION));
+        DroneProgramDiagnostic diagnostic = diagnostic(result, DroneDiagnosticCode.INVALID_NODE_CONFIGURATION);
+        assertEquals(wait.getId(), diagnostic.getNodeId());
+        assertEquals("Ticks", diagnostic.getPropertyId());
     }
 
     @Test
@@ -210,5 +341,12 @@ class DroneProgramCompilerTest {
 
     private static boolean hasDiagnostic(DroneCompileResult result, DroneDiagnosticCode code) {
         return result.getDiagnostics().stream().anyMatch(diagnostic -> diagnostic.getCode() == code);
+    }
+
+    private static DroneProgramDiagnostic diagnostic(DroneCompileResult result, DroneDiagnosticCode code) {
+        return result.getDiagnostics().stream()
+                .filter(value -> value.getCode() == code)
+                .findFirst()
+                .orElseThrow(AssertionError::new);
     }
 }

@@ -109,8 +109,31 @@ public final class DroneNodePropertyDefinition {
             case FLUID_SELECTOR:
                 if (!configuration.hasKey(id, 8)) return "invalid_property_type:" + id;
                 return configuration.getString(id).length() <= maxLength ? null : "property_too_long:" + id;
+            case PROGRAM_REFERENCE: {
+                if (!configuration.hasKey(id, 10)) return "invalid_property_type:" + id;
+                NBTTagCompound program = configuration.getCompoundTag(id);
+                if (!validUuid(program, "ProgramId") || !program.hasKey("Revision", 99)
+                        || program.getLong("Revision") < 0L) return "invalid_program_reference:" + id;
+                return program.getString("Name").length() <= 64 ? null : "property_too_long:" + id;
+            }
+            case DOCK_REFERENCE: {
+                if (!configuration.hasKey(id, 10)) return "invalid_property_type:" + id;
+                NBTTagCompound dock = configuration.getCompoundTag(id);
+                return validUuid(dock, "DockId") && dock.hasKey("Position", 4)
+                        && dock.hasKey("Dimension", 99) ? null : "invalid_dock_reference:" + id;
+            }
             default:
                 return configuration.hasKey(id, 10) ? null : "invalid_property_type:" + id;
+        }
+    }
+
+    private static boolean validUuid(NBTTagCompound compound, String key) {
+        if (!compound.hasKey(key, 8)) return false;
+        try {
+            java.util.UUID.fromString(compound.getString(key));
+            return true;
+        } catch (IllegalArgumentException ignored) {
+            return false;
         }
     }
 }

@@ -11,8 +11,18 @@ public final class DroneHardwareStats {
     private DroneHardwareStats() {}
 
     public static boolean hasUpgrade(IItemHandler upgrades, DroneUpgradeType type) {
-        if (upgrades == null || type.getMetadata() >= upgrades.getSlots()) return false;
-        return ItemDroneUpgradeModule.getType(upgrades.getStackInSlot(type.getMetadata())) == type;
+        return findUpgradeSlot(upgrades, type, -1) >= 0;
+    }
+
+    /** Finds a module regardless of its visual slot; excludedSlot is used while validating slot moves. */
+    public static int findUpgradeSlot(IItemHandler upgrades, DroneUpgradeType type, int excludedSlot) {
+        if (upgrades == null || type == null) return -1;
+        for (int slot = 0; slot < upgrades.getSlots(); slot++) {
+            if (slot != excludedSlot && ItemDroneUpgradeModule.getType(upgrades.getStackInSlot(slot)) == type) {
+                return slot;
+            }
+        }
+        return -1;
     }
 
     public static long capacity(DroneChassisTier chassis, IItemHandler upgrades) {
