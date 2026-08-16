@@ -52,11 +52,12 @@ public final class DroneHardwareStats {
     }
 
     public static int wirelessRange(DroneChassisTier chassis, IItemHandler upgrades) {
-        return wirelessRange(chassis, hasUpgrade(upgrades, DroneUpgradeType.WIRELESS));
+        return wirelessRange(chassis, hasUpgrade(upgrades, DroneUpgradeType.WIRELESS),
+                hasUpgrade(upgrades, DroneUpgradeType.FLEET_COMMUNICATION));
     }
 
-    static int wirelessRange(DroneChassisTier chassis, boolean wireless) {
-        return chassis.getBaseWirelessRange() + (wireless ? 128 : 0);
+    static int wirelessRange(DroneChassisTier chassis, boolean wireless, boolean fleetCommunication) {
+        return chassis.getBaseWirelessRange() + (wireless ? 128 : 0) + (fleetCommunication ? 256 : 0);
     }
 
     public static long energyCost(long baseCost, IItemHandler upgrades) {
@@ -69,10 +70,47 @@ public final class DroneHardwareStats {
     }
 
     public static int transferLimit(IItemHandler upgrades) {
-        return transferLimit(hasUpgrade(upgrades, DroneUpgradeType.EFFICIENCY));
+        return transferLimit(hasUpgrade(upgrades, DroneUpgradeType.EFFICIENCY),
+                hasUpgrade(upgrades, DroneUpgradeType.ADVANCED_ITEM_HANDLING));
     }
 
-    static int transferLimit(boolean efficiency) { return efficiency ? 128 : 64; }
+    static int transferLimit(boolean efficiency, boolean advancedItemHandling) {
+        return advancedItemHandling ? 256 : efficiency ? 128 : 64;
+    }
+
+    public static int navigationRange(IItemHandler upgrades) {
+        return navigationRange(hasUpgrade(upgrades, DroneUpgradeType.ADVANCED_NAVIGATION));
+    }
+
+    static int navigationRange(boolean advancedNavigation) {
+        return advancedNavigation ? 128 : 64;
+    }
+
+    public static int navigationNodeBudget(IItemHandler upgrades) {
+        return navigationNodeBudget(hasUpgrade(upgrades, DroneUpgradeType.ADVANCED_NAVIGATION));
+    }
+
+    static int navigationNodeBudget(boolean advancedNavigation) {
+        return advancedNavigation ? 16_384 : 4_096;
+    }
+
+    /** Maximum number of coordinates a runtime area may expose for each chassis tier. */
+    public static int areaBlockLimit(DroneChassisTier chassis) {
+        if (chassis == null) return 1_024;
+        return switch (chassis) {
+            case HV -> 1_024;
+            case EV -> 2_048;
+            case IV -> 4_096;
+        };
+    }
+
+    public static int euTransferAmperage(IItemHandler upgrades) {
+        return euTransferAmperage(hasUpgrade(upgrades, DroneUpgradeType.EU_INTERFACE));
+    }
+
+    static int euTransferAmperage(boolean euInterface) {
+        return euInterface ? 4 : 1;
+    }
 
     /** Fluid storage exists only while the dedicated module is installed. Values are in mB. */
     public static int fluidCapacity(DroneChassisTier chassis, IItemHandler upgrades) {

@@ -2,24 +2,33 @@ package com.drppp.drtech.common.drone.item;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.math.BlockPos;
 import com.drppp.drtech.common.drone.hardware.DroneChassisTier;
 import com.drppp.drtech.common.drone.hardware.DroneHardwareStats;
 import com.drppp.drtech.common.drone.hardware.DroneUpgradeDataCodec;
+import com.drppp.drtech.common.drone.filter.DroneItemFilterSpec;
+import com.drppp.drtech.common.drone.firmware.DroneSafetyFirmware;
 import com.drppp.drtech.common.drone.program.codec.DroneProgramMigrator;
 import com.drppp.drtech.common.drone.program.codec.DroneProgramFormatException;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /** Shared item/entity payload keys for lossless deployment and recall. */
 public final class DroneItemData {
 
-    public static final int CURRENT_DATA_VERSION = 4;
+    public static final int CURRENT_DATA_VERSION = 9;
 
     public static final String PROGRAM_TAG = "DrTechDroneProgram";
     public static final String INVENTORY_TAG = "DrTechDroneInventory";
+    public static final String WEAPONS_TAG = "DrTechDroneWeapons";
     public static final String FLUID_TAG = "DrTechDroneFluid";
     public static final String DOCK_TAG = "DrTechDroneDock";
     public static final String RUNTIME_TAG = "DrTechDroneRuntime";
@@ -31,8 +40,150 @@ public final class DroneItemData {
     public static final String OWNER_TAG = "DrTechDroneOwner";
     public static final String CHASSIS_TAG = "DrTechDroneChassis";
     public static final String SAFETY_FIRMWARE_TAG = "DrTechDroneSafetyFirmware";
+    public static final String AUTO_PICKUP_MODE_TAG = "DrTechDroneAutoPickupMode";
+    public static final String AUTO_PICKUP_FILTER_TAG = "DrTechDroneAutoPickupFilter";
+    public static final String FALLBACK_DOCKS_TAG = "DrTechDroneFallbackDocks";
+    public static final String LOADED_ENTITY_TAG = "DrTechDroneLoadedEntity";
+    public static final String LOADED_ENTITY_UUID_TAG = "DrTechDroneLoadedEntityUuid";
+    public static final String STATUS_LABEL_TAG = "DrTechDroneStatusLabel";
+    public static final String ROTORS_ACTIVE_TAG = "DrTechDroneRotorsActive";
+    public static final String STATUS_LIGHT_MODE_TAG = "DrTechDroneStatusLightMode";
+    public static final String FOLLOW_TARGET_TAG = "DrTechDroneFollowTarget";
+    public static final String AVOID_TARGET_TAG = "DrTechDroneAvoidTarget";
+    public static final String ATTACK_TARGET_TAG = "DrTechDroneAttackTarget";
 
     private DroneItemData() {}
+
+    public static void setAttackTargetLock(ItemStack stack, @Nullable UUID targetId, @Nullable BlockPos anchor) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        if (targetId == null || anchor == null) {
+            root.removeTag(ATTACK_TARGET_TAG);
+        } else {
+            NBTTagCompound lock = new NBTTagCompound();
+            lock.setString("Target", targetId.toString());
+            lock.setLong("Anchor", anchor.toLong());
+            root.setTag(ATTACK_TARGET_TAG, lock);
+        }
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    @Nullable
+    public static UUID getAttackTargetId(ItemStack stack) {
+        NBTTagCompound lock = getAttackTargetLock(stack);
+        if (lock == null || !lock.hasKey("Target", 8)) return null;
+        try { return UUID.fromString(lock.getString("Target")); }
+        catch (IllegalArgumentException ignored) { return null; }
+    }
+
+    @Nullable
+    public static BlockPos getAttackTargetAnchor(ItemStack stack) {
+        NBTTagCompound lock = getAttackTargetLock(stack);
+        return lock != null && lock.hasKey("Anchor", 4) ? BlockPos.fromLong(lock.getLong("Anchor")) : null;
+    }
+
+    @Nullable
+    private static NBTTagCompound getAttackTargetLock(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root != null && root.hasKey(ATTACK_TARGET_TAG, 10)
+                ? root.getCompoundTag(ATTACK_TARGET_TAG) : null;
+    }
+
+    public static void setEntityTargetLock(ItemStack stack, boolean following,
+            @Nullable UUID targetId, @Nullable BlockPos anchor) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        String key = following ? FOLLOW_TARGET_TAG : AVOID_TARGET_TAG;
+        if (targetId == null || anchor == null) {
+            root.removeTag(key);
+        } else {
+            NBTTagCompound lock = new NBTTagCompound();
+            lock.setString("Target", targetId.toString());
+            lock.setLong("Anchor", anchor.toLong());
+            root.setTag(key, lock);
+        }
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    @Nullable
+    public static UUID getEntityTargetId(ItemStack stack, boolean following) {
+        NBTTagCompound lock = getEntityTargetLock(stack, following);
+        if (lock == null || !lock.hasKey("Target", 8)) return null;
+        try { return UUID.fromString(lock.getString("Target")); }
+        catch (IllegalArgumentException ignored) { return null; }
+    }
+
+    @Nullable
+    public static BlockPos getEntityTargetAnchor(ItemStack stack, boolean following) {
+        NBTTagCompound lock = getEntityTargetLock(stack, following);
+        return lock != null && lock.hasKey("Anchor", 4) ? BlockPos.fromLong(lock.getLong("Anchor")) : null;
+    }
+
+    @Nullable
+    private static NBTTagCompound getEntityTargetLock(ItemStack stack, boolean following) {
+        NBTTagCompound root = stack.getTagCompound();
+        String key = following ? FOLLOW_TARGET_TAG : AVOID_TARGET_TAG;
+        return root != null && root.hasKey(key, 10) ? root.getCompoundTag(key) : null;
+    }
+
+    public static String getStatusLabel(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root == null ? "" : root.getString(STATUS_LABEL_TAG);
+    }
+
+    public static void setStatusLabel(ItemStack stack, @Nullable String label) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        if (label == null || label.isEmpty()) root.removeTag(STATUS_LABEL_TAG);
+        else root.setString(STATUS_LABEL_TAG, label);
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    public static boolean areRotorsActive(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root == null || !root.hasKey(ROTORS_ACTIVE_TAG) || root.getBoolean(ROTORS_ACTIVE_TAG);
+    }
+
+    public static void setRotorsActive(ItemStack stack, boolean active) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        root.setBoolean(ROTORS_ACTIVE_TAG, active);
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    public static int getStatusLightMode(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root == null ? 0 : Math.max(0, Math.min(4, root.getInteger(STATUS_LIGHT_MODE_TAG)));
+    }
+
+    public static void setStatusLightMode(ItemStack stack, int mode) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        root.setInteger(STATUS_LIGHT_MODE_TAG, Math.max(0, Math.min(4, mode)));
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    @Nullable
+    public static NBTTagCompound getLoadedEntity(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root != null && root.hasKey(LOADED_ENTITY_TAG, 10)
+                ? root.getCompoundTag(LOADED_ENTITY_TAG).copy() : null;
+    }
+
+    public static void setLoadedEntity(ItemStack stack, @Nullable NBTTagCompound entity, @Nullable UUID uuid) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        if (entity == null) {
+            root.removeTag(LOADED_ENTITY_TAG);
+            root.removeTag(LOADED_ENTITY_UUID_TAG);
+        } else {
+            root.setTag(LOADED_ENTITY_TAG, entity.copy());
+            if (uuid != null) root.setString(LOADED_ENTITY_UUID_TAG, uuid.toString());
+        }
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    @Nullable
+    public static UUID getLoadedEntityUuid(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        if (root == null || !root.hasKey(LOADED_ENTITY_UUID_TAG, 8)) return null;
+        try { return UUID.fromString(root.getString(LOADED_ENTITY_UUID_TAG)); }
+        catch (IllegalArgumentException ignored) { return null; }
+    }
 
     public static NBTTagCompound getProgram(ItemStack stack) {
         NBTTagCompound root = stack.getTagCompound();
@@ -77,6 +228,31 @@ public final class DroneItemData {
         root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
     }
 
+    public static String getAutoPickupMode(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root == null ? "ALL" : root.getString(AUTO_PICKUP_MODE_TAG);
+    }
+
+    public static void setAutoPickupMode(ItemStack stack, String mode) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        root.setString(AUTO_PICKUP_MODE_TAG, mode == null ? "ALL" : mode);
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    public static DroneItemFilterSpec getAutoPickupFilter(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root == null || !root.hasKey(AUTO_PICKUP_FILTER_TAG, 10)
+                ? DroneItemFilterSpec.ANY
+                : DroneItemFilterSpec.readFromNbt(root.getCompoundTag(AUTO_PICKUP_FILTER_TAG));
+    }
+
+    public static void setAutoPickupFilter(ItemStack stack, @Nullable DroneItemFilterSpec filter) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        if (filter == null) root.removeTag(AUTO_PICKUP_FILTER_TAG);
+        else root.setTag(AUTO_PICKUP_FILTER_TAG, filter.writeToNbt());
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
     static NBTTagCompound copySafetyFirmwarePayload(NBTTagCompound firmware) {
         return firmware == null ? new NBTTagCompound() : firmware.copy();
     }
@@ -95,6 +271,22 @@ public final class DroneItemData {
     public static void setInventory(ItemStack stack, NBTTagCompound inventory) {
         NBTTagCompound root = getOrCreateRoot(stack);
         root.setTag(INVENTORY_TAG, copyInventoryPayload(inventory));
+    }
+
+    public static NBTTagCompound getWeapons(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        NBTTagCompound weapons = root != null && root.hasKey(WEAPONS_TAG, 10)
+                ? root.getCompoundTag(WEAPONS_TAG).copy() : new NBTTagCompound();
+        weapons.setInteger("Size", 2);
+        return weapons;
+    }
+
+    public static void setWeapons(ItemStack stack, NBTTagCompound weapons) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        NBTTagCompound value = weapons == null ? new NBTTagCompound() : weapons.copy();
+        value.setInteger("Size", 2);
+        root.setTag(WEAPONS_TAG, value);
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
     }
 
     public static NBTTagCompound getFluid(ItemStack stack) {
@@ -170,6 +362,9 @@ public final class DroneItemData {
                 root.setInteger(PROGRAM_VERSION_TAG, root.getCompoundTag(PROGRAM_TAG).getInteger("Schema"));
             }
         }
+        if (!root.hasKey(SAFETY_FIRMWARE_TAG, 10)) {
+            root.setTag(SAFETY_FIRMWARE_TAG, new DroneSafetyFirmware().writeToNbt());
+        }
         root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
     }
 
@@ -225,6 +420,37 @@ public final class DroneItemData {
         dock.setInteger("Y", position.getY());
         dock.setInteger("Z", position.getZ());
         root.setTag(DOCK_TAG, dock);
+    }
+
+    public static List<UUID> getFallbackDocks(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        if (root == null || !root.hasKey(FALLBACK_DOCKS_TAG, 9)) return Collections.emptyList();
+        NBTTagList list = root.getTagList(FALLBACK_DOCKS_TAG, 8);
+        List<UUID> result = new ArrayList<>();
+        for (int index = 0; index < list.tagCount() && result.size() < 8; index++) {
+            try {
+                UUID id = UUID.fromString(list.getStringTagAt(index));
+                if (!result.contains(id)) result.add(id);
+            } catch (IllegalArgumentException ignored) {
+                // Ignore damaged or legacy entries while preserving the remaining preference order.
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    public static void setFallbackDocks(ItemStack stack, @Nullable List<UUID> dockIds) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        NBTTagList list = new NBTTagList();
+        if (dockIds != null) {
+            int count = 0;
+            for (UUID id : new LinkedHashSet<>(dockIds)) {
+                if (id == null) continue;
+                list.appendTag(new NBTTagString(id.toString()));
+                if (++count >= 8) break;
+            }
+        }
+        if (list.tagCount() == 0) root.removeTag(FALLBACK_DOCKS_TAG);
+        else root.setTag(FALLBACK_DOCKS_TAG, list);
     }
 
     private static NBTTagCompound getOrCreateRoot(ItemStack stack) {

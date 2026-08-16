@@ -1,9 +1,27 @@
 package com.drppp.drtech;
 
 import net.minecraftforge.common.config.Config;
+import com.drppp.drtech.common.drone.entity.DroneFakePlayerIdentity;
 
 @Config(modid = Tags.MODID)
 public class DrtConfig {
+
+    @Config.LangKey("drone_fake_player_identity")
+    @Config.Comment({"Drone FakePlayer identity: PER_DRONE, OWNER, or SHARED.",
+            "OWNER inherits the owner's UUID; unowned drones fall back to PER_DRONE."})
+    public static DroneFakePlayerIdentity DroneFakePlayerIdentityStrategy = DroneFakePlayerIdentity.PER_DRONE;
+
+    @Config.LangKey("enable_drone_audit_log")
+    @Config.Comment("Write terminal state-changing drone actions to the server log with drone, owner and program ids.")
+    public static boolean EnableDroneAuditLog = true;
+
+    @Config.LangKey("enable_drone_combat")
+    @Config.Comment("Allow programmable drones to execute attack-entity nodes. Bosses remain protected.")
+    public static boolean EnableDroneCombat = false;
+
+    @Config.LangKey("enable_drone_player_attack")
+    @Config.Comment("Allow drone attack nodes to target players when drone combat is enabled.")
+    public static boolean EnableDronePlayerAttack = false;
 
     @Config.LangKey("enable_disassembly")
     @Config.Comment("开启拆解机")

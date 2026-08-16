@@ -3,9 +3,14 @@ package com.drppp.drtech.common.drone.filter;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -34,9 +39,18 @@ public final class DroneBlockFilterSpec {
     public List<Rule> getRules() { return rules; }
 
     public boolean matches(IBlockState state) {
+        return matches(state, null, null);
+    }
+
+    public boolean matches(World world, BlockPos pos) {
+        if (world == null || pos == null) return false;
+        return matches(world.getBlockState(pos), world, pos);
+    }
+
+    private boolean matches(IBlockState state, @Nullable World world, @Nullable BlockPos pos) {
         if (state == null) return false;
         if (rules.isEmpty()) return true;
-        boolean matched = rules.stream().anyMatch(rule -> rule.matches(state));
+        boolean matched = rules.stream().anyMatch(rule -> rule.matches(state, world, pos));
         return mode.apply(matched);
     }
 
@@ -62,6 +76,11 @@ public final class DroneBlockFilterSpec {
 
     public static final class Rule {
         private final ResourceLocation blockId;
+        private final String namespace;
+        private final Boolean tileEntity;
+        private final Boolean replaceable;
+        private final String oreDictionary;
+        private final String category;
         private final int metadata;
         private final Map<String, String> stateProperties;
 
@@ -70,7 +89,40 @@ public final class DroneBlockFilterSpec {
         }
 
         public Rule(ResourceLocation blockId, int metadata, @Nullable Map<String, String> stateProperties) {
+            this(blockId, "", metadata, stateProperties);
+        }
+
+        public Rule(@Nullable ResourceLocation blockId, @Nullable String namespace, int metadata,
+                @Nullable Map<String, String> stateProperties) {
+            this(blockId, namespace, metadata, stateProperties, null);
+        }
+
+        public Rule(@Nullable ResourceLocation blockId, @Nullable String namespace, int metadata,
+                @Nullable Map<String, String> stateProperties, @Nullable Boolean tileEntity) {
+            this(blockId, namespace, metadata, stateProperties, tileEntity, null);
+        }
+
+        public Rule(@Nullable ResourceLocation blockId, @Nullable String namespace, int metadata,
+                @Nullable Map<String, String> stateProperties, @Nullable Boolean tileEntity,
+                @Nullable Boolean replaceable) {
+            this(blockId, namespace, metadata, stateProperties, tileEntity, replaceable, "");
+        }
+
+        public Rule(@Nullable ResourceLocation blockId, @Nullable String namespace, int metadata,
+                @Nullable Map<String, String> stateProperties, @Nullable Boolean tileEntity,
+                @Nullable Boolean replaceable, @Nullable String oreDictionary) {
+            this(blockId, namespace, metadata, stateProperties, tileEntity, replaceable, oreDictionary, "");
+        }
+
+        public Rule(@Nullable ResourceLocation blockId, @Nullable String namespace, int metadata,
+                @Nullable Map<String, String> stateProperties, @Nullable Boolean tileEntity,
+                @Nullable Boolean replaceable, @Nullable String oreDictionary, @Nullable String category) {
             this.blockId = blockId;
+            this.namespace = limit(namespace == null ? "" : namespace, 64);
+            this.tileEntity = tileEntity;
+            this.replaceable = replaceable;
+            this.oreDictionary = limit(oreDictionary == null ? "" : oreDictionary, 128);
+            this.category = normalizeCategory(category);
             this.metadata = metadata;
             LinkedHashMap<String, String> bounded = new LinkedHashMap<>();
             if (stateProperties != null) {
@@ -84,12 +136,40 @@ public final class DroneBlockFilterSpec {
         }
 
         public ResourceLocation getBlockId() { return blockId; }
+        public String getNamespace() { return namespace; }
+        @Nullable public Boolean getTileEntityRequirement() { return tileEntity; }
+        @Nullable public Boolean getReplaceableRequirement() { return replaceable; }
+        public String getOreDictionary() { return oreDictionary; }
+        public String getCategory() { return category; }
         public int getMetadata() { return metadata; }
         public Map<String, String> getStateProperties() { return stateProperties; }
 
-        private boolean matches(IBlockState state) {
+        private boolean matches(IBlockState state, @Nullable World world, @Nullable BlockPos pos) {
             ResourceLocation id = Block.REGISTRY.getNameForObject(state.getBlock());
-            if (!blockId.equals(id)) return false;
+            if (blockId != null && !blockId.equals(id)) return false;
+            if (!namespace.isEmpty() && (id == null || !namespace.equals(id.getNamespace()))) return false;
+            if (tileEntity != null && state.getBlock().hasTileEntity(state) != tileEntity) return false;
+            if (replaceable != null) {
+                if (world == null || pos == null || state.getBlock().isReplaceable(world, pos) != replaceable) return false;
+            }
+            if (!oreDictionary.isEmpty() || !category.isEmpty()) {
+                Item item = Item.getItemFromBlock(state.getBlock());
+                if (item == null) return false;
+                int meta;
+                try {
+                    meta = state.getBlock().getMetaFromState(state);
+                } catch (RuntimeException ignored) {
+                    return false;
+                }
+                boolean oreMatched = oreDictionary.isEmpty();
+                boolean categoryMatched = category.isEmpty();
+                for (int oreId : OreDictionary.getOreIDs(new ItemStack(item, 1, meta))) {
+                    String oreName = OreDictionary.getOreName(oreId);
+                    oreMatched |= oreDictionary.equals(oreName);
+                    categoryMatched |= matchesCategory(category, oreName);
+                }
+                if (!oreMatched || !categoryMatched) return false;
+            }
             if (metadata >= 0) {
                 try {
                     if (state.getBlock().getMetaFromState(state) != metadata) return false;
@@ -113,7 +193,14 @@ public final class DroneBlockFilterSpec {
 
         private NBTTagCompound writeToNbt() {
             NBTTagCompound tag = new NBTTagCompound();
-            tag.setString("Block", blockId.toString());
+            if (blockId != null) tag.setString("Block", blockId.toString());
+            if (!namespace.isEmpty()) tag.setString("Namespace", namespace);
+            if (tileEntity != null) tag.setBoolean("TileEntity", tileEntity);
+            if (tileEntity != null) tag.setBoolean("TileEntitySet", true);
+            if (replaceable != null) tag.setBoolean("Replaceable", replaceable);
+            if (replaceable != null) tag.setBoolean("ReplaceableSet", true);
+            if (!oreDictionary.isEmpty()) tag.setString("Ore", oreDictionary);
+            if (!category.isEmpty()) tag.setString("Category", category);
             tag.setInteger("Meta", metadata);
             if (!stateProperties.isEmpty()) {
                 NBTTagCompound properties = new NBTTagCompound();
@@ -134,8 +221,17 @@ public final class DroneBlockFilterSpec {
                     state.getKeySet().stream().sorted().limit(MAX_STATE_PROPERTIES)
                             .forEach(key -> properties.put(limit(key, 64), limit(state.getString(key), 64)));
                 }
-                return new Rule(new ResourceLocation(tag.getString("Block")),
-                        tag.hasKey("Meta", 99) ? tag.getInteger("Meta") : -1, properties);
+                ResourceLocation blockId = tag.hasKey("Block", 8) && !tag.getString("Block").isEmpty()
+                        ? new ResourceLocation(tag.getString("Block")) : null;
+                String namespace = limit(tag.getString("Namespace"), 64);
+                String ore = limit(tag.getString("Ore"), 128);
+                String category = normalizeCategory(tag.getString("Category"));
+                if (blockId == null && namespace.isEmpty() && ore.isEmpty() && category.isEmpty()) return null;
+                return new Rule(blockId, namespace,
+                        tag.hasKey("Meta", 99) ? tag.getInteger("Meta") : -1, properties,
+                        tag.getBoolean("TileEntitySet") ? tag.getBoolean("TileEntity") : null,
+                        tag.getBoolean("ReplaceableSet") ? tag.getBoolean("Replaceable") : null,
+                        ore, category);
             } catch (RuntimeException ignored) {
                 return null;
             }
@@ -148,6 +244,20 @@ public final class DroneBlockFilterSpec {
 
         private static String limit(String value, int maxLength) {
             return value.length() <= maxLength ? value : value.substring(0, maxLength);
+        }
+
+        private static String normalizeCategory(@Nullable String value) {
+            if ("ORE".equals(value) || "WOOD".equals(value) || "CROP".equals(value)) return value;
+            return "";
+        }
+
+        private static boolean matchesCategory(String category, String oreName) {
+            String name = oreName == null ? "" : oreName.toLowerCase(java.util.Locale.ROOT);
+            if ("ORE".equals(category)) return name.startsWith("ore");
+            if ("WOOD".equals(category)) return name.startsWith("log") || name.startsWith("plank")
+                    || name.startsWith("wood") || name.startsWith("tree");
+            return "CROP".equals(category) && (name.startsWith("crop") || name.startsWith("seed")
+                    || name.startsWith("listallseed"));
         }
     }
 }

@@ -9,6 +9,7 @@ import com.drppp.drtech.common.drone.filter.DroneFilterMode;
 import com.drppp.drtech.common.drone.program.model.DroneArea;
 import com.drppp.drtech.common.drone.program.model.DroneProgramReference;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneSensorService;
+import com.drppp.drtech.common.drone.program.runtime.service.DroneEntitySensorResult;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +24,8 @@ public final class DrTechDroneValueEvaluators {
                 context.getConfiguration().getDouble("Value"));
         registry.register(DrTechDroneNodes.BOOLEAN, (context, output) ->
                 context.getConfiguration().getBoolean("Value"));
+        registry.register(DrTechDroneNodes.STRING, (context, output) ->
+                context.getConfiguration().getString("Text"));
         registry.register(DrTechDroneNodes.COORDINATE, (context, output) -> coordinate(context.getConfiguration()));
         registry.register(DrTechDroneNodes.DOCK_REFERENCE, (context, output) -> {
             NBTTagCompound dock = context.getConfiguration().getCompoundTag("Dock");
@@ -37,11 +40,24 @@ public final class DrTechDroneValueEvaluators {
                 throw new IllegalStateException("Program reference is not selected");
             }
             try {
-                return new DroneProgramReference(java.util.UUID.fromString(program.getString("ProgramId")),
+                java.util.UUID owner = null;
+                if (program.hasKey("OwnerId", 8) && !program.getString("OwnerId").isEmpty()) {
+                    owner = java.util.UUID.fromString(program.getString("OwnerId"));
+                }
+                return new DroneProgramReference(java.util.UUID.fromString(program.getString("ProgramId")), owner,
                         program.getLong("Revision"), program.getString("Name"));
             } catch (IllegalArgumentException exception) {
                 throw new IllegalStateException("Program reference id is invalid", exception);
             }
+        });
+        registry.register(DrTechDroneNodes.CALL_PROGRAM, (context, output) -> {
+            if ("number_output".equals(output)) {
+                return context.getMemory().getCallNumberOutput(context.getNode().getId());
+            }
+            if ("string_output".equals(output)) {
+                return context.getMemory().getCallStringOutput(context.getNode().getId());
+            }
+            throw new IllegalStateException("Unknown subprogram output " + output);
         });
         registry.register(DrTechDroneNodes.AREA, (context, output) -> area(context.getConfiguration()));
         registry.register(DrTechDroneNodes.ITEM_FILTER, (context, output) ->
@@ -186,10 +202,44 @@ public final class DrTechDroneValueEvaluators {
             return context.getEnvironment().countMatchingBlocks(context.requireInput("area", DroneArea.class),
                     optionalBlockFilter(context), Math.max(1, Math.min(DroneArea.MAX_BLOCKS, limit)));
         });
+        registry.register(DrTechDroneNodes.ENTITY_COUNT, (context, output) -> {
+            int limit = context.getConfiguration().hasKey("Limit", 99)
+                    ? context.getConfiguration().getInteger("Limit") : 256;
+            return context.getEnvironment().countEntities(context.requireInput("area", DroneArea.class),
+                    optionalEntityFilter(context), Math.max(1, Math.min(256, limit)));
+        });
+        registry.register(DrTechDroneNodes.ENTITY_SENSOR, (context, output) -> {
+            DroneEntitySensorResult result = context.getEnvironment().senseNearestEntity(
+                    context.requireInput("area", DroneArea.class), optionalEntityFilter(context));
+            if (result.getNearestPosition() == null) {
+                throw new IllegalStateException("No matching living entity exists in the selected area");
+            }
+            return switch (output) {
+                case "position" -> result.getNearestPosition();
+                case "health" -> (double) result.getHealth();
+                case "max_health" -> (double) result.getMaxHealth();
+                case "name" -> result.getName();
+                case "entity_id" -> result.getEntityId();
+                case "uuid" -> result.getEntityUuid();
+                case "owner" -> result.isOwner();
+                case "owned" -> result.isOwned();
+                case "hostile" -> result.isHostile();
+                default -> throw new IllegalStateException("Unknown entity sensor output " + output);
+            };
+        });
+        registry.register(DrTechDroneNodes.DRONE_DAMAGE, (context, output) ->
+                (double) context.getEnvironment().senseDroneDamage().getDroneDamage());
         registry.register(DrTechDroneNodes.COMPARE_NUMBER, DrTechDroneValueEvaluators::compareNumbers);
         registry.register(DrTechDroneNodes.GET_NUMBER_VARIABLE, (context, output) -> {
             String name = context.getConfiguration().getString("Name");
-            return context.getMemory().getNumber(name.isEmpty() ? "value" : name);
+            return context.getMemory().getNumber(name.isEmpty() ? "value" : name,
+                    "LOCAL".equalsIgnoreCase(context.getConfiguration().getString("Scope")));
+        });
+        registry.register(DrTechDroneNodes.COMPARE_STRING, DrTechDroneValueEvaluators::compareStrings);
+        registry.register(DrTechDroneNodes.GET_STRING_VARIABLE, (context, output) -> {
+            String name = context.getConfiguration().getString("Name");
+            return context.getMemory().getString(name.isEmpty() ? "value" : name,
+                    "LOCAL".equalsIgnoreCase(context.getConfiguration().getString("Scope")));
         });
         registry.register(DrTechDroneNodes.NUMBER_MATH, DrTechDroneValueEvaluators::numberMath);
         registry.register(DrTechDroneNodes.BOOLEAN_LOGIC, DrTechDroneValueEvaluators::booleanLogic);
@@ -199,14 +249,27 @@ public final class DrTechDroneValueEvaluators {
         registry.register(DrTechDroneNodes.AREA_FROM_CORNERS, (context, output) ->
                 DroneArea.between(context.requireInput("first", BlockPos.class),
                         context.requireInput("second", BlockPos.class)));
+        registry.register(DrTechDroneNodes.CUBOID_SURFACE_AREA, (context, output) ->
+                DroneArea.cuboidSurface(context.requireInput("first", BlockPos.class),
+                        context.requireInput("second", BlockPos.class),
+                        DroneArea.CuboidSurface.fromName(context.getConfiguration().getString("Surface"))));
         registry.register(DrTechDroneNodes.FOR_EACH_COORDINATE, (context, output) -> {
             DroneArea area = context.requireInput("area", DroneArea.class);
             int nextIndex = context.getMemory().getLoopIteration(context.getNode().getId());
             if (nextIndex <= 0 || nextIndex > area.getVolume()) {
                 throw new IllegalStateException("For Each coordinate is only available inside its body branch");
             }
-            return area.positionAt(nextIndex - 1,
-                    parseTraversalOrder(context.getConfiguration().getString("Order")));
+            int selectedIndex = context.getMemory().getLoopTraversalIndex(context.getNode().getId(), nextIndex - 1,
+                    (int) area.getVolume());
+            return selectedIndex >= 0 ? area.positionAt(selectedIndex) : area.positionAt(nextIndex - 1,
+                    DroneArea.TraversalOrder.fromName(context.getConfiguration().getString("Order")));
+        });
+        registry.register(DrTechDroneNodes.CURRENT_ITEM_FILTER, (context, output) -> {
+            DroneItemFilter current = context.getMemory().getCurrentItemFilter();
+            if (current == null) {
+                throw new IllegalStateException("Current item filter is only available inside For Each Item Filter");
+            }
+            return current;
         });
         registry.register(DrTechDroneNodes.SPHERE_AREA, (context, output) -> {
             NBTTagCompound config = context.getConfiguration();
@@ -223,7 +286,17 @@ public final class DrTechDroneValueEvaluators {
             int height = heightInput == null ? config.getInteger("Height") : heightInput.intValue();
             return DroneArea.cylinder(context.requireInput("center", BlockPos.class),
                     Math.max(1, Math.min(8, radius)), Math.max(1, Math.min(16, height)),
-                    config.getBoolean("Hollow"));
+                    config.getBoolean("Hollow"), DroneArea.Axis.fromName(config.getString("Axis")));
+        });
+        registry.register(DrTechDroneNodes.PYRAMID_AREA, (context, output) -> {
+            NBTTagCompound config = context.getConfiguration();
+            Number radiusInput = context.getOptionalInput("radius", Number.class);
+            Number heightInput = context.getOptionalInput("height", Number.class);
+            int radius = radiusInput == null ? config.getInteger("Radius") : radiusInput.intValue();
+            int height = heightInput == null ? config.getInteger("Height") : heightInput.intValue();
+            return DroneArea.pyramid(context.requireInput("center", BlockPos.class),
+                    Math.max(1, Math.min(8, radius)), Math.max(1, Math.min(16, height)),
+                    config.getBoolean("Hollow"), DroneArea.Axis.fromName(config.getString("Axis")));
         });
         registry.register(DrTechDroneNodes.PATH_AREA, (context, output) -> {
             Number input = context.getOptionalInput("radius", Number.class);
@@ -256,6 +329,31 @@ public final class DrTechDroneValueEvaluators {
             int radius = input == null ? context.getConfiguration().getInteger("Radius") : input.intValue();
             return context.requireInput("area", DroneArea.class).inset(Math.max(0, Math.min(4, radius)));
         });
+        registry.register(DrTechDroneNodes.GRID_AREA, (context, output) -> {
+            NBTTagCompound config = context.getConfiguration();
+            return context.requireInput("area", DroneArea.class).grid(
+                    positiveStep(context, config, "step_x", "StepX"),
+                    positiveStep(context, config, "step_y", "StepY"),
+                    positiveStep(context, config, "step_z", "StepZ"));
+        });
+        registry.register(DrTechDroneNodes.RANDOM_POINTS_AREA, (context, output) -> {
+            Number input = context.getOptionalInput("count", Number.class);
+            int count = input == null ? context.getConfiguration().getInteger("Count") : input.intValue();
+            return context.requireInput("area", DroneArea.class).randomPoints(
+                    Math.max(0, Math.min(DroneArea.MAX_BLOCKS, count)),
+                    context.getConfiguration().getInteger("Seed"));
+        });
+        registry.register(DrTechDroneNodes.AREA_BOUNDARY, (context, output) -> {
+            Number input = context.getOptionalInput("thickness", Number.class);
+            int thickness = input == null ? context.getConfiguration().getInteger("Thickness") : input.intValue();
+            return context.requireInput("area", DroneArea.class).boundary(Math.max(1, Math.min(4, thickness)));
+        });
+        registry.register(DrTechDroneNodes.AREA_SCALE, (context, output) -> {
+            Number input = context.getOptionalInput("factor", Number.class);
+            double factor = input == null ? context.getConfiguration().getDouble("Factor") : input.doubleValue();
+            if (!Double.isFinite(factor)) factor = 1.0D;
+            return context.requireInput("area", DroneArea.class).scale(Math.max(0.25D, Math.min(4.0D, factor)));
+        });
         registry.register(DrTechDroneNodes.AREA_CONTAINS, (context, output) ->
                 context.requireInput("area", DroneArea.class).contains(
                         context.requireInput("coordinate", BlockPos.class)));
@@ -272,6 +370,13 @@ public final class DrTechDroneValueEvaluators {
     private static BlockPos coordinate(NBTTagCompound configuration) {
         return new BlockPos(configuration.getInteger("X"), configuration.getInteger("Y"),
                 configuration.getInteger("Z"));
+    }
+
+    private static int positiveStep(DroneValueEvaluationContext context, NBTTagCompound configuration,
+            String port, String property) {
+        Number input = context.getOptionalInput(port, Number.class);
+        int value = input == null ? configuration.getInteger(property) : input.intValue();
+        return Math.max(1, Math.min(DroneArea.MAX_AXIS_LENGTH, value));
     }
 
     private static DroneArea area(NBTTagCompound configuration) {
@@ -293,6 +398,22 @@ public final class DrTechDroneValueEvaluators {
             case ">=" -> left >= right;
             case "!=" -> Double.compare(left, right) != 0;
             default -> Double.compare(left, right) == 0;
+        };
+    }
+
+    private static Object compareStrings(DroneValueEvaluationContext context, String outputPort) {
+        String left = context.requireInput("left", String.class);
+        String right = context.requireInput("right", String.class);
+        if (context.getConfiguration().getBoolean("IgnoreCase")) {
+            left = left.toLowerCase(java.util.Locale.ROOT);
+            right = right.toLowerCase(java.util.Locale.ROOT);
+        }
+        return switch (context.getConfiguration().getString("Operator")) {
+            case "!=" -> !left.equals(right);
+            case "CONTAINS" -> left.contains(right);
+            case "STARTS_WITH" -> left.startsWith(right);
+            case "ENDS_WITH" -> left.endsWith(right);
+            default -> left.equals(right);
         };
     }
 
@@ -357,6 +478,11 @@ public final class DrTechDroneValueEvaluators {
         return filter == null ? DroneBlockFilterSpec.ANY : filter;
     }
 
+    private static DroneEntityFilterSpec optionalEntityFilter(DroneValueEvaluationContext context) {
+        DroneEntityFilterSpec filter = context.getOptionalInput("filter", DroneEntityFilterSpec.class);
+        return filter == null ? DroneEntityFilterSpec.any() : filter;
+    }
+
     private static DroneFluidFilterSpec optionalFluidFilter(DroneValueEvaluationContext context) {
         DroneFluidFilterSpec filter = context.getOptionalInput("filter", DroneFluidFilterSpec.class);
         return filter == null ? new DroneFluidFilterSpec(DroneFilterMode.WHITELIST,
@@ -380,11 +506,4 @@ public final class DrTechDroneValueEvaluators {
         }
     }
 
-    private static DroneArea.TraversalOrder parseTraversalOrder(String value) {
-        try {
-            return DroneArea.TraversalOrder.valueOf(value);
-        } catch (IllegalArgumentException ignored) {
-            return DroneArea.TraversalOrder.SERPENTINE;
-        }
-    }
 }

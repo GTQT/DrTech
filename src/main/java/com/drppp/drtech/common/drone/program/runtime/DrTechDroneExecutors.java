@@ -9,10 +9,15 @@ import com.drppp.drtech.common.drone.program.registry.DrTechDroneNodes;
 import com.drppp.drtech.common.drone.inventory.DroneItemFilter;
 import com.drppp.drtech.common.drone.filter.DroneFluidFilterSpec;
 import com.drppp.drtech.common.drone.filter.DroneFilterMode;
+import com.drppp.drtech.common.drone.filter.DroneItemFilterSpec;
+import com.drppp.drtech.common.drone.filter.DroneBlockFilterSpec;
+import com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec;
 import com.drppp.drtech.common.drone.program.model.DroneArea;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+
+import java.util.Collections;
 
 public final class DrTechDroneExecutors {
 
@@ -122,6 +127,33 @@ public final class DrTechDroneExecutors {
         });
         registry.register(DrTechDroneNodes.INTERACT_BLOCK, context -> interactBlock(context, false));
         registry.register(DrTechDroneNodes.USE_ITEM_ON_BLOCK, context -> interactBlock(context, true));
+        registry.register(DrTechDroneNodes.USE_ITEM, context -> context.getEnvironment().useItem(
+                optionalFilter(context), context.getConfiguration().getBoolean("Sneaking")));
+        registry.register(DrTechDroneNodes.INTERACT_ENTITY, context -> context.getEnvironment()
+                .interactWithNearestEntity(context.requireInput("target", BlockPos.class),
+                        optionalEntityFilter(context)));
+        registry.register(DrTechDroneNodes.USE_ITEM_ON_ENTITY, context -> context.getEnvironment()
+                .useItemOnEntity(context.requireInput("target", BlockPos.class), optionalFilter(context),
+                        optionalEntityFilter(context, "entity_filter")));
+        registry.register(DrTechDroneNodes.FOLLOW_ENTITY, context -> context.getEnvironment().followEntity(
+                context.requireInput("target", BlockPos.class), entityDistance(context), optionalEntityFilter(context)));
+        registry.register(DrTechDroneNodes.AVOID_ENTITY, context -> context.getEnvironment().moveAwayFromEntity(
+                context.requireInput("target", BlockPos.class), entityDistance(context), optionalEntityFilter(context)));
+        registry.register(DrTechDroneNodes.RENAME_DRONE, context -> context.getEnvironment()
+                .renameDrone(context.requireInput("name", String.class)));
+        registry.register(DrTechDroneNodes.SET_STATUS_LABEL, context -> context.getEnvironment()
+                .setStatusLabel(context.requireInput("label", String.class)));
+        registry.register(DrTechDroneNodes.SET_ROTOR_MODE, context -> context.getEnvironment()
+                .setRotorMode(context.getConfiguration().getString("Mode")));
+        registry.register(DrTechDroneNodes.SET_STATUS_LIGHT, context -> context.getEnvironment()
+                .setStatusLight(context.getConfiguration().getString("Mode")));
+        registry.register(DrTechDroneNodes.EDIT_SIGN, DrTechDroneExecutors::editSign);
+        registry.register(DrTechDroneNodes.ATTACK_ENTITY, context -> context.getEnvironment()
+                .attackEntity(context.requireInput("target", BlockPos.class), optionalEntityFilter(context)));
+        registry.register(DrTechDroneNodes.LOAD_ENTITY, context -> context.getEnvironment()
+                .loadEntity(context.requireInput("target", BlockPos.class), optionalEntityFilter(context)));
+        registry.register(DrTechDroneNodes.RELEASE_ENTITY, context -> context.getEnvironment()
+                .releaseEntity(context.requireInput("target", BlockPos.class)));
         registry.register(DrTechDroneNodes.PICKUP_DROPPED_ITEMS, context -> itemWorldAction(context, true));
         registry.register(DrTechDroneNodes.DROP_ITEMS, context -> itemWorldAction(context, false));
         registry.register(DrTechDroneNodes.HARVEST_CROP, context ->
@@ -134,12 +166,28 @@ public final class DrTechDroneExecutors {
                     context.requireInput("target", BlockPos.class), Math.max(0, Math.min(15, configured)));
         });
         registry.register(DrTechDroneNodes.SET_NUMBER_VARIABLE, context -> {
-            context.getMemory().setNumber(variableName(context), context.requireInput("value", Number.class).doubleValue());
+            context.getMemory().setNumber(variableName(context), context.requireInput("value", Number.class).doubleValue(),
+                    isLocalVariable(context));
             return DroneExecutionResult.success();
         });
         registry.register(DrTechDroneNodes.ADD_NUMBER_VARIABLE, context -> {
-            context.getMemory().addNumber(variableName(context), context.requireInput("amount", Number.class).doubleValue());
+            context.getMemory().addNumber(variableName(context), context.requireInput("amount", Number.class).doubleValue(),
+                    isLocalVariable(context));
             return DroneExecutionResult.success();
+        });
+        registry.register(DrTechDroneNodes.SET_STRING_VARIABLE, context -> {
+            context.getMemory().setString(variableName(context), context.requireInput("value", String.class),
+                    isLocalVariable(context));
+            return DroneExecutionResult.success();
+        });
+        registry.register(DrTechDroneNodes.DISPLAY_STRING, context -> {
+            context.getMemory().setString("_display", context.requireInput("value", String.class));
+            return DroneExecutionResult.success();
+        });
+        registry.register(DrTechDroneNodes.REMOTE_ALERT, context -> {
+            String message = context.requireInput("message", String.class);
+            context.getMemory().setString("_alert", message);
+            return context.getEnvironment().remoteAlert(message);
         });
         registry.register(DrTechDroneNodes.REPEAT, DrTechDroneExecutors::tickRepeat);
         registry.register(DrTechDroneNodes.WAIT_FOR_REDSTONE, context -> {
@@ -158,6 +206,7 @@ public final class DrTechDroneExecutors {
         registry.register(DrTechDroneNodes.WHILE, context -> DroneExecutionResult.success(
                 context.requireInput("condition", Boolean.class) ? "body" : "done"));
         registry.register(DrTechDroneNodes.FOR_EACH_COORDINATE, DrTechDroneExecutors::tickForEachCoordinate);
+        registry.register(DrTechDroneNodes.FOR_EACH_ITEM_FILTER, DrTechDroneExecutors::tickForEachItemFilter);
         registry.freeze();
         return registry;
     }
@@ -165,6 +214,30 @@ public final class DrTechDroneExecutors {
     private static DroneItemFilter optionalFilter(DroneNodeExecutionContext context) {
         DroneItemFilter filter = context.getOptionalInput("filter", DroneItemFilter.class);
         return filter == null ? DroneItemFilter.ANY : filter;
+    }
+
+    private static DroneEntityFilterSpec optionalEntityFilter(DroneNodeExecutionContext context) {
+        return optionalEntityFilter(context, "filter");
+    }
+
+    private static DroneEntityFilterSpec optionalEntityFilter(DroneNodeExecutionContext context, String port) {
+        return context.getOptionalInput(port, DroneEntityFilterSpec.class);
+    }
+
+    private static double entityDistance(DroneNodeExecutionContext context) {
+        Number input = context.getOptionalInput("distance", Number.class);
+        double value = input == null ? context.getConfiguration().hasKey("Distance")
+                ? context.getConfiguration().getDouble("Distance") : 4.0D : input.doubleValue();
+        return Math.max(1.0D, Math.min(64.0D, value));
+    }
+
+    private static DroneExecutionResult editSign(DroneNodeExecutionContext context) {
+        String[] lines = new String[4];
+        for (int index = 0; index < lines.length; index++) {
+            String input = context.getOptionalInput("line_" + (index + 1), String.class);
+            lines[index] = input == null ? context.getConfiguration().getString("Line" + (index + 1)) : input;
+        }
+        return context.getEnvironment().editSign(context.requireInput("target", BlockPos.class), lines);
     }
 
     private static DroneExecutionResult energyTransfer(DroneNodeExecutionContext context, boolean importing) {
@@ -418,10 +491,50 @@ public final class DrTechDroneExecutors {
         DroneArea area = context.requireInput("area", DroneArea.class);
         if (!area.isWithinRuntimeLimits()) return DroneExecutionResult.error("Area exceeds runtime limits");
         int index = context.getMemory().getLoopIteration(context.getNode().getId());
+        if (index == 0) {
+            context.getMemory().setLoopTraversalIndices(context.getNode().getId(), area.traversalIndices(
+                    DroneArea.TraversalOrder.fromName(context.getConfiguration().getString("Order")),
+                    context.getEnvironment().getCurrentPosition()));
+        }
+        boolean skipAir = context.getConfiguration().getBoolean("SkipAir");
+        boolean skipNonMatching = context.getConfiguration().getBoolean("SkipNonMatching");
+        DroneBlockFilterSpec blockFilter = context.getOptionalInput("block_filter", DroneBlockFilterSpec.class);
+        if (skipNonMatching && blockFilter == null) {
+            return DroneExecutionResult.error("Skip non-matching blocks requires a block filter");
+        }
+        while (index < area.getVolume()) {
+            int selectedIndex = context.getMemory().getLoopTraversalIndex(context.getNode().getId(), index,
+                    (int) area.getVolume());
+            BlockPos target = area.positionAt(selectedIndex >= 0 ? selectedIndex : index);
+            if (!(skipAir && context.getEnvironment().isAirBlock(target))
+                    && !(skipNonMatching && !context.getEnvironment().matchesBlock(target, blockFilter))) break;
+            index++;
+            context.getMemory().setLoopIteration(context.getNode().getId(), index);
+        }
         if (index >= area.getVolume()) {
             context.getMemory().clearLoop(context.getNode().getId());
             return DroneExecutionResult.success("done");
         }
+        int selectedIndex = context.getMemory().getLoopTraversalIndex(context.getNode().getId(), index,
+                (int) area.getVolume());
+        context.getMemory().setActionPosition(context.getNode().getId(),
+                area.positionAt(selectedIndex >= 0 ? selectedIndex : index));
+        context.getMemory().setLoopIteration(context.getNode().getId(), index + 1);
+        return DroneExecutionResult.success("body");
+    }
+
+    private static DroneExecutionResult tickForEachItemFilter(DroneNodeExecutionContext context) {
+        DroneItemFilter source = context.requireInput("filter", DroneItemFilter.class);
+        java.util.List<DroneItemFilterSpec.Rule> rules = source.getSpec().getRules();
+        int index = context.getMemory().getLoopIteration(context.getNode().getId());
+        if (index >= rules.size()) {
+            context.getMemory().clearLoop(context.getNode().getId());
+            context.getMemory().clearCurrentItemFilter(context.getNode().getId());
+            return DroneExecutionResult.success("done");
+        }
+        DroneItemFilter current = DroneItemFilter.fromSpec(new DroneItemFilterSpec(DroneFilterMode.WHITELIST,
+                Collections.singletonList(rules.get(index))));
+        context.getMemory().setCurrentItemFilter(context.getNode().getId(), current);
         context.getMemory().setLoopIteration(context.getNode().getId(), index + 1);
         return DroneExecutionResult.success("body");
     }
@@ -429,5 +542,9 @@ public final class DrTechDroneExecutors {
     private static String variableName(DroneNodeExecutionContext context) {
         String name = context.getConfiguration().getString("Name");
         return name.isEmpty() ? "value" : name;
+    }
+
+    private static boolean isLocalVariable(DroneNodeExecutionContext context) {
+        return "LOCAL".equalsIgnoreCase(context.getConfiguration().getString("Scope"));
     }
 }

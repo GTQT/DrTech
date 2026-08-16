@@ -94,11 +94,13 @@ public final class DroneUpgradeDataCodec {
         NBTTagList items = source.getTagList("Items", TAG_COMPOUND);
         for (int index = 0; index < items.tagCount(); index++) {
             NBTTagCompound item = items.getCompoundTagAt(index);
-            int metadata = item.hasKey("Damage", 2) ? item.getShort("Damage") : item.getInteger("Damage");
-            int slot = item.hasKey("Slot", 1) ? item.getByte("Slot") & 255 : item.getInteger("Slot");
-            DroneUpgradeType type = metadata >= 0 && metadata < DroneUpgradeType.values().length
+            boolean hasMetadata = item.hasKey("Damage", 99);
+            boolean hasSlot = item.hasKey("Slot", 99);
+            int metadata = hasMetadata ? item.getInteger("Damage") : -1;
+            int slot = hasSlot ? item.getInteger("Slot") & 255 : -1;
+            DroneUpgradeType type = hasMetadata && metadata >= 0 && metadata < DroneUpgradeType.values().length
                     ? DroneUpgradeType.fromMetadata(metadata)
-                    : slot >= 0 && slot < DroneUpgradeType.values().length
+                    : hasSlot && slot >= 0 && slot < DroneUpgradeType.values().length
                             ? DroneUpgradeType.fromMetadata(slot) : null;
             if (type != null) levels.put(type, 1);
         }

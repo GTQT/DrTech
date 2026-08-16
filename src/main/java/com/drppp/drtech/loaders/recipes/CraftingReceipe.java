@@ -139,11 +139,122 @@ public class CraftingReceipe {
                 'C', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
                 'M', MetaItems.ELECTRIC_MOTOR_HV);
 
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_tool_arm",
+                droneUpgrade(DroneUpgradeType.TOOL_ARM),
+                "PRP", "MCM", "PAP",
+                'P', new UnificationEntry(plate, Titanium),
+                'R', MetaItems.ROBOT_ARM_EV,
+                'M', MetaItems.ELECTRIC_MOTOR_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'A', MetaItems.ROBOT_ARM_HV);
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_entity_scanner",
+                droneUpgrade(DroneUpgradeType.ENTITY_SCANNER),
+                "WSW", "ECE", "WPW",
+                'W', new UnificationEntry(wireFine, Electrum),
+                'S', MetaItems.SENSOR_EV,
+                'E', MetaItems.EMITTER_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'P', new UnificationEntry(plate, Titanium));
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_combat",
+                droneUpgrade(DroneUpgradeType.COMBAT),
+                "PSP", "RCR", "PMP",
+                'P', new UnificationEntry(plate, Titanium),
+                'S', Items.DIAMOND_SWORD,
+                'R', MetaItems.ROBOT_ARM_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'M', MetaItems.ELECTRIC_MOTOR_EV);
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_entity_containment",
+                droneUpgrade(DroneUpgradeType.ENTITY_CONTAINMENT),
+                "PEP", "SCS", "PEP",
+                'P', new UnificationEntry(plate, Titanium),
+                'E', Items.ENDER_PEARL,
+                'S', MetaItems.SENSOR_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV));
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_waterproof",
+                droneUpgrade(DroneUpgradeType.WATERPROOF),
+                "RPR", "PBP", "RCR",
+                'R', new UnificationEntry(plate, SiliconeRubber),
+                'P', new UnificationEntry(plate, Titanium),
+                'B', Items.WATER_BUCKET,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV));
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_self_repair",
+                droneUpgrade(DroneUpgradeType.SELF_REPAIR),
+                "PRP", "ACA", "PMP",
+                'P', new UnificationEntry(plate, Titanium),
+                'R', MetaItems.ROBOT_ARM_EV,
+                'A', MetaItems.ELECTRIC_PISTON_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'M', MetaItems.ELECTRIC_MOTOR_EV);
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_secure_access",
+                droneUpgrade(DroneUpgradeType.SECURE_ACCESS),
+                "SES", "ECE", "PIP",
+                'S', MetaItems.SENSOR_EV,
+                'E', MetaItems.EMITTER_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'P', new UnificationEntry(plate, Titanium),
+                'I', Items.ENDER_EYE);
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_advanced_item_handling",
+                droneUpgrade(DroneUpgradeType.ADVANCED_ITEM_HANDLING),
+                "RCR", "PMP", "RCR",
+                'R', MetaItems.ROBOT_ARM_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'P', new UnificationEntry(plate, Titanium),
+                'M', MetaItems.ELECTRIC_MOTOR_EV);
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_fleet_communication",
+                droneUpgrade(DroneUpgradeType.FLEET_COMMUNICATION),
+                "AEA", "ECE", "PWP",
+                'A', MetaItems.SENSOR_EV,
+                'E', MetaItems.EMITTER_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'P', new UnificationEntry(plate, Titanium),
+                'W', new UnificationEntry(wireFine, Electrum));
+
         ModHandler.addShapedRecipe("drtech_drone_programmer", DrTechMetaTileEntities.DRONE_PROGRAMMER.getStackForm(),
                 "SCS", "RHR", "WCW",
                 'S', MetaItems.SENSOR_EV,
                 'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
                 'R', MetaItems.ROBOT_ARM_EV,
+                'H', gregtech.common.metatileentities.MetaTileEntities.HULL[EV].getStackForm(),
+                'W', new UnificationEntry(cableGtSingle, Aluminium));
+
+        ModHandler.addShapedRecipe("drtech_drone_fleet_controller",
+                DrTechMetaTileEntities.DRONE_FLEET_CONTROLLER.getStackForm(),
+                "SES", "CHC", "WCW",
+                'S', MetaItems.SENSOR_EV,
+                'E', MetaItems.EMITTER_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'H', gregtech.common.metatileentities.MetaTileEntities.HULL[EV].getStackForm(),
+                'W', new UnificationEntry(cableGtSingle, Aluminium));
+
+        ModHandler.addShapedRecipe("drtech_drone_item_endpoint", DrTechMetaTileEntities.DRONE_ITEM_ENDPOINT.getStackForm(),
+                "PCP", "RHR", "WCW",
+                'P', new UnificationEntry(plate, Titanium),
+                'C', Blocks.CHEST,
+                'R', MetaItems.ROBOT_ARM_EV,
+                'H', gregtech.common.metatileentities.MetaTileEntities.HULL[EV].getStackForm(),
+                'W', new UnificationEntry(cableGtSingle, Aluminium));
+
+        ModHandler.addShapedRecipe("drtech_drone_fluid_endpoint", DrTechMetaTileEntities.DRONE_FLUID_ENDPOINT.getStackForm(),
+                "PBP", "UHU", "WBW",
+                'P', new UnificationEntry(plate, Titanium),
+                'B', Items.BUCKET,
+                'U', MetaItems.ELECTRIC_PUMP_EV,
+                'H', gregtech.common.metatileentities.MetaTileEntities.HULL[EV].getStackForm(),
+                'W', new UnificationEntry(cableGtSingle, Aluminium));
+
+        ModHandler.addShapedRecipe("drtech_drone_eu_endpoint", DrTechMetaTileEntities.DRONE_EU_ENDPOINT.getStackForm(),
+                "PCP", "EHE", "WCW",
+                'P', new UnificationEntry(plate, Titanium),
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'E', MetaItems.ENERGIUM_CRYSTAL,
                 'H', gregtech.common.metatileentities.MetaTileEntities.HULL[EV].getStackForm(),
                 'W', new UnificationEntry(cableGtSingle, Aluminium));
 

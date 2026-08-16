@@ -19,6 +19,14 @@ public final class ModelProgrammableDrone extends ModelBase {
     private final ModelRenderer efficiencyModule;
     private final ModelRenderer cargoModule;
     private final ModelRenderer wirelessModule;
+    private final ModelRenderer entityScannerModule;
+    private final ModelRenderer combatModule;
+    private final ModelRenderer containmentModule;
+    private final ModelRenderer waterproofModule;
+    private final ModelRenderer selfRepairModule;
+    private final ModelRenderer secureAccessModule;
+    private final ModelRenderer advancedItemModule;
+    private final ModelRenderer fleetCommunicationModule;
 
     public ModelProgrammableDrone() {
         textureWidth = 64;
@@ -89,6 +97,47 @@ public final class ModelProgrammableDrone extends ModelBase {
         ModelRenderer antennaTip = new ModelRenderer(this, 60, 4);
         antennaTip.addBox(-1.0F, -9.0F, 1.5F, 2, 1, 2);
         wirelessModule.addChild(antennaTip);
+
+        entityScannerModule = moduleRoot();
+        entityScannerModule.addBox(-2.5F, -5.4F, -6.2F, 5, 2, 2);
+        ModelRenderer scannerEye = new ModelRenderer(this, 60, 4);
+        scannerEye.addBox(-1.0F, -5.9F, -6.8F, 2, 1, 1);
+        entityScannerModule.addChild(scannerEye);
+
+        combatModule = moduleRoot();
+        combatModule.addBox(-4.5F, 1.8F, -1.5F, 2, 2, 3);
+        combatModule.addBox(2.5F, 1.8F, -1.5F, 2, 2, 3);
+
+        containmentModule = moduleRoot();
+        containmentModule.addBox(-3.5F, 2.0F, 1.8F, 7, 4, 3);
+        ModelRenderer containmentCore = new ModelRenderer(this, 60, 4);
+        containmentCore.addBox(-1.0F, 3.0F, 1.2F, 2, 2, 1);
+        containmentModule.addChild(containmentCore);
+
+        waterproofModule = moduleRoot();
+        waterproofModule.addBox(-5.4F, -3.4F, -6.4F, 11, 1, 13);
+
+        selfRepairModule = moduleRoot();
+        selfRepairModule.addBox(-1.5F, -5.2F, 2.0F, 3, 2, 4);
+        ModelRenderer repairArm = new ModelRenderer(this, 56, 12);
+        repairArm.addBox(-0.5F, -7.0F, 3.0F, 1, 2, 1);
+        selfRepairModule.addChild(repairArm);
+
+        secureAccessModule = moduleRoot();
+        secureAccessModule.addBox(-1.8F, -4.8F, -1.8F, 4, 1, 4);
+        ModelRenderer securityCore = new ModelRenderer(this, 60, 4);
+        securityCore.addBox(-0.5F, -5.5F, -0.5F, 1, 1, 1);
+        secureAccessModule.addChild(securityCore);
+
+        advancedItemModule = moduleRoot();
+        advancedItemModule.addBox(-6.5F, -1.0F, 1.5F, 2, 4, 4);
+        advancedItemModule.addBox(4.5F, -1.0F, 1.5F, 2, 4, 4);
+
+        fleetCommunicationModule = moduleRoot();
+        fleetCommunicationModule.addBox(-3.5F, -5.2F, 3.5F, 7, 1, 2);
+        ModelRenderer fleetAntenna = new ModelRenderer(this, 60, 4);
+        fleetAntenna.addBox(-0.5F, -9.0F, 4.0F, 1, 4, 1);
+        fleetCommunicationModule.addChild(fleetAntenna);
     }
 
     private ModelRenderer moduleRoot() {
@@ -128,13 +177,19 @@ public final class ModelProgrammableDrone extends ModelBase {
             float netHeadYaw, float headPitch, float scaleFactor, Entity entity) {
         float energyFactor = entity instanceof EntityProgrammableDrone drone && drone.getEnergyPercent() <= 0
                 ? 0.0F : 1.0F;
+        if (entity instanceof EntityProgrammableDrone drone && !drone.areVisualRotorsActive()) energyFactor = 0.0F;
         float propulsionFactor = entity instanceof EntityProgrammableDrone drone
                 && drone.hasVisualUpgrade(DroneUpgradeType.PROPULSION) ? 1.35F : 1.0F;
         for (int i = 0; i < rotors.length; i++) {
             rotors[i].rotateAngleY = ageInTicks * (1.4F + i * 0.08F) * energyFactor * propulsionFactor;
         }
         root.rotateAngleZ = limbSwingAmount * 0.08F;
-        toolArm.rotateAngleX = (float) Math.sin(ageInTicks * 0.15F) * 0.04F;
+        float attack = entity instanceof EntityProgrammableDrone drone
+                ? drone.getAttackAnimationProgress(ageInTicks - entity.ticksExisted) : 0.0F;
+        toolArm.showModel = entity instanceof EntityProgrammableDrone drone
+                && (drone.hasVisualUpgrade(DroneUpgradeType.TOOL_ARM)
+                || drone.hasVisualUpgrade(DroneUpgradeType.COMBAT));
+        toolArm.rotateAngleX = (float) Math.sin(ageInTicks * 0.15F) * 0.04F - attack * 1.15F;
     }
 
     public void renderStatusLights(float scale) {
@@ -149,6 +204,19 @@ public final class ModelProgrammableDrone extends ModelBase {
             case EFFICIENCY -> efficiencyModule.render(scale);
             case CARGO -> cargoModule.render(scale);
             case WIRELESS -> wirelessModule.render(scale);
+            case ENTITY_SCANNER -> entityScannerModule.render(scale);
+            case COMBAT -> combatModule.render(scale);
+            case ENTITY_CONTAINMENT -> containmentModule.render(scale);
+            case WATERPROOF -> waterproofModule.render(scale);
+            case SELF_REPAIR -> selfRepairModule.render(scale);
+            case SECURE_ACCESS -> secureAccessModule.render(scale);
+            case ADVANCED_ITEM_HANDLING -> advancedItemModule.render(scale);
+            case FLEET_COMMUNICATION -> fleetCommunicationModule.render(scale);
         }
+    }
+
+    public void postRenderToolArm(float scale) {
+        root.postRender(scale);
+        toolArm.postRender(scale);
     }
 }

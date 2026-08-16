@@ -96,7 +96,6 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem HIGH_VOLTAGE_WIRE;
 
     // Loot Table
-    public static MetaItem<?>.MetaValueItem LOOT_TABLE_TEST;
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_STONE_AGE;
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_STEAM_AGE;
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_LV;

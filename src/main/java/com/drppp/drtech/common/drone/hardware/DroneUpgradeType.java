@@ -11,7 +11,18 @@ public enum DroneUpgradeType {
     CARGO(3, "cargo"),
     WIRELESS(4, "wireless"),
     FLUID_CARGO(5, "fluid_cargo"),
-    CRAFTING(6, "crafting");
+    CRAFTING(6, "crafting"),
+    ADVANCED_NAVIGATION(7, "advanced_navigation"),
+    EU_INTERFACE(8, "eu_interface"),
+    TOOL_ARM(9, "tool_arm"),
+    ENTITY_SCANNER(10, "entity_scanner"),
+    COMBAT(11, "combat"),
+    ENTITY_CONTAINMENT(12, "entity_containment"),
+    WATERPROOF(13, "waterproof"),
+    SELF_REPAIR(14, "self_repair"),
+    SECURE_ACCESS(15, "secure_access"),
+    ADVANCED_ITEM_HANDLING(16, "advanced_item_handling"),
+    FLEET_COMMUNICATION(17, "fleet_communication");
 
     private final int metadata;
     private final String serializedName;

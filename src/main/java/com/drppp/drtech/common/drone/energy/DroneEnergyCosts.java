@@ -8,6 +8,7 @@ public final class DroneEnergyCosts {
     public static final long PATHFIND = 32L;
     public static final long BLOCK_INTERACTION = 128L;
     public static final long ENTITY_INTERACTION = 128L;
+    public static final long SELF_REPAIR = 512L;
     public static final long TELEPORT = 32_768L;
 
     private DroneEnergyCosts() {}

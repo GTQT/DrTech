@@ -26,6 +26,10 @@ public interface DroneBlockActionService {
         return DroneExecutionResult.error("Block interaction is unavailable in this runtime environment");
     }
 
+    default DroneExecutionResult useItem(DroneItemFilter filter, boolean sneaking) {
+        return DroneExecutionResult.error("Item use is unavailable in this runtime environment");
+    }
+
     default DroneExecutionResult harvestCrop(BlockPos target) {
         return DroneExecutionResult.error("Crop harvesting is unavailable in this runtime environment");
     }

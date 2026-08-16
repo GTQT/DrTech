@@ -30,8 +30,13 @@ public final class DroneEuTransfer {
     private DroneEuTransfer() {}
 
     public static Result importToDrone(DroneEnergyStorage drone, DroneEuEndpoint source, long requested) {
+        return importToDrone(drone, source, requested, 1);
+    }
+
+    public static Result importToDrone(DroneEnergyStorage drone, DroneEuEndpoint source, long requested,
+            int maximumAmperage) {
         if (drone == null || source == null || !source.outputsEnergy()) return result(Status.INVALID_ENDPOINT);
-        long packet = packetLimit(drone, requested);
+        long packet = packetLimit(drone, requested, maximumAmperage);
         if (source.getOutputVoltage() <= 0L || source.getOutputVoltage() > GTValues.V[drone.getTier()]) {
             return result(Status.OVERVOLTAGE);
         }
@@ -48,8 +53,13 @@ public final class DroneEuTransfer {
     }
 
     public static Result exportFromDrone(DroneEnergyStorage drone, DroneEuEndpoint target, long requested) {
+        return exportFromDrone(drone, target, requested, 1);
+    }
+
+    public static Result exportFromDrone(DroneEnergyStorage drone, DroneEuEndpoint target, long requested,
+            int maximumAmperage) {
         if (drone == null || target == null || !target.inputsEnergy()) return result(Status.INVALID_ENDPOINT);
-        long packet = packetLimit(drone, requested);
+        long packet = packetLimit(drone, requested, maximumAmperage);
         if (target.getInputVoltage() <= 0L || target.getInputVoltage() < GTValues.V[drone.getTier()]) {
             return result(Status.OVERVOLTAGE);
         }
@@ -70,10 +80,10 @@ public final class DroneEuTransfer {
         return (int) Math.min(100L, endpoint.getStored() * 100L / endpoint.getCapacity());
     }
 
-    private static long packetLimit(DroneEnergyStorage drone, long requested) {
+    private static long packetLimit(DroneEnergyStorage drone, long requested, int maximumAmperage) {
         long requestedBounded = Math.max(1L, requested);
         long voltage = GTValues.V[Math.max(0, Math.min(GTValues.V.length - 1, drone.getTier()))];
-        return Math.min(requestedBounded, voltage);
+        return Math.min(requestedBounded, safeMultiply(voltage, Math.max(1, maximumAmperage)));
     }
 
     private static Result result(Status status) {

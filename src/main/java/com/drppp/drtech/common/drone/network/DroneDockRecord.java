@@ -22,10 +22,18 @@ public final class DroneDockRecord {
     private final long availableEu;
     private final boolean enabled;
     private final boolean canAcceptDrone;
+    private final String occupancyState;
 
     public DroneDockRecord(UUID dockId, int dimension, BlockPos position, @Nullable UUID ownerId, String name,
             int tier, int priority, long lastHeartbeat, boolean loaded, int currentLoad, long availableEu,
             boolean enabled, boolean canAcceptDrone) {
+        this(dockId, dimension, position, ownerId, name, tier, priority, lastHeartbeat, loaded,
+                currentLoad, availableEu, enabled, canAcceptDrone, currentLoad > 0 ? "STORED" : "FREE");
+    }
+
+    public DroneDockRecord(UUID dockId, int dimension, BlockPos position, @Nullable UUID ownerId, String name,
+            int tier, int priority, long lastHeartbeat, boolean loaded, int currentLoad, long availableEu,
+            boolean enabled, boolean canAcceptDrone, String occupancyState) {
         if (dockId == null || position == null) throw new IllegalArgumentException("Dock id and position are required");
         this.dockId = dockId;
         this.dimension = dimension;
@@ -40,6 +48,8 @@ public final class DroneDockRecord {
         this.availableEu = Math.max(0L, availableEu);
         this.enabled = enabled;
         this.canAcceptDrone = canAcceptDrone;
+        this.occupancyState = "RESERVED".equals(occupancyState) || "STORED".equals(occupancyState)
+                ? occupancyState : "FREE";
     }
 
     public UUID getDockId() { return dockId; }
@@ -55,6 +65,7 @@ public final class DroneDockRecord {
     public long getAvailableEu() { return availableEu; }
     public boolean isEnabled() { return enabled; }
     public boolean canAcceptDrone() { return canAcceptDrone; }
+    public String getOccupancyState() { return occupancyState; }
 
     public NBTTagCompound writeToNbt() {
         NBTTagCompound tag = new NBTTagCompound();
@@ -71,6 +82,7 @@ public final class DroneDockRecord {
         tag.setLong("AvailableEU", availableEu);
         tag.setBoolean("Enabled", enabled);
         tag.setBoolean("CanAcceptDrone", canAcceptDrone);
+        tag.setString("OccupancyState", occupancyState);
         return tag;
     }
 
@@ -78,11 +90,13 @@ public final class DroneDockRecord {
     public static DroneDockRecord readFromNbt(NBTTagCompound tag) {
         UUID id = readUuid(tag, "DockId");
         if (id == null || !tag.hasKey("Position", 4)) return null;
+        String occupancy = tag.hasKey("OccupancyState", 8) ? tag.getString("OccupancyState")
+                : tag.getInteger("CurrentLoad") > 0 ? "STORED" : "FREE";
         return new DroneDockRecord(id, tag.getInteger("Dimension"), BlockPos.fromLong(tag.getLong("Position")),
                 readUuid(tag, "Owner"), tag.getString("Name"), tag.getInteger("Tier"),
                 tag.getInteger("Priority"), tag.getLong("LastHeartbeat"), tag.getBoolean("Loaded"),
                 tag.getInteger("CurrentLoad"), tag.getLong("AvailableEU"), tag.getBoolean("Enabled"),
-                tag.getBoolean("CanAcceptDrone"));
+                tag.getBoolean("CanAcceptDrone"), occupancy);
     }
 
     @Nullable

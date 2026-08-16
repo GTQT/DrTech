@@ -15,6 +15,7 @@ import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import com.drppp.drtech.common.drone.energy.DroneEnergyStorage;
 import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
 import com.drppp.drtech.common.drone.item.DroneItemData;
@@ -46,6 +47,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /** Tiered EU endpoint, program deployer and persistent home for programmable drones. */
@@ -65,6 +67,8 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     private boolean autoRecover = true;
     private boolean pendingResume;
     private int priority;
+    /** 0: ignore redstone, 1: require powered, 2: require unpowered. */
+    private int redstoneMode;
 
     /**
      * UI snapshots.  The dock logic always uses the server fields above; these copies only exist so the client can
@@ -73,6 +77,9 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     private boolean clientDockEnabled = true;
     private boolean clientAutoLaunch;
     private boolean clientLaunchReady;
+    private int clientPriority;
+    private boolean clientRedstonePowered;
+    private boolean clientRedstoneUnpowered;
 
     /** Compatibility constructor retained for the original fixed ID 901 HV dock. */
     public MetaTileEntityDroneDock(ResourceLocation metaTileEntityId) {
@@ -135,7 +142,7 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
 
     private boolean canLaunchStoredDrone() {
         ItemStack stack = importItems.getStackInSlot(DRONE_SLOT);
-        if (!enabled || stack.isEmpty()) return false;
+        if (!enabled || !isRedstoneAllowed() || stack.isEmpty()) return false;
         IElectricItem electricItem = stack.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
         if (electricItem == null || electricItem.getMaxCharge() <= 0L) return false;
         return electricItem.getCharge() * 100L / electricItem.getMaxCharge() >= 90L;
@@ -213,7 +220,7 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     }
 
     public boolean requestBoundDroneRecall(EntityPlayer requester) {
-        if (getWorld() == null || getWorld().isRemote || !canControl(requester)) return false;
+        if (getWorld() == null || getWorld().isRemote || !isRedstoneAllowed() || !canControl(requester)) return false;
         int radius = 128 << Math.max(0, getTier() - GTValues.HV);
         AxisAlignedBB search = new AxisAlignedBB(getPos()).grow(radius);
         List<EntityProgrammableDrone> drones = getWorld().getEntitiesWithinAABB(
@@ -252,12 +259,15 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     private void updateNetworkHeartbeat() {
         if (getWorld() == null || getWorld().isRemote || getPos() == null) return;
         long now = getWorld().getTotalWorldTime();
-        boolean canAccept = enabled && currentDroneId == null && importItems.getStackInSlot(DRONE_SLOT).isEmpty();
+        boolean canAccept = enabled && isRedstoneAllowed() && currentDroneId == null
+                && importItems.getStackInSlot(DRONE_SLOT).isEmpty();
+        boolean storedDrone = !importItems.getStackInSlot(DRONE_SLOT).isEmpty();
+        String occupancyState = currentDroneId != null ? "RESERVED" : storedDrone ? "STORED" : "FREE";
         DroneDockNetwork network = DroneDockNetwork.get(getWorld());
         network.heartbeat(new DroneDockRecord(dockId, getWorld().provider.getDimension(), getPos(), ownerId,
                 dockName, getTier(), priority, now, true,
                 currentDroneId == null && importItems.getStackInSlot(DRONE_SLOT).isEmpty() ? 0 : 1,
-                energyContainer.getEnergyStored(), enabled, canAccept));
+                energyContainer.getEnergyStored(), enabled, canAccept, occupancyState));
         if (now % 1_200L == 0L) network.prune(now);
     }
 
@@ -271,7 +281,7 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     }
 
     public boolean isAvailableForDrone() {
-        return getWorld() != null && !getWorld().isRemote && enabled
+        return getWorld() != null && !getWorld().isRemote && enabled && isRedstoneAllowed()
                 && energyContainer.getEnergyStored() > 0L;
     }
 
@@ -283,6 +293,50 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
     public boolean isAutoLaunch() { return autoLaunch; }
     public boolean isAutoRecover() { return autoRecover; }
     public int getPriority() { return priority; }
+    public int getRedstoneMode() { return redstoneMode; }
+
+    public static int clampPriority(int value) {
+        return Math.max(-100, Math.min(100, value));
+    }
+
+    public static int cycleRedstoneMode(int mode) {
+        return (mode + 1) % 3;
+    }
+
+    public static String sanitizeDockName(String value) {
+        if (value == null) return "Drone Dock";
+        StringBuilder clean = new StringBuilder(32);
+        String source = value.trim();
+        for (int index = 0; index < source.length() && clean.length() < 32; index++) {
+            char character = source.charAt(index);
+            if (character == '\u00a7') {
+                if (index + 1 < source.length()) index++;
+                continue;
+            }
+            if (!Character.isISOControl(character)) clean.append(character);
+        }
+        String result = clean.toString().trim();
+        return result.isEmpty() ? "Drone Dock" : result;
+    }
+
+    private void updateDockNameFromUi(@Nullable EntityPlayer player, String value) {
+        String clean = sanitizeDockName(value);
+        if (getWorld() != null && getWorld().isRemote) {
+            dockName = clean;
+            return;
+        }
+        if (!canControl(player) || Objects.equals(dockName, clean)) return;
+        dockName = clean;
+        markDirty();
+        updateNetworkHeartbeat();
+    }
+
+    private boolean isRedstoneAllowed() {
+        if (redstoneMode == 0 || getWorld() == null) return true;
+        boolean powered = getWorld().isBlockPowered(getPos())
+                || getWorld().getRedstonePowerFromNeighbors(getPos()) > 0;
+        return redstoneMode == 1 ? powered : !powered;
+    }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
@@ -296,6 +350,7 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         data.setBoolean("AutoRecover", autoRecover);
         data.setBoolean("PendingResume", pendingResume);
         data.setInteger("Priority", priority);
+        data.setInteger("RedstoneMode", redstoneMode);
         return data;
     }
 
@@ -305,12 +360,13 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         dockId = readUuid(data, "DockId", initialDockId);
         ownerId = readUuid(data, "Owner", null);
         currentDroneId = readUuid(data, "CurrentDrone", null);
-        dockName = data.hasKey("DockName", 8) ? data.getString("DockName") : "Drone Dock";
+        dockName = sanitizeDockName(data.hasKey("DockName", 8) ? data.getString("DockName") : "Drone Dock");
         enabled = !data.hasKey("Enabled") || data.getBoolean("Enabled");
         autoLaunch = data.getBoolean("AutoLaunch");
         autoRecover = !data.hasKey("AutoRecover") || data.getBoolean("AutoRecover");
         pendingResume = data.getBoolean("PendingResume");
-        priority = Math.max(-100, Math.min(100, data.getInteger("Priority")));
+        priority = clampPriority(data.getInteger("Priority"));
+        redstoneMode = Math.max(0, Math.min(2, data.getInteger("RedstoneMode")));
     }
 
     @Nullable
@@ -350,10 +406,27 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
                 enabled = !enabled;
                 markDirty();
                 updateNetworkHeartbeat();
+            } else if ("PRIORITY_DOWN".equals(command) && canControl(guiData.getPlayer())) {
+                priority = clampPriority(priority - 1);
+                markDirty();
+                updateNetworkHeartbeat();
+            } else if ("PRIORITY_UP".equals(command) && canControl(guiData.getPlayer())) {
+                priority = clampPriority(priority + 1);
+                markDirty();
+                updateNetworkHeartbeat();
+            } else if ("REDSTONE".equals(command) && canControl(guiData.getPlayer())) {
+                redstoneMode = cycleRedstoneMode(redstoneMode);
+                markDirty();
+                updateNetworkHeartbeat();
             }
         });
         return GTGuis.createPanel(this, 176, 230)
                 .child(IKey.lang(getMetaFullName()).asWidget().pos(5, 5))
+                .child(IKey.lang("drtech.drone.dock.name").asWidget().pos(5, 18))
+                .child(new TextFieldWidget().pos(39, 14).size(129, 14).setMaxLength(32)
+                        .setValidator(MetaTileEntityDroneDock::sanitizeDockName)
+                        .value(SyncHandlers.string(() -> dockName,
+                                value -> updateDockNameFromUi(guiData.getPlayer(), value))))
                 .child(IKey.lang("drtech.drone.dock.charge_slot").asWidget().pos(25, 31))
                 .child(IKey.lang("drtech.drone.dock.program_slot").asWidget().pos(101, 31))
                 .child(new ItemSlot().slot(SyncHandlers.itemSlot(importItems, DRONE_SLOT)
@@ -364,9 +437,16 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
                 .child(controlButton("drtech.drone.dock.recall", "RECALL", 62, 73, syncManager))
                 .child(controlButton(IKey.lang(this::getAutoLaunchToggleKey), "AUTO", 116, 73, 52, syncManager))
                 .child(controlButton(IKey.lang(this::getDockEnableToggleKey), "ENABLE", 8, 92, 160, syncManager))
-                .child(IKey.lang(this::getDockEnabledStatusKey).asWidget().pos(8, 112))
-                .child(IKey.lang(this::getAutoLaunchStatusKey).asWidget().pos(8, 123))
-                .child(IKey.lang(this::getLaunchReadinessStatusKey).asWidget().pos(8, 134))
+                .child(controlButton(IKey.lang("drtech.drone.dock.priority.down"),
+                        "PRIORITY_DOWN", 8, 111, 24, syncManager))
+                .child(IKey.lang("drtech.drone.dock.priority.status",
+                        () -> new Object[] {clientPriority}).asWidget().pos(37, 115))
+                .child(controlButton(IKey.lang("drtech.drone.dock.priority.up"),
+                        "PRIORITY_UP", 145, 111, 24, syncManager))
+                .child(controlButton(IKey.lang(this::getRedstoneModeKey), "REDSTONE", 8, 130, 160, syncManager))
+                .child(IKey.lang(this::getDockEnabledStatusKey).asWidget().pos(8, 149))
+                .child(IKey.lang(this::getAutoLaunchStatusKey).asWidget().pos(8, 160))
+                .child(IKey.lang(this::getLaunchReadinessStatusKey).asWidget().pos(8, 171))
                 .child(SlotGroupWidget.playerInventory(false).left(7).bottom(7));
     }
 
@@ -404,6 +484,24 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
                 .adapter(ByteBufAdapters.BOOL)
                 .copyImmutable()
                 .build());
+        syncManager.syncValue("dock_priority", 0, GenericSyncValue.builder(Integer.class)
+                .getter(() -> priority)
+                .setter(value -> clientPriority = value)
+                .adapter(ByteBufAdapters.INT)
+                .copyImmutable()
+                .build());
+        syncManager.syncValue("dock_redstone_powered", 0, GenericSyncValue.builder(Boolean.class)
+                .getter(() -> redstoneMode == 1)
+                .setter(value -> clientRedstonePowered = value)
+                .adapter(ByteBufAdapters.BOOL)
+                .copyImmutable()
+                .build());
+        syncManager.syncValue("dock_redstone_unpowered", 0, GenericSyncValue.builder(Boolean.class)
+                .getter(() -> redstoneMode == 2)
+                .setter(value -> clientRedstoneUnpowered = value)
+                .adapter(ByteBufAdapters.BOOL)
+                .copyImmutable()
+                .build());
     }
 
     private String getDockEnableToggleKey() {
@@ -427,6 +525,12 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         if (!clientDockEnabled) return "drtech.drone.dock.status.launch.disabled";
         return clientLaunchReady ? "drtech.drone.dock.status.launch.ready"
                 : "drtech.drone.dock.status.launch.charging";
+    }
+
+    private String getRedstoneModeKey() {
+        return !clientRedstonePowered && !clientRedstoneUnpowered ? "drtech.drone.dock.redstone.ignore"
+                : clientRedstonePowered ? "drtech.drone.dock.redstone.powered"
+                : "drtech.drone.dock.redstone.unpowered";
     }
 
     @Override

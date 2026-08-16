@@ -21,15 +21,17 @@ public final class DroneNodeDefinition {
     private final ResourceLocation id;
     private final String translationKey;
     private final String category;
+    private final String iconKey;
     private final FlowRole flowRole;
     private final Map<String, DronePortDefinition> ports;
     private final Map<String, DroneNodePropertyDefinition> properties;
 
-    private DroneNodeDefinition(ResourceLocation id, String translationKey, String category, FlowRole flowRole,
+    private DroneNodeDefinition(ResourceLocation id, String translationKey, String category, String iconKey, FlowRole flowRole,
             Collection<DronePortDefinition> ports, Collection<DroneNodePropertyDefinition> properties) {
         this.id = Objects.requireNonNull(id, "id");
         this.translationKey = Objects.requireNonNull(translationKey, "translationKey");
         this.category = Objects.requireNonNull(category, "category");
+        this.iconKey = Objects.requireNonNull(iconKey, "iconKey");
         this.flowRole = Objects.requireNonNull(flowRole, "flowRole");
         LinkedHashMap<String, DronePortDefinition> portMap = new LinkedHashMap<>();
         for (DronePortDefinition port : ports) {
@@ -62,6 +64,8 @@ public final class DroneNodeDefinition {
     public String getCategory() {
         return category;
     }
+    public String getIconKey() { return iconKey; }
+    public String getCategorySymbolKey() { return "drtech.drone.category." + category; }
 
     public FlowRole getFlowRole() {
         return flowRole;
@@ -87,11 +91,13 @@ public final class DroneNodeDefinition {
         private final Collection<DroneNodePropertyDefinition> properties = new ArrayList<>();
         private String category = "misc";
         private String translationKey;
+        private String iconKey;
 
         private Builder(ResourceLocation id, FlowRole flowRole) {
             this.id = Objects.requireNonNull(id, "id");
             this.flowRole = Objects.requireNonNull(flowRole, "flowRole");
             this.translationKey = "drtech.drone.node." + id.getPath();
+            this.iconKey = "drtech.drone.icon." + id.getPath();
         }
 
         public Builder category(String category) {
@@ -104,6 +110,8 @@ public final class DroneNodeDefinition {
             return this;
         }
 
+        public Builder iconKey(String iconKey) { this.iconKey = iconKey; return this; }
+
         public Builder port(DronePortDefinition port) {
             this.ports.add(port);
             return this;
@@ -115,7 +123,7 @@ public final class DroneNodeDefinition {
         }
 
         public DroneNodeDefinition build() {
-            return new DroneNodeDefinition(id, translationKey, category, flowRole, ports, properties);
+            return new DroneNodeDefinition(id, translationKey, category, iconKey, flowRole, ports, properties);
         }
     }
 }

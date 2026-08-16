@@ -8,6 +8,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /** One validated program snapshot owned by a player. */
 public final class DroneProgramLibraryRecord {
@@ -30,6 +33,17 @@ public final class DroneProgramLibraryRecord {
     public int getEdgeCount() { return graph.getEdges().size(); }
     public long getUpdatedAt() { return updatedAt; }
     public DroneProgramGraph getGraph() { return graph.copy(); }
+    public String getSignature() {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(DroneProgramNbtCodec.write(graph).toString().getBytes(StandardCharsets.UTF_8));
+            StringBuilder result = new StringBuilder(64);
+            for (byte value : digest) result.append(String.format("%02x", value & 0xff));
+            return result.toString();
+        } catch (NoSuchAlgorithmException impossible) {
+            throw new IllegalStateException("SHA-256 unavailable", impossible);
+        }
+    }
 
     public NBTTagCompound writeToNbt() {
         NBTTagCompound tag = new NBTTagCompound();

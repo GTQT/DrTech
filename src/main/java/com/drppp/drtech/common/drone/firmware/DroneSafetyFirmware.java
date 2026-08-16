@@ -3,7 +3,8 @@ package com.drppp.drtech.common.drone.firmware;
 import net.minecraft.nbt.NBTTagCompound;
 
 /**
- * Persistent low-energy policy kept outside the visual program runtime.
+ * Built-in persistent low-energy policy kept outside the visual program runtime. It is part of every chassis,
+ * rather than a removable module, so recall and emergency landing remain available to legacy drones.
  *
  * <p>The firmware only decides state; the entity owns movement, docking and EU mutation.</p>
  */

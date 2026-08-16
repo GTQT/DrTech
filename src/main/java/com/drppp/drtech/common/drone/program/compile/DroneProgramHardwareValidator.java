@@ -134,6 +134,20 @@ public final class DroneProgramHardwareValidator {
                 DrTechDroneNodes.CRAFT_ITEMS, DrTechDroneNodes.CAN_CRAFT,
                 DrTechDroneNodes.CRAFTABLE_COUNT, DrTechDroneNodes.CRAFT_GRID
         });
+        requirements.put(DroneUpgradeType.TOOL_ARM, new ResourceLocation[] {
+                DrTechDroneNodes.INTERACT_ENTITY, DrTechDroneNodes.USE_ITEM_ON_ENTITY,
+                DrTechDroneNodes.EDIT_SIGN
+        });
+        requirements.put(DroneUpgradeType.ENTITY_SCANNER, new ResourceLocation[] {
+                DrTechDroneNodes.ENTITY_COUNT, DrTechDroneNodes.ENTITY_SENSOR,
+                DrTechDroneNodes.FOLLOW_ENTITY, DrTechDroneNodes.AVOID_ENTITY
+        });
+        requirements.put(DroneUpgradeType.COMBAT, new ResourceLocation[] {
+                DrTechDroneNodes.ATTACK_ENTITY
+        });
+        requirements.put(DroneUpgradeType.ENTITY_CONTAINMENT, new ResourceLocation[] {
+                DrTechDroneNodes.LOAD_ENTITY, DrTechDroneNodes.RELEASE_ENTITY
+        });
         return requirements;
     }
 }

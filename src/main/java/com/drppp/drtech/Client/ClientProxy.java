@@ -4,6 +4,7 @@ import com.brachy84.mechtech.MechTech;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.CommonProxy;
+import com.drppp.drtech.Client.drone.DroneWorldPreviewRenderer;
 import com.drppp.drtech.hooked.HookClientHooks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
 public class ClientProxy extends CommonProxy {
     public ClientProxy() {
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new DroneWorldPreviewRenderer());
     }
     public void preLoad() {
         super.preLoad();

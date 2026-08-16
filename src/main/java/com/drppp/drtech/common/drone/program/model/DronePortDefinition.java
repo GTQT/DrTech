@@ -57,4 +57,10 @@ public final class DronePortDefinition {
     public boolean allowsMultipleConnections() {
         return multipleConnections;
     }
+
+    /** Stable visual key for the editor; direction/type remain the source of truth. */
+    public String getShapeKey() {
+        return "drtech.drone.port." + direction.name().toLowerCase(java.util.Locale.ROOT)
+                + "." + type.name().toLowerCase(java.util.Locale.ROOT);
+    }
 }

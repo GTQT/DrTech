@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.function.Predicate;
 
 /** Immutable bounded coordinate region shared by the compiler, editor and runtime. */
@@ -16,9 +17,61 @@ public final class DroneArea {
 
     public enum TraversalOrder {
         SERPENTINE,
+        XYZ,
+        XZY,
+        YXZ,
+        YZX,
+        ZXY,
+        ZYX,
+        NEAREST_FIRST,
+        BOTTOM_UP,
         REVERSE,
         TOP_DOWN,
-        RANDOMIZED
+        RANDOMIZED;
+
+        public static TraversalOrder fromName(String name) {
+            if (name == null || name.isEmpty()) return SERPENTINE;
+            try {
+                return valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+                return SERPENTINE;
+            }
+        }
+    }
+
+    public enum CuboidSurface {
+        HOLLOW,
+        FRAME,
+        UP,
+        DOWN,
+        NORTH,
+        SOUTH,
+        WEST,
+        EAST;
+
+        public static CuboidSurface fromName(String name) {
+            if (name == null || name.isEmpty()) return HOLLOW;
+            try {
+                return valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+                return HOLLOW;
+            }
+        }
+    }
+
+    public enum Axis {
+        X,
+        Y,
+        Z;
+
+        public static Axis fromName(String name) {
+            if (name == null || name.isEmpty()) return Y;
+            try {
+                return valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+                return Y;
+            }
+        }
     }
 
     public static final int MAX_AXIS_LENGTH = 32;
@@ -101,6 +154,47 @@ public final class DroneArea {
         return new DroneArea(first, second);
     }
 
+    /** Selects a cuboid shell, its edge frame, or one of its six faces. */
+    public static DroneArea cuboidSurface(BlockPos first, BlockPos second, CuboidSurface surface) {
+        Objects.requireNonNull(first, "first");
+        Objects.requireNonNull(second, "second");
+        CuboidSurface checked = surface == null ? CuboidSurface.HOLLOW : surface;
+        BlockPos boundsMin = new BlockPos(Math.min(first.getX(), second.getX()),
+                Math.min(first.getY(), second.getY()), Math.min(first.getZ(), second.getZ()));
+        BlockPos boundsMax = new BlockPos(Math.max(first.getX(), second.getX()),
+                Math.max(first.getY(), second.getY()), Math.max(first.getZ(), second.getZ()));
+        if (boundsMax.getX() - boundsMin.getX() + 1 > MAX_AXIS_LENGTH
+                || boundsMax.getY() - boundsMin.getY() + 1 > MAX_AXIS_LENGTH
+                || boundsMax.getZ() - boundsMin.getZ() + 1 > MAX_AXIS_LENGTH) {
+            throw new IllegalArgumentException("Cuboid surface exceeds runtime axis limit");
+        }
+        DroneArea area = new DroneArea(boundsMin, boundsMax, position -> {
+            boolean xBoundary = position.getX() == boundsMin.getX() || position.getX() == boundsMax.getX();
+            boolean yBoundary = position.getY() == boundsMin.getY() || position.getY() == boundsMax.getY();
+            boolean zBoundary = position.getZ() == boundsMin.getZ() || position.getZ() == boundsMax.getZ();
+            switch (checked) {
+                case FRAME:
+                    return (xBoundary ? 1 : 0) + (yBoundary ? 1 : 0) + (zBoundary ? 1 : 0) >= 2;
+                case UP:
+                    return position.getY() == boundsMax.getY();
+                case DOWN:
+                    return position.getY() == boundsMin.getY();
+                case NORTH:
+                    return position.getZ() == boundsMin.getZ();
+                case SOUTH:
+                    return position.getZ() == boundsMax.getZ();
+                case WEST:
+                    return position.getX() == boundsMin.getX();
+                case EAST:
+                    return position.getX() == boundsMax.getX();
+                default:
+                    return xBoundary || yBoundary || zBoundary;
+            }
+        });
+        if (!area.isWithinRuntimeLimits()) throw new IllegalArgumentException("Cuboid surface exceeds runtime area limit");
+        return area;
+    }
+
     public static DroneArea sphere(BlockPos center, int radius, boolean hollow) {
         Objects.requireNonNull(center, "center");
         if (radius < 1 || radius > 15) throw new IllegalArgumentException("Sphere radius must be 1..15");
@@ -120,25 +214,113 @@ public final class DroneArea {
 
     /** Creates a vertical cylinder whose center input is the center of its bottom layer. */
     public static DroneArea cylinder(BlockPos baseCenter, int radius, int height, boolean hollow) {
+        return cylinder(baseCenter, radius, height, hollow, Axis.Y);
+    }
+
+    /** Creates a cylinder extending from its base center along the positive selected axis. */
+    public static DroneArea cylinder(BlockPos baseCenter, int radius, int height, boolean hollow, Axis axis) {
         Objects.requireNonNull(baseCenter, "baseCenter");
         if (radius < 1 || radius > 15) throw new IllegalArgumentException("Cylinder radius must be 1..15");
         if (height < 1 || height > MAX_AXIS_LENGTH) {
             throw new IllegalArgumentException("Cylinder height must be 1.." + MAX_AXIS_LENGTH);
         }
+        Axis checked = axis == null ? Axis.Y : axis;
         int outerSquared = radius * radius;
         int innerRadius = Math.max(0, radius - 1);
         int innerSquared = innerRadius * innerRadius;
-        BlockPos min = baseCenter.add(-radius, 0, -radius);
-        BlockPos max = baseCenter.add(radius, height - 1, radius);
+        BlockPos min;
+        BlockPos max;
+        switch (checked) {
+            case X:
+                min = baseCenter.add(0, -radius, -radius);
+                max = baseCenter.add(height - 1, radius, radius);
+                break;
+            case Z:
+                min = baseCenter.add(-radius, -radius, 0);
+                max = baseCenter.add(radius, radius, height - 1);
+                break;
+            default:
+                min = baseCenter.add(-radius, 0, -radius);
+                max = baseCenter.add(radius, height - 1, radius);
+        }
         return new DroneArea(min, max, position -> {
-            long dx = position.getX() - baseCenter.getX();
-            long dz = position.getZ() - baseCenter.getZ();
-            long distanceSquared = dx * dx + dz * dz;
-            boolean cap = position.getY() == baseCenter.getY()
-                    || position.getY() == baseCenter.getY() + height - 1;
+            long firstRadial;
+            long secondRadial;
+            int axial;
+            switch (checked) {
+                case X:
+                    axial = position.getX() - baseCenter.getX();
+                    firstRadial = position.getY() - baseCenter.getY();
+                    secondRadial = position.getZ() - baseCenter.getZ();
+                    break;
+                case Z:
+                    axial = position.getZ() - baseCenter.getZ();
+                    firstRadial = position.getX() - baseCenter.getX();
+                    secondRadial = position.getY() - baseCenter.getY();
+                    break;
+                default:
+                    axial = position.getY() - baseCenter.getY();
+                    firstRadial = position.getX() - baseCenter.getX();
+                    secondRadial = position.getZ() - baseCenter.getZ();
+            }
+            long distanceSquared = firstRadial * firstRadial + secondRadial * secondRadial;
+            boolean cap = axial == 0 || axial == height - 1;
             return distanceSquared <= outerSquared
                     && (!hollow || cap || distanceSquared > innerSquared);
         });
+    }
+
+    /** Creates a square pyramid extending from its base center along the positive selected axis. */
+    public static DroneArea pyramid(BlockPos baseCenter, int radius, int height, boolean hollow, Axis axis) {
+        Objects.requireNonNull(baseCenter, "baseCenter");
+        if (radius < 1 || radius > 15) throw new IllegalArgumentException("Pyramid radius must be 1..15");
+        if (height < 1 || height > MAX_AXIS_LENGTH) {
+            throw new IllegalArgumentException("Pyramid height must be 1.." + MAX_AXIS_LENGTH);
+        }
+        Axis checked = axis == null ? Axis.Y : axis;
+        BlockPos min;
+        BlockPos max;
+        switch (checked) {
+            case X:
+                min = baseCenter.add(0, -radius, -radius);
+                max = baseCenter.add(height - 1, radius, radius);
+                break;
+            case Z:
+                min = baseCenter.add(-radius, -radius, 0);
+                max = baseCenter.add(radius, radius, height - 1);
+                break;
+            default:
+                min = baseCenter.add(-radius, 0, -radius);
+                max = baseCenter.add(radius, height - 1, radius);
+        }
+        DroneArea area = new DroneArea(min, max, position -> {
+            int layer;
+            int firstRadial;
+            int secondRadial;
+            switch (checked) {
+                case X:
+                    layer = position.getX() - baseCenter.getX();
+                    firstRadial = position.getY() - baseCenter.getY();
+                    secondRadial = position.getZ() - baseCenter.getZ();
+                    break;
+                case Z:
+                    layer = position.getZ() - baseCenter.getZ();
+                    firstRadial = position.getX() - baseCenter.getX();
+                    secondRadial = position.getY() - baseCenter.getY();
+                    break;
+                default:
+                    layer = position.getY() - baseCenter.getY();
+                    firstRadial = position.getX() - baseCenter.getX();
+                    secondRadial = position.getZ() - baseCenter.getZ();
+            }
+            int layerRadius = height == 1 ? radius : (int) Math.ceil(
+                    radius * (height - 1 - layer) / (double) (height - 1));
+            boolean inside = Math.abs(firstRadial) <= layerRadius && Math.abs(secondRadial) <= layerRadius;
+            return inside && (!hollow || layer == 0 || Math.abs(firstRadial) == layerRadius
+                    || Math.abs(secondRadial) == layerRadius);
+        });
+        if (!area.isWithinRuntimeLimits()) throw new IllegalArgumentException("Pyramid exceeds runtime area limit");
+        return area;
     }
 
     /** Creates a deterministic voxel line with an optional spherical thickness. */
@@ -233,6 +415,78 @@ public final class DroneArea {
         List<BlockPos> result = new ArrayList<>();
         for (BlockPos position : mutablePositions()) if (!removed.contains(position)) result.add(position);
         return new DroneArea(result);
+    }
+
+    /** Selects points aligned to per-axis spacing, anchored at the area's minimum corner. */
+    public DroneArea grid(int stepX, int stepY, int stepZ) {
+        if (stepX < 1 || stepX > MAX_AXIS_LENGTH || stepY < 1 || stepY > MAX_AXIS_LENGTH
+                || stepZ < 1 || stepZ > MAX_AXIS_LENGTH) {
+            throw new IllegalArgumentException("Grid steps must be 1.." + MAX_AXIS_LENGTH);
+        }
+        requireMaterializable(this);
+        List<BlockPos> selected = new ArrayList<>();
+        for (BlockPos position : mutablePositions()) {
+            if (Math.floorMod(position.getX() - min.getX(), stepX) == 0
+                    && Math.floorMod(position.getY() - min.getY(), stepY) == 0
+                    && Math.floorMod(position.getZ() - min.getZ(), stepZ) == 0) {
+                selected.add(position);
+            }
+        }
+        return new DroneArea(selected);
+    }
+
+    /** Selects a stable, seed-controlled set of unique points from this area. */
+    public DroneArea randomPoints(int count, long seed) {
+        if (count < 0 || count > MAX_BLOCKS) {
+            throw new IllegalArgumentException("Random point count must be 0.." + MAX_BLOCKS);
+        }
+        requireMaterializable(this);
+        List<BlockPos> shuffled = mutablePositions();
+        Random random = new Random(seed);
+        for (int index = shuffled.size(); index > 1; index--) {
+            Collections.swap(shuffled, index - 1, random.nextInt(index));
+        }
+        int selectedCount = Math.min(count, shuffled.size());
+        return new DroneArea(new ArrayList<>(shuffled.subList(0, selectedCount)));
+    }
+
+    /** Returns the selected area's outer layers using Chebyshev neighbourhood thickness. */
+    public DroneArea boundary(int thickness) {
+        if (thickness < 1 || thickness > 4) {
+            throw new IllegalArgumentException("Area boundary thickness must be 1..4");
+        }
+        requireMaterializable(this);
+        DroneArea interior = inset(thickness);
+        return interior.volume == 0L ? this : difference(interior);
+    }
+
+    /** Uniformly rescales the selected voxel field while keeping its minimum corner fixed. */
+    public DroneArea scale(double factor) {
+        if (!Double.isFinite(factor) || factor < 0.25D || factor > 4.0D) {
+            throw new IllegalArgumentException("Area scale factor must be 0.25..4");
+        }
+        requireMaterializable(this);
+        if (volume == 0L || factor == 1.0D) return this;
+        int targetSizeX = Math.max(1, (int) Math.round((sizeX - 1) * factor) + 1);
+        int targetSizeY = Math.max(1, (int) Math.round((sizeY - 1) * factor) + 1);
+        int targetSizeZ = Math.max(1, (int) Math.round((sizeZ - 1) * factor) + 1);
+        long targetVolume = (long) targetSizeX * targetSizeY * targetSizeZ;
+        if (targetSizeX > MAX_AXIS_LENGTH || targetSizeY > MAX_AXIS_LENGTH
+                || targetSizeZ > MAX_AXIS_LENGTH || targetVolume > MAX_BLOCKS) {
+            throw new IllegalArgumentException("Scaled area exceeds runtime limits");
+        }
+        List<BlockPos> scaled = new ArrayList<>((int) targetVolume);
+        for (int y = 0; y < targetSizeY; y++) {
+            int sourceY = Math.min(sizeY - 1, (int) Math.floor(y / factor));
+            for (int z = 0; z < targetSizeZ; z++) {
+                int sourceZ = Math.min(sizeZ - 1, (int) Math.floor(z / factor));
+                for (int x = 0; x < targetSizeX; x++) {
+                    int sourceX = Math.min(sizeX - 1, (int) Math.floor(x / factor));
+                    if (contains(min.add(sourceX, sourceY, sourceZ))) scaled.add(min.add(x, y, z));
+                }
+            }
+        }
+        return new DroneArea(scaled);
     }
 
     public DroneArea offset(int x, int y, int z) {
@@ -395,6 +649,79 @@ public final class DroneArea {
             default:
                 return positionAt(index);
         }
+    }
+
+    /**
+     * Builds a stable base-index permutation. Axis names list the fastest-changing axis first; nearest traversal uses
+     * the supplied position only as its initial sort origin, so callers can persist the result for the whole loop.
+     */
+    public int[] traversalIndices(TraversalOrder order, BlockPos origin) {
+        TraversalOrder checked = order == null ? TraversalOrder.SERPENTINE : order;
+        int size = (int) volume;
+        int[] result = new int[size];
+        for (int index = 0; index < size; index++) result[index] = index;
+        if (size < 2 || checked == TraversalOrder.SERPENTINE) return result;
+        if (checked == TraversalOrder.REVERSE) {
+            for (int index = 0; index < size; index++) result[index] = size - 1 - index;
+            return result;
+        }
+        if (checked == TraversalOrder.RANDOMIZED) {
+            int step = Math.max(1, size / 2 + 1);
+            while (greatestCommonDivisor(step, size) != 1) step++;
+            int offset = Math.floorMod(hashCode(), size);
+            for (int index = 0; index < size; index++) {
+                result[index] = (int) ((offset + (long) index * step) % size);
+            }
+            return result;
+        }
+        List<Integer> indices = new ArrayList<>(size);
+        for (int index = 0; index < size; index++) indices.add(index);
+        Comparator<BlockPos> positionsComparator = traversalComparator(checked,
+                origin == null ? BlockPos.ORIGIN : origin);
+        indices.sort((left, right) -> positionsComparator.compare(positionAt(left), positionAt(right)));
+        for (int index = 0; index < size; index++) result[index] = indices.get(index);
+        return result;
+    }
+
+    private static Comparator<BlockPos> traversalComparator(TraversalOrder order, BlockPos origin) {
+        switch (order) {
+            case XYZ:
+                return axes(BlockPos::getZ, BlockPos::getY, BlockPos::getX);
+            case XZY:
+                return axes(BlockPos::getY, BlockPos::getZ, BlockPos::getX);
+            case YXZ:
+                return axes(BlockPos::getZ, BlockPos::getX, BlockPos::getY);
+            case YZX:
+                return axes(BlockPos::getX, BlockPos::getZ, BlockPos::getY);
+            case ZXY:
+                return axes(BlockPos::getY, BlockPos::getX, BlockPos::getZ);
+            case ZYX:
+                return axes(BlockPos::getX, BlockPos::getY, BlockPos::getZ);
+            case BOTTOM_UP:
+                return axes(BlockPos::getY, BlockPos::getZ, BlockPos::getX);
+            case TOP_DOWN:
+                return Comparator.comparingInt(BlockPos::getY).reversed()
+                        .thenComparingInt(BlockPos::getZ).thenComparingInt(BlockPos::getX);
+            case NEAREST_FIRST:
+                return Comparator.comparingLong((BlockPos position) -> squaredDistance(position, origin))
+                        .thenComparingInt(BlockPos::getY).thenComparingInt(BlockPos::getZ)
+                        .thenComparingInt(BlockPos::getX);
+            default:
+                return axes(BlockPos::getY, BlockPos::getZ, BlockPos::getX);
+        }
+    }
+
+    private static Comparator<BlockPos> axes(java.util.function.ToIntFunction<BlockPos> slowest,
+            java.util.function.ToIntFunction<BlockPos> middle,
+            java.util.function.ToIntFunction<BlockPos> fastest) {
+        return Comparator.comparingInt(slowest).thenComparingInt(middle).thenComparingInt(fastest);
+    }
+
+    private static long squaredDistance(BlockPos position, BlockPos origin) {
+        long x = (long) position.getX() - origin.getX();
+        long y = (long) position.getY() - origin.getY();
+        long z = (long) position.getZ() - origin.getZ();
+        return x * x + y * y + z * z;
     }
 
     private static int greatestCommonDivisor(int first, int second) {

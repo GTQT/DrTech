@@ -24,7 +24,7 @@ public class MetaItemLootTable extends StandardMetaItem {
     public static CreativeTabs LootTab = new CreativeTabs("loot_table") {
         @Override
         public @NotNull ItemStack createIcon() {
-            return LOOT_TABLE_TEST.getStackForm();
+            return LOOT_TABLE_STONE_AGE.getStackForm();
         }
     };
 
@@ -39,7 +39,7 @@ public class MetaItemLootTable extends StandardMetaItem {
     }
 
     public void registerSubItems() {
-        LOOT_TABLE_TEST = register("test");
+        metaId++; // Keep legacy metadata 0 reserved so existing loot bags do not shift ids.
         LOOT_TABLE_STONE_AGE = register("stone_age");
         LOOT_TABLE_STEAM_AGE = register("steam_age");
         LOOT_TABLE_LV = register("lv");

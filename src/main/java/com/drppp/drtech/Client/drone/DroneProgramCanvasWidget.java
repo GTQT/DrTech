@@ -53,6 +53,7 @@ import org.lwjgl.opengl.GL11;
 import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -125,6 +126,8 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     private UUID areaPreviewNodeId;
     private DroneArea cachedAreaPreview;
     private String areaPreviewStatusKey = "drtech.drone.programmer.area_preview_missing";
+    private long areaPreviewNextRefreshNanos;
+    static final long AREA_PREVIEW_REFRESH_NANOS = 100_000_000L;
     private String connectionHint = "";
     private long connectionHintUntil;
     private int connectionHintColor = 0xFFFFA0A0;
@@ -551,6 +554,13 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         if (node.getConfiguration().getBoolean("Breakpoint")) {
             GuiDraw.drawRect(point.x + scaled(NODE_WIDTH - 7), point.y + scaled(1), scaled(5), scaled(5),
                     0xFFFF4D5A);
+        } else if (node.getConfiguration().getBoolean("BreakpointOnFailure")
+                || node.getConfiguration().getInteger("BreakpointLowEnergy") > 0
+                || node.getConfiguration().getBoolean("BreakpointOnVariableWrite")) {
+            // Amber means the node has a conditional, post-action or low-energy breakpoint rather than a stop on
+            // entry. This stays visible even at the smallest useful zoom.
+            GuiDraw.drawRect(point.x + scaled(NODE_WIDTH - 7), point.y + scaled(1), scaled(5), scaled(5),
+                    0xFFFFC34D);
         }
         // Category glyph remains recognisable when node header colours are hard to distinguish.
         GuiDraw.drawRect(point.x + scaled(2), point.y + scaled(2), scaled(7), scaled(7), 0x880C121A);
@@ -1785,7 +1795,11 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         DroneProgramGraph graph = graphSupplier.get();
         DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
         long revision = graph == null ? Long.MIN_VALUE : graph.getRevision();
-        if (revision == areaPreviewRevision && java.util.Objects.equals(areaPreviewNodeId, selectedNodeId)) return;
+        long now = System.nanoTime();
+        if (!shouldRefreshAreaPreview(areaPreviewRevision, revision, areaPreviewNodeId, selectedNodeId,
+                now, areaPreviewNextRefreshNanos)) return;
+        areaPreviewNextRefreshNanos = now > Long.MAX_VALUE - AREA_PREVIEW_REFRESH_NANOS
+                ? Long.MAX_VALUE : now + AREA_PREVIEW_REFRESH_NANOS;
         areaPreviewRevision = revision;
         areaPreviewNodeId = selectedNodeId;
         cachedAreaPreview = null;
@@ -1805,6 +1819,13 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         } catch (RuntimeException ignored) {
             areaPreviewStatusKey = "drtech.drone.programmer.area_preview_invalid";
         }
+    }
+
+    static boolean shouldRefreshAreaPreview(long cachedRevision, long currentRevision,
+            UUID cachedNodeId, UUID currentNodeId, long nowNanos, long nextRefreshNanos) {
+        if (!java.util.Objects.equals(cachedNodeId, currentNodeId)) return true;
+        if (cachedRevision == currentRevision) return false;
+        return nowNanos >= nextRefreshNanos;
     }
 
     private DroneArea resolveStaticArea(DroneProgramGraph graph, DroneProgramNode node, int depth) {
@@ -2265,6 +2286,149 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         });
     }
 
+    public void duplicateLastSelectedItemFilterRule() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || !isSelectedItemFilter()) return;
+        configureSelected((node, config) -> {
+            DroneItemFilterSpec previous = readItemFilter(config, selected.property.getId());
+            List<DroneItemFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty() || rules.size() >= DroneItemFilterSpec.MAX_RULES) return;
+            rules.add(rules.get(rules.size() - 1));
+            writeItemFilter(config, selected.property.getId(), new DroneItemFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    public void moveLastSelectedItemFilterRule(int direction) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || !isSelectedItemFilter() || direction == 0) return;
+        configureSelected((node, config) -> {
+            DroneItemFilterSpec previous = readItemFilter(config, selected.property.getId());
+            List<DroneItemFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            int from = rules.size() - 1;
+            int to = from + (direction < 0 ? -1 : 1);
+            if (from < 0 || to < 0 || to >= rules.size()) return;
+            DroneItemFilterSpec.Rule rule = rules.remove(from);
+            rules.add(to, rule);
+            writeItemFilter(config, selected.property.getId(), new DroneItemFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    public boolean hasSelectedItemFilterRule() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ITEM_SELECTOR) return false;
+        return !readItemFilter(selected.node.getConfiguration(), selected.property.getId()).getRules().isEmpty();
+    }
+
+    public String getSelectedItemFilterBoundsLabel() {
+        SelectedProperty selected = selectedProperty();
+        if (!hasSelectedItemFilterRule()) return I18n.format("drtech.drone.programmer.item_bounds_unset");
+        DroneItemFilterSpec.Rule rule = lastItemRule(selected);
+        return I18n.format("drtech.drone.programmer.item_bounds",
+                formatBound(rule.getMinDurability(), rule.getMaxDurability()),
+                formatBound(rule.getMinCount(), rule.getMaxCount()));
+    }
+
+    public String getSelectedItemFilterNbtLabel() {
+        SelectedProperty selected = selectedProperty();
+        if (!hasSelectedItemFilterRule()) return I18n.format("drtech.drone.programmer.item_nbt_unset");
+        DroneItemFilterSpec.Rule rule = lastItemRule(selected);
+        if (!rule.isMatchNbt()) return I18n.format("drtech.drone.programmer.item_nbt_ignored");
+        return I18n.format(rule.isMatchNbtPartially()
+                ? "drtech.drone.programmer.item_nbt_partial"
+                : "drtech.drone.programmer.item_nbt_exact");
+    }
+
+    public String getSelectedItemFilterNamespaceLabel() {
+        SelectedProperty selected = selectedProperty();
+        if (!hasSelectedItemFilterRule()) return I18n.format("drtech.drone.programmer.item_namespace_unset");
+        String namespace = lastItemRule(selected).getNamespace();
+        return namespace.isEmpty() ? I18n.format("drtech.drone.programmer.item_namespace_any")
+                : I18n.format("drtech.drone.programmer.item_namespace", namespace);
+    }
+
+    /** Sets the namespace on the last rule; an empty value clears the constraint. */
+    public void setSelectedItemFilterNamespace(String namespace) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ITEM_SELECTOR) return;
+        final String value = namespace == null ? "" : namespace.trim().toLowerCase(java.util.Locale.ROOT);
+        if (value.length() > 64 || (!value.isEmpty() && !value.matches("[a-z0-9_.-]+"))) return;
+        configureSelected((node, config) -> {
+            DroneItemFilterSpec previous = readItemFilter(config, selected.property.getId());
+            List<DroneItemFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            DroneItemFilterSpec.Rule old = rules.get(rules.size() - 1);
+            rules.set(rules.size() - 1, new DroneItemFilterSpec.Rule(old.getItemId(), old.getMetadata(),
+                    old.getOreDictionary(), value, old.isMatchNbt(), old.isMatchNbtPartially(), old.getNbt(),
+                    old.getMinDurability(), old.getMaxDurability(), old.getMinCount(), old.getMaxCount()));
+            writeItemFilter(config, selected.property.getId(), new DroneItemFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    public void toggleSelectedItemFilterNbtMode() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ITEM_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneItemFilterSpec previous = readItemFilter(config, selected.property.getId());
+            List<DroneItemFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            int index = rules.size() - 1;
+            DroneItemFilterSpec.Rule old = rules.get(index);
+            if (!old.isMatchNbt()) return;
+            rules.set(index, new DroneItemFilterSpec.Rule(old.getItemId(), old.getMetadata(),
+                    old.getOreDictionary(), old.getNamespace(), true, !old.isMatchNbtPartially(), old.getNbt(),
+                    old.getMinDurability(), old.getMaxDurability(), old.getMinCount(), old.getMaxCount()));
+            writeItemFilter(config, selected.property.getId(), new DroneItemFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    /** Adjusts one bound on the last item-filter rule while preserving all other match criteria. */
+    public void adjustSelectedItemFilterBound(int field, int delta) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ITEM_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneItemFilterSpec previous = readItemFilter(config, selected.property.getId());
+            List<DroneItemFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            int index = rules.size() - 1;
+            DroneItemFilterSpec.Rule old = rules.get(index);
+            int minDurability = old.getMinDurability();
+            int maxDurability = old.getMaxDurability();
+            int minCount = old.getMinCount();
+            int maxCount = old.getMaxCount();
+            switch (field) {
+                case 0: minDurability = clampBound(safeAdd(minDurability, delta), 0, maxDurability); break;
+                case 1: maxDurability = clampBound(safeAdd(maxDurability, delta), minDurability, 1_000_000); break;
+                case 2: minCount = clampBound(safeAdd(minCount, delta), 0, maxCount); break;
+                case 3: maxCount = clampBound(safeAdd(maxCount, delta), minCount, 1_000_000); break;
+                default: return;
+            }
+            rules.set(index, new DroneItemFilterSpec.Rule(old.getItemId(), old.getMetadata(),
+                    old.getOreDictionary(), old.getNamespace(), old.isMatchNbt(), old.isMatchNbtPartially(), old.getNbt(),
+                    minDurability, maxDurability, minCount, maxCount));
+            writeItemFilter(config, selected.property.getId(), new DroneItemFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    private static DroneItemFilterSpec.Rule lastItemRule(SelectedProperty selected) {
+        List<DroneItemFilterSpec.Rule> rules = readItemFilter(selected.node.getConfiguration(),
+                selected.property.getId()).getRules();
+        return rules.get(rules.size() - 1);
+    }
+
+    private static int clampBound(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private static int safeAdd(int value, int delta) {
+        long result = (long) value + delta;
+        return result > Integer.MAX_VALUE ? Integer.MAX_VALUE : result < Integer.MIN_VALUE
+                ? Integer.MIN_VALUE : (int) result;
+    }
+
+    private static String formatBound(int min, int max) {
+        return max >= 1_000_000 || max == Integer.MAX_VALUE ? min + "-*" : min + "-" + max;
+    }
+
     public void clearSelectedProperty() {
         SelectedProperty selected = selectedProperty();
         if (selected == null) return;
@@ -2315,6 +2479,139 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 ? I18n.format("drtech.drone.programmer.block_state_any") : value);
     }
 
+    public String getSelectedBlockNamespaceLabel() {
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        if (rule == null) return I18n.format("drtech.drone.programmer.block_namespace_unset");
+        return rule.getNamespace().isEmpty() ? I18n.format("drtech.drone.programmer.block_namespace_exact")
+                : I18n.format("drtech.drone.programmer.block_namespace", rule.getNamespace());
+    }
+
+    public void generalizeLastSelectedBlockRuleToNamespace() {
+        SelectedProperty selected = selectedProperty();
+        DroneBlockFilterSpec.Rule current = getLastSelectedBlockRule();
+        if (selected == null || current == null) return;
+        String namespace = current.getNamespace();
+        if (namespace.isEmpty() && current.getBlockId() != null) namespace = current.getBlockId().getNamespace();
+        if (namespace.isEmpty()) return;
+        final String capturedNamespace = namespace;
+        configureSelected((node, config) -> {
+            DroneBlockFilterSpec previous = readBlockFilter(config, selected.property.getId());
+            List<DroneBlockFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            rules.set(rules.size() - 1, new DroneBlockFilterSpec.Rule(null, capturedNamespace,
+                    -1, Collections.emptyMap(), current.getTileEntityRequirement(),
+                    current.getReplaceableRequirement(), current.getOreDictionary(), current.getCategory()));
+            writeBlockFilter(config, selected.property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    public String getSelectedBlockTileEntityLabel() {
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        if (rule == null || rule.getTileEntityRequirement() == null) return I18n.format("drtech.drone.programmer.block_tile_any");
+        return I18n.format(rule.getTileEntityRequirement()
+                ? "drtech.drone.programmer.block_tile_yes" : "drtech.drone.programmer.block_tile_no");
+    }
+
+    public void cycleSelectedBlockTileEntityRequirement() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.BLOCK_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneBlockFilterSpec previous = readBlockFilter(config, selected.property.getId());
+            List<DroneBlockFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            DroneBlockFilterSpec.Rule old = rules.get(rules.size() - 1);
+            Boolean next = old.getTileEntityRequirement() == null ? Boolean.TRUE
+                    : old.getTileEntityRequirement() ? Boolean.FALSE : null;
+            rules.set(rules.size() - 1, new DroneBlockFilterSpec.Rule(old.getBlockId(), old.getNamespace(),
+                    old.getMetadata(), old.getStateProperties(), next, old.getReplaceableRequirement(),
+                    old.getOreDictionary(), old.getCategory()));
+            writeBlockFilter(config, selected.property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    public String getSelectedBlockReplaceableLabel() {
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        if (rule == null || rule.getReplaceableRequirement() == null) return I18n.format("drtech.drone.programmer.block_replaceable_any");
+        return I18n.format(rule.getReplaceableRequirement()
+                ? "drtech.drone.programmer.block_replaceable_yes" : "drtech.drone.programmer.block_replaceable_no");
+    }
+
+    public void cycleSelectedBlockReplaceableRequirement() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.BLOCK_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneBlockFilterSpec previous = readBlockFilter(config, selected.property.getId());
+            List<DroneBlockFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            DroneBlockFilterSpec.Rule old = rules.get(rules.size() - 1);
+            Boolean next = old.getReplaceableRequirement() == null ? Boolean.TRUE
+                    : old.getReplaceableRequirement() ? Boolean.FALSE : null;
+            rules.set(rules.size() - 1, new DroneBlockFilterSpec.Rule(old.getBlockId(), old.getNamespace(),
+                    old.getMetadata(), old.getStateProperties(), old.getTileEntityRequirement(), next,
+                    old.getOreDictionary(), old.getCategory()));
+            writeBlockFilter(config, selected.property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    public String getSelectedBlockOreLabel() {
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        return rule == null || rule.getOreDictionary().isEmpty()
+                ? I18n.format("drtech.drone.programmer.block_ore_any")
+                : I18n.format("drtech.drone.programmer.block_ore", rule.getOreDictionary());
+    }
+
+    public void cycleSelectedBlockOreDictionary() {
+        SelectedProperty selected = selectedProperty();
+        DroneBlockFilterSpec.Rule current = getLastSelectedBlockRule();
+        if (selected == null || current == null || current.getBlockId() == null) return;
+        Block block = Block.REGISTRY.getObject(current.getBlockId());
+        Item item = Item.getItemFromBlock(block);
+        if (item == null) return;
+        List<String> ores = new ArrayList<>();
+        ores.add("");
+        int meta = current.getMetadata() < 0 ? 0 : current.getMetadata();
+        for (int oreId : OreDictionary.getOreIDs(new ItemStack(item, 1, meta))) {
+            String ore = OreDictionary.getOreName(oreId);
+            if (!ore.isEmpty() && !ores.contains(ore)) ores.add(ore);
+        }
+        int index = ores.indexOf(current.getOreDictionary());
+        String next = ores.get((Math.max(-1, index) + 1) % ores.size());
+        configureSelected((node, config) -> {
+            DroneBlockFilterSpec previous = readBlockFilter(config, selected.property.getId());
+            List<DroneBlockFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            DroneBlockFilterSpec.Rule old = rules.get(rules.size() - 1);
+            rules.set(rules.size() - 1, new DroneBlockFilterSpec.Rule(old.getBlockId(), old.getNamespace(),
+                    old.getMetadata(), old.getStateProperties(), old.getTileEntityRequirement(),
+                    old.getReplaceableRequirement(), next, old.getCategory()));
+            writeBlockFilter(config, selected.property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
+        });
+    }
+
+    public String getSelectedBlockCategoryLabel() {
+        DroneBlockFilterSpec.Rule rule = getLastSelectedBlockRule();
+        String category = rule == null ? "" : rule.getCategory();
+        return I18n.format("drtech.drone.programmer.block_category."
+                + (category.isEmpty() ? "any" : category.toLowerCase(java.util.Locale.ROOT)));
+    }
+
+    public void cycleSelectedBlockCategory() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.BLOCK_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneBlockFilterSpec previous = readBlockFilter(config, selected.property.getId());
+            List<DroneBlockFilterSpec.Rule> rules = new ArrayList<>(previous.getRules());
+            if (rules.isEmpty()) return;
+            DroneBlockFilterSpec.Rule old = rules.get(rules.size() - 1);
+            List<String> categories = Arrays.asList("ORE", "WOOD", "CROP");
+            int index = categories.indexOf(old.getCategory());
+            String next = categories.get(index < 0 ? 0 : (index + 1) % categories.size());
+            rules.set(rules.size() - 1, new DroneBlockFilterSpec.Rule(null, "", -1,
+                    Collections.emptyMap(), old.getTileEntityRequirement(), old.getReplaceableRequirement(), "", next));
+            writeBlockFilter(config, selected.property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
+        });
+    }
+
     public String getSelectedBlockStatePropertyPage() {
         List<IProperty<?>> properties = getSelectedBlockStateProperties();
         return properties.isEmpty() ? "0/0"
@@ -2350,7 +2647,9 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             Map<String, String> stateProperties = new LinkedHashMap<>(last.getStateProperties());
             if (next.isEmpty()) stateProperties.remove(property.getName());
             else stateProperties.put(property.getName(), next);
-            rules.add(new DroneBlockFilterSpec.Rule(last.getBlockId(), last.getMetadata(), stateProperties));
+            rules.add(new DroneBlockFilterSpec.Rule(last.getBlockId(), last.getNamespace(),
+                    last.getMetadata(), stateProperties, last.getTileEntityRequirement(),
+                    last.getReplaceableRequirement(), last.getOreDictionary(), last.getCategory()));
             writeBlockFilter(config, selected.property.getId(), new DroneBlockFilterSpec(previous.getMode(), rules));
         });
     }
@@ -2623,6 +2922,63 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         configureSelected((node, config) -> config.setBoolean("Breakpoint", !config.getBoolean("Breakpoint")));
     }
 
+    /** Cycles the condition attached to the selected node; variable-write is available only on variable mutators. */
+    public void cycleSelectedConditionalBreakpoint() {
+        configureSelected((node, config) -> {
+            String current = selectedConditionalBreakpoint(node, config);
+            String next;
+            if ("none".equals(current)) next = "failure";
+            else if ("failure".equals(current)) next = "energy25";
+            else if ("energy25".equals(current)) next = "energy50";
+            else if ("energy50".equals(current)) next = "energy75";
+            else if ("energy75".equals(current) && isVariableMutationNode(node)) next = "variable";
+            else next = "none";
+            config.removeTag("BreakpointOnFailure");
+            config.removeTag("BreakpointLowEnergy");
+            config.removeTag("BreakpointOnVariableWrite");
+            if ("failure".equals(next)) config.setBoolean("BreakpointOnFailure", true);
+            else if ("energy25".equals(next)) config.setInteger("BreakpointLowEnergy", 25);
+            else if ("energy50".equals(next)) config.setInteger("BreakpointLowEnergy", 50);
+            else if ("energy75".equals(next)) config.setInteger("BreakpointLowEnergy", 75);
+            else if ("variable".equals(next)) config.setBoolean("BreakpointOnVariableWrite", true);
+        });
+    }
+
+    public String getSelectedBreakpointLabel() {
+        DroneProgramNode node = selectedNode();
+        return I18n.format(node != null && node.getConfiguration().getBoolean("Breakpoint")
+                ? "drtech.drone.programmer.breakpoint_active" : "drtech.drone.programmer.breakpoint");
+    }
+
+    public String getSelectedConditionalBreakpointLabel() {
+        DroneProgramNode node = selectedNode();
+        if (node == null) return I18n.format("drtech.drone.programmer.breakpoint_condition_none");
+        String key = "drtech.drone.programmer.breakpoint_condition_"
+                + selectedConditionalBreakpoint(node, node.getConfiguration());
+        return I18n.format(key);
+    }
+
+    private static String selectedConditionalBreakpoint(DroneProgramNode node,
+            net.minecraft.nbt.NBTTagCompound configuration) {
+        if (configuration.getBoolean("BreakpointOnFailure")) return "failure";
+        int threshold = configuration.getInteger("BreakpointLowEnergy");
+        if (threshold >= 75) return "energy75";
+        if (threshold >= 50) return "energy50";
+        if (threshold > 0) return "energy25";
+        return configuration.getBoolean("BreakpointOnVariableWrite") && isVariableMutationNode(node)
+                ? "variable" : "none";
+    }
+
+    private DroneProgramNode selectedNode() {
+        DroneProgramGraph graph = graphSupplier.get();
+        return graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
+    }
+
+    private static boolean isVariableMutationNode(DroneProgramNode node) {
+        return node != null && (node.getType().equals(DrTechDroneNodes.SET_NUMBER_VARIABLE)
+                || node.getType().equals(DrTechDroneNodes.ADD_NUMBER_VARIABLE));
+    }
+
     public void cycleSelectedOperator() {
         configureSelected((node, config) -> {
             String[] operators;
@@ -2870,6 +3226,14 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         int x = preview == null ? node.getX() : preview.x;
         int y = preview == null ? node.getY() : preview.y;
         return new Point(scale(x + panX), scale(y + panY));
+    }
+
+    /** Converts an absolute GUI drop position into persistent graph coordinates. */
+    public int[] graphPositionAtAbsolute(int absoluteX, int absoluteY) {
+        int localX = absoluteX - getArea().x;
+        int localY = absoluteY - getArea().y;
+        if (localX < 0 || localX >= getArea().w() || localY < 0 || localY >= getArea().h()) return null;
+        return new int[] { unscale(localX) - panX, unscale(localY) - panY };
     }
 
     /** Releases optimistic positions only after the synced graph confirms or rejects the move. */

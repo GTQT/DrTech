@@ -72,6 +72,33 @@ public final class DroneDockNetwork extends WorldSavedData {
                 .min(order);
     }
 
+    /** Selects the least loaded usable dock for automated fleet work without changing manual priority routing. */
+    public Optional<DroneDockRecord> findBalanced(int dimension, BlockPos origin, @Nullable UUID ownerId,
+            int maximumSourceTier, long worldTime, boolean requireAccepting, @Nullable UUID excludedDockId) {
+        if (origin == null) return Optional.empty();
+        Comparator<DroneDockRecord> order = Comparator.comparingInt(DroneDockRecord::getCurrentLoad)
+                .thenComparing(Comparator.comparingInt(DroneDockRecord::getPriority).reversed())
+                .thenComparingDouble(record -> record.getPosition().distanceSq(origin))
+                .thenComparing(record -> record.getDockId().toString());
+        return records.values().stream()
+                .filter(record -> isUsable(record, dimension, ownerId, maximumSourceTier, worldTime,
+                        requireAccepting, excludedDockId))
+                .min(order);
+    }
+
+    /** Resolves an operator-defined fallback order without allowing it to bypass dock safety filters. */
+    public Optional<DroneDockRecord> findPreferred(List<UUID> preferredDockIds, int dimension,
+            @Nullable UUID ownerId, int maximumSourceTier, long worldTime, boolean requireAccepting,
+            @Nullable UUID excludedDockId) {
+        if (preferredDockIds == null) return Optional.empty();
+        for (UUID dockId : preferredDockIds) {
+            DroneDockRecord record = dockId == null ? null : records.get(dockId);
+            if (isUsable(record, dimension, ownerId, maximumSourceTier, worldTime,
+                    requireAccepting, excludedDockId)) return Optional.of(record);
+        }
+        return Optional.empty();
+    }
+
     public Optional<DroneDockRecord> getRecord(UUID dockId) {
         return Optional.ofNullable(records.get(dockId));
     }
@@ -112,6 +139,18 @@ public final class DroneDockNetwork extends WorldSavedData {
                 && worldTime - record.getLastHeartbeat() <= ONLINE_TIMEOUT_TICKS;
     }
 
+    private static boolean isUsable(@Nullable DroneDockRecord record, int dimension, @Nullable UUID ownerId,
+            int maximumSourceTier, long worldTime, boolean requireAccepting, @Nullable UUID excludedDockId) {
+        return record != null && record.getDimension() == dimension
+                && (excludedDockId == null || !excludedDockId.equals(record.getDockId()))
+                && Objects.equals(ownerId, record.getOwnerId())
+                && record.getTier() <= maximumSourceTier
+                && isOnline(record, worldTime)
+                && record.isEnabled()
+                && record.getAvailableEu() > 0L
+                && (!requireAccepting || record.canAcceptDrone());
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         records.clear();
@@ -123,7 +162,8 @@ public final class DroneDockNetwork extends WorldSavedData {
                 DroneDockRecord offline = new DroneDockRecord(record.getDockId(), record.getDimension(),
                         record.getPosition(), record.getOwnerId(), record.getName(), record.getTier(),
                         record.getPriority(), record.getLastHeartbeat(), false, record.getCurrentLoad(),
-                        record.getAvailableEu(), record.isEnabled(), record.canAcceptDrone());
+                        record.getAvailableEu(), record.isEnabled(), record.canAcceptDrone(),
+                        record.getOccupancyState());
                 records.put(offline.getDockId(), offline);
             }
         }

@@ -75,6 +75,17 @@ public final class DroneProgramGraph {
         return new DroneProgramGraph(programId, name, revision, nodes.values(), edges.values());
     }
 
+    /**
+     * Creates an independent program suitable for "Save As".  Node and edge ids
+     * remain stable inside the copied graph, while the program identity and
+     * revision are reset so existing revision-locked references cannot silently
+     * begin targeting the new card.
+     */
+    public DroneProgramGraph copyAsNewProgram(String newName) {
+        return new DroneProgramGraph(UUID.randomUUID(), newName == null ? name : newName,
+                0L, nodes.values(), edges.values());
+    }
+
     public void rename(String name) {
         this.name = name == null ? "" : name;
         revision++;

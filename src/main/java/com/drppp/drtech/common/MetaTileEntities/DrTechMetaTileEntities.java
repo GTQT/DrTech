@@ -5,6 +5,9 @@ import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneFleetController;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneEndpoint;
+import com.drppp.drtech.common.drone.network.DroneEndpoint;
 import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneProgrammer;
 import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneRedstoneEmitter;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
@@ -36,6 +39,10 @@ public class DrTechMetaTileEntities {
     private static final int DRONE_REDSTONE_EMITTER_META_ID = 902;
     private static final int DRONE_DOCK_EV_META_ID = 903;
     private static final int DRONE_DOCK_IV_META_ID = 904;
+    private static final int DRONE_FLEET_CONTROLLER_META_ID = 905;
+    private static final int DRONE_ITEM_ENDPOINT_META_ID = 906;
+    private static final int DRONE_FLUID_ENDPOINT_META_ID = 907;
+    private static final int DRONE_EU_ENDPOINT_META_ID = 908;
 
     public static AnnihilationGenerator ANNIHILATION_GENERATOR;
     public static MetaTileEntityDronePad DRONE_PAD;
@@ -71,6 +78,10 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityDroneDock DRONE_DOCK_EV;
     public static MetaTileEntityDroneDock DRONE_DOCK_IV;
     public static MetaTileEntityDroneRedstoneEmitter DRONE_REDSTONE_EMITTER;
+    public static MetaTileEntityDroneFleetController DRONE_FLEET_CONTROLLER;
+    public static MetaTileEntityDroneEndpoint DRONE_ITEM_ENDPOINT;
+    public static MetaTileEntityDroneEndpoint DRONE_FLUID_ENDPOINT;
+    public static MetaTileEntityDroneEndpoint DRONE_EU_ENDPOINT;
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_256 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_1024 = new MetaTileEntityLaserPipeBending[10]; // IV+
     public static MetaTileEntityLaserPipeBending[] LASER_BENDING_4096 = new MetaTileEntityLaserPipeBending[10]; // IV+
@@ -159,6 +170,14 @@ public class DrTechMetaTileEntities {
                 new MetaTileEntityDroneDock(getDrId("drone_dock.ev"), GTValues.EV));
         DRONE_DOCK_IV = registerMetaTileEntity(DRONE_DOCK_IV_META_ID,
                 new MetaTileEntityDroneDock(getDrId("drone_dock.iv"), GTValues.IV));
+        DRONE_FLEET_CONTROLLER = registerMetaTileEntity(DRONE_FLEET_CONTROLLER_META_ID,
+                new MetaTileEntityDroneFleetController(getDrId("drone_fleet_controller")));
+        DRONE_ITEM_ENDPOINT = registerMetaTileEntity(DRONE_ITEM_ENDPOINT_META_ID,
+                new MetaTileEntityDroneEndpoint(getDrId("drone_item_endpoint"), DroneEndpoint.Kind.ITEM));
+        DRONE_FLUID_ENDPOINT = registerMetaTileEntity(DRONE_FLUID_ENDPOINT_META_ID,
+                new MetaTileEntityDroneEndpoint(getDrId("drone_fluid_endpoint"), DroneEndpoint.Kind.FLUID));
+        DRONE_EU_ENDPOINT = registerMetaTileEntity(DRONE_EU_ENDPOINT_META_ID,
+                new MetaTileEntityDroneEndpoint(getDrId("drone_eu_endpoint"), DroneEndpoint.Kind.EU));
     }
 
 
