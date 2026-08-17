@@ -12,14 +12,22 @@ import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.BlockNetherWart;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,8 +40,10 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 
@@ -41,6 +51,17 @@ import net.minecraftforge.items.ItemStackHandler;
 final class DroneWorldActions {
 
     enum InteractionOutcome { SUCCESS, NO_ITEM, DENIED }
+    enum PlantingOutcome { PLANTED, SKIPPED, NO_ITEM, DENIED }
+
+    static final class FishingRetraction {
+        final ItemStack rod;
+        final java.util.List<EntityItem> loot;
+
+        FishingRetraction(ItemStack rod, java.util.List<EntityItem> loot) {
+            this.rod = rod;
+            this.loot = loot;
+        }
+    }
 
     private DroneWorldActions() {}
 
@@ -180,6 +201,67 @@ final class DroneWorldActions {
         return breakBlock(drone, inventory, target);
     }
 
+    static boolean isTreeLog(WorldServer world, BlockPos target) {
+        return world.isBlockLoaded(target) && !world.isAirBlock(target)
+                && world.getBlockState(target).getBlock().isWood(world, target);
+    }
+
+    static PlantingOutcome replant(EntityProgrammableDrone drone, ItemStackHandler inventory, BlockPos target,
+            DroneItemFilter filter) {
+        WorldServer world = (WorldServer) drone.world;
+        if (!world.isBlockLoaded(target) || !world.isBlockLoaded(target.down())) return PlantingOutcome.DENIED;
+        if (!isPotentialPlantingTarget(world, target)) return PlantingOutcome.SKIPPED;
+        BlockPos soilPosition = target.down();
+        IBlockState soil = world.getBlockState(soilPosition);
+
+        DroneItemFilter effectiveFilter = filter == null ? DroneItemFilter.ANY : filter;
+        boolean hasFilteredPlant = false;
+        int selectedSlot = -1;
+        for (int slot = 0; slot < inventory.getSlots(); slot++) {
+            ItemStack stack = inventory.getStackInSlot(slot);
+            if (stack.isEmpty() || !effectiveFilter.matches(stack)) continue;
+            IPlantable plant = asPlantable(stack);
+            if (plant == null) continue;
+            hasFilteredPlant = true;
+            if (soil.getBlock().canSustainPlant(soil, world, soilPosition, EnumFacing.UP, plant)) {
+                selectedSlot = slot;
+                break;
+            }
+        }
+        if (selectedSlot < 0) return hasFilteredPlant ? PlantingOutcome.SKIPPED : PlantingOutcome.NO_ITEM;
+
+        FakePlayer player = preparePlayer(drone);
+        ItemStack held = inventory.extractItem(selectedSlot, inventory.getSlotLimit(selectedSlot), false);
+        player.inventory.setInventorySlotContents(0, held);
+        EnumActionResult result;
+        try {
+            result = player.interactionManager.processRightClickBlock(player, world, player.getHeldItemMainhand(),
+                    EnumHand.MAIN_HAND, soilPosition, EnumFacing.UP, 0.5F, 1.0F, 0.5F);
+        } finally {
+            inventory.setStackInSlot(selectedSlot, player.getHeldItemMainhand());
+            clearPlayer(player);
+        }
+        return result == EnumActionResult.SUCCESS
+                && !world.getBlockState(target).getBlock().isReplaceable(world, target)
+                ? PlantingOutcome.PLANTED : PlantingOutcome.DENIED;
+    }
+
+    static boolean isPotentialPlantingTarget(WorldServer world, BlockPos target) {
+        if (!world.isBlockLoaded(target) || !world.isBlockLoaded(target.down())
+                || !world.getBlockState(target).getBlock().isReplaceable(world, target)) return false;
+        net.minecraft.block.Block soil = world.getBlockState(target.down()).getBlock();
+        return soil == Blocks.FARMLAND || soil == Blocks.DIRT || soil == Blocks.GRASS
+                || soil == Blocks.SOUL_SAND;
+    }
+
+    private static IPlantable asPlantable(ItemStack stack) {
+        if (stack.getItem() instanceof IPlantable plant) return plant;
+        if (stack.getItem() instanceof ItemBlock itemBlock && itemBlock.getBlock() instanceof IPlantable plant) {
+            return plant;
+        }
+        return null;
+    }
+
     static InteractionOutcome interactEntity(EntityProgrammableDrone drone, ItemStackHandler inventory,
             Entity target, boolean useItem, DroneItemFilter filter) {
         if (!(drone.world instanceof WorldServer) || target == null || !target.isEntityAlive()) {
@@ -221,6 +303,10 @@ final class DroneWorldActions {
         return !target.isEntityAlive() || target.getHealth() < healthBefore;
     }
 
+    static boolean hasUsableWeapon(ItemStackHandler inventory) {
+        return inventory != null && selectBestWeapon(inventory, inventory.getSlots()) >= 0;
+    }
+
     static boolean isWeapon(ItemStack stack) {
         return weaponDamage(stack) > 0.0D;
     }
@@ -254,6 +340,100 @@ final class DroneWorldActions {
     static void activateLightsaber(ItemStack stack) {
         if (stack.getItem() instanceof ItemDoubleLightsaber) ItemDoubleLightsaber.setActive(stack, true);
         else if (stack.getItem() instanceof ItemLightsaber) ItemLightsaber.setActive(stack, true);
+    }
+
+    static EntityFishHook castFishingHook(EntityProgrammableDrone drone, ItemStack rod, BlockPos target) {
+        if (!(drone.world instanceof WorldServer) || rod.isEmpty()
+                || !(rod.getItem() instanceof ItemFishingRod) || target == null) return null;
+        WorldServer world = (WorldServer) drone.world;
+        FakePlayer player = prepareFishingPlayer(drone, rod, null);
+        EntityFishHook hook = new EntityFishHook(world, player,
+                target.getX() + 0.5D, target.getY() + 0.35D, target.getZ() + 0.5D);
+        hook.getEntityData().setString("DrTechDroneFishingOwner", drone.getDroneId().toString());
+        hook.setLuck(EnchantmentHelper.getEnchantmentLevel(Enchantments.LUCK_OF_THE_SEA, rod));
+        hook.setLureSpeed(EnchantmentHelper.getEnchantmentLevel(Enchantments.LURE, rod));
+        player.fishEntity = hook;
+        if (!world.spawnEntity(hook)) {
+            player.fishEntity = null;
+            clearPlayer(player);
+            return null;
+        }
+        world.playSound(null, drone.posX, drone.posY, drone.posZ,
+                SoundEvents.ENTITY_BOBBER_THROW, SoundCategory.NEUTRAL, 0.5F,
+                0.4F / (world.rand.nextFloat() * 0.4F + 0.8F));
+        return hook;
+    }
+
+    static boolean maintainFishingHook(EntityProgrammableDrone drone, ItemStack rod, EntityFishHook hook) {
+        if (hook == null || hook.isDead || rod.isEmpty() || !(rod.getItem() instanceof ItemFishingRod)) return false;
+        prepareFishingPlayer(drone, rod, hook);
+        return true;
+    }
+
+    static void cleanupFishingHooks(EntityProgrammableDrone drone) {
+        if (!(drone.world instanceof WorldServer)) return;
+        String owner = drone.getDroneId().toString();
+        for (EntityFishHook hook : drone.world.getEntities(EntityFishHook.class,
+                candidate -> candidate != null && owner.equals(
+                        candidate.getEntityData().getString("DrTechDroneFishingOwner")))) {
+            hook.setDead();
+        }
+    }
+
+    static boolean isFishingCatchReady(EntityFishHook hook) {
+        if (hook == null || hook.isDead) return false;
+        if (hook.caughtEntity != null) return true;
+        Integer catchable = ObfuscationReflectionHelper.getPrivateValue(EntityFishHook.class, hook,
+                "field_146045_ax", "ticksCatchable");
+        return catchable != null && catchable > 0;
+    }
+
+    static FishingRetraction retractFishingHook(EntityProgrammableDrone drone, ItemStack rod, EntityFishHook hook) {
+        if (hook == null || hook.isDead || rod.isEmpty()) {
+            return new FishingRetraction(rod, java.util.Collections.emptyList());
+        }
+        AxisAlignedBB scanBounds = new AxisAlignedBB(
+                Math.min(drone.posX, hook.posX) - 2.0D,
+                Math.min(drone.posY, hook.posY) - 2.0D,
+                Math.min(drone.posZ, hook.posZ) - 2.0D,
+                Math.max(drone.posX, hook.posX) + 2.0D,
+                Math.max(drone.posY, hook.posY) + 2.0D,
+                Math.max(drone.posZ, hook.posZ) + 2.0D);
+        java.util.Set<Integer> existingItems = new java.util.HashSet<>();
+        for (EntityItem item : drone.world.getEntitiesWithinAABB(EntityItem.class, scanBounds)) {
+            existingItems.add(item.getEntityId());
+        }
+        FakePlayer player = prepareFishingPlayer(drone, rod, hook);
+        int damage = hook.handleHookRetraction();
+        ItemStack updated = player.getHeldItemMainhand();
+        if (damage > 0 && !updated.isEmpty()) updated.damageItem(damage, player);
+        java.util.List<EntityItem> loot = new java.util.ArrayList<>();
+        for (EntityItem item : drone.world.getEntitiesWithinAABB(EntityItem.class, scanBounds)) {
+            if (!item.isDead && !existingItems.contains(item.getEntityId())) loot.add(item);
+        }
+        drone.world.playSound(null, drone.posX, drone.posY, drone.posZ,
+                SoundEvents.ENTITY_BOBBER_RETRIEVE, SoundCategory.NEUTRAL, 1.0F,
+                0.4F / (drone.world.rand.nextFloat() * 0.4F + 0.8F));
+        player.fishEntity = null;
+        clearPlayer(player);
+        return new FishingRetraction(updated, loot);
+    }
+
+    private static FakePlayer prepareFishingPlayer(EntityProgrammableDrone drone, ItemStack rod,
+            EntityFishHook hook) {
+        WorldServer world = (WorldServer) drone.world;
+        java.util.UUID fishingId = java.util.UUID.nameUUIDFromBytes(
+                ("drtech:fishing:" + drone.getDroneId()).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        FakePlayer player = FakePlayerFactory.get(world,
+                new com.mojang.authlib.GameProfile(fishingId, "[DrTechFishing]"));
+        clearPlayer(player);
+        player.setPositionAndRotation(drone.posX, drone.posY, drone.posZ,
+                drone.rotationYaw, drone.rotationPitch);
+        player.interactionManager.setGameType(GameType.SURVIVAL);
+        player.interactionManager.setBlockReachDistance(5.0D);
+        player.inventory.setInventorySlotContents(0, rod.copy());
+        player.fishEntity = hook;
+        return player;
     }
 
     /** Uses CropQT's own empty-hand harvesting contract so the rack, crop identity and inherited stats survive. */

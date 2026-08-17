@@ -19,6 +19,10 @@ public final class ModelProgrammableDrone extends ModelBase {
     private final ModelRenderer efficiencyModule;
     private final ModelRenderer cargoModule;
     private final ModelRenderer wirelessModule;
+    private final ModelRenderer fluidCargoModule;
+    private final ModelRenderer craftingModule;
+    private final ModelRenderer navigationModule;
+    private final ModelRenderer euInterfaceModule;
     private final ModelRenderer entityScannerModule;
     private final ModelRenderer combatModule;
     private final ModelRenderer containmentModule;
@@ -27,6 +31,9 @@ public final class ModelProgrammableDrone extends ModelBase {
     private final ModelRenderer secureAccessModule;
     private final ModelRenderer advancedItemModule;
     private final ModelRenderer fleetCommunicationModule;
+    private final ModelRenderer fishingModule;
+    private final ModelRenderer alchemyModule;
+    private final ModelRenderer cargoStatusLight;
 
     public ModelProgrammableDrone() {
         textureWidth = 64;
@@ -98,6 +105,24 @@ public final class ModelProgrammableDrone extends ModelBase {
         antennaTip.addBox(-1.0F, -9.0F, 1.5F, 2, 1, 2);
         wirelessModule.addChild(antennaTip);
 
+        fluidCargoModule = moduleRoot();
+        fluidCargoModule.addBox(-6.3F, 0.0F, -2.0F, 2, 3, 4);
+        fluidCargoModule.addBox(4.3F, 0.0F, -2.0F, 2, 3, 4);
+
+        craftingModule = moduleRoot();
+        craftingModule.addBox(-3.0F, 2.0F, -4.5F, 6, 2, 2);
+        craftingModule.addBox(-1.0F, 4.0F, -3.8F, 2, 1, 1);
+
+        navigationModule = moduleRoot();
+        navigationModule.addBox(-2.0F, -5.4F, -4.0F, 4, 1, 4);
+        ModelRenderer navigationDish = new ModelRenderer(this, 60, 4);
+        navigationDish.addBox(-1.0F, -6.4F, -3.0F, 2, 1, 2);
+        navigationModule.addChild(navigationDish);
+
+        euInterfaceModule = moduleRoot();
+        euInterfaceModule.addBox(-5.8F, 1.0F, 2.2F, 3, 3, 3);
+        euInterfaceModule.addBox(2.8F, 1.0F, 2.2F, 3, 3, 3);
+
         entityScannerModule = moduleRoot();
         entityScannerModule.addBox(-2.5F, -5.4F, -6.2F, 5, 2, 2);
         ModelRenderer scannerEye = new ModelRenderer(this, 60, 4);
@@ -138,6 +163,22 @@ public final class ModelProgrammableDrone extends ModelBase {
         ModelRenderer fleetAntenna = new ModelRenderer(this, 60, 4);
         fleetAntenna.addBox(-0.5F, -9.0F, 4.0F, 1, 4, 1);
         fleetCommunicationModule.addChild(fleetAntenna);
+
+        fishingModule = moduleRoot();
+        fishingModule.addBox(-2.0F, 2.0F, -4.8F, 4, 2, 2);
+        ModelRenderer fishingReel = new ModelRenderer(this, 60, 4);
+        fishingReel.addBox(-1.0F, 3.5F, -5.0F, 2, 2, 1);
+        fishingModule.addChild(fishingReel);
+
+        alchemyModule = moduleRoot();
+        alchemyModule.addBox(-2.5F, 2.0F, 3.8F, 5, 2, 2);
+        ModelRenderer alchemyCoil = new ModelRenderer(this, 60, 4);
+        alchemyCoil.addBox(-1.0F, 3.5F, 4.0F, 2, 2, 1);
+        alchemyModule.addChild(alchemyCoil);
+
+        cargoStatusLight = new ModelRenderer(this, 60, 0);
+        cargoStatusLight.addBox(-1.5F, 0.0F, 6.05F, 3, 1, 1);
+        cargoStatusLight.setRotationPoint(0.0F, 20.0F, 0.0F);
     }
 
     private ModelRenderer moduleRoot() {
@@ -175,7 +216,7 @@ public final class ModelProgrammableDrone extends ModelBase {
     @Override
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks,
             float netHeadYaw, float headPitch, float scaleFactor, Entity entity) {
-        float energyFactor = entity instanceof EntityProgrammableDrone drone && drone.getEnergyPercent() <= 0
+        float energyFactor = entity instanceof EntityProgrammableDrone drone && !drone.hasVisualRotorPower()
                 ? 0.0F : 1.0F;
         if (entity instanceof EntityProgrammableDrone drone && !drone.areVisualRotorsActive()) energyFactor = 0.0F;
         float propulsionFactor = entity instanceof EntityProgrammableDrone drone
@@ -188,8 +229,15 @@ public final class ModelProgrammableDrone extends ModelBase {
                 ? drone.getAttackAnimationProgress(ageInTicks - entity.ticksExisted) : 0.0F;
         toolArm.showModel = entity instanceof EntityProgrammableDrone drone
                 && (drone.hasVisualUpgrade(DroneUpgradeType.TOOL_ARM)
-                || drone.hasVisualUpgrade(DroneUpgradeType.COMBAT));
-        toolArm.rotateAngleX = (float) Math.sin(ageInTicks * 0.15F) * 0.04F - attack * 1.15F;
+                || drone.hasVisualUpgrade(DroneUpgradeType.COMBAT)
+                || drone.hasVisualUpgrade(DroneUpgradeType.FISHING)
+                || drone.hasVisualUpgrade(DroneUpgradeType.THAUMCRAFT_ALCHEMY));
+        float fishingPull = entity instanceof EntityProgrammableDrone drone
+                ? drone.getFishingPullProgress(ageInTicks - entity.ticksExisted) : 0.0F;
+        float alchemyMove = entity instanceof EntityProgrammableDrone drone
+                ? drone.getAlchemyAnimationProgress(ageInTicks - entity.ticksExisted) : 0.0F;
+        toolArm.rotateAngleX = (float) Math.sin(ageInTicks * 0.15F) * 0.04F
+                - attack * 1.15F - fishingPull * 0.85F - alchemyMove * 0.45F;
     }
 
     public void renderStatusLights(float scale) {
@@ -204,6 +252,11 @@ public final class ModelProgrammableDrone extends ModelBase {
             case EFFICIENCY -> efficiencyModule.render(scale);
             case CARGO -> cargoModule.render(scale);
             case WIRELESS -> wirelessModule.render(scale);
+            case FLUID_CARGO -> fluidCargoModule.render(scale);
+            case CRAFTING -> craftingModule.render(scale);
+            case ADVANCED_NAVIGATION -> navigationModule.render(scale);
+            case EU_INTERFACE -> euInterfaceModule.render(scale);
+            case TOOL_ARM -> { }
             case ENTITY_SCANNER -> entityScannerModule.render(scale);
             case COMBAT -> combatModule.render(scale);
             case ENTITY_CONTAINMENT -> containmentModule.render(scale);
@@ -212,6 +265,8 @@ public final class ModelProgrammableDrone extends ModelBase {
             case SECURE_ACCESS -> secureAccessModule.render(scale);
             case ADVANCED_ITEM_HANDLING -> advancedItemModule.render(scale);
             case FLEET_COMMUNICATION -> fleetCommunicationModule.render(scale);
+            case FISHING -> fishingModule.render(scale);
+            case THAUMCRAFT_ALCHEMY -> alchemyModule.render(scale);
         }
     }
 
@@ -219,4 +274,6 @@ public final class ModelProgrammableDrone extends ModelBase {
         root.postRender(scale);
         toolArm.postRender(scale);
     }
+
+    public void renderCargoStatusLight(float scale) { cargoStatusLight.render(scale); }
 }

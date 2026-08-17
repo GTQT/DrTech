@@ -71,7 +71,7 @@ public final class DroneEndpointNetwork extends WorldSavedData {
                     endpoint.getKind(), endpoint.getDimension(), endpoint.getPosition(), endpoint.getOwnerId(),
                     endpoint.getLastHeartbeat(), false, endpoint.getRequestAmount(), endpoint.getProvideAmount(),
                     endpoint.getPriority(), endpoint.getWhitelist(), endpoint.getMinimumReserve(),
-                    endpoint.getMaximumInventory()));
+                    endpoint.getMaximumInventory(), endpoint.getResources()));
         }
     }
 

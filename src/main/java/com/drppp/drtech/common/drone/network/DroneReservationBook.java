@@ -37,6 +37,34 @@ public final class DroneReservationBook {
         return Optional.of(reservation);
     }
 
+    /** Atomically claims both withdrawal and insertion capacity for one logistics movement. */
+    public Optional<DroneReservation> tryReservePair(UUID jobId, DroneEndpoint source, DroneEndpoint target,
+            String resourceId, long requestedAmount, long worldTime, long leaseTicks) {
+        if (jobId == null || source == null || target == null || resourceId == null || requestedAmount <= 0L
+                || leaseTicks <= 0L || source.getEndpointId().equals(target.getEndpointId())
+                || source.getKind() != target.getKind() || reservationByJob.containsKey(jobId)
+                || !source.matchesResource(resourceId) || !target.matchesResource(resourceId)) return Optional.empty();
+        DroneEndpointResource sourceResource = source.getResource(resourceId);
+        DroneEndpointResource targetResource = target.getResource(resourceId);
+        long sourceAmount = sourceResource == null ? 0L : sourceResource.getAmount();
+        long targetAmount = targetResource == null ? 0L : targetResource.getAmount();
+        long sourceReserved = getReservedAmount(source.getEndpointId());
+        long targetReserved = getReservedAmount(target.getEndpointId());
+        long available = source.availableToProvide(sourceAmount, sourceReserved);
+        long capacity = target.requestCapacity(targetAmount, targetReserved);
+        long amount = Math.min(requestedAmount, Math.min(available, capacity));
+        if (amount <= 0L || amount > Long.MAX_VALUE - sourceReserved || amount > Long.MAX_VALUE - targetReserved) {
+            return Optional.empty();
+        }
+        DroneReservation reservation = new DroneReservation(UUID.randomUUID(), jobId, source.getEndpointId(),
+                target.getEndpointId(), resourceId, amount, saturatingAdd(worldTime, leaseTicks));
+        byReservationId.put(reservation.getReservationId(), reservation);
+        reservationByJob.put(jobId, reservation.getReservationId());
+        reservedByEndpoint.put(source.getEndpointId(), sourceReserved + amount);
+        reservedByEndpoint.put(target.getEndpointId(), targetReserved + amount);
+        return Optional.of(reservation);
+    }
+
     /** Atomically reserves an endpoint resource after applying whitelist and direction-specific limits. */
     public Optional<DroneReservation> tryReserve(UUID jobId, DroneEndpoint endpoint, String resourceId,
             boolean providing, long currentAmount, long worldTime, long leaseTicks) {
@@ -55,6 +83,7 @@ public final class DroneReservationBook {
         long remaining = reservedByEndpoint.getOrDefault(reservation.getEndpointId(), 0L) - reservation.getAmount();
         if (remaining <= 0L) reservedByEndpoint.remove(reservation.getEndpointId());
         else reservedByEndpoint.put(reservation.getEndpointId(), remaining);
+        releaseEndpointAmount(reservation.getTargetEndpointId(), reservation.getAmount());
         return true;
     }
 
@@ -117,6 +146,10 @@ public final class DroneReservationBook {
             tag.setString("ReservationId", reservation.getReservationId().toString());
             tag.setString("JobId", reservation.getJobId().toString());
             tag.setString("EndpointId", reservation.getEndpointId().toString());
+            if (reservation.getTargetEndpointId() != null) {
+                tag.setString("TargetEndpointId", reservation.getTargetEndpointId().toString());
+                tag.setString("ResourceId", reservation.getResourceId());
+            }
             tag.setLong("Amount", reservation.getAmount());
             tag.setLong("ExpiresAt", reservation.getExpiresAtTick());
             list.appendTag(tag);
@@ -133,18 +166,31 @@ public final class DroneReservationBook {
             UUID reservationId = readUuid(tag, "ReservationId");
             UUID jobId = readUuid(tag, "JobId");
             UUID endpointId = readUuid(tag, "EndpointId");
+            UUID targetEndpointId = readUuid(tag, "TargetEndpointId");
             long amount = tag.getLong("Amount");
             long expiresAt = tag.getLong("ExpiresAt");
             if (reservationId == null || jobId == null || endpointId == null || amount <= 0L
                     || expiresAt <= worldTime || byReservationId.containsKey(reservationId)
                     || reservationByJob.containsKey(jobId)) continue;
             long reserved = reservedByEndpoint.getOrDefault(endpointId, 0L);
-            if (amount > Long.MAX_VALUE - reserved) continue;
-            DroneReservation reservation = new DroneReservation(reservationId, jobId, endpointId, amount, expiresAt);
+            long targetReserved = targetEndpointId == null ? 0L
+                    : reservedByEndpoint.getOrDefault(targetEndpointId, 0L);
+            if (amount > Long.MAX_VALUE - reserved || targetEndpointId != null
+                    && (targetEndpointId.equals(endpointId) || amount > Long.MAX_VALUE - targetReserved)) continue;
+            DroneReservation reservation = new DroneReservation(reservationId, jobId, endpointId,
+                    targetEndpointId, tag.getString("ResourceId"), amount, expiresAt);
             byReservationId.put(reservationId, reservation);
             reservationByJob.put(jobId, reservationId);
             reservedByEndpoint.put(endpointId, reserved + amount);
+            if (targetEndpointId != null) reservedByEndpoint.put(targetEndpointId, targetReserved + amount);
         }
+    }
+
+    private void releaseEndpointAmount(UUID endpointId, long amount) {
+        if (endpointId == null) return;
+        long remaining = reservedByEndpoint.getOrDefault(endpointId, 0L) - amount;
+        if (remaining <= 0L) reservedByEndpoint.remove(endpointId);
+        else reservedByEndpoint.put(endpointId, remaining);
     }
 
     private static long saturatingAdd(long left, long right) {

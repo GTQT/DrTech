@@ -23,6 +23,8 @@ import com.drppp.drtech.common.drone.item.ItemDroneProgramCard;
 import com.drppp.drtech.common.drone.item.ItemProgrammableDrone;
 import com.drppp.drtech.common.drone.network.DroneDockNetwork;
 import com.drppp.drtech.common.drone.network.DroneDockRecord;
+import com.drppp.drtech.common.drone.sound.DroneSoundCue;
+import com.drppp.drtech.common.drone.sound.DroneSoundPlayer;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
@@ -38,8 +40,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -107,6 +111,7 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         super.update();
         if (getWorld() == null || getWorld().isRemote) return;
         if (getWorld().getTotalWorldTime() % 20L == 0L) updateNetworkHeartbeat();
+        emitDockVisuals();
         deployProgramToStoredDrone();
         chargeStoredDrone();
         if ((pendingResume || autoLaunch) && canLaunchStoredDrone()) tryLaunchStoredDrone(null);
@@ -136,6 +141,9 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         if (accepted > 0L && energyContainer.getEnergyStored() >= accepted) {
             energyContainer.removeEnergy(accepted);
             electricItem.charge(accepted, getTier(), false, false);
+            DroneSoundPlayer.play(getWorld(), dockId, DroneSoundCue.EU_CHARGE,
+                    getPos().getX() + 0.5D, getPos().getY() + 0.7D, getPos().getZ() + 0.5D,
+                    0.22F, 1.6F);
             markDirty();
         }
     }
@@ -200,6 +208,9 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         if (!importItems.insertItem(DRONE_SLOT, recovered, false).isEmpty()) return false;
         pendingResume = resumeAfterCharge;
         currentDroneId = null;
+        DroneSoundPlayer.play(getWorld(), dockId, DroneSoundCue.DOCK_LOCK,
+                getPos().getX() + 0.5D, getPos().getY() + 0.8D, getPos().getZ() + 0.5D,
+                0.8F, 1.0F);
         drone.completeDockRecovery();
         markDirty();
         updateNetworkHeartbeat();
@@ -215,8 +226,44 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         if (accepted <= 0L || energyContainer.getEnergyStored() < accepted) return 0L;
         energyContainer.removeEnergy(accepted);
         long inserted = droneEnergy.insert(accepted, getTier(), false);
-        if (inserted > 0L) markDirty();
+        if (inserted > 0L) {
+            DroneSoundPlayer.play(getWorld(), dockId, DroneSoundCue.EU_CHARGE,
+                    getPos().getX() + 0.5D, getPos().getY() + 1.0D, getPos().getZ() + 0.5D,
+                    0.22F, 1.7F);
+            markDirty();
+        }
         return inserted;
+    }
+
+    private void emitDockVisuals() {
+        if (!(getWorld() instanceof WorldServer) || getPos() == null) return;
+        long time = getWorld().getTotalWorldTime();
+        if (time % 10L != 0L || getWorld().getClosestPlayer(
+                getPos().getX() + 0.5D, getPos().getY() + 0.5D, getPos().getZ() + 0.5D,
+                64.0D, false) == null) return;
+        WorldServer server = (WorldServer) getWorld();
+        double red = enabled && isRedstoneAllowed() ? 0.12D : 1.0D;
+        double green = enabled && isRedstoneAllowed() ? 1.0D : 0.08D;
+        for (int x = 0; x <= 1; x++) for (int z = 0; z <= 1; z++) {
+            server.spawnParticle(EnumParticleTypes.SPELL_MOB,
+                    getPos().getX() + 0.18D + x * 0.64D, getPos().getY() + 1.02D,
+                    getPos().getZ() + 0.18D + z * 0.64D, 0, red, green, 0.08D, 1.0D);
+        }
+        if (time % 20L == 0L) {
+            server.spawnParticle(EnumParticleTypes.END_ROD, getPos().getX() + 0.5D,
+                    getPos().getY() + 1.25D, getPos().getZ() + 0.5D,
+                    2, 0.04D, 0.45D, 0.04D, 0.01D);
+            ItemStack stored = importItems.getStackInSlot(DRONE_SLOT);
+            IElectricItem electric = stored.isEmpty() ? null
+                    : stored.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
+            if (electric != null && electric.getMaxCharge() > 0L) {
+                double progress = Math.max(0.0D, Math.min(1.0D,
+                        electric.getCharge() / (double) electric.getMaxCharge()));
+                server.spawnParticle(EnumParticleTypes.SPELL_MOB,
+                        getPos().getX() + 0.5D, getPos().getY() + 0.25D + progress * 0.7D,
+                        getPos().getZ() + 0.5D, 0, 0.1D, 0.45D + progress * 0.55D, 1.0D, 1.0D);
+            }
+        }
     }
 
     public boolean requestBoundDroneRecall(EntityPlayer requester) {
@@ -545,6 +592,9 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         IVertexOperation[] colouredPipeline = ArrayUtils.add(pipeline,
                 new ColourMultiplier(GTUtility.convertRGBtoOpaqueRGBA_CL(getPaintingColorForRendering())));
         Textures.VOLTAGE_CASINGS[getTier()].render(renderState, translation, colouredPipeline);
+        com.drppp.drtech.Client.Textures.DRONE_DOCK_CASING.render(renderState, translation, pipeline);
         Textures.INFINITE_EMITTER_FACE.renderSided(EnumFacing.UP, renderState, translation, pipeline);
+        com.drppp.drtech.Client.Textures.DRONE_DOCK_OVERLAY.renderSided(
+                EnumFacing.UP, renderState, translation, pipeline);
     }
 }

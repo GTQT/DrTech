@@ -17,12 +17,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 /** Server-side, tick-budgeted state machine. It never mutates the source graph. */
 public final class DroneProgramRuntime {
+    private static final int AREA_BUILD_CANDIDATES_PER_TICK = 1_024;
 
     public static final int MAX_IMMEDIATE_TRANSITIONS_PER_TICK = 32;
     public static final int MAX_TRACE_ENTRIES = 24;
@@ -33,6 +35,10 @@ public final class DroneProgramRuntime {
     private final DroneExecutorRegistry executors;
     private final DroneValueEvaluatorRegistry valueEvaluators;
     private final DroneRuntimeEnvironment environment;
+    private final Map<String, DroneArea> pendingAreaValues = new HashMap<>();
+    private int areaBuildBudgetRemaining;
+    private long areaBuildProgress;
+    private long areaBuildTotal;
     private UUID currentNodeId;
     private DroneRuntimeStatus status = DroneRuntimeStatus.READY;
     private NBTTagCompound nodeState = new NBTTagCompound();
@@ -86,6 +92,7 @@ public final class DroneProgramRuntime {
             return;
         }
         status = DroneRuntimeStatus.RUNNING;
+        areaBuildBudgetRemaining = AREA_BUILD_CANDIDATES_PER_TICK;
         if (pendingBreakpointState != null) {
             continuePendingBreakpoint();
             return;
@@ -129,6 +136,10 @@ public final class DroneProgramRuntime {
                 try {
                     reference = resolveInput(node.getId(), "program", DroneProgramReference.class,
                             new HashSet<>(), 0);
+                } catch (DroneAreaBuildPendingException pending) {
+                    currentNodeElapsedTicks = Math.min(Long.MAX_VALUE - 1L, currentNodeElapsedTicks + 1L);
+                    memory.setLastAction(DroneActionStatus.RUNNING, "");
+                    return;
                 } catch (RuntimeException exception) {
                     fail("Subprogram reference failed: " + exception.getMessage());
                     return;
@@ -310,6 +321,7 @@ public final class DroneProgramRuntime {
             memory.setString(parameterName(configuration, "StringInputName", "string_input"), stringInput, true);
         }
         program = resolved;
+        clearAreaValueCache();
         currentNodeId = resolved.getEntryNodeId();
         nodeState = new NBTTagCompound();
         currentNodeElapsedTicks = 0L;
@@ -332,6 +344,7 @@ public final class DroneProgramRuntime {
                 parameterName(configuration, "StringOutputName", "string_output"), true));
         memory.popLocalScope();
         program = frame.callerProgram;
+        clearAreaValueCache();
         currentNodeId = frame.callNodeId;
         nodeState = new NBTTagCompound();
         currentNodeElapsedTicks = 0L;
@@ -366,13 +379,18 @@ public final class DroneProgramRuntime {
         if (incoming.isEmpty()) return null;
         if (incoming.size() != 1) throw new IllegalStateException("Value input has multiple connections: " + targetPort);
         DroneProgramEdge edge = incoming.get(0);
-        String address = edge.getSourceNodeId() + ":" + edge.getSourcePortId();
+        String address = program.getProgramId() + ":" + edge.getSourceNodeId() + ":" + edge.getSourcePortId();
         if (!visiting.add(address)) throw new IllegalStateException("Cyclic value dependency at " + address);
         try {
             DroneProgramNode source = program.getNode(edge.getSourceNodeId());
             if (source == null) throw new IllegalStateException("Value source node is missing");
             DroneValueEvaluator evaluator = valueEvaluators.get(source.getType());
             if (evaluator == null) throw new IllegalStateException("No value evaluator for " + source.getType());
+            DroneArea cachedArea = pendingAreaValues.get(address);
+            if (cachedArea != null && expectedType.isInstance(cachedArea)) {
+                prepareAreaValue(cachedArea);
+                return expectedType.cast(cachedArea);
+            }
             DroneNodeExecutionContext.InputResolver resolver = new DroneNodeExecutionContext.InputResolver() {
                 @Override
                 public <V> V resolve(String portId, Class<V> type) {
@@ -384,11 +402,9 @@ public final class DroneProgramRuntime {
             if (value == null) return null;
             if (value instanceof DroneArea) {
                 DroneArea area = (DroneArea) value;
-                int limit = Math.max(1, Math.min(DroneArea.MAX_BLOCKS, environment.getAreaBlockLimit()));
-                if (area.getVolume() > limit) {
-                    throw new IllegalStateException("Area contains " + area.getVolume()
-                            + " coordinates, but this chassis supports " + limit);
-                }
+                pendingAreaValues.put(address, area);
+                prepareAreaValue(area);
+                value = area;
             }
             if (!expectedType.isInstance(value)) {
                 throw new IllegalStateException("Value type mismatch: expected " + expectedType.getSimpleName()
@@ -411,9 +427,33 @@ public final class DroneProgramRuntime {
             return false;
         }
         currentNodeId = edges.get(0).getTargetNodeId();
+        pendingAreaValues.clear();
+        areaBuildProgress = 0L;
+        areaBuildTotal = 0L;
         nodeState = new NBTTagCompound();
         currentNodeElapsedTicks = 0L;
         return true;
+    }
+
+    private void prepareAreaValue(DroneArea area) {
+        if (!area.isMaterialized()) {
+            int processed = area.materializeStep(areaBuildBudgetRemaining);
+            areaBuildBudgetRemaining = Math.max(0, areaBuildBudgetRemaining - processed);
+            areaBuildProgress = area.getMaterializationProgress();
+            areaBuildTotal = area.getMaterializationTotal();
+            if (!area.isMaterialized()) throw DroneAreaBuildPendingException.INSTANCE;
+        }
+        int limit = Math.max(1, Math.min(DroneArea.MAX_BLOCKS, environment.getAreaBlockLimit()));
+        if (area.getVolume() > limit) {
+            throw new IllegalStateException("Area contains " + area.getVolume()
+                    + " coordinates, but this chassis supports " + limit);
+        }
+    }
+
+    private void clearAreaValueCache() {
+        pendingAreaValues.clear();
+        areaBuildProgress = 0L;
+        areaBuildTotal = 0L;
     }
 
     private void updateLoopStack(DroneProgramNode node, String outputPort) {
@@ -453,6 +493,7 @@ public final class DroneProgramRuntime {
     }
 
     private void jumpTo(UUID nodeId) {
+        clearAreaValueCache();
         currentNodeId = nodeId;
         nodeState = new NBTTagCompound();
         currentNodeElapsedTicks = 0L;
@@ -552,6 +593,7 @@ public final class DroneProgramRuntime {
         lastOutputNodeType = "";
         lastOutputPort = "";
         lastOutputAmount = 0L;
+        clearAreaValueCache();
         clearPendingBreakpoint();
         memory.clear();
         breakpointBypassNode = null;
@@ -591,6 +633,9 @@ public final class DroneProgramRuntime {
     }
 
     public String getCurrentNodeProgress() {
+        if (areaBuildTotal > 0L && areaBuildProgress < areaBuildTotal) {
+            return "AREA " + areaBuildProgress + "/" + areaBuildTotal;
+        }
         if (nodeState.hasKey("AreaTotal")) {
             return nodeState.getInteger("AreaIndex") + "/" + nodeState.getInteger("AreaTotal");
         }
@@ -762,6 +807,7 @@ public final class DroneProgramRuntime {
     }
 
     private void fail(String message) {
+        clearAreaValueCache();
         stepOverCallDepth = -1;
         status = DroneRuntimeStatus.ERROR;
         error = message == null ? "unknown" : message;

@@ -46,6 +46,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nullable;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -114,6 +115,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     private int selectedAreaCorner = 1;
     private int selectedPropertyIndex;
     private int selectedBlockStatePropertyIndex;
+    private int selectedEntityAdvancedField;
     private UUID propertyDraftNodeId;
     private String propertyDraftId = "";
     private String propertyDraft = "";
@@ -562,10 +564,14 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             GuiDraw.drawRect(point.x + scaled(NODE_WIDTH - 7), point.y + scaled(1), scaled(5), scaled(5),
                     0xFFFFC34D);
         }
-        // Category glyph remains recognisable when node header colours are hard to distinguish.
-        GuiDraw.drawRect(point.x + scaled(2), point.y + scaled(2), scaled(7), scaled(7), 0x880C121A);
-        GuiDraw.drawText(categorySymbol(definition), point.x + scaled(4), point.y + scaled(3),
-                Math.max(0.45F, zoomPercent / 180.0F), 0xFFF4F7FA, false);
+        // Every built-in node has a dedicated texture; category glyph remains the extension-node fallback.
+        GuiDraw.drawRect(point.x + scaled(1), point.y + scaled(1), scaled(10), scaled(9), 0x880C121A);
+        if (definition != null && "drtech".equals(node.getType().getNamespace())) {
+            DroneNodeIconTextures.draw(node.getType(), point.x + scaled(2), point.y + scaled(2), scaled(7));
+        } else {
+            GuiDraw.drawText(categorySymbol(definition), point.x + scaled(4), point.y + scaled(3),
+                    Math.max(0.45F, zoomPercent / 180.0F), 0xFFF4F7FA, false);
+        }
         String customLabel = node.getConfiguration().getString("Label");
         String title = !customLabel.isEmpty() ? customLabel : definition == null
                 ? I18n.format("drtech.drone.canvas.missing_node", node.getType())
@@ -1702,6 +1708,17 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 || node.getType().equals(DrTechDroneNodes.AREA));
     }
 
+    @Nullable
+    public UUID getSelectedCoordinateCaptureNodeId() {
+        return isSelectedCoordinateCaptureTarget() ? selectedNodeId : null;
+    }
+
+    public boolean isSelectedAreaCaptureTarget() {
+        DroneProgramGraph graph = graphSupplier.get();
+        DroneProgramNode node = graph == null || selectedNodeId == null ? null : graph.getNode(selectedNodeId);
+        return node != null && node.getType().equals(DrTechDroneNodes.AREA);
+    }
+
     public boolean canCapturePlayerCoordinate() {
         return isSelectedCoordinateCaptureTarget() && Minecraft.getMinecraft().player != null;
     }
@@ -2105,8 +2122,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             List<ResourceLocation> rules = new ArrayList<>(previous.getEntityIds());
             if (rules.size() >= DroneEntityFilterSpec.MAX_RULES || rules.contains(entityId)) return;
             rules.add(entityId);
-            writeEntityFilter(config, selected.property.getId(),
-                    new DroneEntityFilterSpec(previous.getMode(), rules));
+            writeEntityFilter(config, selected.property.getId(), previous.withModeAndEntityIds(previous.getMode(), rules));
         });
         clearPropertyDraft();
     }
@@ -2119,7 +2135,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             DroneFilterMode mode = previous.getMode() == DroneFilterMode.WHITELIST
                     ? DroneFilterMode.BLACKLIST : DroneFilterMode.WHITELIST;
             writeEntityFilter(config, selected.property.getId(),
-                    new DroneEntityFilterSpec(mode, new ArrayList<>(previous.getEntityIds())));
+                    previous.withModeAndEntityIds(mode, new ArrayList<>(previous.getEntityIds())));
         });
     }
 
@@ -2139,9 +2155,132 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             DroneEntityFilterSpec previous = readEntityFilter(config, selected.property.getId());
             List<ResourceLocation> rules = new ArrayList<>(previous.getEntityIds());
             if (!rules.isEmpty()) rules.remove(rules.size() - 1);
-            writeEntityFilter(config, selected.property.getId(),
-                    new DroneEntityFilterSpec(previous.getMode(), rules));
+            writeEntityFilter(config, selected.property.getId(), previous.withModeAndEntityIds(previous.getMode(), rules));
         });
+    }
+
+    public void cycleSelectedEntityAdvancedField(int delta) {
+        selectedEntityAdvancedField = Math.floorMod(selectedEntityAdvancedField + delta, 10);
+    }
+
+    public String getSelectedEntityAdvancedLabel() {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ENTITY_SELECTOR) return "";
+        DroneEntityFilterSpec spec = readEntityFilter(selected.node.getConfiguration(), selected.property.getId());
+        String field = I18n.format("drtech.drone.entity_filter.field." + entityAdvancedFieldId());
+        String value;
+        switch (selectedEntityAdvancedField) {
+            case 0: value = spec.getNames().isEmpty() ? "*" : spec.getNames().get(0); break;
+            case 1: value = spec.getEntityUuid() == null ? "*" : spec.getEntityUuid().toString(); break;
+            case 2: value = spec.getOwnerUuid() == null ? "*" : spec.getOwnerUuid().toString(); break;
+            case 3: value = triStateLabel(spec.getAnimals()); break;
+            case 4: value = triStateLabel(spec.getMonsters()); break;
+            case 5: value = triStateLabel(spec.getAdult()); break;
+            case 6: value = String.valueOf(spec.getMinHealth()); break;
+            case 7: value = spec.getMaxHealth() == Float.MAX_VALUE ? "∞" : String.valueOf(spec.getMaxHealth()); break;
+            case 8: value = booleanLabel(spec.isAllowBosses()); break;
+            default: value = booleanLabel(spec.isAllowTransport()); break;
+        }
+        if (value.length() > 18) value = value.substring(0, 17) + "…";
+        return field + ": " + value;
+    }
+
+    public void adjustSelectedEntityAdvancedValue(int delta) {
+        mutateSelectedEntityAdvanced(spec -> {
+            Boolean animals = spec.getAnimals();
+            Boolean monsters = spec.getMonsters();
+            Boolean adult = spec.getAdult();
+            float minHealth = spec.getMinHealth();
+            float maxHealth = spec.getMaxHealth();
+            boolean allowBosses = spec.isAllowBosses();
+            boolean allowTransport = spec.isAllowTransport();
+            if (selectedEntityAdvancedField == 3) animals = cycleTriState(animals, delta);
+            else if (selectedEntityAdvancedField == 4) monsters = cycleTriState(monsters, delta);
+            else if (selectedEntityAdvancedField == 5) adult = cycleTriState(adult, delta);
+            else if (selectedEntityAdvancedField == 6) minHealth = Math.max(0F, minHealth + delta);
+            else if (selectedEntityAdvancedField == 7) {
+                float base = maxHealth == Float.MAX_VALUE ? Math.max(minHealth, 20F) : maxHealth;
+                maxHealth = Math.max(minHealth, base + delta);
+            } else if (selectedEntityAdvancedField == 8) allowBosses = !allowBosses;
+            else if (selectedEntityAdvancedField == 9) allowTransport = !allowTransport;
+            return spec.withAdvanced(spec.getNames(), spec.getEntityUuid(), spec.getOwnerUuid(),
+                    animals, monsters, adult, minHealth, maxHealth, allowBosses, allowTransport);
+        });
+    }
+
+    public void applySelectedEntityAdvancedText(String text) {
+        final String checked = text == null ? "" : text.trim();
+        mutateSelectedEntityAdvanced(spec -> {
+            List<String> names = spec.getNames();
+            UUID entityUuid = spec.getEntityUuid();
+            UUID ownerUuid = spec.getOwnerUuid();
+            float minHealth = spec.getMinHealth();
+            float maxHealth = spec.getMaxHealth();
+            try {
+                if (selectedEntityAdvancedField == 0) names = checked.isEmpty()
+                        ? Collections.emptyList() : Collections.singletonList(checked);
+                else if (selectedEntityAdvancedField == 1) entityUuid = checked.isEmpty() ? null : UUID.fromString(checked);
+                else if (selectedEntityAdvancedField == 2) ownerUuid = checked.isEmpty() ? null : UUID.fromString(checked);
+                else if (selectedEntityAdvancedField == 6) {
+                    float parsed = Float.parseFloat(checked);
+                    if (!Float.isFinite(parsed)) return spec;
+                    minHealth = Math.max(0F, Math.min(1_000_000F, parsed));
+                } else if (selectedEntityAdvancedField == 7) {
+                    float parsed = Float.parseFloat(checked);
+                    if (!Float.isFinite(parsed)) return spec;
+                    maxHealth = Math.max(minHealth, Math.min(1_000_000F, parsed));
+                }
+            } catch (IllegalArgumentException ignored) {
+                return spec;
+            }
+            return spec.withAdvanced(names, entityUuid, ownerUuid, spec.getAnimals(), spec.getMonsters(),
+                    spec.getAdult(), minHealth, maxHealth, spec.isAllowBosses(), spec.isAllowTransport());
+        });
+    }
+
+    public void clearSelectedEntityAdvancedValue() {
+        mutateSelectedEntityAdvanced(spec -> {
+            List<String> names = selectedEntityAdvancedField == 0 ? Collections.emptyList() : spec.getNames();
+            UUID entityUuid = selectedEntityAdvancedField == 1 ? null : spec.getEntityUuid();
+            UUID ownerUuid = selectedEntityAdvancedField == 2 ? null : spec.getOwnerUuid();
+            Boolean animals = selectedEntityAdvancedField == 3 ? null : spec.getAnimals();
+            Boolean monsters = selectedEntityAdvancedField == 4 ? null : spec.getMonsters();
+            Boolean adult = selectedEntityAdvancedField == 5 ? null : spec.getAdult();
+            float minHealth = selectedEntityAdvancedField == 6 ? 0F : spec.getMinHealth();
+            float maxHealth = selectedEntityAdvancedField == 7 ? Float.MAX_VALUE : spec.getMaxHealth();
+            boolean bosses = selectedEntityAdvancedField == 8 ? false : spec.isAllowBosses();
+            boolean transport = selectedEntityAdvancedField == 9 ? false : spec.isAllowTransport();
+            return spec.withAdvanced(names, entityUuid, ownerUuid, animals, monsters, adult,
+                    minHealth, maxHealth, bosses, transport);
+        });
+    }
+
+    private void mutateSelectedEntityAdvanced(java.util.function.UnaryOperator<DroneEntityFilterSpec> mutation) {
+        SelectedProperty selected = selectedProperty();
+        if (selected == null || selected.property.getType() != DroneNodePropertyType.ENTITY_SELECTOR) return;
+        configureSelected((node, config) -> {
+            DroneEntityFilterSpec previous = readEntityFilter(config, selected.property.getId());
+            writeEntityFilter(config, selected.property.getId(), mutation.apply(previous));
+        });
+    }
+
+    private String entityAdvancedFieldId() {
+        return new String[] {"name", "uuid", "owner_uuid", "animals", "monsters", "adult",
+                "min_health", "max_health", "bosses", "transport"}[selectedEntityAdvancedField];
+    }
+
+    private static Boolean cycleTriState(Boolean value, int delta) {
+        int index = value == null ? 0 : value ? 1 : 2;
+        int next = Math.floorMod(index + (delta < 0 ? -1 : 1), 3);
+        return next == 0 ? null : next == 1;
+    }
+
+    private static String triStateLabel(Boolean value) {
+        return value == null ? I18n.format("drtech.drone.entity_filter.any") : booleanLabel(value);
+    }
+
+    private static String booleanLabel(boolean value) {
+        return I18n.format(value ? "drtech.drone.entity_filter.yes" : "drtech.drone.entity_filter.no");
     }
 
     private void appendSelectedItemRule(DroneNodePropertyDefinition property, DroneItemFilterSpec.Rule rule) {
@@ -3291,6 +3430,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             case "events" -> 0xFFE07155;
             case "sensors" -> 0xFF63B7A6;
             case "math" -> 0xFF5FA9C8;
+            case "thaumcraft" -> 0xFF8E55C7;
             default -> 0xFF697A8D;
         };
     }
@@ -3308,6 +3448,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             case "energy" -> "E";
             case "dock" -> "D";
             case "machines" -> "M";
+            case "thaumcraft" -> "T";
             default -> "•";
         };
     }

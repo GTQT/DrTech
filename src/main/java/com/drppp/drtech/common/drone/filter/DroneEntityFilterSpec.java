@@ -53,7 +53,7 @@ public final class DroneEntityFilterSpec {
                 minHealth, maxHealth, allowBosses, allowTransport, DroneFilterMode.WHITELIST, null);
     }
 
-    private DroneEntityFilterSpec(List<String> whitelist, List<String> blacklist, List<String> names,
+    public DroneEntityFilterSpec(List<String> whitelist, List<String> blacklist, List<String> names,
             @Nullable UUID entityUuid, @Nullable UUID ownerUuid, @Nullable Boolean animals, @Nullable Boolean monsters,
             @Nullable Boolean adult, float minHealth, float maxHealth, boolean allowBosses, boolean allowTransport,
             DroneFilterMode mode, List<ResourceLocation> entityIds) {
@@ -109,6 +109,18 @@ public final class DroneEntityFilterSpec {
     public boolean isAllowTransport() { return allowTransport; }
     public DroneFilterMode getMode() { return mode; }
     public List<ResourceLocation> getEntityIds() { return entityIds; }
+    public DroneEntityFilterSpec withModeAndEntityIds(DroneFilterMode newMode, List<ResourceLocation> newEntityIds) {
+        return new DroneEntityFilterSpec(whitelist, blacklist, names, entityUuid, ownerUuid, animals, monsters,
+                adult, minHealth, maxHealth, allowBosses, allowTransport, newMode, newEntityIds);
+    }
+    public DroneEntityFilterSpec withAdvanced(List<String> newNames, @Nullable UUID newEntityUuid,
+            @Nullable UUID newOwnerUuid, @Nullable Boolean newAnimals, @Nullable Boolean newMonsters,
+            @Nullable Boolean newAdult, float newMinHealth, float newMaxHealth,
+            boolean newAllowBosses, boolean newAllowTransport) {
+        return new DroneEntityFilterSpec(whitelist, blacklist, newNames, newEntityUuid, newOwnerUuid,
+                newAnimals, newMonsters, newAdult, newMinHealth, newMaxHealth,
+                newAllowBosses, newAllowTransport, mode, entityIds);
+    }
     public NBTTagCompound writeToNbt() {
         NBTTagCompound tag = new NBTTagCompound(); tag.setString("Mode", mode.name());
         NBTTagList ids = new NBTTagList(); for (ResourceLocation id : entityIds) { NBTTagCompound item = new NBTTagCompound(); item.setString("Value", id.toString()); ids.appendTag(item); } tag.setTag("EntityIds", ids);

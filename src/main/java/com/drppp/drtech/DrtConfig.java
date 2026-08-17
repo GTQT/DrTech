@@ -17,7 +17,7 @@ public class DrtConfig {
 
     @Config.LangKey("enable_drone_combat")
     @Config.Comment("Allow programmable drones to execute attack-entity nodes. Bosses remain protected.")
-    public static boolean EnableDroneCombat = false;
+    public static boolean EnableDroneCombat = true;
 
     @Config.LangKey("enable_drone_player_attack")
     @Config.Comment("Allow drone attack nodes to target players when drone combat is enabled.")

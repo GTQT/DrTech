@@ -121,5 +121,14 @@
       "drtech:item/lightsaber/hit6",
       "drtech:item/lightsaber/hit7"
     ]
+  },
+  "drone.rotor": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "drtech:rocket_loop",
+        "stream": false
+      }
+    ]
   }
 }

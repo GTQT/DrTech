@@ -140,13 +140,20 @@ public final class DroneProgramHardwareValidator {
         });
         requirements.put(DroneUpgradeType.ENTITY_SCANNER, new ResourceLocation[] {
                 DrTechDroneNodes.ENTITY_COUNT, DrTechDroneNodes.ENTITY_SENSOR,
-                DrTechDroneNodes.FOLLOW_ENTITY, DrTechDroneNodes.AVOID_ENTITY
+                DrTechDroneNodes.FOLLOW_ENTITY, DrTechDroneNodes.AVOID_ENTITY,
+                DrTechDroneNodes.PATROL_ATTACK_AREA
         });
         requirements.put(DroneUpgradeType.COMBAT, new ResourceLocation[] {
-                DrTechDroneNodes.ATTACK_ENTITY
+                DrTechDroneNodes.ATTACK_ENTITY, DrTechDroneNodes.PATROL_ATTACK_AREA
         });
         requirements.put(DroneUpgradeType.ENTITY_CONTAINMENT, new ResourceLocation[] {
                 DrTechDroneNodes.LOAD_ENTITY, DrTechDroneNodes.RELEASE_ENTITY
+        });
+        requirements.put(DroneUpgradeType.FISHING, new ResourceLocation[] {
+                DrTechDroneNodes.FISH_AT
+        });
+        requirements.put(DroneUpgradeType.THAUMCRAFT_ALCHEMY, new ResourceLocation[] {
+                DrTechDroneNodes.TRANSFER_THAUMCRAFT_ESSENTIA
         });
         return requirements;
     }

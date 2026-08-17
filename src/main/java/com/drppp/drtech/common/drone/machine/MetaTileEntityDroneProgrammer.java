@@ -1,5 +1,8 @@
 package com.drppp.drtech.common.drone.machine;
 
+import codechicken.lib.render.CCRenderState;
+import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Matrix4;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -18,8 +21,10 @@ import com.drppp.drtech.Client.drone.DroneDiagnosticScrollWidget;
 import com.drppp.drtech.Client.drone.DronePropertyChoiceWidget;
 import com.drppp.drtech.Client.drone.DroneAreaPreviewWidget;
 import com.drppp.drtech.Client.drone.DroneWorldPreviewRenderer;
+import com.drppp.drtech.Client.drone.DroneWorldSelectionHandler;
 import com.drppp.drtech.Client.drone.DroneMultilineTextWidget;
 import com.drppp.drtech.Client.drone.DroneNodeLibraryButtonWidget;
+import com.drppp.drtech.Client.drone.DroneBilingualNodeSearch;
 import com.drppp.drtech.common.drone.item.DroneItemData;
 import com.drppp.drtech.common.drone.hardware.DroneUpgradeDataCodec;
 import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
@@ -89,6 +94,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.input.Keyboard;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
 import java.util.ArrayList;
@@ -111,6 +118,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     private static final String CREATE_TEMPLATE_ACTION = "drone_create_program_template";
     private static final String IMPORT_PROGRAM_ACTION = "drone_import_program";
     private static final String COMPARE_PROGRAM_ACTION = "drone_compare_program";
+    private static final String WORLD_SELECTION_ACTION = "drone_world_selection";
     private static final int MAX_EDIT_DISTANCE_SQUARED = 64;
     private static final int MAX_REMOTE_DEBUG_RANGE = 512;
     private static final long PROGRAM_WRITE_EU = 8_192L;
@@ -131,6 +139,10 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     private int loadedCardFingerprint = Integer.MIN_VALUE;
     private ItemStack loadedCardReference = ItemStack.EMPTY;
     private UUID editorOwner;
+    private UUID worldSelectionOwner;
+    private UUID worldSelectionNodeId;
+    private boolean worldSelectionArea;
+    private long worldSelectionExpiresAt;
     private String serverStatus = "Insert a program card";
 
     private DroneProgramGraph clientGraph;
@@ -278,6 +290,8 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         syncManager.registerSyncedAction(COMPARE_PROGRAM_ACTION, false, true,
                 packet -> compareProgramTransfer(guiData.getPlayer(),
                         packet.readString(DroneProgramTransferCodec.MAX_TEXT_LENGTH)));
+        syncManager.registerSyncedAction(WORLD_SELECTION_ACTION, false, true,
+                packet -> beginWorldSelection(guiData.getPlayer(), packet));
         syncManager.addOpenListener(this::onEditorOpened);
         syncManager.addCloseListener(this::onEditorClosed);
 
@@ -834,9 +848,25 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .overlay(IKey.lang("drtech.drone.programmer.clear"))
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
                         .onMousePressed(mouse -> { canvas.clearSelectedProperty(); return true; }))
-                .child(IKey.lang("drtech.drone.programmer.entity_selector_help").asWidget()
-                        .pos(379, 214).size(134, 27)
+                .child(IKey.dynamic(canvas::getSelectedEntityAdvancedLabel).scale(0.72F).asWidget()
+                        .pos(379, 214).size(134, 12)
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(actionButton("<", 379, 228, () -> canvas.cycleSelectedEntityAdvancedField(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(actionButton(">", 416, 228, () -> canvas.cycleSelectedEntityAdvancedField(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(actionButton("-", 453, 228, () -> canvas.adjustSelectedEntityAdvancedValue(-1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(actionButton("+", 490, 228, () -> canvas.adjustSelectedEntityAdvancedValue(1))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector()))
+                .child(new ButtonWidget<>().pos(379, 246).size(66, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.apply"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
+                        .onMousePressed(mouse -> { canvas.applySelectedEntityAdvancedText(clientEntitySearch); return true; }))
+                .child(new ButtonWidget<>().pos(447, 246).size(66, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.clear"))
+                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedEntitySelector())
+                        .onMousePressed(mouse -> { canvas.clearSelectedEntityAdvancedValue(); return true; }))
                 .child(IKey.lang("drtech.drone.programmer.dock_search").asWidget().pos(379, 122).size(24, 10)
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedDockReference()))
                 .child(new TextFieldWidget().pos(404, 118).size(109, 16).setMaxLength(96)
@@ -993,8 +1023,17 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_drone.help")))
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureDroneCoordinate())
                         .onMousePressed(mouse -> { canvas.captureDroneCoordinate(); return true; }))
+                .child(new ButtonWidget<>().pos(379, 231).size(134, 16)
+                        .overlay(IKey.lang("drtech.drone.programmer.capture_world"))
+                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_world.help")))
+                        .setEnabledIf(widget -> clientInspectorPage == 0
+                                && canvas.isSelectedCoordinateCaptureTarget() && clientEditable)
+                        .onMousePressed(mouse -> {
+                            beginClientWorldSelection(syncManager, canvas);
+                            return true;
+                        }))
                 // Area nodes own this lower region with their preview and projection button.
-                .child(IKey.lang("drtech.drone.programmer.capture_area_corner_help").asWidget().pos(379, 240).size(134, 10)
+                .child(IKey.lang("drtech.drone.programmer.capture_area_corner_help").asWidget().pos(379, 249).size(134, 10)
                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedCoordinateCaptureTarget()
                                 && !canvas.isSelectedAreaPreviewNode()))
                 .child(new ButtonWidget<>().pos(379, 44).size(42, 16)
@@ -1016,7 +1055,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .setEnabledIf(widget -> clientInspectorPage == 1 && clientRemoteDebugPage == 0))
                 .child(IKey.dynamic(this::getRemoteActionText).asWidget().pos(379, 108).size(134, 10)
                         .setEnabledIf(widget -> clientInspectorPage == 1 && clientRemoteDebugPage == 0))
-                .child(IKey.dynamic(this::getRemoteActionErrorText).asWidget().pos(379, 120).size(134, 10)
+                .child(IKey.dynamic(this::getRemoteActionErrorText).scale(0.72F).asWidget().pos(379, 120).size(134, 10)
                         .setEnabledIf(widget -> clientInspectorPage == 1 && clientRemoteDebugPage == 0))
                 .child(IKey.lang("drtech.drone.remote.variables").asWidget().pos(379, 134).size(60, 10)
                         .setEnabledIf(widget -> clientInspectorPage == 1 && clientRemoteDebugPage == 0))
@@ -1091,18 +1130,18 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 .child(diagnosticFilterButton(1, 413))
                 .child(diagnosticFilterButton(2, 447))
                 .child(diagnosticFilterButton(3, 481))
-                .child(new DroneDiagnosticScrollWidget(this::moveDiagnosticPage).pos(379, 82).size(134, 110)
+                .child(new DroneDiagnosticScrollWidget(this::moveDiagnosticPage).pos(379, 82).size(134, 96)
                         .setEnabledIf(widget -> clientInspectorPage == 2))
                 .child(diagnosticRowButton(canvas, 0, 84))
-                .child(diagnosticRowButton(canvas, 1, 121))
-                .child(diagnosticRowButton(canvas, 2, 158))
-                .child(actionButton("<", 379, 197, () -> moveDiagnosticPage(-1))
+                .child(diagnosticRowButton(canvas, 1, 116))
+                .child(diagnosticRowButton(canvas, 2, 148))
+                .child(actionButton("<", 379, 181, () -> moveDiagnosticPage(-1))
                         .setEnabledIf(widget -> clientInspectorPage == 2 && getDiagnosticPageCount() > 1))
-                .child(actionButton(">", 416, 197, () -> moveDiagnosticPage(1))
+                .child(actionButton(">", 416, 181, () -> moveDiagnosticPage(1))
                         .setEnabledIf(widget -> clientInspectorPage == 2 && getDiagnosticPageCount() > 1))
-                .child(IKey.dynamic(this::getDiagnosticPageLabel).asWidget().pos(454, 201).size(59, 10)
+                .child(IKey.dynamic(this::getDiagnosticPageLabel).asWidget().pos(454, 185).size(59, 10)
                         .setEnabledIf(widget -> clientInspectorPage == 2))
-                .child(IKey.lang("drtech.drone.diagnostic.click_to_locate").asWidget().pos(379, 219).size(134, 42)
+                .child(IKey.lang("drtech.drone.diagnostic.click_to_locate").asWidget().pos(379, 201).size(134, 42)
                         .setEnabledIf(widget -> clientInspectorPage == 2))
                 .child(SlotGroupWidget.playerInventory(false).disableSortButtons().left(7).bottom(7))
                 .child(canvas)
@@ -1786,10 +1825,11 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             DroneProgramCanvasWidget canvas) {
         int column = index % 2;
         int row = index / 2;
-        return new DroneNodeLibraryButtonWidget().pos(5 + column * 42, 83 + row * 15).size(39, 14)
+        return new DroneNodeLibraryButtonWidget().nodeType(() -> libraryNodeAt(index))
+                .pos(5 + column * 42, 83 + row * 15).size(39, 14)
                 .overlay(IKey.dynamic(() -> {
                     ResourceLocation nodeType = libraryNodeAt(index);
-                    return nodeType == null ? "" : compactNodeText(nodeType);
+                    return nodeType == null ? "" : "   " + compactNodeText(nodeType);
                 }).scale(0.68F))
                 .tooltipStatic(tooltip -> tooltip.addLine(IKey.dynamic(() -> {
                     ResourceLocation nodeType = libraryNodeAt(index);
@@ -1950,16 +1990,8 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     }
 
     private boolean matchesNodeSearch(ResourceLocation nodeType) {
-        String query = clientNodeSearch == null ? "" : clientNodeSearch.trim().toLowerCase(java.util.Locale.ROOT);
-        if (query.isEmpty()) return true;
-        String label = I18n.format("drtech.drone.node." + nodeType.getPath()).toLowerCase(java.util.Locale.ROOT);
         DroneNodeDefinition definition = NODE_LIBRARY.get(nodeType);
-        String category = definition == null ? "" : definition.getCategory();
-        String categoryLabel = I18n.format("drtech.drone.programmer.node_category." + category)
-                .toLowerCase(java.util.Locale.ROOT);
-        String alias = nodeType.getPath().replace('_', ' ');
-        return nodeType.getPath().contains(query) || alias.contains(query) || label.contains(query)
-                || category.contains(query) || categoryLabel.contains(query);
+        return DroneBilingualNodeSearch.matches(nodeType, definition, clientNodeSearch);
     }
 
     /** Builds a compact, dynamic node-card tooltip without changing the program schema. */
@@ -2021,7 +2053,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private ButtonWidget<?> diagnosticFilterButton(int filter, int x) {
         return new ButtonWidget<>().pos(x, 64).size(32, 16)
-                .overlay(IKey.dynamic(() -> getDiagnosticFilterLabel(filter)))
+                .overlay(IKey.dynamic(() -> getDiagnosticFilterLabel(filter)).scale(0.72F))
                 .setEnabledIf(widget -> clientInspectorPage == 2)
                 .onMousePressed(mouse -> {
                     clientDiagnosticFilter = filter;
@@ -2031,8 +2063,10 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     }
 
     private ButtonWidget<?> diagnosticRowButton(DroneProgramCanvasWidget canvas, int row, int y) {
-        return new ButtonWidget<>().pos(379, y).size(134, 34)
-                .overlay(IKey.dynamic(() -> getDiagnosticRowLabel(row)))
+        return new ButtonWidget<>().pos(379, y).size(134, 29)
+                // Diagnostic details belong in the tooltip; the fixed, scaled label keeps
+                // even long translated errors inside its row and above the pager/tool bar.
+                .overlay(IKey.dynamic(() -> getDiagnosticRowLabel(row)).scale(0.68F))
                 .tooltipStatic(tooltip -> {
                     tooltip.addLine(IKey.dynamic(() -> getDiagnosticRowTooltip(row)));
                     tooltip.addLine(IKey.dynamic(() -> getDiagnosticRepairTooltip(row)));
@@ -2080,8 +2114,11 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private ButtonWidget<?> remoteTraceRowButton(DroneProgramCanvasWidget canvas, int row, int y) {
         return new ButtonWidget<>().pos(379, y).size(134, 10)
-                .overlay(IKey.dynamic(() -> getRemoteTraceRow(row)))
-                .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.remote.trace_focus_help")))
+                .overlay(IKey.dynamic(() -> getRemoteTraceRow(row)).scale(0.68F))
+                .tooltipStatic(tooltip -> {
+                    tooltip.addLine(IKey.dynamic(() -> getRemoteTraceTooltip(row)));
+                    tooltip.addLine(IKey.lang("drtech.drone.remote.trace_focus_help"));
+                })
                 .onMousePressed(mouse -> {
                     focusRemoteTrace(canvas, row);
                     return true;
@@ -2099,6 +2136,17 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             configuration.setBoolean("Collapsed", false);
         }
         if (nodeType.equals(DrTechDroneNodes.WAIT)) configuration.setInteger("Ticks", 20);
+        if (nodeType.equals(DrTechDroneNodes.PATROL_ATTACK_AREA)) {
+            configuration.setString("Priority", "HOSTILE_FIRST");
+            configuration.setBoolean("UntilAreaClear", true);
+            configuration.setBoolean("HostileOnly", true);
+            configuration.setInteger("MaxChaseTicks", 1_200);
+            configuration.setInteger("MaxChaseDistance", 16);
+            configuration.setString("NoTargetMode", "COMPLETE");
+            configuration.setInteger("RescanTicks", 20);
+            configuration.setBoolean("ReacquireLostTarget", true);
+            configuration.setBoolean("ReturnToAreaOnComplete", true);
+        }
         if (nodeType.equals(DrTechDroneNodes.CHARGE_UNTIL)) configuration.setDouble("Percent", 100.0D);
         if (nodeType.equals(DrTechDroneNodes.CONFIGURE_SAFETY)) {
             configuration.setInteger("ReturnPercent", 20);
@@ -2217,6 +2265,93 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private void sendEditCommand(PanelSyncManager syncManager, DroneGraphEditCommand command) {
         syncManager.callSyncedAction(EDIT_ACTION, packet -> packet.writeCompoundTag(DroneGraphCommandCodec.write(command)));
+    }
+
+    private void beginClientWorldSelection(PanelSyncManager syncManager, DroneProgramCanvasWidget canvas) {
+        UUID nodeId = canvas.getSelectedCoordinateCaptureNodeId();
+        if (nodeId == null || !clientEditable) return;
+        boolean area = canvas.isSelectedAreaCaptureTarget();
+        syncManager.callSyncedAction(WORLD_SELECTION_ACTION, packet -> {
+            packet.writeString(nodeId.toString());
+            packet.writeBoolean(area);
+        });
+        DroneWorldSelectionHandler.begin(getPos(), nodeId, area);
+    }
+
+    private void beginWorldSelection(EntityPlayer player, PacketBuffer packet) {
+        if (getWorld() == null || getWorld().isRemote || player.getDistanceSq(getPos()) > MAX_EDIT_DISTANCE_SQUARED) return;
+        refreshCardSession();
+        // The client closes the GUI immediately after requesting world picking. The close
+        // callback can therefore clear editorOwner before this packet is handled; a released
+        // lock is safe here because the request is still bound to the nearby programmer and
+        // the loaded program card. A lock held by another player remains rejected.
+        if (editSession == null || editorOwner != null && !editorOwner.equals(player.getUniqueID())) return;
+        UUID nodeId;
+        try {
+            nodeId = UUID.fromString(packet.readString(36));
+        } catch (IllegalArgumentException exception) {
+            return;
+        }
+        boolean area = packet.readBoolean();
+        DroneProgramNode node = editSession.getGraph().getNode(nodeId);
+        if (node == null || area != node.getType().equals(DrTechDroneNodes.AREA)
+                || !area && !node.getType().equals(DrTechDroneNodes.COORDINATE)) return;
+        worldSelectionOwner = player.getUniqueID();
+        worldSelectionNodeId = nodeId;
+        worldSelectionArea = area;
+        worldSelectionExpiresAt = getWorld().getTotalWorldTime() + 1200L;
+        serverStatus = area ? "World area selection active" : "World coordinate selection active";
+    }
+
+    public void applyWorldSelection(EntityPlayer player, UUID nodeId, BlockPos first, BlockPos second) {
+        if (getWorld() == null || getWorld().isRemote || player == null || first == null
+                || worldSelectionOwner == null || !worldSelectionOwner.equals(player.getUniqueID())
+                || worldSelectionNodeId == null || !worldSelectionNodeId.equals(nodeId)
+                || getWorld().getTotalWorldTime() > worldSelectionExpiresAt) {
+            clearWorldSelection();
+            return;
+        }
+        refreshCardSession();
+        if (editSession == null) {
+            clearWorldSelection();
+            return;
+        }
+        DroneProgramNode node = editSession.getGraph().getNode(nodeId);
+        if (node == null || worldSelectionArea && second == null
+                || worldSelectionArea != node.getType().equals(DrTechDroneNodes.AREA)) {
+            clearWorldSelection();
+            return;
+        }
+        NBTTagCompound config = node.getConfiguration();
+        if (worldSelectionArea) {
+            config.setInteger("X1", first.getX());
+            config.setInteger("Y1", first.getY());
+            config.setInteger("Z1", first.getZ());
+            config.setInteger("X2", second.getX());
+            config.setInteger("Y2", second.getY());
+            config.setInteger("Z2", second.getZ());
+        } else {
+            config.setInteger("X", first.getX());
+            config.setInteger("Y", first.getY());
+            config.setInteger("Z", first.getZ());
+        }
+        DroneGraphEditResult result = editSession.apply(DroneGraphEditCommand.configureNode(
+                editSession.getGraph().getRevision(), nodeId, config));
+        if (result.isAccepted()) {
+            saveSessionToCard();
+            serverStatus = worldSelectionArea ? "World area saved" : "World coordinate saved";
+            markDirty();
+        } else {
+            serverStatus = result.getStatus().name() + ": " + result.getMessage();
+        }
+        clearWorldSelection();
+    }
+
+    private void clearWorldSelection() {
+        worldSelectionOwner = null;
+        worldSelectionNodeId = null;
+        worldSelectionArea = false;
+        worldSelectionExpiresAt = 0L;
     }
 
     private void sendHistoryCommand(PanelSyncManager syncManager, boolean undo) {
@@ -3181,7 +3316,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         String severity = localizeDiagnosticSeverity(diagnostic.severity);
         String code = localizeDiagnosticCode(diagnostic.code);
         String node = diagnostic.nodeId == null ? "" : " · " + diagnosticNodeLabel(diagnostic.nodeId);
-        return number + ". " + severity + " · " + shorten(code, 14) + shorten(node, 10);
+        return number + ". " + shorten(severity, 4) + " · " + shorten(code, 10) + shorten(node, 7);
     }
 
     private String getDiagnosticRowTooltip(int row) {
@@ -3256,7 +3391,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private String getRemoteActionErrorText() {
         if (clientRemoteActionError == null || clientRemoteActionError.isEmpty()) return "";
-        return I18n.format("drtech.drone.remote.action_error", shorten(clientRemoteActionError, 30));
+        return shorten(I18n.format("drtech.drone.remote.action_error", clientRemoteActionError), 28);
     }
 
     private String getRemotePortNodeText() {
@@ -3407,8 +3542,18 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private String getRemoteTraceRow(int row) {
         ClientRemoteTrace trace = getRemoteTraceAt(row);
-        return trace == null ? (row == 0 && filteredRemoteTraces().isEmpty()
-                ? I18n.format("drtech.drone.remote.no_trace") : "") : localizeRemoteTrace(trace.text);
+        if (trace == null) {
+            return row == 0 && filteredRemoteTraces().isEmpty()
+                    ? I18n.format("drtech.drone.remote.no_trace") : "";
+        }
+        String localized = localizeRemoteTrace(trace.text).replace('\r', ' ').replace('\n', ' ')
+                .replaceAll("\\s+", " ").trim();
+        return shorten(localized, 28);
+    }
+
+    private String getRemoteTraceTooltip(int row) {
+        ClientRemoteTrace trace = getRemoteTraceAt(row);
+        return trace == null ? "" : localizeRemoteTrace(trace.text);
     }
 
     private void moveRemoteTraceOffset(int delta) {
@@ -3741,6 +3886,17 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             this.text = text;
             this.nodeId = nodeId;
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation,
+            IVertexOperation[] pipeline) {
+        super.renderMetaTileEntity(renderState, translation, pipeline);
+        com.drppp.drtech.Client.Textures.DRONE_PROGRAMMER_CASING.render(
+                renderState, translation, pipeline);
+        com.drppp.drtech.Client.Textures.DRONE_PROGRAMMER_OVERLAY.renderSided(
+                getFrontFacing(), renderState, translation, pipeline);
     }
 
     @Override

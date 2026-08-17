@@ -24,11 +24,13 @@ import java.util.List;
 /** Shared item/entity payload keys for lossless deployment and recall. */
 public final class DroneItemData {
 
-    public static final int CURRENT_DATA_VERSION = 9;
+    public static final int CURRENT_DATA_VERSION = 11;
 
     public static final String PROGRAM_TAG = "DrTechDroneProgram";
     public static final String INVENTORY_TAG = "DrTechDroneInventory";
     public static final String WEAPONS_TAG = "DrTechDroneWeapons";
+    public static final String FISHING_ROD_TAG = "DrTechDroneFishingRod";
+    public static final String ALCHEMY_JAR_TAG = "DrTechDroneAlchemyJar";
     public static final String FLUID_TAG = "DrTechDroneFluid";
     public static final String DOCK_TAG = "DrTechDroneDock";
     public static final String RUNTIME_TAG = "DrTechDroneRuntime";
@@ -51,6 +53,8 @@ public final class DroneItemData {
     public static final String FOLLOW_TARGET_TAG = "DrTechDroneFollowTarget";
     public static final String AVOID_TARGET_TAG = "DrTechDroneAvoidTarget";
     public static final String ATTACK_TARGET_TAG = "DrTechDroneAttackTarget";
+    public static final String INTERACTION_TARGET_TAG = "DrTechDroneInteractionTarget";
+    public static final String LOAD_TARGET_TAG = "DrTechDroneLoadTarget";
 
     private DroneItemData() {}
 
@@ -86,6 +90,42 @@ public final class DroneItemData {
         NBTTagCompound root = stack.getTagCompound();
         return root != null && root.hasKey(ATTACK_TARGET_TAG, 10)
                 ? root.getCompoundTag(ATTACK_TARGET_TAG) : null;
+    }
+
+    public static void setInteractionTargetLock(ItemStack stack, boolean loading,
+            @Nullable UUID targetId, @Nullable BlockPos anchor) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        String key = loading ? LOAD_TARGET_TAG : INTERACTION_TARGET_TAG;
+        if (targetId == null || anchor == null) {
+            root.removeTag(key);
+        } else {
+            NBTTagCompound lock = new NBTTagCompound();
+            lock.setString("Target", targetId.toString());
+            lock.setLong("Anchor", anchor.toLong());
+            root.setTag(key, lock);
+        }
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    @Nullable
+    public static UUID getInteractionTargetId(ItemStack stack, boolean loading) {
+        NBTTagCompound lock = getInteractionTargetLock(stack, loading);
+        if (lock == null || !lock.hasKey("Target", 8)) return null;
+        try { return UUID.fromString(lock.getString("Target")); }
+        catch (IllegalArgumentException ignored) { return null; }
+    }
+
+    @Nullable
+    public static BlockPos getInteractionTargetAnchor(ItemStack stack, boolean loading) {
+        NBTTagCompound lock = getInteractionTargetLock(stack, loading);
+        return lock != null && lock.hasKey("Anchor", 4) ? BlockPos.fromLong(lock.getLong("Anchor")) : null;
+    }
+
+    @Nullable
+    private static NBTTagCompound getInteractionTargetLock(ItemStack stack, boolean loading) {
+        NBTTagCompound root = stack.getTagCompound();
+        String key = loading ? LOAD_TARGET_TAG : INTERACTION_TARGET_TAG;
+        return root != null && root.hasKey(key, 10) ? root.getCompoundTag(key) : null;
     }
 
     public static void setEntityTargetLock(ItemStack stack, boolean following,
@@ -286,6 +326,38 @@ public final class DroneItemData {
         NBTTagCompound value = weapons == null ? new NBTTagCompound() : weapons.copy();
         value.setInteger("Size", 2);
         root.setTag(WEAPONS_TAG, value);
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    public static NBTTagCompound getFishingRod(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        NBTTagCompound rod = root != null && root.hasKey(FISHING_ROD_TAG, 10)
+                ? root.getCompoundTag(FISHING_ROD_TAG).copy() : new NBTTagCompound();
+        rod.setInteger("Size", 1);
+        return rod;
+    }
+
+    public static void setFishingRod(ItemStack stack, NBTTagCompound rod) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        NBTTagCompound value = rod == null ? new NBTTagCompound() : rod.copy();
+        value.setInteger("Size", 1);
+        root.setTag(FISHING_ROD_TAG, value);
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    public static NBTTagCompound getAlchemyJar(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        NBTTagCompound jar = root != null && root.hasKey(ALCHEMY_JAR_TAG, 10)
+                ? root.getCompoundTag(ALCHEMY_JAR_TAG).copy() : new NBTTagCompound();
+        jar.setInteger("Size", 1);
+        return jar;
+    }
+
+    public static void setAlchemyJar(ItemStack stack, NBTTagCompound jar) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        NBTTagCompound value = jar == null ? new NBTTagCompound() : jar.copy();
+        value.setInteger("Size", 1);
+        root.setTag(ALCHEMY_JAR_TAG, value);
         root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
     }
 

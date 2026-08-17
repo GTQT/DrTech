@@ -10,10 +10,16 @@ public final class DroneEndpointWorldLink {
     private final long distance;
 
     DroneEndpointWorldLink(DroneEndpointRoute route) {
-        this.dimension = route.getSource().getDimension();
-        this.sourcePosition = route.getSource().getPosition();
-        this.targetPosition = route.getTarget().getPosition();
-        this.distance = route.getDistance();
+        this(route.getSource().getDimension(), route.getSource().getPosition(),
+                route.getTarget().getPosition(), route.getDistance());
+    }
+
+    public DroneEndpointWorldLink(int dimension, BlockPos sourcePosition, BlockPos targetPosition, long distance) {
+        if (sourcePosition == null || targetPosition == null) throw new IllegalArgumentException("Link positions are required");
+        this.dimension = dimension;
+        this.sourcePosition = sourcePosition.toImmutable();
+        this.targetPosition = targetPosition.toImmutable();
+        this.distance = Math.max(0L, distance);
     }
 
     public int getDimension() { return dimension; }

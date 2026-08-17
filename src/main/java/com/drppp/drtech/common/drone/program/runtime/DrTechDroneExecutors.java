@@ -13,6 +13,8 @@ import com.drppp.drtech.common.drone.filter.DroneItemFilterSpec;
 import com.drppp.drtech.common.drone.filter.DroneBlockFilterSpec;
 import com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec;
 import com.drppp.drtech.common.drone.program.model.DroneArea;
+import com.drppp.drtech.common.drone.program.runtime.service.DroneEntitySensorResult;
+import com.drppp.drtech.common.drone.program.runtime.service.DroneSensorService;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -23,6 +25,7 @@ public final class DrTechDroneExecutors {
 
     private static final int DEFAULT_WAIT_TICKS = 20;
     private static final int MAX_WAIT_TICKS = 20 * 60 * 60;
+    private static final int MAX_PATROL_RETURN_ATTEMPTS = 16;
     public static final int MAX_REPEAT_COUNT = 1_000_000;
 
     private DrTechDroneExecutors() {}
@@ -41,6 +44,8 @@ public final class DrTechDroneExecutors {
                 context.getEnvironment().placeBlock(context.requireInput("target", BlockPos.class),
                         optionalFilter(context)));
         registry.register(DrTechDroneNodes.PLACE_AREA, context -> tickArea(context, true));
+        registry.register(DrTechDroneNodes.FELL_TREES, context -> tickForestryArea(context, false));
+        registry.register(DrTechDroneNodes.REPLANT_AREA, context -> tickForestryArea(context, true));
         registry.register(DrTechDroneNodes.RETURN_TO_DOCK, context ->
                 context.getEnvironment().returnToDock(context.requireInput("target", BlockPos.class)));
         registry.register(DrTechDroneNodes.CHARGE_UNTIL, context -> {
@@ -125,6 +130,16 @@ public final class DrTechDroneExecutors {
             context.getMemory().setActionAmount(context.getNode().getId(), result.getAmount());
             return result;
         });
+        registry.register(DrTechDroneNodes.TRANSFER_THAUMCRAFT_ESSENTIA, context -> {
+            int maxAmount = context.getConfiguration().hasKey("MaxAmount")
+                    ? Math.max(1, Math.min(250, context.getConfiguration().getInteger("MaxAmount"))) : 64;
+            BlockPos smelter = context.requireInput("smelter", BlockPos.class);
+            DroneArea tubeArea = context.getOptionalInput("tube_area", DroneArea.class);
+            DroneExecutionResult result = context.getEnvironment().transferThaumcraftEssentia(
+                    smelter, tubeArea, maxAmount);
+            context.getMemory().setActionAmount(context.getNode().getId(), result.getAmount());
+            return result;
+        });
         registry.register(DrTechDroneNodes.INTERACT_BLOCK, context -> interactBlock(context, false));
         registry.register(DrTechDroneNodes.USE_ITEM_ON_BLOCK, context -> interactBlock(context, true));
         registry.register(DrTechDroneNodes.USE_ITEM, context -> context.getEnvironment().useItem(
@@ -150,10 +165,17 @@ public final class DrTechDroneExecutors {
         registry.register(DrTechDroneNodes.EDIT_SIGN, DrTechDroneExecutors::editSign);
         registry.register(DrTechDroneNodes.ATTACK_ENTITY, context -> context.getEnvironment()
                 .attackEntity(context.requireInput("target", BlockPos.class), optionalEntityFilter(context)));
+        registry.register(DrTechDroneNodes.PATROL_ATTACK_AREA, DrTechDroneExecutors::tickPatrolAttackArea);
         registry.register(DrTechDroneNodes.LOAD_ENTITY, context -> context.getEnvironment()
                 .loadEntity(context.requireInput("target", BlockPos.class), optionalEntityFilter(context)));
         registry.register(DrTechDroneNodes.RELEASE_ENTITY, context -> context.getEnvironment()
                 .releaseEntity(context.requireInput("target", BlockPos.class)));
+        registry.register(DrTechDroneNodes.FISH_AT, context -> {
+            DroneExecutionResult result = context.getEnvironment()
+                    .fishAt(context.requireInput("target", BlockPos.class));
+            context.getMemory().setActionAmount(context.getNode().getId(), result.getAmount());
+            return result;
+        });
         registry.register(DrTechDroneNodes.PICKUP_DROPPED_ITEMS, context -> itemWorldAction(context, true));
         registry.register(DrTechDroneNodes.DROP_ITEMS, context -> itemWorldAction(context, false));
         registry.register(DrTechDroneNodes.HARVEST_CROP, context ->
@@ -222,6 +244,183 @@ public final class DrTechDroneExecutors {
 
     private static DroneEntityFilterSpec optionalEntityFilter(DroneNodeExecutionContext context, String port) {
         return context.getOptionalInput(port, DroneEntityFilterSpec.class);
+    }
+
+    private static DroneExecutionResult tickPatrolAttackArea(DroneNodeExecutionContext context) {
+        DroneArea area = context.requireInput("area", DroneArea.class);
+        DroneEntityFilterSpec filter = optionalEntityFilter(context);
+        NBTTagCompound state = context.getState();
+        boolean hostileOnly = !context.getConfiguration().hasKey("HostileOnly", 1)
+                || context.getConfiguration().getBoolean("HostileOnly");
+        if (state.hasKey("ReturnTarget", 4)) return tickPatrolReturn(context, state);
+        if (state.hasKey("RescanRemaining", 99)) {
+            int remaining = state.getInteger("RescanRemaining") - 1;
+            if (remaining > 0) {
+                state.setInteger("RescanRemaining", remaining);
+                return DroneExecutionResult.running();
+            }
+            state.removeTag("RescanRemaining");
+        }
+        if (!state.hasKey("Target", 4)) {
+            DroneSensorService.EntityPriority priority = patrolPriority(context);
+            DroneEntitySensorResult target = context.getEnvironment()
+                    .senseAttackableEntity(area, filter, priority, hostileOnly);
+            if (target.getNearestPosition() == null) return handleNoPatrolTarget(context, state, area);
+            state.setLong("Target", target.getNearestPosition().toLong());
+            state.setString("TargetUuid", target.getEntityUuid());
+            state.setInteger("ChaseTicks", 0);
+        }
+        int maxChaseDistance = context.getConfiguration().hasKey("MaxChaseDistance", 99)
+                ? context.getConfiguration().getInteger("MaxChaseDistance") : 16;
+        maxChaseDistance = Math.max(0, Math.min(128, maxChaseDistance));
+        DroneExecutionResult result = context.getEnvironment().attackEntityInArea(
+                BlockPos.fromLong(state.getLong("Target")), filter, true, area, maxChaseDistance,
+                state.getString("TargetUuid"), hostileOnly);
+        if (result.getState() == DroneActionState.RUNNING) {
+            int chaseTicks = state.getInteger("ChaseTicks") + 1;
+            state.setInteger("ChaseTicks", chaseTicks);
+            int maximum = context.getConfiguration().hasKey("MaxChaseTicks", 99)
+                    ? context.getConfiguration().getInteger("MaxChaseTicks") : 1_200;
+            maximum = Math.max(20, Math.min(72_000, maximum));
+            if (chaseTicks <= maximum) return result;
+            clearPatrolTarget(context, state);
+            return DroneExecutionResult.failure(DroneActionStatus.OUT_OF_RANGE, "failed",
+                    "Patrol target chase timed out");
+        }
+        boolean lostTarget = result.getState() == DroneActionState.FAILURE
+                && result.getStatus() == DroneActionStatus.NOT_FOUND;
+        clearPatrolTarget(context, state);
+        boolean reacquire = !context.getConfiguration().hasKey("ReacquireLostTarget", 1)
+                || context.getConfiguration().getBoolean("ReacquireLostTarget");
+        if (lostTarget && reacquire) return DroneExecutionResult.running();
+        if (result.getState() != DroneActionState.SUCCESS) return result;
+        int defeated = Math.max(0, state.getInteger("DefeatedCount")) + 1;
+        state.setInteger("DefeatedCount", defeated);
+        boolean untilAreaClear = !context.getConfiguration().hasKey("UntilAreaClear", 1)
+                || context.getConfiguration().getBoolean("UntilAreaClear");
+        if (!untilAreaClear) return beginPatrolReturn(context, state, area, "COMPLETE");
+        DroneSensorService.EntityPriority priority = patrolPriority(context);
+        return context.getEnvironment().senseAttackableEntity(area, filter, priority, hostileOnly)
+                .getNearestPosition() == null
+                ? handleNoPatrolTarget(context, state, area) : DroneExecutionResult.running();
+    }
+
+    private static DroneExecutionResult handleNoPatrolTarget(DroneNodeExecutionContext context,
+            NBTTagCompound state, DroneArea area) {
+        String mode = context.getConfiguration().hasKey("NoTargetMode", 8)
+                ? context.getConfiguration().getString("NoTargetMode") : "COMPLETE";
+        if ("WAIT".equals(mode)) return beginPatrolReturn(context, state, area, "WAIT");
+        if ("FAILED".equals(mode)) {
+            return DroneExecutionResult.failure(DroneActionStatus.NOT_FOUND, "failed",
+                    "No matching living entity exists in the patrol area");
+        }
+        return beginPatrolReturn(context, state, area, "COMPLETE");
+    }
+
+    private static DroneExecutionResult beginPatrolReturn(DroneNodeExecutionContext context,
+            NBTTagCompound state, DroneArea area, String returnMode) {
+        boolean returnToArea = !context.getConfiguration().hasKey("ReturnToAreaOnComplete", 1)
+                || context.getConfiguration().getBoolean("ReturnToAreaOnComplete");
+        if (!returnToArea) return finishPatrolReturn(context, state, returnMode);
+        state.removeTag("ReturnRejected");
+        BlockPos target = context.getEnvironment().findNearestPassablePosition(area, new long[0]);
+        if (target == null) {
+            return DroneExecutionResult.failure(DroneActionStatus.UNREACHABLE, "failed",
+                    "No passable return position exists in the patrol area");
+        }
+        state.setLong("ReturnTarget", target.toLong());
+        state.setString("ReturnMode", returnMode);
+        return tickPatrolReturn(context, state);
+    }
+
+    private static DroneExecutionResult tickPatrolReturn(DroneNodeExecutionContext context,
+            NBTTagCompound state) {
+        DroneExecutionResult movement = context.getEnvironment().moveTo(
+                BlockPos.fromLong(state.getLong("ReturnTarget")));
+        if (movement.getState() == DroneActionState.FAILURE
+                && movement.getStatus() == DroneActionStatus.UNREACHABLE) {
+            long rejectedTarget = state.getLong("ReturnTarget");
+            long[] rejected = appendRejectedReturnTarget(
+                    decodeRejectedReturnTargets(state.getIntArray("ReturnRejected")), rejectedTarget);
+            state.setIntArray("ReturnRejected", encodeRejectedReturnTargets(rejected));
+            if (rejected.length >= MAX_PATROL_RETURN_ATTEMPTS) {
+                clearPatrolReturnState(state);
+                return DroneExecutionResult.failure(DroneActionStatus.UNREACHABLE, "failed",
+                        "Patrol return exhausted all fallback attempts");
+            }
+            DroneArea area = context.requireInput("area", DroneArea.class);
+            BlockPos fallback = context.getEnvironment().findNearestPassablePosition(area, rejected);
+            if (fallback == null) {
+                clearPatrolReturnState(state);
+                return DroneExecutionResult.failure(DroneActionStatus.UNREACHABLE, "failed",
+                        "No reachable fallback position remains in the patrol area");
+            }
+            state.setLong("ReturnTarget", fallback.toLong());
+            return DroneExecutionResult.running();
+        }
+        if (movement.getState() != DroneActionState.SUCCESS) return movement;
+        String returnMode = state.hasKey("ReturnMode", 8) ? state.getString("ReturnMode") : "COMPLETE";
+        clearPatrolReturnState(state);
+        return finishPatrolReturn(context, state, returnMode);
+    }
+
+    private static long[] appendRejectedReturnTarget(long[] rejected, long target) {
+        if (rejected == null) rejected = new long[0];
+        for (long existing : rejected) if (existing == target) return rejected;
+        long[] expanded = new long[Math.min(MAX_PATROL_RETURN_ATTEMPTS, rejected.length + 1)];
+        System.arraycopy(rejected, 0, expanded, 0, Math.min(rejected.length, expanded.length));
+        if (expanded.length > rejected.length) expanded[expanded.length - 1] = target;
+        return expanded;
+    }
+
+    private static long[] decodeRejectedReturnTargets(int[] encoded) {
+        if (encoded == null || encoded.length < 2) return new long[0];
+        int count = Math.min(MAX_PATROL_RETURN_ATTEMPTS, encoded.length / 2);
+        long[] decoded = new long[count];
+        for (int index = 0; index < count; index++) {
+            decoded[index] = (long) encoded[index * 2] << 32
+                    | encoded[index * 2 + 1] & 0xFFFF_FFFFL;
+        }
+        return decoded;
+    }
+
+    private static int[] encodeRejectedReturnTargets(long[] rejected) {
+        int count = Math.min(MAX_PATROL_RETURN_ATTEMPTS, rejected == null ? 0 : rejected.length);
+        int[] encoded = new int[count * 2];
+        for (int index = 0; index < count; index++) {
+            encoded[index * 2] = (int) (rejected[index] >>> 32);
+            encoded[index * 2 + 1] = (int) rejected[index];
+        }
+        return encoded;
+    }
+
+    private static void clearPatrolReturnState(NBTTagCompound state) {
+        state.removeTag("ReturnTarget");
+        state.removeTag("ReturnMode");
+        state.removeTag("ReturnRejected");
+    }
+
+    private static DroneExecutionResult finishPatrolReturn(DroneNodeExecutionContext context,
+            NBTTagCompound state, String returnMode) {
+        if ("WAIT".equals(returnMode)) {
+            int delay = context.getConfiguration().hasKey("RescanTicks", 99)
+                    ? context.getConfiguration().getInteger("RescanTicks") : 20;
+            state.setInteger("RescanRemaining", Math.max(1, Math.min(1_200, delay)));
+            return DroneExecutionResult.running();
+        }
+        return DroneExecutionResult.success(Math.max(0, state.getInteger("DefeatedCount")));
+    }
+
+    private static void clearPatrolTarget(DroneNodeExecutionContext context, NBTTagCompound state) {
+        state.removeTag("Target");
+        state.removeTag("TargetUuid");
+        state.removeTag("ChaseTicks");
+        context.getEnvironment().clearAttackTarget();
+    }
+
+    private static DroneSensorService.EntityPriority patrolPriority(DroneNodeExecutionContext context) {
+        return DroneSensorService.EntityPriority.fromName(context.getConfiguration().hasKey("Priority", 8)
+                ? context.getConfiguration().getString("Priority") : "HOSTILE_FIRST");
     }
 
     private static double entityDistance(DroneNodeExecutionContext context) {
@@ -440,6 +639,32 @@ public final class DrTechDroneExecutors {
         index++;
         state.setInteger("AreaIndex", index);
         return index >= total ? DroneExecutionResult.success() : DroneExecutionResult.running();
+    }
+
+    private static DroneExecutionResult tickForestryArea(DroneNodeExecutionContext context, boolean planting) {
+        DroneArea area = context.requireInput("area", DroneArea.class);
+        if (!area.isWithinRuntimeLimits() || area.getVolume() > context.getEnvironment().getAreaBlockLimit()) {
+            return DroneExecutionResult.error("Area exceeds the drone chassis runtime limit");
+        }
+        NBTTagCompound state = context.getState();
+        int index = Math.max(0, state.getInteger("AreaIndex"));
+        int affected = Math.max(0, state.getInteger("Affected"));
+        int total = (int) area.getVolume();
+        state.setInteger("AreaTotal", total);
+        if (index >= total) {
+            context.getMemory().setActionAmount(context.getNode().getId(), affected);
+            return DroneExecutionResult.success(affected);
+        }
+        BlockPos target = area.positionAt(index);
+        DroneExecutionResult result = planting
+                ? context.getEnvironment().replant(target, optionalFilter(context))
+                : context.getEnvironment().fellTreeBlock(target);
+        if (result.getState() != DroneActionState.SUCCESS) return result;
+        affected += Math.max(0, result.getAmount());
+        state.setInteger("Affected", affected);
+        state.setInteger("AreaIndex", ++index);
+        context.getMemory().setActionAmount(context.getNode().getId(), affected);
+        return index >= total ? DroneExecutionResult.success(affected) : DroneExecutionResult.running();
     }
 
     private static DroneExecutionResult tickWait(DroneNodeExecutionContext context) {

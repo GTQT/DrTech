@@ -13,13 +13,15 @@ public final class DrTechSounds {
     public static final SoundEvent LIGHTSABER_OFF = create("player.lightsaber.off");
     public static final SoundEvent LIGHTSABER_SWING = create("player.lightsaber.swing");
     public static final SoundEvent LIGHTSABER_HIT = create("player.lightsaber.hit");
+    public static final SoundEvent DRONE_ROTOR = create("drone.rotor");
 
     private DrTechSounds() {
     }
 
     @SubscribeEvent
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
-        event.getRegistry().registerAll(LIGHTSABER_ON, LIGHTSABER_OFF, LIGHTSABER_SWING, LIGHTSABER_HIT);
+        event.getRegistry().registerAll(LIGHTSABER_ON, LIGHTSABER_OFF, LIGHTSABER_SWING, LIGHTSABER_HIT,
+                DRONE_ROTOR);
     }
 
     private static SoundEvent create(String name) {

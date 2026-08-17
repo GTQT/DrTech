@@ -34,6 +34,14 @@ public interface DroneBlockActionService {
         return DroneExecutionResult.error("Crop harvesting is unavailable in this runtime environment");
     }
 
+    default DroneExecutionResult fellTreeBlock(BlockPos target) {
+        return DroneExecutionResult.error("Tree felling is unavailable in this runtime environment");
+    }
+
+    default DroneExecutionResult replant(BlockPos target, DroneItemFilter filter) {
+        return DroneExecutionResult.error("Crop replanting is unavailable in this runtime environment");
+    }
+
     default DroneExecutionResult setRedstoneOutput(BlockPos target, int strength) {
         return DroneExecutionResult.error("Programmable redstone output is unavailable in this runtime environment");
     }

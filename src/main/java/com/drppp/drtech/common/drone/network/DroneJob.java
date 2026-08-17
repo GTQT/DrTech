@@ -8,6 +8,7 @@ import java.util.UUID;
 /** Mutable server-side lifecycle for a fleet job; persistence is owned by the future fleet controller. */
 public final class DroneJob {
     public enum State { QUEUED, RUNNING, RETRY_WAIT, COMPLETED, FAILED, CANCELLED }
+    public enum LogisticsStage { NONE, DISCOVER, RESERVED, TO_SOURCE, PICKUP, TO_TARGET, DELIVER, RETURNING }
 
     private static final int MAX_ATTEMPTS = 16;
     private static final long MAX_BACKOFF_TICKS = 20L * 60L * 30L;
@@ -24,6 +25,15 @@ public final class DroneJob {
     private long nextEligibleTick;
     private long runningSinceTick = -1L;
     private String lastFailure = "";
+    private DroneEndpoint.Kind resourceKind;
+    private String resourceId = "";
+    private long requestedAmount;
+    private UUID sourceEndpointId;
+    private UUID targetEndpointId;
+    private UUID assignedDroneId;
+    private long pickedAmount;
+    private long deliveredAmount;
+    private LogisticsStage logisticsStage = LogisticsStage.NONE;
 
     public DroneJob(UUID jobId, UUID ownerId, int priority, long submittedTick, long timeoutTicks,
             int maxAttempts, long baseBackoffTicks) {
@@ -38,6 +48,28 @@ public final class DroneJob {
         this.nextEligibleTick = this.submittedTick;
     }
 
+    public static DroneJob logistics(UUID jobId, UUID ownerId, int priority, long submittedTick,
+            long timeoutTicks, int maxAttempts, long baseBackoffTicks, DroneEndpoint.Kind resourceKind,
+            String resourceId, long requestedAmount, UUID sourceEndpointId, UUID targetEndpointId) {
+        if (resourceKind == null || sourceEndpointId == null || targetEndpointId == null
+                || sourceEndpointId.equals(targetEndpointId)) {
+            throw new IllegalArgumentException("Distinct source and target endpoints are required");
+        }
+        String checkedResource = normalizeResourceId(resourceId);
+        if (checkedResource.isEmpty() || requestedAmount <= 0L) {
+            throw new IllegalArgumentException("Resource id and positive amount are required");
+        }
+        DroneJob job = new DroneJob(jobId, ownerId, priority, submittedTick, timeoutTicks,
+                maxAttempts, baseBackoffTicks);
+        job.resourceKind = resourceKind;
+        job.resourceId = checkedResource;
+        job.requestedAmount = requestedAmount;
+        job.sourceEndpointId = sourceEndpointId;
+        job.targetEndpointId = targetEndpointId;
+        job.logisticsStage = LogisticsStage.DISCOVER;
+        return job;
+    }
+
     public UUID getJobId() { return jobId; }
     public UUID getOwnerId() { return ownerId; }
     public int getPriority() { return priority; }
@@ -49,6 +81,42 @@ public final class DroneJob {
     public long getRunningSinceTick() { return runningSinceTick; }
     public State getState() { return state; }
     public String getLastFailure() { return lastFailure; }
+    public boolean isLogisticsJob() { return logisticsStage != LogisticsStage.NONE; }
+    @Nullable public DroneEndpoint.Kind getResourceKind() { return resourceKind; }
+    public String getResourceId() { return resourceId; }
+    public long getRequestedAmount() { return requestedAmount; }
+    @Nullable public UUID getSourceEndpointId() { return sourceEndpointId; }
+    @Nullable public UUID getTargetEndpointId() { return targetEndpointId; }
+    @Nullable public UUID getAssignedDroneId() { return assignedDroneId; }
+    public long getPickedAmount() { return pickedAmount; }
+    public long getDeliveredAmount() { return deliveredAmount; }
+    public LogisticsStage getLogisticsStage() { return logisticsStage; }
+
+    boolean assignDrone(UUID droneId) {
+        if (!isLogisticsJob() || droneId == null || assignedDroneId != null) return false;
+        assignedDroneId = droneId;
+        return true;
+    }
+
+    void clearAssignedDrone() { assignedDroneId = null; }
+
+    boolean setLogisticsStage(LogisticsStage nextStage) {
+        if (!isLogisticsJob() || nextStage == null || nextStage == LogisticsStage.NONE) return false;
+        logisticsStage = nextStage;
+        return true;
+    }
+
+    boolean recordPickup(long amount) {
+        if (!isLogisticsJob() || amount <= 0L || pickedAmount >= requestedAmount) return false;
+        pickedAmount = Math.min(requestedAmount, saturatingAdd(pickedAmount, amount));
+        return true;
+    }
+
+    boolean recordDelivery(long amount) {
+        if (!isLogisticsJob() || amount <= 0L || deliveredAmount >= pickedAmount) return false;
+        deliveredAmount = Math.min(pickedAmount, saturatingAdd(deliveredAmount, amount));
+        return true;
+    }
 
     public boolean isEligible(long worldTime) {
         return (state == State.QUEUED || state == State.RETRY_WAIT) && worldTime >= nextEligibleTick;
@@ -105,6 +173,17 @@ public final class DroneJob {
         tag.setLong("NextEligible", nextEligibleTick);
         tag.setLong("RunningSince", runningSinceTick);
         tag.setString("LastFailure", lastFailure);
+        if (isLogisticsJob()) {
+            tag.setString("ResourceKind", resourceKind.name());
+            tag.setString("ResourceId", resourceId);
+            tag.setLong("RequestedAmount", requestedAmount);
+            tag.setString("SourceEndpoint", sourceEndpointId.toString());
+            tag.setString("TargetEndpoint", targetEndpointId.toString());
+            if (assignedDroneId != null) tag.setString("AssignedDrone", assignedDroneId.toString());
+            tag.setLong("PickedAmount", pickedAmount);
+            tag.setLong("DeliveredAmount", deliveredAmount);
+            tag.setString("LogisticsStage", logisticsStage.name());
+        }
         return tag;
     }
 
@@ -121,11 +200,17 @@ public final class DroneJob {
         job.nextEligibleTick = Math.max(job.submittedTick, tag.getLong("NextEligible"));
         job.runningSinceTick = tag.getLong("RunningSince");
         job.lastFailure = tag.getString("LastFailure");
+        readLogisticsPayload(job, tag);
         return job;
     }
 
     void recoverAfterLoad(long worldTime) {
-        if (state == State.RUNNING) fail(worldTime, "SERVER_RESTART");
+        if (state == State.RUNNING) {
+            fail(worldTime, "SERVER_RESTART");
+            clearAssignedDrone();
+            if (isLogisticsJob()) logisticsStage = pickedAmount > deliveredAmount
+                    ? LogisticsStage.TO_TARGET : LogisticsStage.DISCOVER;
+        }
     }
 
     private long backoffForAttempt(int failedAttempt) {
@@ -136,6 +221,35 @@ public final class DroneJob {
 
     private static long saturatingAdd(long left, long right) {
         return right > Long.MAX_VALUE - left ? Long.MAX_VALUE : left + right;
+    }
+
+    private static void readLogisticsPayload(DroneJob job, NBTTagCompound tag) {
+        if (!tag.hasKey("ResourceKind", 8)) return;
+        DroneEndpoint.Kind kind;
+        LogisticsStage stage;
+        try {
+            kind = DroneEndpoint.Kind.valueOf(tag.getString("ResourceKind"));
+            stage = LogisticsStage.valueOf(tag.getString("LogisticsStage"));
+        } catch (IllegalArgumentException ignored) { return; }
+        String resource = normalizeResourceId(tag.getString("ResourceId"));
+        UUID source = readUuid(tag, "SourceEndpoint");
+        UUID target = readUuid(tag, "TargetEndpoint");
+        long requested = Math.max(0L, tag.getLong("RequestedAmount"));
+        if (resource.isEmpty() || source == null || target == null || source.equals(target) || requested <= 0L) return;
+        job.resourceKind = kind;
+        job.resourceId = resource;
+        job.requestedAmount = requested;
+        job.sourceEndpointId = source;
+        job.targetEndpointId = target;
+        job.assignedDroneId = readUuid(tag, "AssignedDrone");
+        job.pickedAmount = Math.min(requested, Math.max(0L, tag.getLong("PickedAmount")));
+        job.deliveredAmount = Math.min(job.pickedAmount, Math.max(0L, tag.getLong("DeliveredAmount")));
+        job.logisticsStage = stage == LogisticsStage.NONE ? LogisticsStage.DISCOVER : stage;
+    }
+
+    private static String normalizeResourceId(String resourceId) {
+        String checked = resourceId == null ? "" : resourceId.trim();
+        return checked.substring(0, Math.min(128, checked.length()));
     }
 
     @Nullable

@@ -82,9 +82,13 @@ public final class DroneArea {
     private final int sizeX;
     private final int sizeY;
     private final int sizeZ;
-    private final long volume;
-    private final List<BlockPos> positions;
-    private final List<BlockPos> topDownPositions;
+    private long volume;
+    private List<BlockPos> positions;
+    private List<BlockPos> topDownPositions;
+    private Predicate<BlockPos> pendingSelection;
+    private List<BlockPos> pendingPositions;
+    private long pendingBoundsVolume;
+    private int pendingIndex;
 
     private DroneArea(BlockPos first, BlockPos second) {
         Objects.requireNonNull(first, "first");
@@ -110,15 +114,12 @@ public final class DroneArea {
         sizeX = max.getX() - min.getX() + 1;
         sizeY = max.getY() - min.getY() + 1;
         sizeZ = max.getZ() - min.getZ() + 1;
-        long boundsVolume = (long) sizeX * sizeY * sizeZ;
-        List<BlockPos> selected = new ArrayList<>((int) Math.min(boundsVolume, MAX_BLOCKS + 1L));
-        for (int index = 0; index < boundsVolume; index++) {
-            BlockPos candidate = cuboidPositionAt(index);
-            if (includes.test(candidate)) selected.add(candidate);
-        }
-        positions = Collections.unmodifiableList(selected);
-        topDownPositions = orderedTopDown(positions);
-        volume = positions.size();
+        pendingBoundsVolume = (long) sizeX * sizeY * sizeZ;
+        pendingSelection = includes;
+        pendingPositions = new ArrayList<>((int) Math.min(pendingBoundsVolume, MAX_BLOCKS + 1L));
+        positions = null;
+        topDownPositions = null;
+        volume = -1L;
     }
 
     private DroneArea(List<BlockPos> orderedPositions) {
@@ -191,7 +192,6 @@ public final class DroneArea {
                     return xBoundary || yBoundary || zBoundary;
             }
         });
-        if (!area.isWithinRuntimeLimits()) throw new IllegalArgumentException("Cuboid surface exceeds runtime area limit");
         return area;
     }
 
@@ -319,7 +319,6 @@ public final class DroneArea {
             return inside && (!hollow || layer == 0 || Math.abs(firstRadial) == layerRadius
                     || Math.abs(secondRadial) == layerRadius);
         });
-        if (!area.isWithinRuntimeLimits()) throw new IllegalArgumentException("Pyramid exceeds runtime area limit");
         return area;
     }
 
@@ -490,6 +489,7 @@ public final class DroneArea {
     }
 
     public DroneArea offset(int x, int y, int z) {
+        ensureMaterialized();
         if (positions == null) return between(checkedAdd(min, x, y, z), checkedAdd(max, x, y, z));
         List<BlockPos> shifted = new ArrayList<>(positions.size());
         for (BlockPos position : positions) shifted.add(checkedAdd(position, x, y, z));
@@ -498,6 +498,7 @@ public final class DroneArea {
 
     /** Expands the area by a Chebyshev radius, equivalent to adding a cube around every selected coordinate. */
     public DroneArea expand(int radius) {
+        ensureMaterialized();
         if (radius < 0 || radius > 4) throw new IllegalArgumentException("Area expansion radius must be 0..4");
         if (radius == 0 || volume == 0L) return this;
         if (positions == null) {
@@ -527,6 +528,7 @@ public final class DroneArea {
 
     /** Removes coordinates that do not have a complete cube of neighbours inside the source area. */
     public DroneArea inset(int radius) {
+        ensureMaterialized();
         if (radius < 0 || radius > 4) throw new IllegalArgumentException("Area inset radius must be 0..4");
         if (radius == 0 || volume == 0L) return this;
         if (positions == null) {
@@ -555,6 +557,7 @@ public final class DroneArea {
     }
 
     public boolean contains(BlockPos position) {
+        ensureMaterialized();
         if (position == null || volume == 0L) return false;
         if (positions != null) return positions.contains(position);
         return position.getX() >= min.getX() && position.getX() <= max.getX()
@@ -563,6 +566,7 @@ public final class DroneArea {
     }
 
     private List<BlockPos> mutablePositions() {
+        ensureMaterialized();
         List<BlockPos> result = new ArrayList<>((int) volume);
         for (int index = 0; index < volume; index++) result.add(positionAt(index));
         return result;
@@ -613,22 +617,67 @@ public final class DroneArea {
     }
 
     public long getVolume() {
+        ensureMaterialized();
         return volume;
     }
 
     public boolean isWithinRuntimeLimits() {
+        ensureMaterialized();
         return sizeX <= MAX_AXIS_LENGTH && sizeY <= MAX_AXIS_LENGTH && sizeZ <= MAX_AXIS_LENGTH
                 && volume <= MAX_BLOCKS;
     }
 
+    /**
+     * Advances a predicate-backed shape by at most {@code candidateBudget} bounding-box candidates. Plain cuboids
+     * and already materialized shapes consume no budget. The runtime calls this once per value chain and yields when
+     * it returns incomplete, preventing a 32^3 candidate shape from monopolising one server tick.
+     */
+    public int materializeStep(int candidateBudget) {
+        if (pendingSelection == null || candidateBudget <= 0) return 0;
+        int processed = 0;
+        while (pendingIndex < pendingBoundsVolume && processed < candidateBudget) {
+            BlockPos candidate = cuboidPositionAt(pendingIndex++);
+            if (pendingSelection.test(candidate)) pendingPositions.add(candidate);
+            processed++;
+        }
+        if (pendingIndex >= pendingBoundsVolume) finishMaterialization();
+        return processed;
+    }
+
+    public boolean isMaterialized() { return pendingSelection == null; }
+
+    public long getMaterializationProgress() {
+        return pendingSelection == null ? Math.max(0L, volume) : pendingIndex;
+    }
+
+    public long getMaterializationTotal() {
+        return pendingSelection == null ? Math.max(0L, volume) : pendingBoundsVolume;
+    }
+
+    private void ensureMaterialized() {
+        while (pendingSelection != null) materializeStep(1_024);
+    }
+
+    private void finishMaterialization() {
+        positions = Collections.unmodifiableList(new ArrayList<>(pendingPositions));
+        topDownPositions = orderedTopDown(positions);
+        volume = positions.size();
+        pendingSelection = null;
+        pendingPositions = null;
+        pendingBoundsVolume = 0L;
+        pendingIndex = 0;
+    }
+
     /** Y-major serpentine traversal reduces repositioning between adjacent targets. */
     public BlockPos positionAt(int index) {
+        ensureMaterialized();
         if (index < 0 || index >= volume) throw new IndexOutOfBoundsException("Area index " + index);
         return positions == null ? cuboidPositionAt(index) : positions.get(index);
     }
 
     /** Returns a coordinate using a deterministic traversal strategy without mutating the area. */
     public BlockPos positionAt(int index, TraversalOrder order) {
+        ensureMaterialized();
         if (index < 0 || index >= volume) throw new IndexOutOfBoundsException("Area index " + index);
         TraversalOrder checked = order == null ? TraversalOrder.SERPENTINE : order;
         int size = (int) volume;
@@ -656,6 +705,7 @@ public final class DroneArea {
      * the supplied position only as its initial sort origin, so callers can persist the result for the whole loop.
      */
     public int[] traversalIndices(TraversalOrder order, BlockPos origin) {
+        ensureMaterialized();
         TraversalOrder checked = order == null ? TraversalOrder.SERPENTINE : order;
         int size = (int) volume;
         int[] result = new int[size];
@@ -750,11 +800,14 @@ public final class DroneArea {
         if (this == other) return true;
         if (!(other instanceof DroneArea)) return false;
         DroneArea that = (DroneArea) other;
+        ensureMaterialized();
+        that.ensureMaterialized();
         return min.equals(that.min) && max.equals(that.max) && Objects.equals(positions, that.positions);
     }
 
     @Override
     public int hashCode() {
+        ensureMaterialized();
         return 31 * (31 * min.hashCode() + max.hashCode()) + Objects.hashCode(positions);
     }
 }

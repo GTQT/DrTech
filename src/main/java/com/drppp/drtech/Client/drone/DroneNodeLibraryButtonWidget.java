@@ -11,6 +11,9 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import net.minecraft.util.ResourceLocation;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 
 /** Node-library button that keeps click behavior while supporting drag-to-canvas creation. */
 public final class DroneNodeLibraryButtonWidget extends ButtonWidget<DroneNodeLibraryButtonWidget>
@@ -18,6 +21,7 @@ public final class DroneNodeLibraryButtonWidget extends ButtonWidget<DroneNodeLi
 
     private final Area movingArea = new Area();
     private boolean moving;
+    private boolean drawDragPreview;
     private int realX;
     private int realY;
     private int relativeClickX;
@@ -28,6 +32,19 @@ public final class DroneNodeLibraryButtonWidget extends ButtonWidget<DroneNodeLi
     private Consumer<int[]> dropHandler = position -> { };
     private Runnable clickHandler = () -> { };
     private boolean validDrop;
+    private Supplier<ResourceLocation> nodeTypeSupplier = () -> null;
+
+    public DroneNodeLibraryButtonWidget nodeType(Supplier<ResourceLocation> nodeTypeSupplier) {
+        this.nodeTypeSupplier = nodeTypeSupplier == null ? () -> null : nodeTypeSupplier;
+        return this;
+    }
+
+    @Override
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+        super.draw(context, widgetTheme);
+        ResourceLocation nodeType = nodeTypeSupplier.get();
+        if (nodeType != null) DroneNodeIconTextures.draw(nodeType, 2, 2, 10);
+    }
 
     public DroneNodeLibraryButtonWidget dropTarget(Predicate<IWidget> dropTarget) {
         this.dropTarget = dropTarget == null ? widget -> false : dropTarget;
@@ -46,6 +63,7 @@ public final class DroneNodeLibraryButtonWidget extends ButtonWidget<DroneNodeLi
 
     @Override
     public void drawMovingState(ModularGuiContext context, float partialTicks) {
+        if (!drawDragPreview) return;
         WidgetTree.drawTree(this, context, true, true);
     }
 
@@ -60,6 +78,7 @@ public final class DroneNodeLibraryButtonWidget extends ButtonWidget<DroneNodeLi
         dragStartX = getContext().getAbsMouseX();
         dragStartY = getContext().getAbsMouseY();
         validDrop = false;
+        drawDragPreview = false;
         return true;
     }
 
@@ -73,11 +92,14 @@ public final class DroneNodeLibraryButtonWidget extends ButtonWidget<DroneNodeLi
             clickHandler.run();
         }
         validDrop = false;
+        drawDragPreview = false;
         movingArea.setBounds(getArea().x, getArea().y, getArea().w(), getArea().h());
     }
 
     @Override
     public void onDrag(int mouseButton, long timeSinceLastClick) {
+        drawDragPreview = !isClickGesture(dragStartX, dragStartY,
+                getContext().getAbsMouseX(), getContext().getAbsMouseY());
         movingArea.x = getContext().getAbsMouseX() - relativeClickX;
         movingArea.y = getContext().getAbsMouseY() - relativeClickY;
     }
@@ -108,7 +130,11 @@ public final class DroneNodeLibraryButtonWidget extends ButtonWidget<DroneNodeLi
     @Override
     public void transform(IViewportStack stack) {
         super.transform(stack);
-        if (moving) {
+        // ModularUI marks the widget as moving immediately on mouse-down, including a plain
+        // click. Applying the drag transform before the pointer crosses our click threshold
+        // produces one frame at the GUI origin. Keep the library entry in place until this is
+        // an actual drag; drawMovingState follows the same flag.
+        if (moving && drawDragPreview) {
             stack.translate(-getArea().rx, -getArea().ry, 0);
             stack.translate(-realX, -realY, 0);
             stack.translate(movingArea.x, movingArea.y, 0);

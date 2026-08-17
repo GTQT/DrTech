@@ -76,6 +76,18 @@ public final class DroneFleetState extends WorldSavedData {
         return reservation;
     }
 
+    public Optional<DroneReservation> reserveLogistics(UUID requesterId, UUID jobId, DroneEndpoint source,
+            DroneEndpoint target, String resourceId, long requestedAmount, long worldTime, long leaseTicks) {
+        DroneJob job = getJobForOwner(requesterId, jobId).orElse(null);
+        if (job == null || job.getState() != DroneJob.State.RUNNING || !job.isLogisticsJob()
+                || source == null || target == null || !requesterId.equals(source.getOwnerId())
+                || !requesterId.equals(target.getOwnerId())) return Optional.empty();
+        Optional<DroneReservation> reservation = reservations.tryReservePair(jobId, source, target,
+                resourceId, requestedAmount, worldTime, leaseTicks);
+        if (reservation.isPresent()) markDirty();
+        return reservation;
+    }
+
     public boolean completeJob(UUID requesterId, UUID jobId) {
         if (!getJobForOwner(requesterId, jobId).isPresent() || !jobs.complete(jobId)) return false;
         reservations.releaseForJob(jobId);

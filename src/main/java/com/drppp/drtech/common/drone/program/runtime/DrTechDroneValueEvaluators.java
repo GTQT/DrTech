@@ -125,6 +125,11 @@ public final class DrTechDroneValueEvaluators {
         registry.register(DrTechDroneNodes.MACHINE_DIAGNOSTIC, (context, output) ->
                 context.getEnvironment().getMachineDiagnostic(context.requireInput("target", BlockPos.class)));
         registry.register(DrTechDroneNodes.REPAIR_MACHINE, actionAmount);
+        registry.register(DrTechDroneNodes.TRANSFER_THAUMCRAFT_ESSENTIA, actionAmount);
+        registry.register(DrTechDroneNodes.PATROL_ATTACK_AREA, actionAmount);
+        registry.register(DrTechDroneNodes.FISH_AT, actionAmount);
+        registry.register(DrTechDroneNodes.FELL_TREES, actionAmount);
+        registry.register(DrTechDroneNodes.REPLANT_AREA, actionAmount);
         registry.register(DrTechDroneNodes.MACHINE_NEEDS_MAINTENANCE, (context, output) ->
                 context.getEnvironment().needsMachineMaintenance(context.requireInput("target", BlockPos.class)));
         registry.register(DrTechDroneNodes.MACHINE_MAINTENANCE_PROBLEMS, (context, output) ->

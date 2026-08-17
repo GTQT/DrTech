@@ -39,6 +39,8 @@ public final class DrTechDroneNodes {
     public static final ResourceLocation BREAK_BLOCK_AT = id("break_block_at");
     public static final ResourceLocation PLACE_BLOCK = id("place_block");
     public static final ResourceLocation PLACE_AREA = id("place_area");
+    public static final ResourceLocation FELL_TREES = id("fell_trees");
+    public static final ResourceLocation REPLANT_AREA = id("replant_area");
     public static final ResourceLocation IMPORT_ITEMS = id("import_items");
     public static final ResourceLocation EXPORT_ITEMS = id("export_items");
     public static final ResourceLocation IMPORT_FLUID = id("import_fluid");
@@ -80,6 +82,7 @@ public final class DrTechDroneNodes {
     public static final ResourceLocation MACHINE_LOW_ENERGY = id("machine_low_energy");
     public static final ResourceLocation MACHINE_DIAGNOSTIC = id("machine_diagnostic");
     public static final ResourceLocation REPAIR_MACHINE = id("repair_machine");
+    public static final ResourceLocation TRANSFER_THAUMCRAFT_ESSENTIA = id("transfer_thaumcraft_essentia");
     public static final ResourceLocation MACHINE_NEEDS_MAINTENANCE = id("machine_needs_maintenance");
     public static final ResourceLocation MACHINE_MAINTENANCE_PROBLEMS = id("machine_maintenance_problems");
     public static final ResourceLocation REDSTONE_STRENGTH = id("redstone_strength");
@@ -103,6 +106,8 @@ public final class DrTechDroneNodes {
     public static final ResourceLocation SET_STATUS_LIGHT = id("set_status_light");
     public static final ResourceLocation EDIT_SIGN = id("edit_sign");
     public static final ResourceLocation ATTACK_ENTITY = id("attack_entity");
+    public static final ResourceLocation PATROL_ATTACK_AREA = id("patrol_attack_area");
+    public static final ResourceLocation FISH_AT = id("fish_at");
     public static final ResourceLocation LOAD_ENTITY = id("load_entity");
     public static final ResourceLocation RELEASE_ENTITY = id("release_entity");
     public static final ResourceLocation ENTITY_COUNT = id("entity_count");
@@ -308,6 +313,15 @@ public final class DrTechDroneNodes {
                 .port(DronePortDefinition.input("area", DronePortType.AREA, true))
                 .port(DronePortDefinition.input("filter", DronePortType.ITEM_FILTER, false))
                 .build());
+        registry.register(action(FELL_TREES, "blocks")
+                .port(DronePortDefinition.input("area", DronePortType.AREA, true))
+                .port(DronePortDefinition.output("felled", DronePortType.NUMBER, false))
+                .build());
+        registry.register(action(REPLANT_AREA, "blocks")
+                .port(DronePortDefinition.input("area", DronePortType.AREA, true))
+                .port(DronePortDefinition.input("filter", DronePortType.ITEM_FILTER, false))
+                .port(DronePortDefinition.output("planted", DronePortType.NUMBER, false))
+                .build());
         registry.register(action(IMPORT_ITEMS, "items")
                 .port(DronePortDefinition.input("target", DronePortType.COORDINATE, false))
                 .port(DronePortDefinition.input("area", DronePortType.AREA, false))
@@ -469,6 +483,14 @@ public final class DrTechDroneNodes {
                 .port(DronePortDefinition.output("repaired", DronePortType.NUMBER, false))
                 .property(DroneNodePropertyDefinition.bool("RequireAll"))
                 .build());
+        // Keep the optional integration on its own visible library page. It must remain registered even when
+        // Thaumcraft is absent so saved programs can still be opened and receive a clear runtime diagnostic.
+        registry.register(action(TRANSFER_THAUMCRAFT_ESSENTIA, "thaumcraft")
+                .port(DronePortDefinition.input("smelter", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.input("tube_area", DronePortType.AREA, false))
+                .port(DronePortDefinition.output("transferred", DronePortType.NUMBER, false))
+                .property(DroneNodePropertyDefinition.integer("MaxAmount", 1, 250))
+                .build());
         registry.register(DroneNodeDefinition.builder(MACHINE_NEEDS_MAINTENANCE,
                         DroneNodeDefinition.FlowRole.VALUE)
                 .category("machines")
@@ -532,6 +554,25 @@ public final class DrTechDroneNodes {
         registry.register(action(ATTACK_ENTITY, "entities")
                 .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
                 .port(DronePortDefinition.input("filter", DronePortType.ENTITY_FILTER, false)).build());
+        registry.register(action(PATROL_ATTACK_AREA, "entities")
+                .port(DronePortDefinition.input("area", DronePortType.AREA, true))
+                .port(DronePortDefinition.input("filter", DronePortType.ENTITY_FILTER, false))
+                .port(DronePortDefinition.output("defeated_count", DronePortType.NUMBER, false))
+                .property(DroneNodePropertyDefinition.enumeration("Priority",
+                        "NEAREST", "LOWEST_HEALTH", "HIGHEST_HEALTH", "HOSTILE_FIRST"))
+                .property(DroneNodePropertyDefinition.bool("UntilAreaClear"))
+                .property(DroneNodePropertyDefinition.bool("HostileOnly"))
+                .property(DroneNodePropertyDefinition.integer("MaxChaseTicks", 20, 72_000))
+                .property(DroneNodePropertyDefinition.integer("MaxChaseDistance", 0, 128))
+                .property(DroneNodePropertyDefinition.enumeration("NoTargetMode", "COMPLETE", "WAIT", "FAILED"))
+                .property(DroneNodePropertyDefinition.integer("RescanTicks", 1, 1_200))
+                .property(DroneNodePropertyDefinition.bool("ReacquireLostTarget"))
+                .property(DroneNodePropertyDefinition.bool("ReturnToAreaOnComplete"))
+                .build());
+        registry.register(action(FISH_AT, "entities")
+                .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
+                .port(DronePortDefinition.output("caught", DronePortType.NUMBER, false))
+                .build());
         registry.register(action(LOAD_ENTITY, "entities")
                 .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
                 .port(DronePortDefinition.input("filter", DronePortType.ENTITY_FILTER, false)).build());

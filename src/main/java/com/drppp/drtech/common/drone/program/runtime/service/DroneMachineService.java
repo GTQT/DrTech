@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.drone.program.runtime.service;
 
 import com.drppp.drtech.common.drone.program.runtime.DroneExecutionResult;
+import com.drppp.drtech.common.drone.program.model.DroneArea;
 import net.minecraft.util.math.BlockPos;
 
 /** GregTech machine control and read-only workable state exposed to visual programs. */
@@ -39,4 +40,8 @@ public interface DroneMachineService {
     }
     default boolean needsMachineMaintenance(BlockPos target) { return false; }
     default int getMachineMaintenanceProblemCount(BlockPos target) { return 0; }
+
+    default DroneExecutionResult transferThaumcraftEssentia(BlockPos smelter, DroneArea tubeArea, int maxAmount) {
+        return DroneExecutionResult.error("Thaumcraft essentia transfer is unavailable in this runtime environment");
+    }
 }

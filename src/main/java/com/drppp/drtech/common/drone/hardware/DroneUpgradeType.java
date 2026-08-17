@@ -22,7 +22,9 @@ public enum DroneUpgradeType {
     SELF_REPAIR(14, "self_repair"),
     SECURE_ACCESS(15, "secure_access"),
     ADVANCED_ITEM_HANDLING(16, "advanced_item_handling"),
-    FLEET_COMMUNICATION(17, "fleet_communication");
+    FLEET_COMMUNICATION(17, "fleet_communication"),
+    FISHING(18, "fishing"),
+    THAUMCRAFT_ALCHEMY(19, "thaumcraft_alchemy");
 
     private final int metadata;
     private final String serializedName;

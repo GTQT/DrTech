@@ -1,4 +1,4 @@
 {
   "parent": "item/generated",
-  "textures": { "layer0": "drtech:items/drone/drone_upgrade_crafting" }
+  "textures": { "layer0": "drtech:items/drone/drone_upgrade_tool_arm" }
 }

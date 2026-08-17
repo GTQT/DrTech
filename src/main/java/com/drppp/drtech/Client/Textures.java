@@ -41,6 +41,18 @@ public class Textures {
     public static  TextureArea BACKGROUND;
     public static  TextureArea PAIL_BACKGROUND;
     public static SimpleOverlayRenderer WIRELESS_HATCH_HATCH;
+    public static SimpleOverlayRenderer DRONE_DOCK_OVERLAY;
+    public static SimpleOverlayRenderer DRONE_PROGRAMMER_OVERLAY;
+    public static SimpleOverlayRenderer DRONE_CONTROLLER_OVERLAY;
+    public static SimpleOverlayRenderer DRONE_ENDPOINT_ITEM_OVERLAY;
+    public static SimpleOverlayRenderer DRONE_ENDPOINT_FLUID_OVERLAY;
+    public static SimpleOverlayRenderer DRONE_ENDPOINT_EU_OVERLAY;
+    public static SimpleSidedCubeRenderer DRONE_DOCK_CASING;
+    public static SimpleSidedCubeRenderer DRONE_PROGRAMMER_CASING;
+    public static SimpleSidedCubeRenderer DRONE_CONTROLLER_CASING;
+    public static SimpleSidedCubeRenderer DRONE_ENDPOINT_ITEM_CASING;
+    public static SimpleSidedCubeRenderer DRONE_ENDPOINT_FLUID_CASING;
+    public static SimpleSidedCubeRenderer DRONE_ENDPOINT_EU_CASING;
     public static OrientedOverlayRenderer DISASSEMBLY;
     public static OrientedOverlayRenderer INDUSTRIAL_APIARY;
     public static OrientedOverlayRenderer RU_SHREDDER;
@@ -130,6 +142,18 @@ public class Textures {
         BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);
         PAIL_BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/pail_background.png", 500, 500, 3, 3);
         WIRELESS_HATCH_HATCH = new SimpleOverlayRenderer("overlay/wireless_hatch/overlay_front");
+        DRONE_DOCK_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/dock");
+        DRONE_PROGRAMMER_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/programmer");
+        DRONE_CONTROLLER_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/controller");
+        DRONE_ENDPOINT_ITEM_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/endpoint_item");
+        DRONE_ENDPOINT_FLUID_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/endpoint_fluid");
+        DRONE_ENDPOINT_EU_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/endpoint_eu");
+        DRONE_DOCK_CASING = new SimpleSidedCubeRenderer("drtech:casings/drone/dock");
+        DRONE_PROGRAMMER_CASING = new SimpleSidedCubeRenderer("drtech:casings/drone/programmer");
+        DRONE_CONTROLLER_CASING = new SimpleSidedCubeRenderer("drtech:casings/drone/controller");
+        DRONE_ENDPOINT_ITEM_CASING = new SimpleSidedCubeRenderer("drtech:casings/drone/endpoint_item");
+        DRONE_ENDPOINT_FLUID_CASING = new SimpleSidedCubeRenderer("drtech:casings/drone/endpoint_fluid");
+        DRONE_ENDPOINT_EU_CASING = new SimpleSidedCubeRenderer("drtech:casings/drone/endpoint_eu");
         for(int i = 0; i < MACHINE_CASINGS.length; ++i) {
             String voltageName = GTValues.VN[i].toLowerCase();
             MACHINE_CASINGS[i] = new SimpleSidedCubeRenderer("casings/drtmachine/" + voltageName);

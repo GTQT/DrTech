@@ -4,6 +4,7 @@ import com.drppp.drtech.common.drone.program.runtime.DroneExecutionResult;
 import net.minecraft.util.math.BlockPos;
 import com.drppp.drtech.common.drone.inventory.DroneItemFilter;
 import com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec;
+import com.drppp.drtech.common.drone.program.model.DroneArea;
 
 public interface DroneEntityService {
     default DroneExecutionResult interactWithNearestEntity(BlockPos target) {
@@ -35,6 +36,24 @@ public interface DroneEntityService {
         return DroneExecutionResult.error("Entity attack is unavailable in this runtime environment");
     }
 
+    default DroneExecutionResult attackEntity(BlockPos target, DroneEntityFilterSpec filter,
+            boolean untilDefeated) {
+        return attackEntity(target, filter);
+    }
+
+    default DroneExecutionResult attackEntityInArea(BlockPos target, DroneEntityFilterSpec filter,
+            boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance) {
+        return attackEntity(target, filter, untilDefeated);
+    }
+
+    default DroneExecutionResult attackEntityInArea(BlockPos target, DroneEntityFilterSpec filter,
+            boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance,
+            String expectedEntityUuid, boolean hostileOnly) {
+        return attackEntityInArea(target, filter, untilDefeated, patrolArea, maxChaseDistance);
+    }
+
+    default void clearAttackTarget() {}
+
     default DroneExecutionResult followEntity(BlockPos target, double distance) {
         return followEntity(target, distance, null);
     }
@@ -63,6 +82,10 @@ public interface DroneEntityService {
 
     default DroneExecutionResult releaseEntity(BlockPos target) {
         return DroneExecutionResult.error("Entity release is unavailable in this runtime environment");
+    }
+
+    default DroneExecutionResult fishAt(BlockPos target) {
+        return DroneExecutionResult.error("Fishing is unavailable in this runtime environment");
     }
 
     default DroneExecutionResult renameDrone(String name) {

@@ -1,4 +1,4 @@
 {
   "parent": "item/generated",
-  "textures": { "layer0": "drtech:items/drone/drone_upgrade_wireless" }
+  "textures": { "layer0": "drtech:items/drone/drone_upgrade_fleet_communication" }
 }

@@ -217,6 +217,31 @@ public class CraftingReceipe {
                 'P', new UnificationEntry(plate, Titanium),
                 'W', new UnificationEntry(wireFine, Electrum));
 
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_fishing",
+                droneUpgrade(DroneUpgradeType.FISHING),
+                "PRP", "FCF", "PMP",
+                'P', new UnificationEntry(plate, Titanium),
+                'R', MetaItems.ROBOT_ARM_EV,
+                'F', Items.FISHING_ROD,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'M', MetaItems.ELECTRIC_MOTOR_EV);
+
+        if (Loader.isModLoaded("thaumcraft")) {
+            Item thaumcraftFilter = ForgeRegistries.ITEMS.getValue(new ResourceLocation("thaumcraft", "filter"));
+            Item thaumcraftPhial = ForgeRegistries.ITEMS.getValue(new ResourceLocation("thaumcraft", "phial"));
+            if (thaumcraftFilter != null && thaumcraftPhial != null) {
+                ModHandler.addShapedRecipe("drtech_drone_upgrade_thaumcraft_alchemy",
+                        droneUpgrade(DroneUpgradeType.THAUMCRAFT_ALCHEMY),
+                        "PFP", "RCR", "PHP",
+                        'P', new UnificationEntry(plate, Titanium),
+                        'F', thaumcraftFilter,
+                        'R', MetaItems.ROBOT_ARM_EV,
+                        'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                        'H', thaumcraftPhial);
+            }
+        }
+
+
         ModHandler.addShapedRecipe("drtech_drone_programmer", DrTechMetaTileEntities.DRONE_PROGRAMMER.getStackForm(),
                 "SCS", "RHR", "WCW",
                 'S', MetaItems.SENSOR_EV,

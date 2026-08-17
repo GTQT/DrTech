@@ -11,6 +11,22 @@ import javax.annotation.Nullable;
 public interface DroneSensorService {
     enum LightType { MAX, BLOCK, SKY }
 
+    enum EntityPriority {
+        NEAREST,
+        LOWEST_HEALTH,
+        HIGHEST_HEALTH,
+        HOSTILE_FIRST;
+
+        public static EntityPriority fromName(String name) {
+            if (name == null || name.isEmpty()) return NEAREST;
+            try {
+                return valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+                return NEAREST;
+            }
+        }
+    }
+
     default boolean isRedstonePowered(BlockPos target) { return false; }
     default boolean isOwnerWithin(double radius) { return false; }
     default int getCargoItemCount(DroneItemFilter filter) { return 0; }
@@ -27,5 +43,20 @@ public interface DroneSensorService {
     default int countMatchingBlocks(DroneArea area, DroneBlockFilterSpec filter, int limit) { return 0; }
     default int countEntities(DroneArea area, @Nullable com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec filter, int limit) { return 0; }
     default DroneEntitySensorResult senseNearestEntity(DroneArea area, @Nullable com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec filter) { return DroneEntitySensorResult.EMPTY; }
+    default DroneEntitySensorResult senseEntity(DroneArea area,
+            @Nullable com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec filter,
+            EntityPriority priority) {
+        return senseNearestEntity(area, filter);
+    }
+    default DroneEntitySensorResult senseEntity(DroneArea area,
+            @Nullable com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec filter,
+            EntityPriority priority, boolean hostileOnly) {
+        return senseEntity(area, filter, priority);
+    }
+    default DroneEntitySensorResult senseAttackableEntity(DroneArea area,
+            @Nullable com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec filter,
+            EntityPriority priority, boolean hostileOnly) {
+        return senseEntity(area, filter, priority, hostileOnly);
+    }
     default DroneEntitySensorResult senseDroneDamage() { return DroneEntitySensorResult.EMPTY; }
 }

@@ -26,6 +26,7 @@ public final class DroneEndpoint {
     private final List<String> whitelist;
     private final long minimumReserve;
     private final long maximumInventory;
+    private final List<DroneEndpointResource> resources;
 
     public DroneEndpoint(UUID endpointId, Kind kind, int dimension, BlockPos position, @Nullable UUID ownerId,
             long lastHeartbeat, boolean loaded) {
@@ -35,12 +36,20 @@ public final class DroneEndpoint {
     public DroneEndpoint(UUID endpointId, Kind kind, int dimension, BlockPos position, @Nullable UUID ownerId,
             long lastHeartbeat, boolean loaded, long requestAmount, long provideAmount, int priority) {
         this(endpointId, kind, dimension, position, ownerId, lastHeartbeat, loaded, requestAmount, provideAmount,
-                priority, Collections.emptyList(), 0L, 0L);
+                priority, Collections.emptyList(), 0L, 0L, Collections.emptyList());
     }
 
     public DroneEndpoint(UUID endpointId, Kind kind, int dimension, BlockPos position, @Nullable UUID ownerId,
             long lastHeartbeat, boolean loaded, long requestAmount, long provideAmount, int priority,
             List<String> whitelist, long minimumReserve, long maximumInventory) {
+        this(endpointId, kind, dimension, position, ownerId, lastHeartbeat, loaded, requestAmount, provideAmount,
+                priority, whitelist, minimumReserve, maximumInventory, Collections.emptyList());
+    }
+
+    public DroneEndpoint(UUID endpointId, Kind kind, int dimension, BlockPos position, @Nullable UUID ownerId,
+            long lastHeartbeat, boolean loaded, long requestAmount, long provideAmount, int priority,
+            List<String> whitelist, long minimumReserve, long maximumInventory,
+            List<DroneEndpointResource> resources) {
         if (endpointId == null || kind == null || position == null) {
             throw new IllegalArgumentException("Endpoint id, kind and position are required");
         }
@@ -65,6 +74,11 @@ public final class DroneEndpoint {
         this.whitelist = Collections.unmodifiableList(normalized);
         this.minimumReserve = Math.max(0L, minimumReserve);
         this.maximumInventory = Math.max(0L, maximumInventory);
+        List<DroneEndpointResource> snapshots = new ArrayList<>();
+        if (resources != null) for (DroneEndpointResource resource : resources) {
+            if (resource != null && snapshots.size() < 64) snapshots.add(resource);
+        }
+        this.resources = Collections.unmodifiableList(snapshots);
     }
 
     public UUID getEndpointId() { return endpointId; }
@@ -80,6 +94,14 @@ public final class DroneEndpoint {
     public List<String> getWhitelist() { return whitelist; }
     public long getMinimumReserve() { return minimumReserve; }
     public long getMaximumInventory() { return maximumInventory; }
+    public List<DroneEndpointResource> getResources() { return resources; }
+    @Nullable public DroneEndpointResource getResource(String resourceId) {
+        if (resourceId == null) return null;
+        for (DroneEndpointResource resource : resources) {
+            if (resourceId.equals(resource.getResourceId())) return resource;
+        }
+        return null;
+    }
     public boolean matchesResource(String resourceId) {
         return DroneEndpointPolicy.matchesResource(this, resourceId);
     }
@@ -111,6 +133,9 @@ public final class DroneEndpoint {
         tag.setTag("Whitelist", allowed);
         tag.setLong("MinimumReserve", minimumReserve);
         tag.setLong("MaximumInventory", maximumInventory);
+        net.minecraft.nbt.NBTTagList resourceList = new net.minecraft.nbt.NBTTagList();
+        for (DroneEndpointResource resource : resources) resourceList.appendTag(resource.writeToNbt());
+        tag.setTag("Resources", resourceList);
         return tag;
     }
 
@@ -128,7 +153,8 @@ public final class DroneEndpoint {
                 tag.hasKey("ProvideAmount", 4) ? tag.getLong("ProvideAmount") : 0L,
                 tag.hasKey("Priority", 3) ? tag.getInteger("Priority") : 0,
                 readWhitelist(tag), tag.hasKey("MinimumReserve", 4) ? tag.getLong("MinimumReserve") : 0L,
-                tag.hasKey("MaximumInventory", 4) ? tag.getLong("MaximumInventory") : 0L);
+                tag.hasKey("MaximumInventory", 4) ? tag.getLong("MaximumInventory") : 0L,
+                readResources(tag));
     }
 
     private static List<String> readWhitelist(NBTTagCompound tag) {
@@ -137,6 +163,16 @@ public final class DroneEndpoint {
         for (int i = 0; i < list.tagCount() && values.size() < 64; i++) {
             String value = list.getCompoundTagAt(i).getString("Value");
             if (!value.trim().isEmpty()) values.add(value.trim().substring(0, Math.min(128, value.trim().length())));
+        }
+        return values;
+    }
+
+    private static List<DroneEndpointResource> readResources(NBTTagCompound tag) {
+        List<DroneEndpointResource> values = new ArrayList<>();
+        net.minecraft.nbt.NBTTagList list = tag.getTagList("Resources", 10);
+        for (int i = 0; i < list.tagCount() && values.size() < 64; i++) {
+            DroneEndpointResource value = DroneEndpointResource.readFromNbt(list.getCompoundTagAt(i));
+            if (value != null) values.add(value);
         }
         return values;
     }
