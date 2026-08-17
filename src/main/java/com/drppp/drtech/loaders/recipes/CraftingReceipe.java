@@ -139,6 +139,23 @@ public class CraftingReceipe {
                 'C', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
                 'M', MetaItems.ELECTRIC_MOTOR_HV);
 
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_advanced_navigation",
+                droneUpgrade(DroneUpgradeType.ADVANCED_NAVIGATION),
+                "SES", "ECE", "PIP",
+                'S', MetaItems.SENSOR_EV,
+                'E', MetaItems.EMITTER_EV,
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'P', new UnificationEntry(plate, Titanium),
+                'I', Items.ENDER_EYE);
+
+        ModHandler.addShapedRecipe("drtech_drone_upgrade_eu_interface",
+                droneUpgrade(DroneUpgradeType.EU_INTERFACE),
+                "WCW", "EPE", "WCW",
+                'W', new UnificationEntry(cableGtSingle, Aluminium),
+                'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
+                'E', MetaItems.EMITTER_EV,
+                'P', new UnificationEntry(plate, Titanium));
+
         ModHandler.addShapedRecipe("drtech_drone_upgrade_tool_arm",
                 droneUpgrade(DroneUpgradeType.TOOL_ARM),
                 "PRP", "MCM", "PAP",

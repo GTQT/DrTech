@@ -4,6 +4,7 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.UISettings;
@@ -54,10 +55,10 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
     private static final int FLUID_CAPACITY = 64_000;
     private final DroneEndpoint.Kind kind;
     private final ItemStackHandler itemBuffer = new ItemStackHandler(ITEM_SLOTS) {
-        @Override protected void onContentsChanged(int slot) { markDirty(); }
+        @Override protected void onContentsChanged(int slot) { markDirty(); publishEndpointSnapshot(); }
     };
     private final FluidTank fluidBuffer = new FluidTank(FLUID_CAPACITY) {
-        @Override protected void onContentsChanged() { markDirty(); }
+        @Override protected void onContentsChanged() { markDirty(); publishEndpointSnapshot(); }
     };
     private UUID endpointId = UUID.randomUUID();
     private UUID ownerId;
@@ -77,6 +78,28 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
 
     public DroneEndpoint.Kind getKind() {
         return kind;
+    }
+
+    public UUID getEndpointId() { return endpointId; }
+    @Nullable public UUID getOwnerId() { return ownerId; }
+
+    /** Removes EU from the endpoint's real GT buffer, bounded by the caller and current storage. */
+    public long extractLogisticsEu(long maximum) {
+        if (kind != DroneEndpoint.Kind.EU || maximum <= 0L) return 0L;
+        long amount = Math.min(maximum, energyContainer.getEnergyStored());
+        long moved = amount <= 0L ? 0L : energyContainer.removeEnergy(amount);
+        if (moved > 0L) { markDirty(); publishEndpointSnapshot(); }
+        return moved;
+    }
+
+    /** Inserts EU into the endpoint's real GT buffer, bounded by its remaining capacity. */
+    public long insertLogisticsEu(long maximum) {
+        if (kind != DroneEndpoint.Kind.EU || maximum <= 0L) return 0L;
+        long space = Math.max(0L, energyContainer.getEnergyCapacity() - energyContainer.getEnergyStored());
+        long amount = Math.min(maximum, space);
+        long moved = amount <= 0L ? 0L : energyContainer.addEnergy(amount);
+        if (moved > 0L) { markDirty(); publishEndpointSnapshot(); }
+        return moved;
     }
 
     @Override
@@ -117,11 +140,24 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
     public void update() {
         super.update();
         if (getWorld() != null && !getWorld().isRemote && getOffsetTimer() % 20 == 0) {
-            DroneEndpointNetwork.get(getWorld()).heartbeat(new DroneEndpoint(endpointId, kind,
-                    getWorld().provider.getDimension(), getPos(), ownerId, getWorld().getTotalWorldTime(), true,
-                    requestAmount, provideAmount, priority, whitelist, minimumReserve, maximumInventory,
-                    createResourceSnapshot()));
+            publishEndpointSnapshot();
         }
+    }
+
+    @Override
+    public void onRemoval() {
+        if (getWorld() != null && !getWorld().isRemote) {
+            DroneEndpointNetwork.get(getWorld()).remove(endpointId);
+        }
+        super.onRemoval();
+    }
+
+    private void publishEndpointSnapshot() {
+        if (getWorld() == null || getWorld().isRemote || getPos() == null) return;
+        DroneEndpointNetwork.get(getWorld()).heartbeat(new DroneEndpoint(endpointId, kind,
+                getWorld().provider.getDimension(), getPos(), ownerId, getWorld().getTotalWorldTime(), true,
+                requestAmount, provideAmount, priority, whitelist, minimumReserve, maximumInventory,
+                createResourceSnapshot()));
     }
 
     private List<DroneEndpointResource> createResourceSnapshot() {
@@ -165,6 +201,7 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
         this.provideAmount = Math.max(0L, provideAmount);
         this.priority = Math.max(-100, Math.min(100, priority));
         markDirty();
+        publishEndpointSnapshot();
     }
 
     public void configureInventoryPolicy(List<String> whitelist, long minimumReserve, long maximumInventory) {
@@ -172,6 +209,7 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
         this.minimumReserve = Math.max(0L, minimumReserve);
         this.maximumInventory = Math.max(0L, maximumInventory);
         markDirty();
+        publishEndpointSnapshot();
     }
 
     @Override
@@ -234,7 +272,9 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
             PanelSyncManager syncManager) {
         return new ButtonWidget<>().pos(x, y).size(22, 12).overlay(IKey.str(label))
                 .onMousePressed(mouse -> {
-                    syncManager.callSyncedAction(CONFIG_ACTION, packet -> packet.writeString(command));
+                    String action = command + (Interactable.hasControlDown() ? "_LARGE"
+                            : Interactable.hasShiftDown() ? "_MEDIUM" : "_SMALL");
+                    syncManager.callSyncedAction(CONFIG_ACTION, packet -> packet.writeString(action));
                     return true;
                 });
     }
@@ -269,20 +309,25 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
 
     private void receiveConfigAction(EntityPlayer player, String command) {
         if (player == null || ownerId == null || !ownerId.equals(player.getUniqueID())) return;
-        switch (command) {
-            case "REQUEST_MINUS": requestAmount = decrease(requestAmount, 100L); break;
-            case "REQUEST_PLUS": requestAmount = increase(requestAmount, 100L); break;
-            case "PROVIDE_MINUS": provideAmount = decrease(provideAmount, 100L); break;
-            case "PROVIDE_PLUS": provideAmount = increase(provideAmount, 100L); break;
+        long step = adjustmentStep(command);
+        String action = command.endsWith("_LARGE") ? command.substring(0, command.length() - 6)
+                : command.endsWith("_MEDIUM") ? command.substring(0, command.length() - 7)
+                : command.endsWith("_SMALL") ? command.substring(0, command.length() - 6) : command;
+        switch (action) {
+            case "REQUEST_MINUS": requestAmount = decrease(requestAmount, step); break;
+            case "REQUEST_PLUS": requestAmount = increase(requestAmount, step); break;
+            case "PROVIDE_MINUS": provideAmount = decrease(provideAmount, step); break;
+            case "PROVIDE_PLUS": provideAmount = increase(provideAmount, step); break;
             case "PRIORITY_MINUS": priority = Math.max(-100, priority - 1); break;
             case "PRIORITY_PLUS": priority = Math.min(100, priority + 1); break;
-            case "RESERVE_MINUS": minimumReserve = decrease(minimumReserve, 100L); break;
-            case "RESERVE_PLUS": minimumReserve = increase(minimumReserve, 100L); break;
-            case "MAXIMUM_MINUS": maximumInventory = decrease(maximumInventory, 100L); break;
-            case "MAXIMUM_PLUS": maximumInventory = increase(maximumInventory, 100L); break;
+            case "RESERVE_MINUS": minimumReserve = decrease(minimumReserve, step); break;
+            case "RESERVE_PLUS": minimumReserve = increase(minimumReserve, step); break;
+            case "MAXIMUM_MINUS": maximumInventory = decrease(maximumInventory, step); break;
+            case "MAXIMUM_PLUS": maximumInventory = increase(maximumInventory, step); break;
             default: return;
         }
         markDirty();
+        publishEndpointSnapshot();
     }
 
     private void receiveWhitelistAction(EntityPlayer player, String command, String rawValue) {
@@ -309,6 +354,7 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
         }
         whitelist = Collections.unmodifiableList(next);
         markDirty();
+        publishEndpointSnapshot();
     }
 
     private NBTTagCompound createConfigState() {
@@ -354,16 +400,40 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
         if (getWorld() != null && !getWorld().isRemote && ownerId == null && player != null) {
             ownerId = player.getUniqueID();
             markDirty();
+            publishEndpointSnapshot();
         }
     }
 
     private String statusLine() {
-        String config = " | Req: " + requestAmount + " | Out: " + provideAmount + " | P: " + priority;
-        if (kind == DroneEndpoint.Kind.ITEM) return "Slots: " + ITEM_SLOTS + config + " | " + shortId();
-        if (kind == DroneEndpoint.Kind.FLUID) return "Fluid: " + fluidBuffer.getFluidAmount() + "/"
-                + fluidBuffer.getCapacity() + " mB" + config + " | " + shortId();
-        return "EU: " + energyContainer.getEnergyStored() + "/" + energyContainer.getEnergyCapacity()
-                + config + " | " + shortId();
+        String key = kind == DroneEndpoint.Kind.ITEM ? "drtech.drone.endpoint.status.item"
+                : kind == DroneEndpoint.Kind.FLUID ? "drtech.drone.endpoint.status.fluid"
+                : "drtech.drone.endpoint.status.eu";
+        long amount = kind == DroneEndpoint.Kind.ITEM ? itemAmount()
+                : kind == DroneEndpoint.Kind.FLUID ? fluidBuffer.getFluidAmount()
+                : energyContainer.getEnergyStored();
+        long capacity = kind == DroneEndpoint.Kind.ITEM ? ITEM_SLOTS * 64L
+                : kind == DroneEndpoint.Kind.FLUID ? fluidBuffer.getCapacity()
+                : energyContainer.getEnergyCapacity();
+        return net.minecraft.client.resources.I18n.format(key, amount, capacity, requestAmount,
+                provideAmount, priority, adjustmentStep("_SMALL"), adjustmentStep("_MEDIUM"),
+                adjustmentStep("_LARGE"), shortId());
+    }
+
+    private long adjustmentStep(String command) {
+        boolean medium = command != null && command.endsWith("_MEDIUM");
+        boolean large = command != null && command.endsWith("_LARGE");
+        if (kind == DroneEndpoint.Kind.ITEM) return large ? 64L : medium ? 16L : 1L;
+        if (kind == DroneEndpoint.Kind.FLUID) return large ? 16_000L : medium ? 1_000L : 100L;
+        long packet = GTValues.V[GTValues.EV];
+        return large ? packet * 64L : medium ? packet * 4L : packet;
+    }
+
+    private long itemAmount() {
+        long amount = 0L;
+        for (int slot = 0; slot < itemBuffer.getSlots(); slot++) {
+            amount += itemBuffer.getStackInSlot(slot).getCount();
+        }
+        return amount;
     }
 
     private String shortId() { return endpointId.toString().substring(0, 8); }

@@ -285,6 +285,35 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         return false;
     }
 
+    /** Owner-id service entry used after an external caller has passed its own authentication boundary. */
+    public boolean requestBoundDroneRecall(UUID requesterId) {
+        if (requesterId == null || getWorld() == null || getWorld().isRemote || !isRedstoneAllowed()
+                || ownerId == null || !ownerId.equals(requesterId)) return false;
+        int radius = 128 << Math.max(0, getTier() - GTValues.HV);
+        AxisAlignedBB search = new AxisAlignedBB(getPos()).grow(radius);
+        for (EntityProgrammableDrone drone : getWorld().getEntitiesWithinAABB(
+                EntityProgrammableDrone.class, search)) {
+            if (drone.isBoundToDock(getPos()) && requesterId.equals(drone.getOwnerId())
+                    && drone.requestManualRecall()) {
+                currentDroneId = drone.getDroneId();
+                markDirty();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Claims an unused dock or verifies its existing owner without accepting a nullable player. */
+    public boolean claimForOwner(UUID requesterId) {
+        if (requesterId == null) return false;
+        if (ownerId == null) {
+            ownerId = requesterId;
+            markDirty();
+            updateNetworkHeartbeat();
+        }
+        return ownerId.equals(requesterId);
+    }
+
     public boolean tryReserveDrone(UUID droneId, @Nullable UUID droneOwner) {
         if (!enabled || droneId == null || ownerId != null && !ownerId.equals(droneOwner)) return false;
         if (currentDroneId != null && !currentDroneId.equals(droneId)) return false;

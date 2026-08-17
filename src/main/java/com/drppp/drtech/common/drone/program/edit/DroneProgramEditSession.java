@@ -66,6 +66,7 @@ public final class DroneProgramEditSession {
                 || candidate.getEdges().size() > DroneProgramCompiler.MAX_EDGES) {
             return rejected(DroneGraphEditStatus.LIMIT_EXCEEDED, "Program graph limit exceeded");
         }
+        candidate.refreshEditorOverlayLayout();
 
         pushHistory(undoHistory, graph);
         redoHistory.clear();

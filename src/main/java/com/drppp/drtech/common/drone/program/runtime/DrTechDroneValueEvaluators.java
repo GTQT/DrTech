@@ -19,6 +19,13 @@ public final class DrTechDroneValueEvaluators {
     private DrTechDroneValueEvaluators() {}
 
     public static DroneValueEvaluatorRegistry createDefaultRegistry() {
+        DroneValueEvaluatorRegistry registry = createExtensibleRegistry();
+        registry.freeze();
+        return registry;
+    }
+
+    /** Mutable built-in registry used only during the Forge extension registration window. */
+    public static DroneValueEvaluatorRegistry createExtensibleRegistry() {
         DroneValueEvaluatorRegistry registry = new DroneValueEvaluatorRegistry();
         registry.register(DrTechDroneNodes.NUMBER, (context, output) ->
                 context.getConfiguration().getDouble("Value"));
@@ -368,7 +375,6 @@ public final class DrTechDroneValueEvaluators {
                 DroneArea.plane(context.requireInput("origin", BlockPos.class),
                         context.requireInput("first", BlockPos.class),
                         context.requireInput("second", BlockPos.class)));
-        registry.freeze();
         return registry;
     }
 

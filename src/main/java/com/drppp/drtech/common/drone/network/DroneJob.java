@@ -8,10 +8,11 @@ import java.util.UUID;
 /** Mutable server-side lifecycle for a fleet job; persistence is owned by the future fleet controller. */
 public final class DroneJob {
     public enum State { QUEUED, RUNNING, RETRY_WAIT, COMPLETED, FAILED, CANCELLED }
-    public enum LogisticsStage { NONE, DISCOVER, RESERVED, TO_SOURCE, PICKUP, TO_TARGET, DELIVER, RETURNING }
+    public enum LogisticsStage { NONE, DISCOVER, RESERVED, TO_SOURCE, PICKUP, TO_TARGET, DELIVER, RETURNING, RECOVERED }
 
     private static final int MAX_ATTEMPTS = 16;
     private static final long MAX_BACKOFF_TICKS = 20L * 60L * 30L;
+    private static final int MAX_FAILURE_LENGTH = 256;
 
     private final UUID jobId;
     private final UUID ownerId;
@@ -118,6 +119,34 @@ public final class DroneJob {
         return true;
     }
 
+    void limitRequestedAmount(long amount) {
+        if (!isLogisticsJob() || amount <= 0L) return;
+        requestedAmount = Math.min(requestedAmount, amount);
+        pickedAmount = Math.min(pickedAmount, requestedAmount);
+        deliveredAmount = Math.min(deliveredAmount, pickedAmount);
+    }
+
+    void prepareLogisticsRetry() {
+        if (!isLogisticsJob()) {
+            clearAssignedDrone();
+            return;
+        }
+        if (pickedAmount > deliveredAmount && assignedDroneId != null) {
+            logisticsStage = LogisticsStage.TO_TARGET;
+        } else {
+            clearAssignedDrone();
+            logisticsStage = LogisticsStage.DISCOVER;
+        }
+    }
+
+    boolean finishLogisticsRecovery() {
+        if ((state != State.FAILED && state != State.CANCELLED) || logisticsStage != LogisticsStage.RETURNING
+                || pickedAmount <= deliveredAmount || assignedDroneId == null) return false;
+        logisticsStage = LogisticsStage.RECOVERED;
+        clearAssignedDrone();
+        return true;
+    }
+
     public boolean isEligible(long worldTime) {
         return (state == State.QUEUED || state == State.RETRY_WAIT) && worldTime >= nextEligibleTick;
     }
@@ -126,6 +155,13 @@ public final class DroneJob {
         if (!isEligible(worldTime)) return false;
         state = State.RUNNING;
         runningSinceTick = worldTime;
+        lastFailure = "";
+        return true;
+    }
+
+    boolean touch(long worldTime) {
+        if (state != State.RUNNING) return false;
+        runningSinceTick = Math.max(runningSinceTick, worldTime);
         return true;
     }
 
@@ -138,25 +174,49 @@ public final class DroneJob {
         if (state != State.RUNNING) return;
         state = State.COMPLETED;
         runningSinceTick = -1L;
+        lastFailure = "";
     }
 
     void fail(long worldTime, @Nullable String reason) {
         if (state != State.RUNNING) return;
         attempts++;
         runningSinceTick = -1L;
-        lastFailure = reason == null ? "" : reason;
+        lastFailure = normalizeFailure(reason);
         if (attempts >= maxAttempts) {
             state = State.FAILED;
+            if (isLogisticsJob() && pickedAmount > deliveredAmount && assignedDroneId != null) {
+                logisticsStage = LogisticsStage.RETURNING;
+            } else {
+                prepareLogisticsRetry();
+            }
             return;
         }
         state = State.RETRY_WAIT;
         nextEligibleTick = saturatingAdd(worldTime, backoffForAttempt(attempts));
+        prepareLogisticsRetry();
     }
 
-    void cancel() {
-        if (state == State.COMPLETED || state == State.FAILED) return;
+    /** Scheduling contention is not an execution attempt and must not exhaust the retry budget. */
+    boolean defer(long worldTime, @Nullable String reason, long delayTicks) {
+        if (state != State.RUNNING) return false;
+        state = State.RETRY_WAIT;
+        runningSinceTick = -1L;
+        lastFailure = normalizeFailure(reason);
+        nextEligibleTick = saturatingAdd(worldTime, Math.max(1L, delayTicks));
+        prepareLogisticsRetry();
+        return true;
+    }
+
+    boolean cancel() {
+        if (state == State.COMPLETED || state == State.FAILED || state == State.CANCELLED) return false;
         state = State.CANCELLED;
         runningSinceTick = -1L;
+        if (isLogisticsJob() && pickedAmount > deliveredAmount && assignedDroneId != null) {
+            logisticsStage = LogisticsStage.RETURNING;
+        } else {
+            clearAssignedDrone();
+        }
+        return true;
     }
 
     NBTTagCompound writeToNbt() {
@@ -199,7 +259,7 @@ public final class DroneJob {
         job.attempts = Math.max(0, Math.min(job.maxAttempts, tag.getInteger("Attempts")));
         job.nextEligibleTick = Math.max(job.submittedTick, tag.getLong("NextEligible"));
         job.runningSinceTick = tag.getLong("RunningSince");
-        job.lastFailure = tag.getString("LastFailure");
+        job.lastFailure = normalizeFailure(tag.getString("LastFailure"));
         readLogisticsPayload(job, tag);
         return job;
     }
@@ -207,9 +267,6 @@ public final class DroneJob {
     void recoverAfterLoad(long worldTime) {
         if (state == State.RUNNING) {
             fail(worldTime, "SERVER_RESTART");
-            clearAssignedDrone();
-            if (isLogisticsJob()) logisticsStage = pickedAmount > deliveredAmount
-                    ? LogisticsStage.TO_TARGET : LogisticsStage.DISCOVER;
         }
     }
 
@@ -250,6 +307,11 @@ public final class DroneJob {
     private static String normalizeResourceId(String resourceId) {
         String checked = resourceId == null ? "" : resourceId.trim();
         return checked.substring(0, Math.min(128, checked.length()));
+    }
+
+    private static String normalizeFailure(@Nullable String failure) {
+        String checked = failure == null ? "" : failure.replace('\n', ' ').replace('\r', ' ').trim();
+        return checked.substring(0, Math.min(MAX_FAILURE_LENGTH, checked.length()));
     }
 
     @Nullable

@@ -2,13 +2,25 @@ package com.drppp.drtech.common.drone.api;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.eventhandler.Event;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Forge event for third-party drone module descriptors. */
-public class DroneModuleRegistryEvent extends Event {
-    private final Map<ResourceLocation, Object> modules = new LinkedHashMap<>();
-    public void register(ResourceLocation id, Object descriptor) { if (id == null || descriptor == null) throw new IllegalArgumentException("Module id and descriptor are required"); if (modules.putIfAbsent(id, descriptor) != null) throw new IllegalArgumentException("Duplicate module id " + id); }
-    public Map<ResourceLocation, Object> getModules() { return Collections.unmodifiableMap(modules); }
+/** Forge event fired once while third-party module declarations may be registered. */
+public final class DroneModuleRegistryEvent extends Event {
+    private final Map<ResourceLocation, DroneModuleDefinition> modules;
+
+    DroneModuleRegistryEvent(Map<ResourceLocation, DroneModuleDefinition> modules) { this.modules = modules; }
+
+    public void register(DroneModuleDefinition definition) {
+        if (definition == null || modules.size() >= 1024
+                || modules.putIfAbsent(definition.getId(), definition) != null) {
+            throw new IllegalArgumentException("Duplicate or null drone module definition");
+        }
+    }
+
+    public Map<ResourceLocation, DroneModuleDefinition> getModules() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(modules));
+    }
 }

@@ -234,10 +234,12 @@ public final class ModelProgrammableDrone extends ModelBase {
                 || drone.hasVisualUpgrade(DroneUpgradeType.THAUMCRAFT_ALCHEMY));
         float fishingPull = entity instanceof EntityProgrammableDrone drone
                 ? drone.getFishingPullProgress(ageInTicks - entity.ticksExisted) : 0.0F;
+        float fishingCast = entity instanceof EntityProgrammableDrone drone
+                ? drone.getFishingCastProgress(ageInTicks - entity.ticksExisted) : 0.0F;
         float alchemyMove = entity instanceof EntityProgrammableDrone drone
                 ? drone.getAlchemyAnimationProgress(ageInTicks - entity.ticksExisted) : 0.0F;
         toolArm.rotateAngleX = (float) Math.sin(ageInTicks * 0.15F) * 0.04F
-                - attack * 1.15F - fishingPull * 0.85F - alchemyMove * 0.45F;
+                - attack * 1.15F + fishingCast * 0.95F - fishingPull * 0.85F - alchemyMove * 0.45F;
     }
 
     public void renderStatusLights(float scale) {

@@ -11,6 +11,7 @@ import java.util.Objects;
 
 /** Dedicated registry; NBT stores ResourceLocation ids and never Java class names. */
 public final class DroneNodeRegistry {
+    private static final int MAX_ENTRIES = 4096;
 
     private final Map<ResourceLocation, DroneNodeDefinition> definitions = new LinkedHashMap<>();
     private boolean frozen;
@@ -20,6 +21,9 @@ public final class DroneNodeRegistry {
             throw new IllegalStateException("Drone node registry is frozen");
         }
         Objects.requireNonNull(definition, "definition");
+        if (definition.getId().toString().length() > 128 || definitions.size() >= MAX_ENTRIES) {
+            throw new IllegalArgumentException("Drone node registry limit exceeded");
+        }
         if (definitions.putIfAbsent(definition.getId(), definition) != null) {
             throw new IllegalArgumentException("Duplicate drone node id " + definition.getId());
         }

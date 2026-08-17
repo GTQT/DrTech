@@ -31,6 +31,13 @@ public final class DrTechDroneExecutors {
     private DrTechDroneExecutors() {}
 
     public static DroneExecutorRegistry createDefaultRegistry() {
+        DroneExecutorRegistry registry = createExtensibleRegistry();
+        registry.freeze();
+        return registry;
+    }
+
+    /** Mutable built-in registry used only during the Forge extension registration window. */
+    public static DroneExecutorRegistry createExtensibleRegistry() {
         DroneExecutorRegistry registry = new DroneExecutorRegistry();
         registry.register(DrTechDroneNodes.WAIT, DrTechDroneExecutors::tickWait);
         registry.register(DrTechDroneNodes.BRANCH, context -> DroneExecutionResult.success(
@@ -164,7 +171,8 @@ public final class DrTechDroneExecutors {
                 .setStatusLight(context.getConfiguration().getString("Mode")));
         registry.register(DrTechDroneNodes.EDIT_SIGN, DrTechDroneExecutors::editSign);
         registry.register(DrTechDroneNodes.ATTACK_ENTITY, context -> context.getEnvironment()
-                .attackEntity(context.requireInput("target", BlockPos.class), optionalEntityFilter(context)));
+                .attackEntity(context.requireInput("target", BlockPos.class), optionalEntityFilter(context), false,
+                        combatWeaponMode(context), combatAttackInterval(context)));
         registry.register(DrTechDroneNodes.PATROL_ATTACK_AREA, DrTechDroneExecutors::tickPatrolAttackArea);
         registry.register(DrTechDroneNodes.LOAD_ENTITY, context -> context.getEnvironment()
                 .loadEntity(context.requireInput("target", BlockPos.class), optionalEntityFilter(context)));
@@ -229,7 +237,6 @@ public final class DrTechDroneExecutors {
                 context.requireInput("condition", Boolean.class) ? "body" : "done"));
         registry.register(DrTechDroneNodes.FOR_EACH_COORDINATE, DrTechDroneExecutors::tickForEachCoordinate);
         registry.register(DrTechDroneNodes.FOR_EACH_ITEM_FILTER, DrTechDroneExecutors::tickForEachItemFilter);
-        registry.freeze();
         return registry;
     }
 
@@ -275,7 +282,8 @@ public final class DrTechDroneExecutors {
         maxChaseDistance = Math.max(0, Math.min(128, maxChaseDistance));
         DroneExecutionResult result = context.getEnvironment().attackEntityInArea(
                 BlockPos.fromLong(state.getLong("Target")), filter, true, area, maxChaseDistance,
-                state.getString("TargetUuid"), hostileOnly);
+                state.getString("TargetUuid"), hostileOnly,
+                combatWeaponMode(context), combatAttackInterval(context));
         if (result.getState() == DroneActionState.RUNNING) {
             int chaseTicks = state.getInteger("ChaseTicks") + 1;
             state.setInteger("ChaseTicks", chaseTicks);
@@ -421,6 +429,21 @@ public final class DrTechDroneExecutors {
     private static DroneSensorService.EntityPriority patrolPriority(DroneNodeExecutionContext context) {
         return DroneSensorService.EntityPriority.fromName(context.getConfiguration().hasKey("Priority", 8)
                 ? context.getConfiguration().getString("Priority") : "HOSTILE_FIRST");
+    }
+
+    private static String combatWeaponMode(DroneNodeExecutionContext context) {
+        String mode = context.getConfiguration().hasKey("WeaponMode", 8)
+                ? context.getConfiguration().getString("WeaponMode") : "STRONGEST";
+        if (!"PRIMARY".equals(mode) && !"SECONDARY".equals(mode) && !"ALTERNATE".equals(mode)) {
+            return "STRONGEST";
+        }
+        return mode;
+    }
+
+    private static int combatAttackInterval(DroneNodeExecutionContext context) {
+        int interval = context.getConfiguration().hasKey("AttackIntervalTicks", 99)
+                ? context.getConfiguration().getInteger("AttackIntervalTicks") : 8;
+        return Math.max(4, Math.min(40, interval));
     }
 
     private static double entityDistance(DroneNodeExecutionContext context) {

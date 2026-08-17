@@ -1,5 +1,9 @@
 package com.drppp.drtech.Client.drone;
 
+import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
+import com.drppp.drtech.common.drone.api.DroneExtensionAvailability;
+import com.drppp.drtech.common.drone.program.compile.DroneDiagnosticSeverity;
+
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -85,10 +89,11 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     private final Consumer<DroneGraphEditCommand> commandSink;
     private final BooleanSupplier editableSupplier;
     private final Supplier<Set<UUID>> diagnosticNodesSupplier;
+    private Supplier<Map<UUID, DroneDiagnosticSeverity>> diagnosticSeveritySupplier = Collections::emptyMap;
     private final Supplier<UUID> activeNodeSupplier;
     private final Supplier<BlockPos> dockCoordinateSupplier;
     private final Supplier<BlockPos> droneCoordinateSupplier;
-    private final DroneNodeRegistry registry = DrTechDroneNodes.createDefaultRegistry();
+    private final DroneNodeRegistry registry = DroneExtensionRegistry.nodes();
     private final Map<UUID, PreviewPosition> previews = new HashMap<>();
 
     private UUID selectedNodeId;
@@ -156,6 +161,12 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         background();
     }
 
+    public DroneProgramCanvasWidget withDiagnosticSeverities(
+            Supplier<Map<UUID, DroneDiagnosticSeverity>> supplier) {
+        diagnosticSeveritySupplier = supplier == null ? Collections::emptyMap : supplier;
+        return this;
+    }
+
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         CanvasScissor scissor = CanvasScissor.begin(context, getArea().w(), getArea().h());
@@ -178,10 +189,16 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             return;
         }
         reconcileAcknowledgedDragPreviews(graph);
+        boolean fastDrag = draggingNodeId != null;
+        UUID activeNodeId = activeNodeSupplier.get();
+        Set<UUID> diagnosticNodes = diagnosticNodesSupplier.get();
+        Map<UUID, DroneDiagnosticSeverity> diagnosticSeverities = diagnosticSeveritySupplier.get();
+        PortConnectivity connectivity = fastDrag ? PortConnectivity.EMPTY : PortConnectivity.index(graph);
         drawGroupFrames(graph);
         Set<UUID> hiddenNodes = DroneGroupLayout.hiddenByCollapsedGroups(graph);
-        PortHit hoveredPort = findPort(graph, context.getMouseX(), context.getMouseY());
-        drawEdges(graph, hiddenNodes, hoveredPort);
+        PortHit hoveredPort = fastDrag ? null : findPort(graph, hiddenNodes,
+                context.getMouseX(), context.getMouseY());
+        drawEdges(graph, hiddenNodes, hoveredPort, fastDrag);
         if (pendingPort != null) {
             Point from = portPoint(graph.getNode(pendingPort.nodeId), pendingPort.portId, DronePortDirection.OUTPUT);
             if (from != null) {
@@ -191,34 +208,41 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         }
         for (DroneProgramNode node : graph.getNodes()) {
             if (DroneGroupLayout.isGroup(node) || hiddenNodes.contains(node.getId())) continue;
-            drawNode(graph, node, hoveredPort);
+            if (!isNodeVisible(node)) continue;
+            drawNode(node, hoveredPort, activeNodeId, diagnosticNodes,
+                    diagnosticSeverities, connectivity, fastDrag);
         }
         drawMarquee();
-        drawMiniMap(graph, width);
+        drawMiniMap(graph, width, hiddenNodes, activeNodeId);
         drawConnectionGuide(width, height);
         GuiDraw.drawText(zoomPercent + "%", width - 30, height - 10, 0.7F, 0xFF8291A5, false);
         drawContextMenu(context.getMouseX(), context.getMouseY());
     }
 
     /** Draw focused port connections last so crossing lines cannot hide the route being inspected. */
-    private void drawEdges(DroneProgramGraph graph, Set<UUID> hiddenNodes, PortHit hoveredPort) {
+    private void drawEdges(DroneProgramGraph graph, Set<UUID> hiddenNodes, PortHit hoveredPort,
+            boolean fastDrag) {
         List<DroneProgramEdge> ordered = DroneEdgePresentation.dataThenFlow(graph, registry);
         if (hoveredPort == null) {
-            for (DroneProgramEdge edge : ordered) drawVisibleEdge(graph, hiddenNodes, edge, null);
+            for (DroneProgramEdge edge : ordered) drawVisibleEdge(graph, hiddenNodes, edge, null, fastDrag);
             return;
         }
         for (DroneProgramEdge edge : ordered) {
-            if (!touchesHoveredPort(edge, hoveredPort)) drawVisibleEdge(graph, hiddenNodes, edge, hoveredPort);
+            if (!touchesHoveredPort(edge, hoveredPort)) {
+                drawVisibleEdge(graph, hiddenNodes, edge, hoveredPort, fastDrag);
+            }
         }
         for (DroneProgramEdge edge : ordered) {
-            if (touchesHoveredPort(edge, hoveredPort)) drawVisibleEdge(graph, hiddenNodes, edge, hoveredPort);
+            if (touchesHoveredPort(edge, hoveredPort)) {
+                drawVisibleEdge(graph, hiddenNodes, edge, hoveredPort, fastDrag);
+            }
         }
     }
 
     private void drawVisibleEdge(DroneProgramGraph graph, Set<UUID> hiddenNodes, DroneProgramEdge edge,
-            PortHit hoveredPort) {
+            PortHit hoveredPort, boolean fastDrag) {
         if (!hiddenNodes.contains(edge.getSourceNodeId()) && !hiddenNodes.contains(edge.getTargetNodeId())) {
-            drawEdge(graph, edge, hoveredPort);
+            drawEdge(graph, edge, hoveredPort, fastDrag);
         }
     }
 
@@ -304,6 +328,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     private void drawGroupFrames(DroneProgramGraph graph) {
         for (DroneProgramNode group : graph.getNodes()) {
             if (!DroneGroupLayout.isGroup(group)) continue;
+            if (!isNodeVisible(group)) continue;
             Point point = nodePoint(group);
             boolean collapsed = DroneGroupLayout.isCollapsed(group);
             int width = scaled(DroneGroupLayout.width(group));
@@ -423,7 +448,8 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         }
     }
 
-    private void drawEdge(DroneProgramGraph graph, DroneProgramEdge edge, PortHit hoveredPort) {
+    private void drawEdge(DroneProgramGraph graph, DroneProgramEdge edge, PortHit hoveredPort,
+            boolean fastDrag) {
         DroneProgramNode source = graph.getNode(edge.getSourceNodeId());
         DroneProgramNode target = graph.getNode(edge.getTargetNodeId());
         Point from = portPoint(source, edge.getSourcePortId(), DronePortDirection.OUTPUT);
@@ -439,10 +465,10 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         int color = colorForType(type);
         if (!related) color = dimColor(color);
         drawRoutedEdge(from, to, edge.getId(), color, flow, portFocused);
-        if (flow && related && zoomPercent >= 75 && shouldLabelFlow(edge.getSourcePortId())) {
+        if (!fastDrag && flow && related && zoomPercent >= 75 && shouldLabelFlow(edge.getSourcePortId())) {
             drawEdgeLabel(from, to, portLabel(edge.getSourcePortId()), color);
         }
-        if (portFocused && zoomPercent >= 65) drawConnectionEndpointLabels(edge, from, to, color);
+        if (!fastDrag && portFocused && zoomPercent >= 65) drawConnectionEndpointLabels(edge, from, to, color);
     }
 
     private void drawRoutedEdge(Point from, Point to, UUID edgeId, int color, boolean flow, boolean focused) {
@@ -538,42 +564,49 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         return 0xFF000000 | red << 16 | green << 8 | blue;
     }
 
-    private void drawNode(DroneProgramGraph graph, DroneProgramNode node, PortHit hoveredPort) {
+    private void drawNode(DroneProgramNode node, PortHit hoveredPort, UUID activeNodeId,
+            Set<UUID> diagnosticNodes, Map<UUID, DroneDiagnosticSeverity> diagnosticSeverities,
+            PortConnectivity connectivity, boolean fastDrag) {
         Point point = nodePoint(node);
         DroneNodeDefinition definition = registry.get(node.getType());
+        DroneExtensionAvailability extension = DroneExtensionRegistry.availabilityForNode(node.getType());
+        boolean unavailableExtension = extension != null && extension.isPlaceholder();
         int nodeHeight = nodeHeight(definition);
-        boolean active = node.getId().equals(activeNodeSupplier.get());
+        boolean active = node.getId().equals(activeNodeId);
         boolean selected = selectedNodeIds.contains(node.getId());
-        int background = selected ? 0xFF314760
+        int background = unavailableExtension ? 0xFF3A3030 : selected ? 0xFF314760
                 : active ? 0xFF25493F : 0xFF26313E;
         GuiDraw.drawRect(point.x, point.y, scaled(NODE_WIDTH), scaled(nodeHeight), background);
         GuiDraw.drawRect(point.x, point.y, scaled(NODE_WIDTH), scaled(11), categoryColor(definition));
-        int border = node.getId().equals(selectedNodeId) ? 0xFF8DCAFF
+        int border = unavailableExtension ? 0xFFFFB24D
+                : node.getId().equals(selectedNodeId) ? 0xFF8DCAFF
                 : selected ? 0xFF4F9EDB
-                : diagnosticNodesSupplier.get().contains(node.getId()) ? 0xFFFF5A5A
+                : diagnosticNodes.contains(node.getId()) ? 0xFFFF5A5A
                 : active ? 0xFF52E39E : 0xFF526274;
         GuiDraw.drawBorderInsideXYWH(point.x, point.y, scaled(NODE_WIDTH), scaled(nodeHeight), border);
-        if (node.getConfiguration().getBoolean("Breakpoint")) {
-            GuiDraw.drawRect(point.x + scaled(NODE_WIDTH - 7), point.y + scaled(1), scaled(5), scaled(5),
-                    0xFFFF4D5A);
+        DroneDiagnosticSeverity severity = diagnosticSeverities.get(node.getId());
+        if (severity != null) {
+            drawDiagnosticIcon(point.x + scaled(NODE_WIDTH - 8), point.y + scaled(1), severity);
+        } else if (node.getConfiguration().getBoolean("Breakpoint")) {
+            drawBreakpointIcon(point.x + scaled(NODE_WIDTH - 8), point.y + scaled(1), false);
         } else if (node.getConfiguration().getBoolean("BreakpointOnFailure")
                 || node.getConfiguration().getInteger("BreakpointLowEnergy") > 0
                 || node.getConfiguration().getBoolean("BreakpointOnVariableWrite")) {
             // Amber means the node has a conditional, post-action or low-energy breakpoint rather than a stop on
             // entry. This stays visible even at the smallest useful zoom.
-            GuiDraw.drawRect(point.x + scaled(NODE_WIDTH - 7), point.y + scaled(1), scaled(5), scaled(5),
-                    0xFFFFC34D);
+            drawBreakpointIcon(point.x + scaled(NODE_WIDTH - 8), point.y + scaled(1), true);
         }
         // Every built-in node has a dedicated texture; category glyph remains the extension-node fallback.
         GuiDraw.drawRect(point.x + scaled(1), point.y + scaled(1), scaled(10), scaled(9), 0x880C121A);
-        if (definition != null && "drtech".equals(node.getType().getNamespace())) {
+        if (!unavailableExtension && definition != null && "drtech".equals(node.getType().getNamespace())) {
             DroneNodeIconTextures.draw(node.getType(), point.x + scaled(2), point.y + scaled(2), scaled(7));
         } else {
             GuiDraw.drawText(categorySymbol(definition), point.x + scaled(4), point.y + scaled(3),
                     Math.max(0.45F, zoomPercent / 180.0F), 0xFFF4F7FA, false);
         }
         String customLabel = node.getConfiguration().getString("Label");
-        String title = !customLabel.isEmpty() ? customLabel : definition == null
+        String title = unavailableExtension ? I18n.format(extension.getDisplayKey())
+                : !customLabel.isEmpty() ? customLabel : definition == null
                 ? I18n.format("drtech.drone.canvas.missing_node", node.getType())
                 : I18n.format("drtech.drone.node." + node.getType().getPath());
         GuiDraw.drawText(title, point.x + scaled(11), point.y + scaled(2), Math.max(0.5F, zoomPercent / 150.0F),
@@ -591,7 +624,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                     && hoveredPort.port.getDirection() == port.getDirection();
             boolean compatible = pendingPort == null || port.getDirection() == DronePortDirection.OUTPUT
                     || port.getType().accepts(pendingPort.type);
-            boolean missing = port.isRequired() && !isPortConnected(graph, node, port);
+            boolean missing = !fastDrag && port.isRequired() && !connectivity.isConnected(node.getId(), port);
             int outline = hovered ? (compatible ? 0xFFFFFF66 : 0xFFFF4D5A)
                     : missing ? 0xFFFF4D5A : 0;
             if (outline != 0) {
@@ -599,8 +632,8 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 GuiDraw.drawRect(portPoint.x - outlineSize / 2, portPoint.y - outlineSize / 2,
                         outlineSize, outlineSize, outline);
             }
-            drawPortShape(portPoint, port.getType(), size, colorForType(port.getType()));
-            drawPortLabel(point, portPoint, port);
+            drawPortShape(portPoint, port, size, colorForType(port.getType()));
+            if (!fastDrag) drawPortLabel(point, portPoint, port);
         }
     }
 
@@ -617,7 +650,8 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         }
     }
 
-    private void drawPortShape(Point point, DronePortType type, int size, int color) {
+    private void drawPortShape(Point point, DronePortDefinition port, int size, int color) {
+        DronePortType type = port.getType();
         int left = point.x - size / 2;
         int top = point.y - size / 2;
         int centerX = point.x;
@@ -625,11 +659,14 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         int line = Math.max(1, size / 4);
         switch (type) {
             case FLOW:
-                GuiDraw.drawRect(left, centerY - line / 2, Math.max(2, size / 2 + 1), line, color);
+                int direction = port.getDirection() == DronePortDirection.INPUT ? -1 : 1;
+                int shaftX = direction > 0 ? left : centerX;
+                GuiDraw.drawRect(shaftX, centerY - line / 2, Math.max(2, size / 2 + 1), line, color);
                 for (int row = 0; row < size; row++) {
                     int distance = Math.abs(row - size / 2);
                     int width = Math.max(1, size / 2 + 1 - distance);
-                    GuiDraw.drawRect(centerX, top + row, width, 1, color);
+                    int arrowX = direction > 0 ? centerX : centerX - width + 1;
+                    GuiDraw.drawRect(arrowX, top + row, width, 1, color);
                 }
                 break;
             case BOOLEAN:
@@ -656,6 +693,37 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
             default:
                 GuiDraw.drawRect(left, top, size, size, color);
         }
+        if (port.allowsMultipleConnections()) {
+            GuiDraw.drawBorderInsideXYWH(left - 1, top - 1, size + 2, size + 2, 0xFFF4F7FA);
+        }
+    }
+
+    private void drawDiagnosticIcon(int x, int y, DroneDiagnosticSeverity severity) {
+        int size = Math.max(5, scaled(6));
+        int color = severity == DroneDiagnosticSeverity.ERROR ? 0xFFFF4D5A
+                : severity == DroneDiagnosticSeverity.WARNING ? 0xFFFFC34D : 0xFF61B7FF;
+        GuiDraw.drawRect(x, y, size, size, 0xFF151A21);
+        GuiDraw.drawBorderInsideXYWH(x, y, size, size, color);
+        if (severity == DroneDiagnosticSeverity.ERROR) {
+            for (int index = 1; index < size - 1; index++) {
+                GuiDraw.drawRect(x + index, y + index, 1, 1, color);
+                GuiDraw.drawRect(x + size - 1 - index, y + index, 1, 1, color);
+            }
+        } else {
+            int center = x + size / 2;
+            GuiDraw.drawRect(center, y + 1, 1, Math.max(1, size - 3), color);
+            GuiDraw.drawRect(center, y + size - 2, 1, 1, color);
+        }
+    }
+
+    private void drawBreakpointIcon(int x, int y, boolean conditional) {
+        int size = Math.max(5, scaled(6));
+        int color = conditional ? 0xFFFFC34D : 0xFFFF4D5A;
+        GuiDraw.drawRect(x, y, size, size, 0xFF151A21);
+        GuiDraw.drawBorderInsideXYWH(x, y, size, size, color);
+        int inset = Math.max(1, size / 3);
+        GuiDraw.drawRect(x + inset, y + inset, Math.max(1, size - inset * 2),
+                Math.max(1, size - inset * 2), color);
     }
 
     private void drawPortLabel(Point nodePoint, Point socket, DronePortDefinition port) {
@@ -702,19 +770,18 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         GuiDraw.drawBorderInsideXYWH(left, top, width, height, 0xFF68B7FF);
     }
 
-    private void drawMiniMap(DroneProgramGraph graph, int canvasWidth) {
+    private void drawMiniMap(DroneProgramGraph graph, int canvasWidth, Set<UUID> hiddenNodes, UUID activeNodeId) {
         MiniMapProjection projection = miniMapProjection(graph, canvasWidth);
         if (projection == null) return;
         GuiDraw.drawRect(projection.left, projection.top, MINIMAP_WIDTH, MINIMAP_HEIGHT, 0xD0192029);
         GuiDraw.drawBorderInsideXYWH(projection.left, projection.top, MINIMAP_WIDTH, MINIMAP_HEIGHT, 0xFF526274);
-        Set<UUID> hiddenNodes = DroneGroupLayout.hiddenByCollapsedGroups(graph);
         for (DroneProgramNode node : graph.getNodes()) {
             if (hiddenNodes.contains(node.getId())) continue;
             int x = projection.projectX(node.getX());
             int y = projection.projectY(node.getY());
             int color = node.getId().equals(selectedNodeId) ? 0xFF8DCAFF
                     : selectedNodeIds.contains(node.getId()) ? 0xFF4F9EDB
-                    : node.getId().equals(activeNodeSupplier.get()) ? 0xFF52E39E : 0xFF8392A5;
+                    : node.getId().equals(activeNodeId) ? 0xFF52E39E : 0xFF8392A5;
             int nodeWidth = DroneGroupLayout.isGroup(node) ? DroneGroupLayout.width(node) : NODE_WIDTH;
             int nodeHeight = DroneGroupLayout.isGroup(node)
                     ? (DroneGroupLayout.isCollapsed(node) ? DroneGroupLayout.HEADER_HEIGHT : DroneGroupLayout.height(node))
@@ -740,6 +807,7 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     public void drawForeground(ModularGuiContext context) {
         super.drawForeground(context);
         if (!isBelowMouseFor(0)) return;
+        if (draggingNodeId != null) return;
         if (contextMenu != null) return;
         DroneProgramGraph graph = graphSupplier.get();
         if (graph == null) return;
@@ -925,8 +993,12 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
                 PreviewPosition origin = entry.getValue();
                 int x = origin.x + deltaX;
                 int y = origin.y + deltaY;
-                previews.put(entry.getKey(), new PreviewPosition(snap ? snapCoordinate(x) : x,
-                        snap ? snapCoordinate(y) : y));
+                int previewX = snap ? snapCoordinate(x) : x;
+                int previewY = snap ? snapCoordinate(y) : y;
+                PreviewPosition previous = previews.get(entry.getKey());
+                if (previous == null || previous.x != previewX || previous.y != previewY || previous.isAwaiting()) {
+                    previews.put(entry.getKey(), new PreviewPosition(previewX, previewY));
+                }
             }
         } else if (marqueeSelecting && mouseButton == 0) {
             marqueeEndX = mouseX;
@@ -3293,7 +3365,10 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
     }
 
     private PortHit findPort(DroneProgramGraph graph, int x, int y) {
-        Set<UUID> hiddenNodes = DroneGroupLayout.hiddenByCollapsedGroups(graph);
+        return findPort(graph, DroneGroupLayout.hiddenByCollapsedGroups(graph), x, y);
+    }
+
+    private PortHit findPort(DroneProgramGraph graph, Set<UUID> hiddenNodes, int x, int y) {
         for (DroneProgramNode node : graph.getNodes()) {
             if (hiddenNodes.contains(node.getId())) continue;
             DroneNodeDefinition definition = registry.get(node.getType());
@@ -3339,19 +3414,6 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         return Math.max(NODE_HEIGHT, PORT_START_Y + Math.max(0, rows - 1) * PORT_STEP_Y + 7);
     }
 
-    private static boolean isPortConnected(DroneProgramGraph graph, DroneProgramNode node,
-            DronePortDefinition port) {
-        for (DroneProgramEdge edge : graph.getEdges()) {
-            if (port.getDirection() == DronePortDirection.INPUT
-                    && edge.getTargetNodeId().equals(node.getId())
-                    && edge.getTargetPortId().equals(port.getId())) return true;
-            if (port.getDirection() == DronePortDirection.OUTPUT
-                    && edge.getSourceNodeId().equals(node.getId())
-                    && edge.getSourcePortId().equals(port.getId())) return true;
-        }
-        return false;
-    }
-
     private static String portLabel(String portId) {
         return I18n.format("drtech.drone.port." + portId);
     }
@@ -3365,6 +3427,17 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         int x = preview == null ? node.getX() : preview.x;
         int y = preview == null ? node.getY() : preview.y;
         return new Point(scale(x + panX), scale(y + panY));
+    }
+
+    private boolean isNodeVisible(DroneProgramNode node) {
+        Point point = nodePoint(node);
+        boolean group = DroneGroupLayout.isGroup(node);
+        int width = scaled(group ? DroneGroupLayout.width(node) : NODE_WIDTH);
+        int height = scaled(group ? (DroneGroupLayout.isCollapsed(node)
+                ? DroneGroupLayout.HEADER_HEIGHT : DroneGroupLayout.height(node))
+                : nodeHeight(registry.get(node.getType())));
+        return point.x + width >= 0 && point.y + height >= 0
+                && point.x < getArea().w() && point.y < getArea().h();
     }
 
     /** Converts an absolute GUI drop position into persistent graph coordinates. */
@@ -3507,6 +3580,30 @@ public final class DroneProgramCanvasWidget extends Widget<DroneProgramCanvasWid
         private final int x;
         private final int y;
         private Point(int x, int y) { this.x = x; this.y = y; }
+    }
+
+    /** O(E) frame index replacing the old O(port count * edge count) connection scan. */
+    private static final class PortConnectivity {
+        private static final PortConnectivity EMPTY = new PortConnectivity();
+        private final Map<UUID, Set<String>> inputs = new HashMap<>();
+        private final Map<UUID, Set<String>> outputs = new HashMap<>();
+
+        private static PortConnectivity index(DroneProgramGraph graph) {
+            PortConnectivity index = new PortConnectivity();
+            for (DroneProgramEdge edge : graph.getEdges()) {
+                index.inputs.computeIfAbsent(edge.getTargetNodeId(), ignored -> new java.util.HashSet<>())
+                        .add(edge.getTargetPortId());
+                index.outputs.computeIfAbsent(edge.getSourceNodeId(), ignored -> new java.util.HashSet<>())
+                        .add(edge.getSourcePortId());
+            }
+            return index;
+        }
+
+        private boolean isConnected(UUID nodeId, DronePortDefinition port) {
+            Map<UUID, Set<String>> side = port.getDirection() == DronePortDirection.INPUT ? inputs : outputs;
+            Set<String> connected = side.get(nodeId);
+            return connected != null && connected.contains(port.getId());
+        }
     }
 
     private static final class PreviewPosition {

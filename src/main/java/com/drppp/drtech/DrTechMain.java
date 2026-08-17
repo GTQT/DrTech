@@ -22,6 +22,7 @@ import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
+import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
 import com.drppp.drtech.common.world.AmethystGeodeWorldGenerator;
 import com.drppp.drtech.common.world.DriedGhastWorldGenerator;
 import com.drppp.drtech.hooked.HookCapability;
@@ -34,6 +35,9 @@ import com.drppp.drtech.glider.GliderFlightCapability;
 import com.drppp.drtech.glider.GliderNetwork;
 import com.drppp.drtech.wings.WingsBaublesCompat;
 import com.drppp.drtech.intergations.top.TopInit;
+import com.drppp.drtech.compat.opencomputers.OpenComputersCompat;
+import com.drppp.drtech.compat.opencomputers.OpenComputersPairingCommand;
+import com.drppp.drtech.compat.opencomputers.OpenComputersPairingCleanupHandler;
 import com.meowmel.cropQT.api.CropInitHandler;
 import com.meowmel.cropQT.client.CropStickTESR;
 import com.meowmel.cropQT.gtfo.TileCropFarmerMode;
@@ -124,6 +128,7 @@ public class DrTechMain {
         drtMetaEntities.init();
         TileEntityUIFactory.INSTANCE.init();
         DrtToolItems.init();
+        DroneExtensionRegistry.bootstrap();
         DrTechMetaTileEntities.initialization();
         CropInitHandler.preInit();
         HookNetwork.init();
@@ -207,6 +212,10 @@ public class DrTechMain {
         }
         CropInitHandler.init();
         BlockComposter.registerDispenseBehaviors();
+        OpenComputersCompat.initialize();
+        if (OpenComputersCompat.isAvailable()) {
+            MinecraftForge.EVENT_BUS.register(new OpenComputersPairingCleanupHandler());
+        }
 
         // LootGames game & task registration
         LootGames.gameManager.registerGame(GameOfLight.class, new GameOfLight.Factory());
@@ -235,6 +244,7 @@ public class DrTechMain {
 
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
+        if (OpenComputersCompat.isAvailable()) event.registerServerCommand(new OpenComputersPairingCommand());
     }
 
     @Mod.EventHandler

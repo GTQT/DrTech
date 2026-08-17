@@ -1,5 +1,7 @@
 package com.drppp.drtech.common.drone.machine;
 
+import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
+
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
@@ -65,6 +67,7 @@ import com.drppp.drtech.common.drone.program.edit.DroneProgramEditSession;
 import com.drppp.drtech.common.drone.program.runtime.DrTechDroneExecutors;
 import com.drppp.drtech.common.drone.program.runtime.DrTechDroneValueEvaluators;
 import com.drppp.drtech.common.drone.program.runtime.DroneExecutorRegistry;
+import com.drppp.drtech.common.drone.program.runtime.DroneProgramRuntime;
 import com.drppp.drtech.common.drone.program.runtime.DroneValueEvaluatorRegistry;
 import gregtech.api.GTValues;
 import gregtech.api.items.itemhandlers.GTItemStackHandler;
@@ -103,6 +106,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /** Server-authoritative visual programmer with a single writer lock and optimistic revision checks. */
@@ -122,7 +126,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     private static final int MAX_EDIT_DISTANCE_SQUARED = 64;
     private static final int MAX_REMOTE_DEBUG_RANGE = 512;
     private static final long PROGRAM_WRITE_EU = 8_192L;
-    private static final DroneNodeRegistry NODE_LIBRARY = DrTechDroneNodes.createDefaultRegistry();
+    private static final DroneNodeRegistry NODE_LIBRARY = DroneExtensionRegistry.nodes();
     /** Fits the editor toolbar (ending at y=266) plus the 76px player inventory and 3px safety gap. */
     private static final int PROGRAMMER_PANEL_HEIGHT = 352;
     private static final int LIBRARY_PAGE_COUNT = 10;
@@ -153,6 +157,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     private final List<String> clientDiagnosticLines = new ArrayList<>();
     private final List<ClientDiagnostic> clientDiagnostics = new ArrayList<>();
     private final Set<UUID> clientDiagnosticNodeIds = new HashSet<>();
+    private final Map<UUID, DroneDiagnosticSeverity> clientDiagnosticSeverityByNode = new java.util.HashMap<>();
     private UUID clientActiveNodeId;
     private String clientRuntimeStatus = "NOT RUN";
     private boolean clientRemoteConnected;
@@ -299,6 +304,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 command -> sendEditCommand(syncManager, command), () -> clientEditable,
                 this::getClientDiagnosticNodeIds, () -> clientActiveNodeId,
                 this::getClientDockCapturePosition, this::getClientRemoteCapturePosition)
+                .withDiagnosticSeverities(this::getClientDiagnosticSeverityByNode)
                 .pos(91, 24).size(281, 222);
 
         return GTGuis.createPanel(this, 560, PROGRAMMER_PANEL_HEIGHT)
@@ -1003,39 +1009,40 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                                 && !canvas.isSelectedBlockSelector() && !canvas.isSelectedAreaPreviewNode()
                                 && !canvas.isSelectedCoordinateCaptureTarget())
                         .onMousePressed(mouse -> { canvas.cycleSelectedConditionalBreakpoint(); return true; }))
-                .child(new ButtonWidget<>().pos(379, 195).size(65, 16)
-                        .overlay(IKey.lang("drtech.drone.programmer.capture_player"))
-                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_help")))
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCapturePlayerCoordinate())
-                        .onMousePressed(mouse -> { canvas.capturePlayerCoordinate(); return true; }))
-                .child(new ButtonWidget<>().pos(448, 195).size(65, 16)
-                        .overlay(IKey.lang("drtech.drone.programmer.capture_target"))
-                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_help")))
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureTargetedCoordinate())
-                        .onMousePressed(mouse -> { canvas.captureTargetedCoordinate(); return true; }))
-                .child(new ButtonWidget<>().pos(379, 213).size(65, 16)
-                        .overlay(IKey.lang("drtech.drone.programmer.capture_dock"))
-                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_dock.help")))
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureDockCoordinate())
-                        .onMousePressed(mouse -> { canvas.captureDockCoordinate(); return true; }))
-                .child(new ButtonWidget<>().pos(448, 213).size(65, 16)
-                        .overlay(IKey.lang("drtech.drone.programmer.capture_drone"))
-                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_drone.help")))
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureDroneCoordinate())
-                        .onMousePressed(mouse -> { canvas.captureDroneCoordinate(); return true; }))
-                .child(new ButtonWidget<>().pos(379, 231).size(134, 16)
-                        .overlay(IKey.lang("drtech.drone.programmer.capture_world"))
-                        .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_world.help")))
-                        .setEnabledIf(widget -> clientInspectorPage == 0
-                                && canvas.isSelectedCoordinateCaptureTarget() && clientEditable)
-                        .onMousePressed(mouse -> {
-                            beginClientWorldSelection(syncManager, canvas);
-                            return true;
-                        }))
-                // Area nodes own this lower region with their preview and projection button.
-                .child(IKey.lang("drtech.drone.programmer.capture_area_corner_help").asWidget().pos(379, 249).size(134, 10)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedCoordinateCaptureTarget()
-                                && !canvas.isSelectedAreaPreviewNode()))
+                 .child(new ButtonWidget<>().pos(379, 195).size(65, 16)
+                         .overlay(IKey.lang("drtech.drone.programmer.capture_player"))
+                         .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCapturePlayerCoordinate()
+                                 && !canvas.isSelectedAreaPreviewNode())
+                         .onMousePressed(mouse -> { canvas.capturePlayerCoordinate(); return true; }))
+                 .child(new ButtonWidget<>().pos(448, 195).size(65, 16)
+                         .overlay(IKey.lang("drtech.drone.programmer.capture_target"))
+                         .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureTargetedCoordinate()
+                                 && !canvas.isSelectedAreaPreviewNode())
+                         .onMousePressed(mouse -> { canvas.captureTargetedCoordinate(); return true; }))
+                 .child(new ButtonWidget<>().pos(379, 213).size(65, 16)
+                         .overlay(IKey.lang("drtech.drone.programmer.capture_dock"))
+                         .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_dock.help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureDockCoordinate()
+                                 && !canvas.isSelectedAreaPreviewNode())
+                         .onMousePressed(mouse -> { canvas.captureDockCoordinate(); return true; }))
+                 .child(new ButtonWidget<>().pos(448, 213).size(65, 16)
+                         .overlay(IKey.lang("drtech.drone.programmer.capture_drone"))
+                         .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_drone.help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.canCaptureDroneCoordinate()
+                                 && !canvas.isSelectedAreaPreviewNode())
+                         .onMousePressed(mouse -> { canvas.captureDroneCoordinate(); return true; }))
+                 .child(new ButtonWidget<>().pos(379, 231).size(134, 16)
+                         .overlay(IKey.lang("drtech.drone.programmer.capture_world"))
+                         .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_world.help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0
+                                 && canvas.isSelectedCoordinateCaptureTarget()
+                                 && !canvas.isSelectedAreaPreviewNode() && clientEditable)
+                         .onMousePressed(mouse -> {
+                             beginClientWorldSelection(syncManager, canvas);
+                             return true;
+                         }))
                 .child(new ButtonWidget<>().pos(379, 44).size(42, 16)
                         .overlay(IKey.dynamic(() -> I18n.format(clientRemoteDebugPage == 0
                                 ? "drtech.drone.remote.status_active" : "drtech.drone.remote.status")))
@@ -1145,16 +1152,33 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                         .setEnabledIf(widget -> clientInspectorPage == 2))
                 .child(SlotGroupWidget.playerInventory(false).disableSortButtons().left(7).bottom(7))
                 .child(canvas)
-                .child(new DroneAreaPreviewWidget(canvas::getSelectedAreaPreview,
-                        canvas::getSelectedAreaPreviewStatus).pos(379, 193).size(134, 43)
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedAreaPreviewNode()))
-                .child(new ButtonWidget<>().pos(379, 238).size(134, 16)
-                        .overlay(IKey.dynamic(this::getAreaProjectionLabel))
-                        .tooltipStatic(tooltip -> tooltip.addLine(
-                                IKey.lang("drtech.drone.programmer.area_project.help")))
-                        .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedAreaPreviewNode()
-                                && canvas.getSelectedAreaPreview() != null)
-                        .onMousePressed(mouse -> { toggleAreaProjection(canvas); return true; }))
+                 .child(new DroneAreaPreviewWidget(canvas::getSelectedAreaPreview,
+                         canvas::getSelectedAreaPreviewStatus).pos(379, 193).size(134, 43)
+                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedAreaPreviewNode()))
+                 .child(new ButtonWidget<>().pos(379, 238).size(66, 16)
+                         .overlay(IKey.lang("drtech.drone.programmer.capture_world.short"))
+                         .tooltipStatic(tooltip -> tooltip.addLine(IKey.lang("drtech.drone.programmer.capture_world.help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0
+                                 && canvas.isSelectedAreaCaptureTarget() && clientEditable)
+                         .onMousePressed(mouse -> {
+                             beginClientWorldSelection(syncManager, canvas);
+                             return true;
+                         }))
+                 .child(new ButtonWidget<>().pos(447, 238).size(66, 16)
+                         .overlay(IKey.dynamic(this::getAreaProjectionLabel))
+                         .tooltipStatic(tooltip -> tooltip.addLine(
+                                 IKey.lang("drtech.drone.programmer.area_project.help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedAreaCaptureTarget()
+                                 && canvas.getSelectedAreaPreview() != null)
+                         .onMousePressed(mouse -> { toggleAreaProjection(canvas); return true; }))
+                 .child(new ButtonWidget<>().pos(379, 238).size(134, 16)
+                         .overlay(IKey.dynamic(this::getAreaProjectionLabel))
+                         .tooltipStatic(tooltip -> tooltip.addLine(
+                                 IKey.lang("drtech.drone.programmer.area_project.help")))
+                         .setEnabledIf(widget -> clientInspectorPage == 0 && canvas.isSelectedAreaPreviewNode()
+                                 && !canvas.isSelectedAreaCaptureTarget()
+                                 && canvas.getSelectedAreaPreview() != null)
+                         .onMousePressed(mouse -> { toggleAreaProjection(canvas); return true; }))
                 .child(new DronePropertyChoiceWidget(canvas::getSelectedChoiceValues,
                         canvas::getSelectedChoiceValue, canvas::isSelectedDirectionProperty,
                         canvas::selectPropertyChoice).pos(379, 118).size(134, 88)
@@ -2491,8 +2515,8 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
             serverStatus = "Cannot write: fix all compile errors first";
             return;
         }
-        DroneExecutorRegistry executors = DrTechDroneExecutors.createDefaultRegistry();
-        DroneValueEvaluatorRegistry evaluators = DrTechDroneValueEvaluators.createDefaultRegistry();
+        DroneExecutorRegistry executors = DroneExtensionRegistry.actions();
+        DroneValueEvaluatorRegistry evaluators = DroneExtensionRegistry.sensors();
         for (DroneProgramNode node : editSession.getGraph().getNodes()) {
             boolean builtIn = node.getType().equals(DrTechDroneNodes.START)
                     || node.getType().equals(DrTechDroneNodes.END)
@@ -2780,7 +2804,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         }
         try {
             DroneProgramGraph graph = card.readProgram(stack).orElseGet(MetaTileEntityDroneProgrammer::createDefaultGraph);
-            editSession = new DroneProgramEditSession(graph, DrTechDroneNodes.createDefaultRegistry());
+            editSession = new DroneProgramEditSession(graph, DroneExtensionRegistry.nodes());
             if (!card.hasProgram(stack)) saveSessionToCard();
             serverStatus = "Ready";
         } catch (DroneProgramFormatException exception) {
@@ -2958,6 +2982,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
         clientDiagnosticLines.clear();
         clientDiagnostics.clear();
         clientDiagnosticNodeIds.clear();
+        clientDiagnosticSeverityByNode.clear();
         clientActiveNodeId = null;
         clientRuntimeStatus = "NOT RUN";
         clientRemoteConnected = false;
@@ -3088,6 +3113,14 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 try {
                     nodeId = UUID.fromString(node);
                     clientDiagnosticNodeIds.add(nodeId);
+                    DroneDiagnosticSeverity parsedSeverity;
+                    try { parsedSeverity = DroneDiagnosticSeverity.valueOf(severity); }
+                    catch (IllegalArgumentException invalid) { parsedSeverity = DroneDiagnosticSeverity.INFO; }
+                    DroneDiagnosticSeverity previous = clientDiagnosticSeverityByNode.get(nodeId);
+                    if (previous == null
+                            || diagnosticSeverityOrder(parsedSeverity) < diagnosticSeverityOrder(previous)) {
+                        clientDiagnosticSeverityByNode.put(nodeId, parsedSeverity);
+                    }
                 } catch (IllegalArgumentException ignored) {}
             }
             clientDiagnostics.add(new ClientDiagnostic(severity, code, nodeId, port, property,
@@ -3121,7 +3154,8 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                     ? I18n.format("drtech.drone.remote.no_trace") : localizeRemoteTrace(trace);
             List<ClientRemoteTrace> traces = new ArrayList<>();
             NBTTagList traceList = remote.getTagList("TraceList", 10);
-            for (int index = 0; index < traceList.tagCount() && traces.size() < 24; index++) {
+            for (int index = 0; index < traceList.tagCount()
+                    && traces.size() < DroneProgramRuntime.MAX_TRACE_ENTRIES; index++) {
                 NBTTagCompound entry = traceList.getCompoundTagAt(index);
                 String traceText = entry.getString("Text");
                 if (traceText.isEmpty()) continue;
@@ -3132,6 +3166,7 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
                 traces.add(new ClientRemoteTrace(traceText, traceNodeId));
             }
             clientRemoteTraces = Collections.unmodifiableList(traces);
+            if (clientGraph != null) clientGraph.updateEditorTimeline(traceList);
             clampRemoteTraceOffset();
             clientRemoteActionStatus = remote.getString("ActionStatus");
             if (clientRemoteActionStatus.isEmpty()) clientRemoteActionStatus = "SUCCESS";
@@ -3256,6 +3291,15 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private Set<UUID> getClientDiagnosticNodeIds() {
         return Collections.unmodifiableSet(clientDiagnosticNodeIds);
+    }
+
+    private Map<UUID, DroneDiagnosticSeverity> getClientDiagnosticSeverityByNode() {
+        return Collections.unmodifiableMap(clientDiagnosticSeverityByNode);
+    }
+
+    private static int diagnosticSeverityOrder(DroneDiagnosticSeverity severity) {
+        return severity == DroneDiagnosticSeverity.ERROR ? 0
+                : severity == DroneDiagnosticSeverity.WARNING ? 1 : 2;
     }
 
     private String getDiagnosticsText() {
@@ -3491,8 +3535,8 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
 
     private String getAreaProjectionLabel() {
         return I18n.format(clientAreaProjectionEnabled
-                ? "drtech.drone.programmer.area_project_hide"
-                : "drtech.drone.programmer.area_project_show");
+                ? "drtech.drone.programmer.area_project_hide.short"
+                : "drtech.drone.programmer.area_project_show.short");
     }
 
     private void toggleAreaProjection(DroneProgramCanvasWidget canvas) {

@@ -11,6 +11,8 @@ import java.util.List;
 
 /** Persisted identity and location for one native logistics endpoint. */
 public final class DroneEndpoint {
+    private static final long DEFAULT_ITEM_CAPACITY = 9L * 64L;
+    private static final long DEFAULT_FLUID_CAPACITY = 64_000L;
     public enum Kind { ITEM, FLUID, EU }
 
     private final UUID endpointId;
@@ -95,6 +97,24 @@ public final class DroneEndpoint {
     public long getMinimumReserve() { return minimumReserve; }
     public long getMaximumInventory() { return maximumInventory; }
     public List<DroneEndpointResource> getResources() { return resources; }
+    public long getStoredAmount() {
+        long total = 0L;
+        for (DroneEndpointResource resource : resources) {
+            total = resource.getAmount() > Long.MAX_VALUE - total ? Long.MAX_VALUE : total + resource.getAmount();
+        }
+        return total;
+    }
+    public long getStorageCapacity() {
+        long capacity = 0L;
+        for (DroneEndpointResource resource : resources) capacity = Math.max(capacity, resource.getCapacity());
+        if (capacity > 0L) return capacity;
+        return kind == Kind.ITEM ? DEFAULT_ITEM_CAPACITY : kind == Kind.FLUID ? DEFAULT_FLUID_CAPACITY : 0L;
+    }
+    public boolean canStoreResource(String resourceId) {
+        if (!matchesResource(resourceId)) return false;
+        if (kind != Kind.FLUID || resources.isEmpty()) return true;
+        return getResource(resourceId) != null;
+    }
     @Nullable public DroneEndpointResource getResource(String resourceId) {
         if (resourceId == null) return null;
         for (DroneEndpointResource resource : resources) {

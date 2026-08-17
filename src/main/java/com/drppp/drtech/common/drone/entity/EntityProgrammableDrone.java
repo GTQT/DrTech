@@ -17,6 +17,7 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.drone.energy.DroneEnergyCosts;
 import com.drppp.drtech.common.drone.api.DroneEntityTransportEvent;
+import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
 import com.drppp.drtech.common.drone.api.DroneSignEditEvent;
 import com.drppp.drtech.common.drone.action.DroneTransferRequest;
 import com.drppp.drtech.common.drone.action.DroneInteractionRequest;
@@ -38,10 +39,12 @@ import com.drppp.drtech.common.drone.hardware.ItemDroneUpgradeModule;
 import com.drppp.drtech.common.drone.compat.ThaumcraftEssentiaNodeCompat;
 import com.drppp.drtech.common.drone.inventory.DroneItemFilter;
 import com.drppp.drtech.common.drone.inventory.DroneAutoPickupMode;
+import com.drppp.drtech.common.drone.inventory.DroneCargoFullPolicy;
 import com.drppp.drtech.common.drone.filter.DroneItemFilterSpec;
 import com.drppp.drtech.common.drone.inventory.DroneCraftingPlanner;
 import com.drppp.drtech.common.drone.inventory.DroneItemTransfer;
 import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneEndpoint;
 import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneRedstoneEmitter;
 import com.drppp.drtech.common.drone.navigation.DronePathResult;
 import com.drppp.drtech.common.drone.navigation.DronePathfinder;
@@ -50,6 +53,11 @@ import com.drppp.drtech.common.drone.network.DroneDockNetwork;
 import com.drppp.drtech.common.drone.network.DroneDockRecord;
 import com.drppp.drtech.common.drone.network.DroneRegistry;
 import com.drppp.drtech.common.drone.network.DroneRegistryRecord;
+import com.drppp.drtech.common.drone.network.DroneEndpoint;
+import com.drppp.drtech.common.drone.network.DroneEndpointNetwork;
+import com.drppp.drtech.common.drone.network.DroneFleetState;
+import com.drppp.drtech.common.drone.network.DroneJob;
+import com.drppp.drtech.common.drone.network.DroneReservation;
 import com.drppp.drtech.common.drone.sound.DroneSoundCue;
 import com.drppp.drtech.common.drone.sound.DroneSoundPlayer;
 import com.drppp.drtech.common.drone.visual.DroneVisualState;
@@ -59,6 +67,8 @@ import com.drppp.drtech.common.drone.program.codec.DroneProgramMigrator;
 import com.drppp.drtech.common.drone.program.compile.DroneCompileResult;
 import com.drppp.drtech.common.drone.program.compile.CompiledDroneProgram;
 import com.drppp.drtech.common.drone.program.compile.DroneProgramCompiler;
+import com.drppp.drtech.common.drone.program.compile.DroneProgramHardwareValidator;
+import com.drppp.drtech.common.drone.program.compile.DroneDiagnosticSeverity;
 import com.drppp.drtech.common.drone.program.model.DroneProgramGraph;
 import com.drppp.drtech.common.drone.program.model.DroneProgramReference;
 import com.drppp.drtech.common.drone.program.model.DroneArea;
@@ -76,6 +86,7 @@ import com.drppp.drtech.common.drone.program.runtime.service.DroneSensorService;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneEntitySensorResult;
 import com.drppp.drtech.common.drone.filter.DroneEntityFilterSpec;
 import com.google.common.base.Optional;
+import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IWorkable;
@@ -98,6 +109,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.ItemFishingRod;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -184,6 +196,10 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
             EntityProgrammableDrone.class, DataSerializers.ITEM_STACK);
     private static final DataParameter<Integer> FISHING_HOOK_ID = EntityDataManager.createKey(
             EntityProgrammableDrone.class, DataSerializers.VARINT);
+    private static final DataParameter<NBTTagCompound> FISHING_VISUAL_TARGET = EntityDataManager.createKey(
+            EntityProgrammableDrone.class, DataSerializers.COMPOUND_TAG);
+    private static final DataParameter<Integer> FISHING_CAST_TICKS = EntityDataManager.createKey(
+            EntityProgrammableDrone.class, DataSerializers.VARINT);
     private static final DataParameter<Integer> FISHING_PULL_TICKS = EntityDataManager.createKey(
             EntityProgrammableDrone.class, DataSerializers.VARINT);
     private static final DataParameter<ItemStack> HELD_ALCHEMY_JAR = EntityDataManager.createKey(
@@ -216,6 +232,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     private final ItemStackHandler fishingRod = createFishingRodHandler();
     private final ItemStackHandler alchemyJar = createAlchemyJarHandler();
     private final FluidTank fluidTank = new FluidTank(0);
+    /** EU being transported is isolated from the flight battery so movement cannot consume the payload. */
+    private long logisticsEuCargo;
     private NBTTagCompound program;
     private DroneProgramRuntime runtime;
     private NBTTagCompound pendingRuntimeState;
@@ -234,6 +252,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     private BlockPos loadTargetAnchor;
     private int attackCooldownTicks;
     private int attackChaseTicks;
+    private int alternateWeaponSlot;
     private int interactionChaseTicks;
     private int followChaseTicks;
     private int avoidChaseTicks;
@@ -248,7 +267,10 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     private boolean pickupActionThisTick;
     private DroneAutoPickupMode autoPickupMode = DroneAutoPickupMode.ALL;
     private DroneItemFilterSpec autoPickupFilter = DroneItemFilterSpec.ANY;
+    private DroneCargoFullPolicy cargoFullPolicy = DroneCargoFullPolicy.STOP;
+    private boolean cargoFullPickupSuspended;
     private int lastFluidEffectTick = Integer.MIN_VALUE / 2;
+    private int lastLogisticsEffectTick = Integer.MIN_VALUE / 2;
     private int dockRecoveryCooldown;
     private int flightMarkerTicks;
     private int rotorResyncTicks;
@@ -288,11 +310,13 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     private int clientFluidAmount;
     private int clientFluidCapacity;
     private String clientFluidName = "";
+    private long clientLogisticsEu;
     private boolean clientBatteryLocked;
     private boolean clientCargoLocked;
     private float clientHealth;
     private float clientMaxHealth;
     private String clientEntityPayload = "";
+    private String clientCargoFullPolicy = DroneCargoFullPolicy.STOP.name();
     private int fallbackCandidateIndex;
 
     public EntityProgrammableDrone(World world) {
@@ -324,6 +348,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         dataManager.register(ATTACK_ANIMATION_TICKS, 0);
         dataManager.register(HELD_FISHING_ROD, ItemStack.EMPTY);
         dataManager.register(FISHING_HOOK_ID, -1);
+        dataManager.register(FISHING_VISUAL_TARGET, new NBTTagCompound());
+        dataManager.register(FISHING_CAST_TICKS, 0);
         dataManager.register(FISHING_PULL_TICKS, 0);
         dataManager.register(HELD_ALCHEMY_JAR, ItemStack.EMPTY);
         dataManager.register(ALCHEMY_ASPECT_COLOR, -1);
@@ -363,6 +389,9 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         }
         if (dataManager.get(FISHING_PULL_TICKS) > 0) {
             dataManager.set(FISHING_PULL_TICKS, dataManager.get(FISHING_PULL_TICKS) - 1);
+        }
+        if (dataManager.get(FISHING_CAST_TICKS) > 0) {
+            dataManager.set(FISHING_CAST_TICKS, dataManager.get(FISHING_CAST_TICKS) - 1);
         }
         if (dataManager.get(ALCHEMY_ANIMATION_TICKS) > 0) {
             dataManager.set(ALCHEMY_ANIMATION_TICKS, dataManager.get(ALCHEMY_ANIMATION_TICKS) - 1);
@@ -411,7 +440,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 motionZ *= 0.25D;
                 motionY = Math.max(motionY - 0.04D, -0.12D);
             }
-            if (runtime != null && executionEnabled) {
+            boolean logisticsActive = tickAssignedLogisticsJob();
+            if (!logisticsActive && runtime != null && executionEnabled) {
                 runtime.tick();
                 recordDebugTaskEnergy(runtimeNodeBeforeTick, runtimeAreaTotalBeforeTick,
                         Math.max(0L, energyBeforeTick - energy.getStored()));
@@ -422,7 +452,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     executionEnabled = false;
                 }
             }
-            if (rotorsActive && !pickupActionThisTick) collectNearbyItems();
+            if (rotorsActive && !pickupActionThisTick && !logisticsActive) collectNearbyItems();
         } else {
             motionY -= 0.04D;
         }
@@ -462,13 +492,25 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     }
 
     private void heartbeatRegistry() {
-        String status = safetyFirmware.getState().name();
+        DroneSafetyState safetyState = safetyFirmware.getState();
+        String status = safetyState.name();
         String programId = "";
         long revision = 0L;
         if (runtime != null) {
-            status = runtime.getStatus().name();
+            if (safetyState == DroneSafetyState.PROGRAM) status = runtime.getStatus().name();
             if (runtime.getProgramId() != null) programId = runtime.getProgramId().toString();
             revision = runtime.getProgramRevision();
+        }
+        UUID ownerId = getOwnerId();
+        if (ownerId != null) {
+            DroneFleetState fleet = DroneFleetState.get(world);
+            DroneJob logistics = fleet.findAssignedLogisticsJob(ownerId, droneId).orElse(null);
+            if (logistics == null) logistics = fleet.findAssignedLogisticsRecovery(ownerId, droneId).orElse(null);
+            if (logistics != null) {
+                status = "LOGISTICS_" + logistics.getLogisticsStage().name();
+            } else if (fleet.findRetainedLogisticsJob(ownerId, droneId).isPresent()) {
+                status = "LOGISTICS_RETRY_WAIT";
+            }
         }
         DroneRegistry.get(world).heartbeat(new DroneRegistryRecord(droneId,
                 world.provider.getDimension(), new BlockPos(posX, posY, posZ), getOwnerId(), chassis.name(),
@@ -483,6 +525,368 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
             if (!inventory.getStackInSlot(slot).isEmpty()) occupied++;
         }
         return occupied;
+    }
+
+    /** Executes an assigned native logistics job without advancing the loaded user program. */
+    private boolean tickAssignedLogisticsJob() {
+        UUID ownerId = getOwnerId();
+        if (ownerId == null) return false;
+        DroneFleetState fleet = DroneFleetState.get(world);
+        DroneJob job = fleet.findAssignedLogisticsJob(ownerId, droneId).orElse(null);
+        if (job == null) {
+            DroneJob recovery = fleet.findAssignedLogisticsRecovery(ownerId, droneId).orElse(null);
+            if (recovery != null) return tickFailedLogisticsRecovery();
+            if (fleet.findRetainedLogisticsJob(ownerId, droneId).isPresent()) {
+                if (!areVisualRotorsActive()) forceRotorsActiveSync();
+                pickupActionThisTick = true;
+                motionX *= 0.25D;
+                motionY *= 0.25D;
+                motionZ *= 0.25D;
+                return true;
+            }
+            return false;
+        }
+        if (ticksExisted % 20 == 0) {
+            fleet.touchLogisticsJob(ownerId, job.getJobId(), world.getTotalWorldTime());
+        }
+        if (!areVisualRotorsActive()) forceRotorsActiveSync();
+        DroneReservation reservation = fleet.getReservationForJob(ownerId, job.getJobId()).orElse(null);
+        DroneEndpointNetwork network = DroneEndpointNetwork.get(world);
+        DroneEndpoint source = network.getEndpoint(job.getSourceEndpointId());
+        DroneEndpoint target = network.getEndpoint(job.getTargetEndpointId());
+        boolean carrying = job.getPickedAmount() > job.getDeliveredAmount();
+        if (reservation == null || !validLiveLogisticsEndpoint(target, job)
+                || !carrying && !validLiveLogisticsEndpoint(source, job)) {
+            fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(), "ENDPOINT_OR_RESERVATION_UNAVAILABLE");
+            return true;
+        }
+        MetaTileEntityDroneEndpoint sourceMte = carrying ? null : findLogisticsEndpoint(source);
+        MetaTileEntityDroneEndpoint targetMte = findLogisticsEndpoint(target);
+        if (targetMte == null || !carrying && sourceMte == null) {
+            fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(), "ENDPOINT_TILE_UNAVAILABLE");
+            return true;
+        }
+        switch (job.getLogisticsStage()) {
+            case DISCOVER, RESERVED, TO_SOURCE -> {
+                DroneExecutionResult movement = moveToLogisticsEndpoint(source.getPosition());
+                if (movement.getState() == DroneActionState.RUNNING) return true;
+                if (movement.getState() != DroneActionState.SUCCESS) {
+                    fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(),
+                            "SOURCE_" + movement.getStatus().name());
+                    return true;
+                }
+                fleet.setLogisticsStage(ownerId, job.getJobId(), DroneJob.LogisticsStage.PICKUP);
+            }
+            case PICKUP -> {
+                if (sourceMte == null) {
+                    fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(), "SOURCE_TILE_UNAVAILABLE");
+                    return true;
+                }
+                long remaining = Math.max(0L, reservation.getAmount() - job.getPickedAmount());
+                if (remaining <= 0L) {
+                    fleet.setLogisticsStage(ownerId, job.getJobId(), DroneJob.LogisticsStage.TO_TARGET);
+                    return true;
+                }
+                long batch = Math.min(remaining, logisticsBatchLimit(job.getResourceKind()));
+                if (!hasEnergyFor(logisticsTransferEnergyCost(job.getResourceKind(), batch))) {
+                    fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(), "TRANSFER_NO_ENERGY");
+                    return true;
+                }
+                long moved = pickupEndpointResource(sourceMte, job.getResourceKind(), job.getResourceId(), batch);
+                if (moved > 0L) {
+                    consumeEnergy(logisticsTransferEnergyCost(job.getResourceKind(), moved));
+                    FluidStack movedFluid = job.getResourceKind() == DroneEndpoint.Kind.FLUID
+                            && matchesLogisticsFluid(fluidTank.getFluid(), job.getResourceId())
+                                    ? fluidTank.getFluid().copy() : null;
+                    emitLogisticsTransferFeedback(job.getResourceKind(), source.getPosition(), movedFluid, true);
+                    fleet.recordLogisticsPickup(ownerId, job.getJobId(), moved);
+                    if (job.getPickedAmount() >= reservation.getAmount()) {
+                        fleet.setLogisticsStage(ownerId, job.getJobId(), DroneJob.LogisticsStage.TO_TARGET);
+                    }
+                    return true;
+                }
+                if (job.getPickedAmount() > job.getDeliveredAmount()) {
+                    fleet.setLogisticsStage(ownerId, job.getJobId(), DroneJob.LogisticsStage.TO_TARGET);
+                } else {
+                    fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(),
+                            "SOURCE_EMPTY_OR_TRANSPORT_FULL");
+                }
+            }
+            case TO_TARGET -> {
+                DroneExecutionResult movement = moveToLogisticsEndpoint(target.getPosition());
+                if (movement.getState() == DroneActionState.RUNNING) return true;
+                if (movement.getState() != DroneActionState.SUCCESS) {
+                    fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(),
+                            "TARGET_" + movement.getStatus().name());
+                    return true;
+                }
+                fleet.setLogisticsStage(ownerId, job.getJobId(), DroneJob.LogisticsStage.DELIVER);
+            }
+            case DELIVER -> {
+                long remaining = Math.max(0L, job.getPickedAmount() - job.getDeliveredAmount());
+                if (remaining <= 0L) {
+                    if (job.getDeliveredAmount() >= reservation.getAmount()) {
+                        fleet.completeJob(ownerId, job.getJobId());
+                    } else {
+                        fleet.setLogisticsStage(ownerId, job.getJobId(), DroneJob.LogisticsStage.TO_SOURCE);
+                    }
+                    return true;
+                }
+                long batch = Math.min(remaining, logisticsBatchLimit(job.getResourceKind()));
+                FluidStack movedFluid = job.getResourceKind() == DroneEndpoint.Kind.FLUID
+                        && matchesLogisticsFluid(fluidTank.getFluid(), job.getResourceId())
+                                ? fluidTank.getFluid().copy() : null;
+                if (!hasEnergyFor(logisticsTransferEnergyCost(job.getResourceKind(), batch))) {
+                    fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(), "TRANSFER_NO_ENERGY");
+                    return true;
+                }
+                long moved = deliverEndpointResource(targetMte, job.getResourceKind(), job.getResourceId(), batch);
+                if (moved > 0L) {
+                    consumeEnergy(logisticsTransferEnergyCost(job.getResourceKind(), moved));
+                    emitLogisticsTransferFeedback(job.getResourceKind(), target.getPosition(), movedFluid, false);
+                    fleet.recordLogisticsDelivery(ownerId, job.getJobId(), moved);
+                    if (job.getDeliveredAmount() >= job.getPickedAmount()) {
+                        if (job.getDeliveredAmount() >= reservation.getAmount()) {
+                            fleet.completeJob(ownerId, job.getJobId());
+                        } else {
+                            fleet.setLogisticsStage(ownerId, job.getJobId(), DroneJob.LogisticsStage.TO_SOURCE);
+                        }
+                    }
+                    return true;
+                }
+                fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(),
+                        "TARGET_FULL_OR_TRANSPORT_MISSING");
+            }
+            case RETURNING -> fleet.completeJob(ownerId, job.getJobId());
+            default -> fleet.failJob(ownerId, job.getJobId(), world.getTotalWorldTime(), "INVALID_LOGISTICS_STAGE");
+        }
+        return true;
+    }
+
+    /** Returns a terminal job's retained payload to a real dock without mutating or discarding it. */
+    private boolean tickFailedLogisticsRecovery() {
+        if (!areVisualRotorsActive()) forceRotorsActiveSync();
+        pickupActionThisTick = true;
+        MetaTileEntityDroneDock dock = findDroneDock(boundDock);
+        if (dock == null || !dock.isAvailableForDrone() || !dock.isAutoRecover()) {
+            if (dockRecoveryCooldown <= 0) {
+                selectFallbackDock();
+                dockRecoveryCooldown = 20;
+                dock = findDroneDock(boundDock);
+            }
+        }
+        if (dock == null || !dock.isAvailableForDrone() || !dock.isAutoRecover()) {
+            motionX *= 0.25D;
+            motionY *= 0.25D;
+            motionZ *= 0.25D;
+            return true;
+        }
+        DroneExecutionResult movement = getSafetyNavigation().moveTo(boundDock.up());
+        if (movement.getState() == DroneActionState.SUCCESS) {
+            dataManager.set(FLIGHT_MARKER, DroneVisualState.FlightMarker.LANDING.ordinal());
+            flightMarkerTicks = 20;
+            dock.acceptRecoveredDrone(this, false);
+        } else if (movement.getState() != DroneActionState.RUNNING && dockRecoveryCooldown <= 0) {
+            selectFallbackDock();
+            dockRecoveryCooldown = 20;
+        }
+        return true;
+    }
+
+    private boolean validLiveLogisticsEndpoint(DroneEndpoint endpoint, DroneJob job) {
+        return endpoint != null && endpoint.getKind() == job.getResourceKind()
+                && endpoint.getDimension() == world.provider.getDimension()
+                && java.util.Objects.equals(endpoint.getOwnerId(), job.getOwnerId())
+                && DroneEndpointNetwork.isOnline(endpoint, world.getTotalWorldTime());
+    }
+
+    @Nullable
+    private MetaTileEntityDroneEndpoint findLogisticsEndpoint(DroneEndpoint endpoint) {
+        if (endpoint == null || !world.isBlockLoaded(endpoint.getPosition())) return null;
+        TileEntity tile = world.getTileEntity(endpoint.getPosition());
+        if (!(tile instanceof IGregTechTileEntity holder)
+                || !(holder.getMetaTileEntity() instanceof MetaTileEntityDroneEndpoint result)) return null;
+        return endpoint.getEndpointId().equals(result.getEndpointId()) && endpoint.getKind() == result.getKind()
+                && java.util.Objects.equals(endpoint.getOwnerId(), result.getOwnerId()) ? result : null;
+    }
+
+    private DroneExecutionResult moveToLogisticsEndpoint(BlockPos endpointPosition) {
+        DroneArea neighborhood = DroneArea.between(endpointPosition.add(-1, -1, -1),
+                endpointPosition.add(1, 1, 1));
+        BlockPos stand = getSafetyNavigation().findNearestPassablePosition(neighborhood,
+                new long[] { endpointPosition.toLong() });
+        return stand == null ? DroneExecutionResult.failure(DroneActionStatus.UNREACHABLE, "failed",
+                "No passable logistics interaction position") : getSafetyNavigation().moveTo(stand);
+    }
+
+    private long logisticsBatchLimit(DroneEndpoint.Kind kind) {
+        if (kind == DroneEndpoint.Kind.ITEM) {
+            return DroneHardwareStats.hasUpgrade(upgrades, DroneUpgradeType.ADVANCED_ITEM_HANDLING) ? 256L : 64L;
+        }
+        if (kind == DroneEndpoint.Kind.FLUID) return 1_000L;
+        long voltage = GTValues.V[chassis.getVoltageTier()];
+        return Math.max(1L, voltage * DroneHardwareStats.euTransferAmperage(upgrades));
+    }
+
+    private long logisticsTransferEnergyCost(DroneEndpoint.Kind kind, long amount) {
+        if (kind == DroneEndpoint.Kind.ITEM) return DroneEnergyCosts.logisticsItems(amount);
+        if (kind == DroneEndpoint.Kind.FLUID) return DroneEnergyCosts.logisticsFluid(amount);
+        return DroneEnergyCosts.logisticsEu(amount, GTValues.V[chassis.getVoltageTier()]);
+    }
+
+    private long pickupEndpointResource(MetaTileEntityDroneEndpoint endpoint, DroneEndpoint.Kind kind,
+            String resourceId, long maximum) {
+        if (kind == DroneEndpoint.Kind.ITEM) {
+            return pickupEndpointItems(endpoint, resourceId, (int) Math.min(Integer.MAX_VALUE, maximum));
+        }
+        if (kind == DroneEndpoint.Kind.FLUID) {
+            return pickupEndpointFluid(endpoint, resourceId, (int) Math.min(Integer.MAX_VALUE, maximum));
+        }
+        return pickupEndpointEu(endpoint, maximum);
+    }
+
+    private long deliverEndpointResource(MetaTileEntityDroneEndpoint endpoint, DroneEndpoint.Kind kind,
+            String resourceId, long maximum) {
+        if (kind == DroneEndpoint.Kind.ITEM) {
+            return deliverEndpointItems(endpoint, resourceId, (int) Math.min(Integer.MAX_VALUE, maximum));
+        }
+        if (kind == DroneEndpoint.Kind.FLUID) {
+            return deliverEndpointFluid(endpoint, resourceId, (int) Math.min(Integer.MAX_VALUE, maximum));
+        }
+        return deliverEndpointEu(endpoint, maximum);
+    }
+
+    private long pickupEndpointFluid(MetaTileEntityDroneEndpoint endpoint, String resourceId, int maximum) {
+        IFluidHandler source = endpoint.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
+        if (source == null || maximum <= 0 || fluidTank.getCapacity() <= 0) return 0L;
+        FluidStack request = findLogisticsFluid(source, resourceId, maximum);
+        if (request == null) return 0L;
+        FluidStack available = source.drain(request, false);
+        if (available == null || available.amount <= 0) return 0L;
+        int accepted = fluidTank.fill(available, false);
+        if (accepted <= 0) return 0L;
+        FluidStack extractRequest = available.copy();
+        extractRequest.amount = Math.min(accepted, available.amount);
+        FluidStack extracted = source.drain(extractRequest, true);
+        if (extracted == null || extracted.amount <= 0) return 0L;
+        int inserted = fluidTank.fill(extracted, true);
+        if (inserted < extracted.amount) {
+            FluidStack remainder = extracted.copy();
+            remainder.amount -= inserted;
+            source.fill(remainder, true);
+        }
+        return inserted;
+    }
+
+    private long deliverEndpointFluid(MetaTileEntityDroneEndpoint endpoint, String resourceId, int maximum) {
+        IFluidHandler target = endpoint.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
+        FluidStack stored = fluidTank.getFluid();
+        if (target == null || maximum <= 0 || !matchesLogisticsFluid(stored, resourceId)) return 0L;
+        FluidStack offered = stored.copy();
+        offered.amount = Math.min(maximum, stored.amount);
+        int accepted = target.fill(offered, false);
+        if (accepted <= 0) return 0L;
+        FluidStack extracted = fluidTank.drain(Math.min(accepted, offered.amount), true);
+        if (extracted == null || extracted.amount <= 0) return 0L;
+        int inserted = target.fill(extracted, true);
+        if (inserted < extracted.amount) {
+            FluidStack remainder = extracted.copy();
+            remainder.amount -= inserted;
+            fluidTank.fill(remainder, true);
+        }
+        return inserted;
+    }
+
+    @Nullable
+    private static FluidStack findLogisticsFluid(IFluidHandler handler, String resourceId, int maximum) {
+        for (IFluidTankProperties property : handler.getTankProperties()) {
+            FluidStack contents = property.getContents();
+            if (!property.canDrain() || !matchesLogisticsFluid(contents, resourceId)) continue;
+            FluidStack request = contents.copy();
+            request.amount = Math.min(maximum, contents.amount);
+            return request;
+        }
+        return null;
+    }
+
+    private static boolean matchesLogisticsFluid(@Nullable FluidStack fluid, String resourceId) {
+        return fluid != null && fluid.amount > 0 && fluid.getFluid() != null
+                && fluid.getFluid().getName().equals(resourceId);
+    }
+
+    private long pickupEndpointEu(MetaTileEntityDroneEndpoint endpoint, long maximum) {
+        long capacity = getConfiguredCapacity();
+        long space = logisticsEuCargo >= capacity ? 0L : capacity - logisticsEuCargo;
+        long moved = endpoint.extractLogisticsEu(Math.min(maximum, space));
+        logisticsEuCargo += moved;
+        return moved;
+    }
+
+    private long deliverEndpointEu(MetaTileEntityDroneEndpoint endpoint, long maximum) {
+        long moved = endpoint.insertLogisticsEu(Math.min(maximum, logisticsEuCargo));
+        logisticsEuCargo -= moved;
+        return moved;
+    }
+
+    private long pickupEndpointItems(MetaTileEntityDroneEndpoint endpoint, String resourceId, int maximum) {
+        IItemHandler source = endpoint.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if (source == null || maximum <= 0) return 0L;
+        int movedTotal = 0;
+        for (int slot = 0; slot < source.getSlots() && movedTotal < maximum; slot++) {
+            ItemStack available = source.extractItem(slot, maximum - movedTotal, true);
+            if (available.isEmpty() || !matchesLogisticsItem(available, resourceId)) continue;
+            ItemStack cargoRemainder = insertCargo(available, true);
+            int accepted = available.getCount() - cargoRemainder.getCount();
+            if (accepted <= 0) continue;
+            ItemStack extracted = source.extractItem(slot, accepted, false);
+            if (extracted.isEmpty()) continue;
+            ItemStack remainder = insertCargo(extracted, false);
+            int inserted = extracted.getCount() - remainder.getCount();
+            movedTotal += inserted;
+            if (!remainder.isEmpty()) source.insertItem(slot, remainder, false);
+        }
+        return movedTotal;
+    }
+
+    private long deliverEndpointItems(MetaTileEntityDroneEndpoint endpoint, String resourceId, int maximum) {
+        IItemHandler target = endpoint.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if (target == null || maximum <= 0) return 0L;
+        int movedTotal = 0;
+        for (int slot = 0; slot < getActiveCargoSlots() && movedTotal < maximum; slot++) {
+            ItemStack available = inventory.extractItem(slot, maximum - movedTotal, true);
+            if (available.isEmpty() || !matchesLogisticsItem(available, resourceId)) continue;
+            ItemStack targetRemainder = insertIntoHandler(target, available, true);
+            int accepted = available.getCount() - targetRemainder.getCount();
+            if (accepted <= 0) continue;
+            ItemStack extracted = inventory.extractItem(slot, accepted, false);
+            if (extracted.isEmpty()) continue;
+            ItemStack remainder = insertIntoHandler(target, extracted, false);
+            int inserted = extracted.getCount() - remainder.getCount();
+            movedTotal += inserted;
+            if (!remainder.isEmpty()) insertCargo(remainder, false);
+        }
+        return movedTotal;
+    }
+
+    private ItemStack insertCargo(ItemStack stack, boolean simulate) {
+        ItemStack remainder = stack.copy();
+        for (int slot = 0; slot < getActiveCargoSlots() && !remainder.isEmpty(); slot++) {
+            remainder = inventory.insertItem(slot, remainder, simulate);
+        }
+        return remainder;
+    }
+
+    private static ItemStack insertIntoHandler(IItemHandler handler, ItemStack stack, boolean simulate) {
+        ItemStack remainder = stack.copy();
+        for (int slot = 0; slot < handler.getSlots() && !remainder.isEmpty(); slot++) {
+            remainder = handler.insertItem(slot, remainder, simulate);
+        }
+        return remainder;
+    }
+
+    private static boolean matchesLogisticsItem(ItemStack stack, String resourceId) {
+        ResourceLocation id = stack.isEmpty() ? null : Item.REGISTRY.getNameForObject(stack.getItem());
+        return id != null && id.toString().equals(resourceId);
     }
 
     /** Builds a conservative estimate only for bounded area actions with real completed samples. */
@@ -661,6 +1065,35 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         }
         world.playSound(null, target, importing ? SoundEvents.ITEM_BUCKET_FILL : SoundEvents.ITEM_BUCKET_EMPTY,
                 SoundCategory.BLOCKS, 0.35F, 1.15F + rand.nextFloat() * 0.15F);
+    }
+
+    /** Shows that a native logistics transfer actually moved payload, without producing per-tick sound spam. */
+    private void emitLogisticsTransferFeedback(DroneEndpoint.Kind kind, BlockPos endpoint,
+            @Nullable FluidStack fluid, boolean importing) {
+        pickupActionThisTick = true;
+        if (kind == DroneEndpoint.Kind.FLUID) {
+            emitFluidTransferEffect(endpoint, fluid, importing);
+            return;
+        }
+        if (!(world instanceof WorldServer) || ticksExisted - lastLogisticsEffectTick < 4) return;
+        lastLogisticsEffectTick = ticksExisted;
+        playCue(kind == DroneEndpoint.Kind.EU ? DroneSoundCue.EU_CHARGE : DroneSoundCue.TOOL_ARM,
+                kind == DroneEndpoint.Kind.EU ? 0.28F : 0.45F,
+                kind == DroneEndpoint.Kind.EU ? 1.65F : 1.1F);
+        WorldServer server = (WorldServer) world;
+        double endpointX = endpoint.getX() + 0.5D;
+        double endpointY = endpoint.getY() + 0.65D;
+        double endpointZ = endpoint.getZ() + 0.5D;
+        for (int step = 1; step <= 4; step++) {
+            double progress = step / 5.0D;
+            if (!importing) progress = 1.0D - progress;
+            server.spawnParticle(kind == DroneEndpoint.Kind.EU
+                            ? EnumParticleTypes.FIREWORKS_SPARK : EnumParticleTypes.CRIT,
+                    endpointX + (posX - endpointX) * progress,
+                    endpointY + (posY + height * 0.45D - endpointY) * progress,
+                    endpointZ + (posZ - endpointZ) * progress,
+                    1, 0.015D, 0.015D, 0.015D, 0.01D);
+        }
     }
 
     @Nullable
@@ -843,6 +1276,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         }
         recalledOrDropped = true;
         ItemStack stack = createDroneItem();
+        settleLogisticsForRecoveredItem();
         unbindCurrentDock();
         if (!player.inventory.addItemStackToInventory(stack)) {
             entityDropItem(stack, 0.2F);
@@ -894,14 +1328,35 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     /** Called only after the dock has committed the recovered item to its inventory. */
     public void completeDockRecovery() {
         if (recalledOrDropped || world.isRemote) return;
+        settleLogisticsForRecoveredItem();
         recalledOrDropped = true;
         setDead();
+    }
+
+    /** Closes the task only after its physical payload has been preserved in the recovered drone item. */
+    private void settleLogisticsForRecoveredItem() {
+        UUID ownerId = getOwnerId();
+        if (ownerId != null) {
+            DroneFleetState fleet = DroneFleetState.get(world);
+            DroneJob active = fleet.findAssignedLogisticsJob(ownerId, droneId).orElse(null);
+            if (active != null) fleet.cancelJob(ownerId, active.getJobId());
+            DroneJob recovery = fleet.findAssignedLogisticsRecovery(ownerId, droneId).orElse(null);
+            if (recovery != null) fleet.finishLogisticsRecovery(ownerId, recovery.getJobId());
+        }
     }
 
     @Override
     public void onDeath(DamageSource cause) {
         if (!world.isRemote && !recalledOrDropped) {
             playCue(DroneSoundCue.DEATH, 1.0F, 0.8F);
+            UUID ownerId = getOwnerId();
+            if (ownerId != null) {
+                DroneFleetState fleet = DroneFleetState.get(world);
+                DroneJob active = fleet.findAssignedLogisticsJob(ownerId, droneId).orElse(null);
+                if (active != null) {
+                    fleet.failJob(ownerId, active.getJobId(), world.getTotalWorldTime(), "DRONE_DESTROYED");
+                }
+            }
             recalledOrDropped = true;
             ItemStack dropped = createDroneItem();
             unbindCurrentDock();
@@ -930,11 +1385,13 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         DroneItemData.setSafetyFirmware(stack, safetyFirmware.writeToNbt());
         DroneItemData.setAutoPickupMode(stack, autoPickupMode.name());
         DroneItemData.setAutoPickupFilter(stack, autoPickupFilter);
+        DroneItemData.setCargoFullPolicy(stack, cargoFullPolicy.name());
         DroneItemData.setInventory(stack, inventory.serializeNBT());
         DroneItemData.setWeapons(stack, weapons.serializeNBT());
         DroneItemData.setFishingRod(stack, fishingRod.serializeNBT());
         DroneItemData.setAlchemyJar(stack, alchemyJar.serializeNBT());
         DroneItemData.setFluid(stack, fluidTank.writeToNBT(new NBTTagCompound()));
+        DroneItemData.setLogisticsEu(stack, logisticsEuCargo);
         DroneItemData.setDock(stack, boundDock, world.provider.getDimension());
         DroneItemData.setFallbackDocks(stack, fallbackDockIds);
         DroneItemData.setLoadedEntity(stack, loadedEntityData, loadedEntityUuid);
@@ -961,6 +1418,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         this.fishingRod.deserializeNBT(DroneItemData.getFishingRod(source));
         this.alchemyJar.deserializeNBT(DroneItemData.getAlchemyJar(source));
         loadFluidTank(DroneItemData.getFluid(source));
+        logisticsEuCargo = DroneItemData.getLogisticsEu(source);
         loadingHardware = false;
         IElectricItem electricItem = source.getCapability(GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
         long charge = electricItem == null ? 0L : electricItem.getCharge();
@@ -970,6 +1428,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         this.safetyFirmware.readFromNbt(DroneItemData.getSafetyFirmware(source));
         this.autoPickupMode = DroneAutoPickupMode.fromName(DroneItemData.getAutoPickupMode(source));
         this.autoPickupFilter = DroneItemData.getAutoPickupFilter(source);
+        this.cargoFullPolicy = DroneCargoFullPolicy.fromName(DroneItemData.getCargoFullPolicy(source));
         this.boundDock = DroneItemData.getDock(source, world.provider.getDimension());
         setFallbackDockIds(DroneItemData.getFallbackDocks(source));
         this.loadedEntityData = DroneItemData.getLoadedEntity(source);
@@ -1096,6 +1555,26 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         int entityId = dataManager.get(FISHING_HOOK_ID);
         Entity entity = entityId < 0 || world == null ? null : world.getEntityByID(entityId);
         return entity instanceof EntityFishHook ? (EntityFishHook) entity : null;
+    }
+
+    @Nullable
+    public BlockPos getVisualFishingTarget() {
+        NBTTagCompound state = dataManager.get(FISHING_VISUAL_TARGET);
+        return state != null && state.getBoolean("Active")
+                ? new BlockPos(state.getInteger("X"), state.getInteger("Y"), state.getInteger("Z")) : null;
+    }
+
+    /** Arm swing for the visible throw; the server-side hook still owns all vanilla fishing rules. */
+    public float getFishingCastProgress(float partialTicks) {
+        float flight = getFishingCastFlightProgress(partialTicks);
+        return flight >= 1.0F ? 0.0F : (float) Math.sin(flight * Math.PI);
+    }
+
+    /** Linear progress used to animate the client fallback bobber from the claw to the water. */
+    public float getFishingCastFlightProgress(float partialTicks) {
+        int remaining = dataManager.get(FISHING_CAST_TICKS);
+        if (remaining <= 0) return 1.0F;
+        return Math.max(0.0F, Math.min(1.0F, (12.0F - remaining + partialTicks) / 12.0F));
     }
 
     public float getFishingPullProgress(float partialTicks) {
@@ -1318,6 +1797,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
             }
         }
         if (type == DroneUpgradeType.FLUID_CARGO && fluidTank.getFluidAmount() > 0) return true;
+        if (type == DroneUpgradeType.EU_INTERFACE && logisticsEuCargo > 0L) return true;
         if (type == DroneUpgradeType.COMBAT
                 && (!weapons.getStackInSlot(0).isEmpty() || !weapons.getStackInSlot(1).isEmpty())) return true;
         if (type == DroneUpgradeType.FISHING && !fishingRod.getStackInSlot(0).isEmpty()) return true;
@@ -1353,6 +1833,10 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
 
     private boolean consumeEnergy(long baseCost) {
         return energy.consume(DroneHardwareStats.energyCost(baseCost, upgrades));
+    }
+
+    private boolean hasEnergyFor(long baseCost) {
+        return energy.getStored() >= DroneHardwareStats.energyCost(baseCost, upgrades);
     }
 
     private boolean hasEnergy(long baseCost) {
@@ -1419,6 +1903,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 .child(compactControlButton("drtech.drone.controller.remove", "FALLBACK_REMOVE", 228, syncManager))
                 .child(compactControlButton("drtech.drone.controller.move_up", "FALLBACK_UP", 252, syncManager))
                 .child(compactControlButton("drtech.drone.controller.move_down", "FALLBACK_DOWN", 276, syncManager))
+                .child(cargoPolicyButton(syncManager))
                 .child(SlotGroupWidget.playerInventory(false).left(7).bottom(7));
         for (int slot = 0; slot < inventory.getSlots(); slot++) {
             int cargoSlot = slot;
@@ -1476,6 +1961,16 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 });
     }
 
+    private ButtonWidget<?> cargoPolicyButton(PanelSyncManager syncManager) {
+        return new ButtonWidget<>().pos(94, 249).size(30, 15)
+                .overlay(IKey.dynamic(this::getClientCargoPolicyShort).scale(0.56F))
+                .tooltipDynamic(tooltip -> tooltip.addLine(IKey.dynamic(this::getClientCargoPolicyLine)))
+                .onMousePressed(mouse -> {
+                    syncManager.callSyncedAction(CONTROL_ACTION, packet -> packet.writeString("CARGO_POLICY"));
+                    return true;
+                });
+    }
+
     private void handleControl(EntityPlayer player, String command) {
         if (world.isRemote || player.getDistanceSq(this) > 64.0D) return;
         applyControl(player, command);
@@ -1500,6 +1995,11 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
     private boolean applyControl(UUID requesterId, String command) {
         if (requesterId == null || !requesterId.equals(getOwnerId())) return false;
         if (command.startsWith("FALLBACK_")) return applyFallbackControl(command);
+        if ("CARGO_POLICY".equals(command)) {
+            cargoFullPolicy = cargoFullPolicy.next();
+            cargoFullPickupSuspended = false;
+            return true;
+        }
         if (runtime == null) return false;
         if (safetyFirmware.getState() != DroneSafetyState.PROGRAM
                 && ("START".equals(command) || "RESUME".equals(command) || "RESTART".equals(command)
@@ -1560,8 +2060,23 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         if (activeFishingHook != null && !activeFishingHook.isDead) activeFishingHook.setDead();
         activeFishingHook = null;
         activeFishingTarget = null;
-        if (!world.isRemote) dataManager.set(FISHING_HOOK_ID, -1);
+        if (!world.isRemote) {
+            dataManager.set(FISHING_HOOK_ID, -1);
+            setFishingVisualTarget(null);
+            dataManager.set(FISHING_CAST_TICKS, 0);
+        }
         DroneWorldActions.cleanupFishingHooks(this);
+    }
+
+    private void setFishingVisualTarget(@Nullable BlockPos target) {
+        NBTTagCompound state = new NBTTagCompound();
+        if (target != null) {
+            state.setBoolean("Active", true);
+            state.setInteger("X", target.getX());
+            state.setInteger("Y", target.getY());
+            state.setInteger("Z", target.getZ());
+        }
+        dataManager.set(FISHING_VISUAL_TARGET, state);
     }
 
     /** Reasserts active rotors for tracking clients after a runtime pause/resume transition. */
@@ -1633,6 +2148,28 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         return runtime == null ? -1L : runtime.getProgramRevision();
     }
 
+    /** Installs a validated library program through an authenticated external-control service. */
+    public boolean assignLibraryProgram(UUID requesterId, DroneProgramGraph graph) {
+        if (world == null || world.isRemote || requesterId == null || graph == null
+                || !requesterId.equals(getOwnerId()) || hasAssignedLogisticsWork(requesterId)
+                || runtime != null && runtime.getStatus() == DroneRuntimeStatus.RUNNING) return false;
+        DroneCompileResult result = new DroneProgramCompiler(DroneExtensionRegistry.nodes()).compile(graph);
+        if (result.hasErrors() || DroneProgramHardwareValidator.validate(graph, createDroneItem(), world).stream()
+                .anyMatch(diagnostic -> diagnostic.getSeverity() == DroneDiagnosticSeverity.ERROR)) return false;
+        program = DroneProgramNbtCodec.write(graph);
+        pendingRuntimeState = null;
+        rebuildRuntime();
+        markVelocityChanged();
+        return runtime != null;
+    }
+
+    private boolean hasAssignedLogisticsWork(UUID ownerId) {
+        DroneFleetState fleet = DroneFleetState.get(world);
+        return fleet.findAssignedLogisticsJob(ownerId, droneId).isPresent()
+                || fleet.findAssignedLogisticsRecovery(ownerId, droneId).isPresent()
+                || fleet.findRetainedLogisticsJob(ownerId, droneId).isPresent();
+    }
+
     public NBTTagCompound createRemoteDebugSnapshot() {
         NBTTagCompound snapshot = new NBTTagCompound();
         snapshot.setInteger("EntityId", getEntityId());
@@ -1646,6 +2183,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         snapshot.setInteger("FluidAmount", fluidTank.getFluidAmount());
         snapshot.setInteger("FluidCapacity", fluidTank.getCapacity());
         snapshot.setString("FluidName", fluidTank.getFluid() == null ? "" : fluidTank.getFluid().getLocalizedName());
+        snapshot.setLong("LogisticsEuCargo", logisticsEuCargo);
         snapshot.setString("SafetyState", safetyFirmware.getState().name());
         snapshot.setString("StatusLabel", getVisualStatusLabel());
         snapshot.setBoolean("RotorsActive", areVisualRotorsActive());
@@ -1707,7 +2245,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
             BlockPos loopCoordinate = runtime.getCurrentLoopCoordinate();
             if (loopCoordinate != null) snapshot.setLong("CurrentAreaPosition", loopCoordinate.toLong());
             snapshot.setString("Trace", runtime.getTraceSummary(2));
-            snapshot.setTag("TraceList", runtime.getTraceSnapshot(24));
+            snapshot.setTag("TraceList", runtime.getTraceSnapshot(DroneProgramRuntime.MAX_TRACE_ENTRIES));
         }
         return snapshot;
     }
@@ -1722,11 +2260,13 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         snapshot.setInteger("FluidAmount", fluidTank.getFluidAmount());
         snapshot.setInteger("FluidCapacity", fluidTank.getCapacity());
         snapshot.setString("FluidName", fluidTank.getFluid() == null ? "" : fluidTank.getFluid().getLocalizedName());
+        snapshot.setLong("LogisticsEuCargo", logisticsEuCargo);
         snapshot.setBoolean("BatteryLocked", isUpgradeRemovalLocked(DroneUpgradeType.BATTERY));
         snapshot.setBoolean("CargoLocked", isUpgradeRemovalLocked(DroneUpgradeType.CARGO));
         snapshot.setFloat("Health", getHealth());
         snapshot.setFloat("MaxHealth", getMaxHealth());
         snapshot.setString("EntityPayload", getLoadedEntitySummary());
+        snapshot.setString("CargoFullPolicy", cargoFullPolicy.name());
         snapshot.setBoolean("Loop", loopProgram);
         snapshot.setString("Dock", boundDock == null ? "Unbound"
                 : boundDock.getX() + ", " + boundDock.getY() + ", " + boundDock.getZ());
@@ -1784,11 +2324,25 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         clientFluidAmount = snapshot.getInteger("FluidAmount");
         clientFluidCapacity = snapshot.getInteger("FluidCapacity");
         clientFluidName = snapshot.getString("FluidName");
+        clientLogisticsEu = Math.max(0L, snapshot.getLong("LogisticsEuCargo"));
         clientBatteryLocked = snapshot.getBoolean("BatteryLocked");
         clientCargoLocked = snapshot.getBoolean("CargoLocked");
         clientHealth = snapshot.getFloat("Health");
         clientMaxHealth = snapshot.getFloat("MaxHealth");
         clientEntityPayload = snapshot.getString("EntityPayload");
+        clientCargoFullPolicy = snapshot.hasKey("CargoFullPolicy", 8)
+                ? snapshot.getString("CargoFullPolicy") : DroneCargoFullPolicy.STOP.name();
+    }
+
+    private String getClientCargoPolicyShort() {
+        DroneCargoFullPolicy policy = DroneCargoFullPolicy.fromName(clientCargoFullPolicy);
+        return I18n.format("drtech.drone.cargo_full.short." + policy.name().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    private String getClientCargoPolicyLine() {
+        DroneCargoFullPolicy policy = DroneCargoFullPolicy.fromName(clientCargoFullPolicy);
+        return I18n.format("drtech.drone.cargo_full.policy",
+                I18n.format("drtech.drone.cargo_full." + policy.name().toLowerCase(java.util.Locale.ROOT)));
     }
 
     private String getClientEnergyLine() { return I18n.format("drtech.drone.ui.energy", clientEnergy, clientCapacity); }
@@ -1858,6 +2412,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 + "\n" + I18n.format("drtech.drone.ui.fluid", clientFluidName.isEmpty()
                         ? I18n.format("drtech.drone.ui.fluid_empty") : clientFluidName,
                         clientFluidAmount, clientFluidCapacity)
+                + "\n" + I18n.format("drtech.drone.ui.logistics_eu", clientLogisticsEu)
                 + "\n" + I18n.format("drtech.drone.ui.entity_payload", clientEntityPayload.isEmpty()
                         ? I18n.format("drtech.drone.ui.entity_payload_empty") : clientEntityPayload);
         if (clientBatteryLocked) line += "\n" + I18n.format("drtech.drone.ui.battery_locked");
@@ -1989,6 +2544,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         compound.setTag("DroneSafetyFirmware", safetyFirmware.writeToNbt());
         compound.setString("AutoPickupMode", autoPickupMode.name());
         compound.setTag("AutoPickupFilter", autoPickupFilter.writeToNbt());
+        compound.setString("CargoFullPolicy", cargoFullPolicy.name());
         compound.setTag("DroneInventory", inventory.serializeNBT());
         compound.setTag("DroneWeapons", weapons.serializeNBT());
         compound.setTag("DroneFishingRod", fishingRod.serializeNBT());
@@ -1997,12 +2553,14 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         compound.setBoolean("RotorsActive", areVisualRotorsActive());
         compound.setInteger("StatusLightMode", getVisualStatusLightMode());
         compound.setTag("DroneFluidTank", fluidTank.writeToNBT(new NBTTagCompound()));
+        compound.setLong("LogisticsEuCargo", logisticsEuCargo);
         if (boundDock != null) compound.setLong("BoundDock", boundDock.toLong());
         NBTTagList fallbackDocks = new NBTTagList();
         for (UUID id : fallbackDockIds) fallbackDocks.appendTag(new NBTTagString(id.toString()));
         compound.setTag("FallbackDocks", fallbackDocks);
         compound.setBoolean("ExecutionEnabled", executionEnabled);
         compound.setInteger("DockRecoveryCooldown", dockRecoveryCooldown);
+        compound.setInteger("AlternateWeaponSlot", alternateWeaponSlot);
         compound.setBoolean("LoopProgram", loopProgram);
         compound.setLong("NextAlchemyTransferTick", nextAlchemyTransferTick);
         UUID ownerId = getOwnerId();
@@ -2052,6 +2610,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         autoPickupFilter = compound.hasKey("AutoPickupFilter", 10)
                 ? DroneItemFilterSpec.readFromNbt(compound.getCompoundTag("AutoPickupFilter"))
                 : DroneItemFilterSpec.ANY;
+        cargoFullPolicy = DroneCargoFullPolicy.fromName(compound.getString("CargoFullPolicy"));
+        cargoFullPickupSuspended = false;
         if (compound.hasKey("DroneInventory", 10)) {
             NBTTagCompound savedInventory = compound.getCompoundTag("DroneInventory").copy();
             savedInventory.setInteger("Size", DroneHardwareStats.MAX_CARGO_SLOTS);
@@ -2076,6 +2636,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         dataManager.set(ROTORS_ACTIVE, !compound.hasKey("RotorsActive") || compound.getBoolean("RotorsActive"));
         dataManager.set(STATUS_LIGHT_MODE, Math.max(0, Math.min(4, compound.getInteger("StatusLightMode"))));
         loadFluidTank(compound.hasKey("DroneFluidTank", 10) ? compound.getCompoundTag("DroneFluidTank") : null);
+        logisticsEuCargo = Math.max(0L, compound.getLong("LogisticsEuCargo"));
         loadingHardware = false;
         DroneEnergyStorage savedEnergy = DroneEnergyStorage.readFromNbt(compound.getCompoundTag("DroneEnergy"),
                 getConfiguredCapacity(), chassis.getVoltageTier());
@@ -2094,6 +2655,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         }
         executionEnabled = !compound.hasKey("ExecutionEnabled") || compound.getBoolean("ExecutionEnabled");
         dockRecoveryCooldown = Math.max(0, compound.getInteger("DockRecoveryCooldown"));
+        alternateWeaponSlot = Math.max(0, compound.getInteger("AlternateWeaponSlot")) % 2;
         loopProgram = compound.getBoolean("LoopProgram");
         setOwnerId(readUuid(compound, "Owner"));
         rebuildRuntime();
@@ -2166,10 +2728,10 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
         }
         try {
             DroneProgramGraph graph = DroneProgramNbtCodec.read(program);
-            DroneCompileResult result = new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry()).compile(graph);
+            DroneCompileResult result = new DroneProgramCompiler(DroneExtensionRegistry.nodes()).compile(graph);
             result.getProgram().ifPresent(compiled -> {
-                runtime = new DroneProgramRuntime(compiled, DrTechDroneExecutors.createDefaultRegistry(),
-                        DrTechDroneValueEvaluators.createDefaultRegistry(), createRuntimeEnvironment());
+                runtime = new DroneProgramRuntime(compiled, DroneExtensionRegistry.actions(),
+                        DroneExtensionRegistry.sensors(), createRuntimeEnvironment());
                 if (pendingRuntimeState != null) {
                     runtime.readFromNbt(pendingRuntimeState);
                 }
@@ -2197,6 +2759,11 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
             @Override
             public int getAreaBlockLimit() {
                 return DroneHardwareStats.areaBlockLimit(chassis);
+            }
+
+            @Override
+            public boolean hasUpgrade(DroneUpgradeType type) {
+                return DroneHardwareStats.hasUpgrade(upgrades, type);
             }
 
             @Override
@@ -2240,7 +2807,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 UUID owner = getOwnerId();
                 if (owner == null || reference == null || world == null) return null;
                 return DroneProgramLibrary.get(world).resolve(owner, reference)
-                        .map(graph -> new DroneProgramCompiler(DrTechDroneNodes.createDefaultRegistry()).compile(graph)
+                        .map(graph -> new DroneProgramCompiler(DroneExtensionRegistry.nodes()).compile(graph)
                                 .getProgram().orElse(null)).orElse(null);
             }
 
@@ -2744,7 +3311,7 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                             "No matching dropped item is in range");
                 }
                 int possible = collectDroppedItems(request.getRadius(), filter, request.getMaximumAmount(), true);
-                if (possible <= 0) return DroneExecutionResult.failure(DroneActionStatus.NO_SPACE, "failed",
+                if (possible <= 0) return handleItemCargoFull(
                         "Drone cargo has no space for matching dropped items");
                 if (!consumeEnergy(DroneEnergyCosts.ENTITY_INTERACTION)) return insufficientEnergy();
                 int moved = collectDroppedItems(request.getRadius(), filter,
@@ -3202,20 +3769,29 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
 
             @Override
             public DroneExecutionResult attackEntity(BlockPos target, DroneEntityFilterSpec filter) {
-                return attackEntityInternal(target, filter, false, null, 0, "", false);
+                return attackEntityInternal(target, filter, false, null, 0, "", false,
+                        "STRONGEST", 8);
             }
 
             @Override
             public DroneExecutionResult attackEntity(BlockPos target, DroneEntityFilterSpec filter,
                     boolean untilDefeated) {
-                return attackEntityInternal(target, filter, untilDefeated, null, 0, "", false);
+                return attackEntityInternal(target, filter, untilDefeated, null, 0, "", false,
+                        "STRONGEST", 8);
+            }
+
+            @Override
+            public DroneExecutionResult attackEntity(BlockPos target, DroneEntityFilterSpec filter,
+                    boolean untilDefeated, String weaponMode, int attackIntervalTicks) {
+                return attackEntityInternal(target, filter, untilDefeated, null, 0, "", false,
+                        weaponMode, attackIntervalTicks);
             }
 
             @Override
             public DroneExecutionResult attackEntityInArea(BlockPos target, DroneEntityFilterSpec filter,
                     boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance) {
                 return attackEntityInternal(target, filter, untilDefeated, patrolArea,
-                        Math.max(0, Math.min(128, maxChaseDistance)), "", false);
+                        Math.max(0, Math.min(128, maxChaseDistance)), "", false, "STRONGEST", 8);
             }
 
             @Override
@@ -3223,19 +3799,29 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance,
                     String expectedEntityUuid, boolean hostileOnly) {
                 return attackEntityInternal(target, filter, untilDefeated, patrolArea,
-                        Math.max(0, Math.min(128, maxChaseDistance)), expectedEntityUuid, hostileOnly);
+                        Math.max(0, Math.min(128, maxChaseDistance)), expectedEntityUuid, hostileOnly,
+                        "STRONGEST", 8);
+            }
+
+            @Override
+            public DroneExecutionResult attackEntityInArea(BlockPos target, DroneEntityFilterSpec filter,
+                    boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance,
+                    String expectedEntityUuid, boolean hostileOnly, String weaponMode, int attackIntervalTicks) {
+                return attackEntityInternal(target, filter, untilDefeated, patrolArea,
+                        Math.max(0, Math.min(128, maxChaseDistance)), expectedEntityUuid, hostileOnly,
+                        weaponMode, attackIntervalTicks);
             }
 
             private DroneExecutionResult attackEntityInternal(BlockPos target, DroneEntityFilterSpec filter,
                     boolean untilDefeated, @Nullable DroneArea patrolArea, int maxChaseDistance,
-                    String expectedEntityUuid, boolean hostileOnly) {
+                    String expectedEntityUuid, boolean hostileOnly, String weaponMode, int attackIntervalTicks) {
                 if (!DroneHardwareStats.hasUpgrade(upgrades, DroneUpgradeType.COMBAT)) {
                     return DroneExecutionResult.failure(DroneActionStatus.DENIED, "failed",
                             "Combat module is not installed");
                 }
-                if (!DroneWorldActions.hasUsableWeapon(weapons)) {
+                if (!DroneWorldActions.hasUsableWeapon(weapons, weaponMode, alternateWeaponSlot)) {
                     return DroneExecutionResult.failure(DroneActionStatus.NO_RESOURCE, "failed",
-                            "Combat weapon slots do not contain a usable weapon");
+                            "The selected combat weapon slot does not contain a usable weapon");
                 }
                 if (attackCooldownTicks > 0) return DroneExecutionResult.running(attackCooldownTicks);
                 setVisualEntityTarget(null);
@@ -3289,14 +3875,17 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 DroneExecutionResult movement = approach(entity.getPosition());
                 if (movement.getState() != DroneActionState.SUCCESS) return movement;
                 if (!hasEnergy(DroneEnergyCosts.ENTITY_INTERACTION)) return insufficientEnergy();
-                if (DroneWorldActions.attackEntity(EntityProgrammableDrone.this, weapons, entity)) {
+                int usedWeaponSlot = DroneWorldActions.attackEntity(EntityProgrammableDrone.this, weapons, entity,
+                        weaponMode, alternateWeaponSlot);
+                if (usedWeaponSlot >= 0) {
+                    if ("ALTERNATE".equalsIgnoreCase(weaponMode)) alternateWeaponSlot = usedWeaponSlot == 0 ? 1 : 0;
                     consumeEnergy(DroneEnergyCosts.ENTITY_INTERACTION);
                     triggerAttackAnimation();
                     world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_PLAYER_ATTACK_STRONG,
                             SoundCategory.NEUTRAL, 0.7F, 1.1F);
                     ((WorldServer) world).spawnParticle(EnumParticleTypes.CRIT, entity.posX,
                             entity.posY + entity.height * 0.6D, entity.posZ, 6, 0.25D, 0.2D, 0.25D, 0.02D);
-                    attackCooldownTicks = 8;
+                    attackCooldownTicks = Math.max(4, Math.min(40, attackIntervalTicks));
                     if (!untilDefeated || !entity.isEntityAlive()) attackChaseTicks = 0;
                     if (!untilDefeated || !entity.isEntityAlive()) setVisualEntityTarget(null);
                     return untilDefeated && entity.isEntityAlive()
@@ -3579,6 +4168,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     activeFishingHook = null;
                     activeFishingTarget = null;
                     dataManager.set(FISHING_HOOK_ID, -1);
+                    setFishingVisualTarget(null);
+                    dataManager.set(FISHING_CAST_TICKS, 0);
                 }
                 ItemStack rod = fishingRod.getStackInSlot(0);
                 if (activeFishingHook == null) {
@@ -3606,6 +4197,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     consumeEnergy(DroneEnergyCosts.ENTITY_INTERACTION);
                     activeFishingTarget = target.toImmutable();
                     dataManager.set(FISHING_HOOK_ID, activeFishingHook.getEntityId());
+                    setFishingVisualTarget(activeFishingTarget);
+                    dataManager.set(FISHING_CAST_TICKS, 12);
                     syncFishingRod();
                     return DroneExecutionResult.running();
                 }
@@ -3619,6 +4212,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     activeFishingHook = null;
                     activeFishingTarget = null;
                     dataManager.set(FISHING_HOOK_ID, -1);
+                    setFishingVisualTarget(null);
+                    dataManager.set(FISHING_CAST_TICKS, 0);
                     return DroneExecutionResult.failure(DroneActionStatus.NOT_FOUND, "failed",
                             "Fishing hook was lost");
                 }
@@ -3630,6 +4225,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                     activeFishingHook = null;
                     activeFishingTarget = null;
                     dataManager.set(FISHING_HOOK_ID, -1);
+                    setFishingVisualTarget(null);
+                    dataManager.set(FISHING_CAST_TICKS, 0);
                     return DroneExecutionResult.failure(DroneActionStatus.DENIED, "failed",
                             "Fishing hooks cannot pull protected players or owned entities");
                 }
@@ -3638,6 +4235,8 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 activeFishingHook = null;
                 activeFishingTarget = null;
                 dataManager.set(FISHING_HOOK_ID, -1);
+                setFishingVisualTarget(null);
+                dataManager.set(FISHING_CAST_TICKS, 0);
                 dataManager.set(FISHING_PULL_TICKS, 10);
                 fishingRod.setStackInSlot(0, retraction.rod);
                 syncFishingRod();
@@ -4024,6 +4623,9 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                 if (target == null) {
                     TransferTargetSelection selection = selectAreaTransferTarget(request, importing, filter);
                     if (selection.target == null) {
+                        if (importing && selection.status == DroneActionStatus.NO_SPACE) {
+                            return handleItemCargoFull(selection.message);
+                        }
                         return DroneExecutionResult.failure(selection.status, "failed", selection.message);
                     }
                     target = selection.target;
@@ -4045,8 +4647,10 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
                             "Source contains no extractable matching items");
                 }
                 int possible = DroneItemTransfer.transfer(source, destination, filter, limit, true);
-                if (possible <= 0) return DroneExecutionResult.failure(DroneActionStatus.NO_SPACE, "failed",
-                        "Destination has no space for matching items");
+                if (possible <= 0) return importing
+                        ? handleItemCargoFull("Drone cargo has no space for matching items")
+                        : DroneExecutionResult.failure(DroneActionStatus.NO_SPACE, "failed",
+                                "Destination has no space for matching items");
                 if (!consumeEnergy(DroneEnergyCosts.ENTITY_INTERACTION)) return insufficientEnergy();
                 int moved = DroneItemTransfer.transfer(source, destination, filter, possible, false);
                 return moved > 0 ? DroneExecutionResult.running(moved)
@@ -4205,9 +4809,61 @@ public final class EntityProgrammableDrone extends EntityFlying implements IGuiH
 
     private void collectNearbyItems() {
         if (autoPickupMode == DroneAutoPickupMode.OFF || autoPickupMode == DroneAutoPickupMode.PROGRAM_ONLY) return;
+        if (cargoFullPickupSuspended) {
+            if (!hasAnyCargoSpace()) return;
+            cargoFullPickupSuspended = false;
+        }
         DroneItemFilter filter = autoPickupMode == DroneAutoPickupMode.FILTER_MATCHING
                 ? DroneItemFilter.fromSpec(autoPickupFilter) : DroneItemFilter.ANY;
-        collectDroppedItems(1.25D, filter, Integer.MAX_VALUE, false);
+        if (!hasMatchingDroppedItem(1.25D, filter)) return;
+        int moved = collectDroppedItems(1.25D, filter, Integer.MAX_VALUE, false);
+        if (moved <= 0) handleAutomaticCargoFull();
+    }
+
+    private void handleAutomaticCargoFull() {
+        switch (cargoFullPolicy) {
+            case DROP_ONE_STACK -> dropOneCargoStack();
+            case RETURN_TO_DOCK -> {
+                cargoFullPickupSuspended = true;
+                requestManualRecall();
+            }
+            default -> cargoFullPickupSuspended = true;
+        }
+    }
+
+    private DroneExecutionResult handleItemCargoFull(String message) {
+        if (cargoFullPolicy == DroneCargoFullPolicy.DROP_ONE_STACK && dropOneCargoStack()) {
+            return DroneExecutionResult.running();
+        }
+        if (cargoFullPolicy == DroneCargoFullPolicy.RETURN_TO_DOCK) requestManualRecall();
+        return DroneExecutionResult.failure(DroneActionStatus.NO_SPACE, "failed", message);
+    }
+
+    private boolean hasAnyCargoSpace() {
+        for (int slot = 0; slot < getActiveCargoSlots(); slot++) {
+            ItemStack stack = inventory.getStackInSlot(slot);
+            if (stack.isEmpty() || stack.getCount() < Math.min(stack.getMaxStackSize(), inventory.getSlotLimit(slot))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean dropOneCargoStack() {
+        for (int slot = getActiveCargoSlots() - 1; slot >= 0; slot--) {
+            ItemStack preview = inventory.extractItem(slot, Integer.MAX_VALUE, true);
+            if (preview.isEmpty()) continue;
+            ItemStack extracted = inventory.extractItem(slot, preview.getCount(), false);
+            if (extracted.isEmpty()) continue;
+            EntityItem dropped = entityDropItem(extracted, -0.2F);
+            if (dropped != null) {
+                dropped.setPickupDelay(100);
+                return true;
+            }
+            insertCargo(extracted, false);
+            return false;
+        }
+        return false;
     }
 
     private boolean hasMatchingDroppedItem(double radius, DroneItemFilter filter) {

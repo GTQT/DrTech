@@ -23,6 +23,12 @@ public class DrtConfig {
     @Config.Comment("Allow drone attack nodes to target players when drone combat is enabled.")
     public static boolean EnableDronePlayerAttack = false;
 
+    @Config.LangKey("drone_fishing_luck_bonus")
+    @Config.Comment({"Additional vanilla fishing luck applied to drone bobbers.",
+            "This stacks with Luck of the Sea; 8 strongly favors treasure and suppresses junk."})
+    @Config.RangeInt(min = 0, max = 100)
+    public static int DroneFishingLuckBonus = 8;
+
     @Config.LangKey("enable_disassembly")
     @Config.Comment("开启拆解机")
     @Config.RequiresMcRestart

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.drppp.drtech.common.drone.program.registry.DrTechDroneNodes;
 
 /** Immutable lookup snapshot consumed by the future server-side runtime. */
 public final class CompiledDroneProgram {
@@ -30,11 +31,17 @@ public final class CompiledDroneProgram {
         this.entryNodeId = entryNodeId;
         Map<UUID, DroneProgramNode> nodeMap = new HashMap<>();
         for (DroneProgramNode node : graph.getNodes()) {
-            nodeMap.put(node.getId(), node);
+            if (!DrTechDroneNodes.isEditorOnly(node.getType())) nodeMap.put(node.getId(), node);
         }
         this.nodes = Collections.unmodifiableMap(nodeMap);
-        this.outgoing = indexEdges(graph.getEdges(), true);
-        this.incoming = indexEdges(graph.getEdges(), false);
+        List<DroneProgramEdge> executableEdges = new ArrayList<>();
+        for (DroneProgramEdge edge : graph.getEdges()) {
+            if (nodeMap.containsKey(edge.getSourceNodeId()) && nodeMap.containsKey(edge.getTargetNodeId())) {
+                executableEdges.add(edge);
+            }
+        }
+        this.outgoing = indexEdges(executableEdges, true);
+        this.incoming = indexEdges(executableEdges, false);
     }
 
     private static Map<PortAddress, List<DroneProgramEdge>> indexEdges(Collection<DroneProgramEdge> edges,

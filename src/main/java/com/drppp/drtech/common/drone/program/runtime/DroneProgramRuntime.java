@@ -1,6 +1,10 @@
 package com.drppp.drtech.common.drone.program.runtime;
 
+import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
+
 import com.drppp.drtech.common.drone.program.compile.CompiledDroneProgram;
+import com.drppp.drtech.common.drone.program.compile.DroneProgramHardwareValidator;
+import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
 import com.drppp.drtech.common.drone.program.model.DroneProgramEdge;
 import com.drppp.drtech.common.drone.program.model.DroneProgramNode;
 import com.drppp.drtech.common.drone.program.model.DroneArea;
@@ -27,7 +31,7 @@ public final class DroneProgramRuntime {
     private static final int AREA_BUILD_CANDIDATES_PER_TICK = 1_024;
 
     public static final int MAX_IMMEDIATE_TRANSITIONS_PER_TICK = 32;
-    public static final int MAX_TRACE_ENTRIES = 24;
+    public static final int MAX_TRACE_ENTRIES = 256;
 
     private final CompiledDroneProgram rootProgram;
     /** The currently executing program; differs from rootProgram only while inside a subprogram call. */
@@ -47,6 +51,8 @@ public final class DroneProgramRuntime {
     private final Deque<CallFrame> callStack = new ArrayDeque<>();
     /** Parallel node ids keep persisted traces clickable without changing the legacy text trace format. */
     private final Deque<String> traceNodeIds = new ArrayDeque<>();
+    private final Deque<Long> traceTicks = new ArrayDeque<>();
+    private long traceSequence;
     private UUID breakpointBypassNode;
     private boolean singleStepRequested;
     /** Caller stack depth to pause at after a step-over subprogram returns; -1 when inactive. */
@@ -73,7 +79,7 @@ public final class DroneProgramRuntime {
     private long lastOutputAmount;
 
     public DroneProgramRuntime(CompiledDroneProgram program, DroneExecutorRegistry executors) {
-        this(program, executors, DrTechDroneValueEvaluators.createDefaultRegistry(), DroneRuntimeEnvironment.EMPTY);
+        this(program, executors, DroneExtensionRegistry.sensors(), DroneRuntimeEnvironment.EMPTY);
     }
 
     public DroneProgramRuntime(CompiledDroneProgram program, DroneExecutorRegistry executors,
@@ -128,6 +134,13 @@ public final class DroneProgramRuntime {
                 }
                 status = DroneRuntimeStatus.COMPLETED;
                 addTrace("END");
+                return;
+            }
+
+            DroneUpgradeType missingUpgrade = DroneProgramHardwareValidator.getFirstMissingUpgrade(
+                    node.getType(), environment::hasUpgrade);
+            if (missingUpgrade != null) {
+                fail("Required drone upgrade is missing: " + missingUpgrade.getId());
                 return;
             }
 
@@ -384,6 +397,11 @@ public final class DroneProgramRuntime {
         try {
             DroneProgramNode source = program.getNode(edge.getSourceNodeId());
             if (source == null) throw new IllegalStateException("Value source node is missing");
+            DroneUpgradeType missingUpgrade = DroneProgramHardwareValidator.getFirstMissingUpgrade(
+                    source.getType(), environment::hasUpgrade);
+            if (missingUpgrade != null) {
+                throw new IllegalStateException("Required drone upgrade is missing: " + missingUpgrade.getId());
+            }
             DroneValueEvaluator evaluator = valueEvaluators.get(source.getType());
             if (evaluator == null) throw new IllegalStateException("No value evaluator for " + source.getType());
             DroneArea cachedArea = pendingAreaValues.get(address);
@@ -742,13 +760,16 @@ public final class DroneProgramRuntime {
         int skip = Math.max(0, trace.size() - Math.min(maxEntries, MAX_TRACE_ENTRIES));
         Iterator<String> textIterator = trace.iterator();
         Iterator<String> nodeIterator = traceNodeIds.iterator();
+        Iterator<Long> tickIterator = traceTicks.iterator();
         int index = 0;
         while (textIterator.hasNext()) {
             String text = textIterator.next();
             String nodeId = nodeIterator.hasNext() ? nodeIterator.next() : "";
+            long tick = tickIterator.hasNext() ? tickIterator.next() : index;
             if (index++ < skip) continue;
             NBTTagCompound entry = new NBTTagCompound();
             entry.setString("Text", text);
+            entry.setLong("Tick", tick);
             if (!nodeId.isEmpty()) entry.setString("Node", nodeId);
             snapshot.appendTag(entry);
         }
@@ -758,15 +779,20 @@ public final class DroneProgramRuntime {
     public void clearTrace() {
         trace.clear();
         traceNodeIds.clear();
+        traceTicks.clear();
+        traceSequence = 0L;
     }
 
     private void addTrace(String entry) {
         while (trace.size() >= MAX_TRACE_ENTRIES) {
             trace.removeFirst();
             if (!traceNodeIds.isEmpty()) traceNodeIds.removeFirst();
+            if (!traceTicks.isEmpty()) traceTicks.removeFirst();
         }
-        trace.addLast(entry == null ? "unknown" : entry);
+        String safe = entry == null ? "unknown" : entry.replace('\r', ' ').replace('\n', ' ');
+        trace.addLast(safe.substring(0, Math.min(160, safe.length())));
         traceNodeIds.addLast(currentNodeId == null ? "" : currentNodeId.toString());
+        traceTicks.addLast(++traceSequence);
     }
 
     private void prepareDebugInputs(DroneProgramNode node) {
@@ -856,6 +882,11 @@ public final class DroneProgramRuntime {
         NBTTagList traceNodesTag = new NBTTagList();
         for (String nodeId : traceNodeIds) traceNodesTag.appendTag(new NBTTagString(nodeId));
         tag.setTag("TraceNodes", traceNodesTag);
+        NBTTagList traceTicksTag = new NBTTagList();
+        for (Long tick : traceTicks) { NBTTagCompound tickTag = new NBTTagCompound();
+            tickTag.setLong("Tick", tick == null ? 0L : tick); traceTicksTag.appendTag(tickTag); }
+        tag.setTag("TraceTicks", traceTicksTag);
+        tag.setLong("TraceSequence", traceSequence);
         tag.setString("Error", error);
         return tag;
     }
@@ -932,13 +963,18 @@ public final class DroneProgramRuntime {
             memory.ensureLocalScopeDepth(callStack.size() + 1);
             trace.clear();
             traceNodeIds.clear();
+            traceTicks.clear();
             NBTTagList traceTag = tag.getTagList("Trace", 8);
             NBTTagList traceNodesTag = tag.getTagList("TraceNodes", 8);
+            NBTTagList traceTicksTag = tag.getTagList("TraceTicks", 10);
             int first = Math.max(0, traceTag.tagCount() - MAX_TRACE_ENTRIES);
             for (int i = first; i < traceTag.tagCount(); i++) {
                 trace.addLast(traceTag.getStringTagAt(i));
                 traceNodeIds.addLast(i < traceNodesTag.tagCount() ? traceNodesTag.getStringTagAt(i) : "");
+                traceTicks.addLast(i < traceTicksTag.tagCount() ? Math.max(0L,
+                        traceTicksTag.getCompoundTagAt(i).getLong("Tick")) : (long) (i - first + 1));
             }
+            traceSequence = Math.max(tag.getLong("TraceSequence"), traceTicks.isEmpty() ? 0L : traceTicks.getLast());
             error = tag.getString("Error");
         } catch (IllegalArgumentException exception) {
             fail("Saved runtime state is malformed");

@@ -4,6 +4,7 @@ import com.drppp.drtech.common.drone.program.compile.DroneProgramCompiler;
 import com.drppp.drtech.common.drone.program.model.DroneProgramEdge;
 import com.drppp.drtech.common.drone.program.model.DroneProgramGraph;
 import com.drppp.drtech.common.drone.program.model.DroneProgramNode;
+import com.drppp.drtech.common.drone.program.model.DroneEditorOverlay;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
@@ -52,6 +53,7 @@ public final class DroneProgramNbtCodec {
             edges.appendTag(tag);
         }
         root.setTag("Edges", edges);
+        root.setTag("EditorOverlay", graph.getEditorOverlay().writeToNbt());
         return root;
     }
 
@@ -97,10 +99,13 @@ public final class DroneProgramNbtCodec {
         }
 
         try {
+            DroneEditorOverlay overlay = root.hasKey("EditorOverlay", TAG_COMPOUND)
+                    ? DroneEditorOverlay.readFromNbt(root.getCompoundTag("EditorOverlay"))
+                    : new DroneEditorOverlay().withLayoutFromNodes(nodes);
             return new DroneProgramGraph(readUuid(root, "ProgramId"), trim(root.getString("Name"), MAX_NAME_LENGTH),
-                    root.getLong("Revision"), nodes, edges);
+                    root.getLong("Revision"), nodes, edges, overlay);
         } catch (IllegalArgumentException exception) {
-            throw new DroneProgramFormatException("Program contains duplicate ids", exception);
+            throw new DroneProgramFormatException("Program contains invalid ids or editor overlay", exception);
         }
     }
 

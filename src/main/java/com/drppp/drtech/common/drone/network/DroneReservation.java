@@ -22,7 +22,8 @@ public final class DroneReservation {
         this.jobId = jobId;
         this.endpointId = endpointId;
         this.secondaryEndpointId = secondaryEndpointId;
-        this.resourceId = resourceId == null ? "" : resourceId;
+        String checkedResource = resourceId == null ? "" : resourceId.trim();
+        this.resourceId = checkedResource.substring(0, Math.min(128, checkedResource.length()));
         this.amount = amount;
         this.expiresAtTick = expiresAtTick;
     }
@@ -34,6 +35,7 @@ public final class DroneReservation {
     public UUID getTargetEndpointId() { return secondaryEndpointId; }
     public String getResourceId() { return resourceId; }
     public boolean isEndpointPair() { return secondaryEndpointId != null; }
+    public boolean isProvidingOnly() { return secondaryEndpointId == null && !resourceId.isEmpty(); }
     public long getAmount() { return amount; }
     public long getExpiresAtTick() { return expiresAtTick; }
 }

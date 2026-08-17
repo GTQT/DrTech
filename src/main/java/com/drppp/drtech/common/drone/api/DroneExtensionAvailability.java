@@ -26,9 +26,24 @@ public final class DroneExtensionAvailability {
         for (ResourceLocation required : descriptor.getRequiredModules()) if (installedModules == null || !installedModules.contains(required)) missing.add(required);
         return new DroneExtensionAvailability(descriptor, missing.isEmpty() ? Status.AVAILABLE : Status.MISSING_MODULE, missing);
     }
+    public static DroneExtensionAvailability resolve(DroneExtensionDescriptor descriptor) {
+        return resolve(descriptor, DroneExtensionRegistry.API_VERSION,
+                new ArrayList<>(DroneExtensionRegistry.modules().keySet()));
+    }
     public DroneExtensionDescriptor getDescriptor() { return descriptor; }
     public Status getStatus() { return status; }
     public List<ResourceLocation> getMissingModules() { return missingModules; }
     public boolean isPlaceholder() { return status != Status.AVAILABLE; }
-    public String getDisplayKey() { return isPlaceholder() ? "drtech.drone.extension.missing" : descriptor.getId().toString(); }
+    public String getDisplayKey() {
+        if (isPlaceholder()) return status == Status.VERSION_INCOMPATIBLE
+                ? "drtech.drone.extension.version_incompatible" : "drtech.drone.extension.missing_module";
+        DroneExtensionDisplay display = DroneExtensionRegistry.displays().get(descriptor.getId());
+        return display == null ? "drtech.drone.extension.available" : display.getTitleKey();
+    }
+
+    public ResourceLocation getIcon() {
+        DroneExtensionDisplay display = DroneExtensionRegistry.displays().get(descriptor.getId());
+        return display == null || isPlaceholder() ? new ResourceLocation("drtech", "textures/gui/drone/extension_missing")
+                : display.getIcon();
+    }
 }

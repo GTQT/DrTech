@@ -24,6 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.opengl.GL11;
 
 public final class RenderProgrammableDrone extends RenderLiving<EntityProgrammableDrone> {
@@ -156,11 +157,26 @@ public final class RenderProgrammableDrone extends RenderLiving<EntityProgrammab
         // the shaft outward and down to match the suspended profile shown by the device model.
         GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(-34.0F, 0.0F, 0.0F, 1.0F);
-        GlStateManager.translate(-0.08F, 0.03F, 0.0F);
+        // Keep the handle pivot at the centre claw and use the reference pose: the shaft slopes down and
+        // outward to the right instead of leaning left. The generated third-person item model needs this
+        // negative in-plane angle after the drone's X/Y hand transform.
+        GlStateManager.rotate(-38.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.translate(-0.045F, 0.015F, 0.0F);
+        // Item models assume alpha testing/blending has already been enabled by a hand renderer. The drone model
+        // does not guarantee that state, which made transparent fishing-rod pixels appear as a large solid card.
+        // Keep the third-person grip pivot (the rod butt) at the claw. Transparent pixels no longer create a card,
+        // Keep the rod proportional to the claw; the previous 0.78 scale made the generated item model larger
+        // than the whole drone at close range.
         GlStateManager.scale(0.78F, 0.78F, 0.78F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(
+                GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         Minecraft.getMinecraft().getRenderItem().renderItem(
                 rod, ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND);
+        GlStateManager.disableBlend();
         GlStateManager.popMatrix();
         bindTexture(TEXTURE);
     }
@@ -225,13 +241,30 @@ public final class RenderProgrammableDrone extends RenderLiving<EntityProgrammab
         if (!entity.hasVisualUpgrade(DroneUpgradeType.FISHING)
                 || entity.getVisualFishingRod().isEmpty()) return;
         EntityFishHook hook = entity.getVisualFishingHook();
-        if (hook == null || hook.isDead) return;
+        BlockPos visualTarget = entity.getVisualFishingTarget();
+        if ((hook == null || hook.isDead) && visualTarget == null) return;
         double droneX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
         double droneY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
         double droneZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
-        double hookX = hook.lastTickPosX + (hook.posX - hook.lastTickPosX) * partialTicks;
-        double hookY = hook.lastTickPosY + (hook.posY - hook.lastTickPosY) * partialTicks;
-        double hookZ = hook.lastTickPosZ + (hook.posZ - hook.lastTickPosZ) * partialTicks;
+        boolean fallbackBobber = hook == null || hook.isDead;
+        double hookX;
+        double hookY;
+        double hookZ;
+        if (!fallbackBobber) {
+            hookX = hook.lastTickPosX + (hook.posX - hook.lastTickPosX) * partialTicks;
+            hookY = hook.lastTickPosY + (hook.posY - hook.lastTickPosY) * partialTicks;
+            hookZ = hook.lastTickPosZ + (hook.posZ - hook.lastTickPosZ) * partialTicks;
+        } else {
+            float flight = entity.getFishingCastFlightProgress(partialTicks);
+            double targetX = visualTarget.getX() + 0.5D;
+            double targetY = visualTarget.getY() + 0.38D
+                    + (flight >= 1.0F ? Math.sin((entity.ticksExisted + partialTicks) * 0.22D) * 0.025D : 0.0D);
+            double targetZ = visualTarget.getZ() + 0.5D;
+            hookX = droneX + (targetX - droneX) * flight;
+            hookY = droneY + 0.05D + (targetY - droneY - 0.05D) * flight
+                    + Math.sin(flight * Math.PI) * 0.75D;
+            hookZ = droneZ + (targetZ - droneZ) * flight;
+        }
         double endX = x + hookX - droneX;
         double endY = y + hookY - droneY;
         double endZ = z + hookZ - droneZ;
@@ -251,9 +284,33 @@ public final class RenderProgrammableDrone extends RenderLiving<EntityProgrammab
                     .color(28, 28, 24, 255).endVertex();
         }
         Tessellator.getInstance().draw();
+        if (fallbackBobber) renderFallbackFishingBobber(endX, endY, endZ);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.enableTexture2D();
+    }
+
+    /** Client fallback for vanilla hooks owned by an untracked FakePlayer. */
+    private void renderFallbackFishingBobber(double x, double y, double z) {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
+        drawBobberBox(-0.065D, 0.0D, -0.065D, 0.065D, 0.12D, 0.065D, 0.82F, 0.12F, 0.10F);
+        drawBobberBox(-0.055D, -0.10D, -0.055D, 0.055D, 0.0D, 0.055D, 0.94F, 0.94F, 0.88F);
+        GlStateManager.popMatrix();
+    }
+
+    private static void drawBobberBox(double minX, double minY, double minZ,
+            double maxX, double maxY, double maxZ, float red, float green, float blue) {
+        GlStateManager.color(red, green, blue, 1.0F);
+        GL11.glBegin(GL11.GL_QUADS);
+        cubeVertex(minX, minY, minZ); cubeVertex(maxX, minY, minZ); cubeVertex(maxX, maxY, minZ); cubeVertex(minX, maxY, minZ);
+        cubeVertex(maxX, minY, maxZ); cubeVertex(minX, minY, maxZ); cubeVertex(minX, maxY, maxZ); cubeVertex(maxX, maxY, maxZ);
+        cubeVertex(minX, minY, maxZ); cubeVertex(minX, minY, minZ); cubeVertex(minX, maxY, minZ); cubeVertex(minX, maxY, maxZ);
+        cubeVertex(maxX, minY, minZ); cubeVertex(maxX, minY, maxZ); cubeVertex(maxX, maxY, maxZ); cubeVertex(maxX, maxY, minZ);
+        cubeVertex(minX, maxY, minZ); cubeVertex(maxX, maxY, minZ); cubeVertex(maxX, maxY, maxZ); cubeVertex(minX, maxY, maxZ);
+        cubeVertex(minX, minY, maxZ); cubeVertex(maxX, minY, maxZ); cubeVertex(maxX, minY, minZ); cubeVertex(minX, minY, minZ);
+        GL11.glEnd();
     }
 
     private void renderEntityTargetLine(EntityProgrammableDrone drone, double x, double y, double z,

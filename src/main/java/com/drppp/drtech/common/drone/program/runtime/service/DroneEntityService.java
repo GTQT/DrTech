@@ -41,6 +41,11 @@ public interface DroneEntityService {
         return attackEntity(target, filter);
     }
 
+    default DroneExecutionResult attackEntity(BlockPos target, DroneEntityFilterSpec filter,
+            boolean untilDefeated, String weaponMode, int attackIntervalTicks) {
+        return attackEntity(target, filter, untilDefeated);
+    }
+
     default DroneExecutionResult attackEntityInArea(BlockPos target, DroneEntityFilterSpec filter,
             boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance) {
         return attackEntity(target, filter, untilDefeated);
@@ -50,6 +55,13 @@ public interface DroneEntityService {
             boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance,
             String expectedEntityUuid, boolean hostileOnly) {
         return attackEntityInArea(target, filter, untilDefeated, patrolArea, maxChaseDistance);
+    }
+
+    default DroneExecutionResult attackEntityInArea(BlockPos target, DroneEntityFilterSpec filter,
+            boolean untilDefeated, DroneArea patrolArea, int maxChaseDistance,
+            String expectedEntityUuid, boolean hostileOnly, String weaponMode, int attackIntervalTicks) {
+        return attackEntityInArea(target, filter, untilDefeated, patrolArea, maxChaseDistance,
+                expectedEntityUuid, hostileOnly);
     }
 
     default void clearAttackTarget() {}

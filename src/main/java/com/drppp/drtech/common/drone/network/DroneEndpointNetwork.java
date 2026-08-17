@@ -20,6 +20,7 @@ import java.util.UUID;
 public final class DroneEndpointNetwork extends WorldSavedData {
     public static final String DATA_NAME = "drtech_drone_endpoints";
     public static final long ONLINE_TIMEOUT_TICKS = 100L;
+    public static final long PRUNE_AFTER_TICKS = 24_000L;
     private static final int MAX_RECORDS = 2048;
     private final Map<UUID, DroneEndpoint> endpoints = new LinkedHashMap<>();
 
@@ -38,9 +39,29 @@ public final class DroneEndpointNetwork extends WorldSavedData {
     }
 
     public void heartbeat(DroneEndpoint endpoint) {
-        if (endpoint == null || (!endpoints.containsKey(endpoint.getEndpointId()) && endpoints.size() >= MAX_RECORDS)) return;
+        if (endpoint == null) return;
+        if (!endpoints.containsKey(endpoint.getEndpointId()) && endpoints.size() >= MAX_RECORDS) {
+            prune(endpoint.getLastHeartbeat());
+        }
+        if (!endpoints.containsKey(endpoint.getEndpointId()) && endpoints.size() >= MAX_RECORDS) return;
         endpoints.put(endpoint.getEndpointId(), endpoint);
         markDirty();
+    }
+
+    public boolean remove(UUID endpointId) {
+        if (endpointId == null || endpoints.remove(endpointId) == null) return false;
+        markDirty();
+        return true;
+    }
+
+    /** Keeps temporarily unloaded endpoints, but bounds records left by crashes or old worlds. */
+    public int prune(long worldTime) {
+        int before = endpoints.size();
+        endpoints.values().removeIf(endpoint -> worldTime > endpoint.getLastHeartbeat()
+                && worldTime - endpoint.getLastHeartbeat() > PRUNE_AFTER_TICKS);
+        int removed = before - endpoints.size();
+        if (removed > 0) markDirty();
+        return removed;
     }
 
     public List<DroneEndpoint> listForOwner(@Nullable UUID ownerId, @Nullable DroneEndpoint.Kind kind) {
@@ -54,6 +75,19 @@ public final class DroneEndpointNetwork extends WorldSavedData {
                 .thenComparing(endpoint -> endpoint.getPosition().toLong())
                 .thenComparing(endpoint -> endpoint.getEndpointId().toString()));
         return Collections.unmodifiableList(result);
+    }
+
+    public List<DroneEndpoint> snapshot() {
+        List<DroneEndpoint> result = new ArrayList<>(endpoints.values());
+        result.sort(Comparator.comparingInt(DroneEndpoint::getDimension)
+                .thenComparing(endpoint -> endpoint.getPosition().toLong())
+                .thenComparing(endpoint -> endpoint.getEndpointId().toString()));
+        return Collections.unmodifiableList(result);
+    }
+
+    @Nullable
+    public DroneEndpoint getEndpoint(UUID endpointId) {
+        return endpointId == null ? null : endpoints.get(endpointId);
     }
 
     public static boolean isOnline(DroneEndpoint endpoint, long worldTime) {

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /** Target-drone preflight checks. These diagnostics are never persisted into the reusable program card. */
 public final class DroneProgramHardwareValidator {
@@ -43,6 +44,22 @@ public final class DroneProgramHardwareValidator {
             if (contains(requirement.getValue(), nodeType)) result.add(requirement.getKey());
         }
         return result.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(result);
+    }
+
+    /**
+     * Returns the first missing built-in module in stable enum order.  Runtime execution uses the
+     * same table as editor/preflight validation so an old program cannot bypass newly introduced
+     * hardware requirements after being loaded from NBT.
+     */
+    @Nullable
+    public static DroneUpgradeType getFirstMissingUpgrade(ResourceLocation nodeType,
+            Predicate<DroneUpgradeType> installed) {
+        if (nodeType == null || installed == null) return null;
+        for (DroneUpgradeType type : DroneUpgradeType.values()) {
+            ResourceLocation[] nodes = REQUIRED_UPGRADES.get(type);
+            if (nodes != null && contains(nodes, nodeType) && !installed.test(type)) return type;
+        }
+        return null;
     }
 
     public static List<DroneProgramDiagnostic> validate(DroneProgramGraph graph, ItemStack drone,
@@ -135,8 +152,13 @@ public final class DroneProgramHardwareValidator {
                 DrTechDroneNodes.CRAFTABLE_COUNT, DrTechDroneNodes.CRAFT_GRID
         });
         requirements.put(DroneUpgradeType.TOOL_ARM, new ResourceLocation[] {
-                DrTechDroneNodes.INTERACT_ENTITY, DrTechDroneNodes.USE_ITEM_ON_ENTITY,
-                DrTechDroneNodes.EDIT_SIGN
+                DrTechDroneNodes.BREAK_BLOCK, DrTechDroneNodes.BREAK_BLOCK_AT,
+                DrTechDroneNodes.PLACE_BLOCK, DrTechDroneNodes.PLACE_AREA,
+                DrTechDroneNodes.FELL_TREES, DrTechDroneNodes.REPLANT_AREA,
+                DrTechDroneNodes.INTERACT_BLOCK, DrTechDroneNodes.USE_ITEM_ON_BLOCK,
+                DrTechDroneNodes.USE_ITEM, DrTechDroneNodes.INTERACT_ENTITY,
+                DrTechDroneNodes.USE_ITEM_ON_ENTITY, DrTechDroneNodes.EDIT_SIGN,
+                DrTechDroneNodes.HARVEST_CROP, DrTechDroneNodes.REPAIR_MACHINE
         });
         requirements.put(DroneUpgradeType.ENTITY_SCANNER, new ResourceLocation[] {
                 DrTechDroneNodes.ENTITY_COUNT, DrTechDroneNodes.ENTITY_SENSOR,

@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.drone.program.model;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +18,7 @@ public final class DroneProgramGraph {
     private final Map<UUID, DroneProgramEdge> edges = new LinkedHashMap<>();
     private String name;
     private long revision;
+    private DroneEditorOverlay editorOverlay;
 
     public DroneProgramGraph(String name) {
         this(UUID.randomUUID(), name, 0L, Collections.emptyList(), Collections.emptyList());
@@ -24,6 +26,12 @@ public final class DroneProgramGraph {
 
     public DroneProgramGraph(UUID programId, String name, long revision, Collection<DroneProgramNode> nodes,
             Collection<DroneProgramEdge> edges) {
+        this(programId, name, revision, nodes, edges,
+                new DroneEditorOverlay().withLayoutFromNodes(nodes));
+    }
+
+    public DroneProgramGraph(UUID programId, String name, long revision, Collection<DroneProgramNode> nodes,
+            Collection<DroneProgramEdge> edges, DroneEditorOverlay editorOverlay) {
         this.programId = Objects.requireNonNull(programId, "programId");
         this.name = name == null ? "" : name;
         this.revision = Math.max(0L, revision);
@@ -37,6 +45,7 @@ public final class DroneProgramGraph {
                 throw new IllegalArgumentException("Duplicate edge id " + edge.getId());
             }
         }
+        this.editorOverlay = editorOverlay == null ? new DroneEditorOverlay() : editorOverlay.copy();
     }
 
     public UUID getProgramId() {
@@ -59,6 +68,15 @@ public final class DroneProgramGraph {
         return Collections.unmodifiableCollection(edges.values());
     }
 
+    public DroneEditorOverlay getEditorOverlay() { return editorOverlay.copy(); }
+
+    public void refreshEditorOverlayLayout() {
+        editorOverlay = editorOverlay.withLayoutFromNodes(nodes.values());
+    }
+
+    /** Client-side debugger projection; does not alter executable revision semantics. */
+    public void updateEditorTimeline(NBTTagList trace) { editorOverlay = editorOverlay.withTimeline(trace); }
+
     public DroneProgramNode getNode(UUID id) {
         return nodes.get(id);
     }
@@ -68,11 +86,11 @@ public final class DroneProgramGraph {
     }
 
     public DroneProgramGraph copy() {
-        return new DroneProgramGraph(programId, name, revision, nodes.values(), edges.values());
+        return new DroneProgramGraph(programId, name, revision, nodes.values(), edges.values(), editorOverlay);
     }
 
     public DroneProgramGraph copyWithRevision(long revision) {
-        return new DroneProgramGraph(programId, name, revision, nodes.values(), edges.values());
+        return new DroneProgramGraph(programId, name, revision, nodes.values(), edges.values(), editorOverlay);
     }
 
     /**
@@ -83,7 +101,7 @@ public final class DroneProgramGraph {
      */
     public DroneProgramGraph copyAsNewProgram(String newName) {
         return new DroneProgramGraph(UUID.randomUUID(), newName == null ? name : newName,
-                0L, nodes.values(), edges.values());
+                0L, nodes.values(), edges.values(), editorOverlay);
     }
 
     public void rename(String name) {

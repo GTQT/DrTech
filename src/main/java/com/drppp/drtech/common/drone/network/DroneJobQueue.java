@@ -14,6 +14,8 @@ import java.util.UUID;
 
 /** Server-owned fleet job scheduler with deterministic priority, timeout, and retry handling. */
 public final class DroneJobQueue {
+    private static final int MAX_JOBS = 2_048;
+    private static final int PRUNE_TO_JOBS = 1_792;
     private final Map<UUID, DroneJob> jobs = new LinkedHashMap<>();
     private static final Comparator<DroneJob> NEXT_JOB_ORDER = Comparator
             .comparingInt(DroneJob::getPriority).reversed()
@@ -22,12 +24,37 @@ public final class DroneJobQueue {
 
     public boolean submit(DroneJob job) {
         if (job == null || jobs.containsKey(job.getJobId())) return false;
+        if (jobs.size() >= MAX_JOBS) pruneTerminalHistory(PRUNE_TO_JOBS);
+        if (jobs.size() >= MAX_JOBS) return false;
         jobs.put(job.getJobId(), job);
         return true;
     }
 
+    private void pruneTerminalHistory(int targetSize) {
+        if (jobs.size() <= targetSize) return;
+        List<DroneJob> removable = new ArrayList<>();
+        for (DroneJob job : jobs.values()) {
+            DroneJob.State state = job.getState();
+            if ((state == DroneJob.State.COMPLETED || state == DroneJob.State.FAILED
+                    || state == DroneJob.State.CANCELLED)
+                    && job.getLogisticsStage() != DroneJob.LogisticsStage.RETURNING) removable.add(job);
+        }
+        removable.sort(Comparator.comparingLong(DroneJob::getSubmittedTick)
+                .thenComparing(job -> job.getJobId().toString()));
+        for (DroneJob job : removable) {
+            if (jobs.size() <= targetSize) break;
+            jobs.remove(job.getJobId());
+        }
+    }
+
     public Optional<DroneJob> takeNext(long worldTime) {
         return jobs.values().stream().filter(job -> job.isEligible(worldTime)).min(NEXT_JOB_ORDER)
+                .filter(job -> job.start(worldTime));
+    }
+
+    public Optional<DroneJob> takeNextLogistics(long worldTime) {
+        return jobs.values().stream().filter(DroneJob::isLogisticsJob)
+                .filter(job -> job.isEligible(worldTime)).min(NEXT_JOB_ORDER)
                 .filter(job -> job.start(worldTime));
     }
 
@@ -51,11 +78,14 @@ public final class DroneJobQueue {
         return true;
     }
 
+    public boolean defer(UUID jobId, long worldTime, String reason, long delayTicks) {
+        DroneJob job = jobs.get(jobId);
+        return job != null && job.defer(worldTime, reason, delayTicks);
+    }
+
     public boolean cancel(UUID jobId) {
         DroneJob job = jobs.get(jobId);
-        if (job == null) return false;
-        job.cancel();
-        return true;
+        return job != null && job.cancel();
     }
 
     public Optional<DroneJob> get(UUID jobId) { return Optional.ofNullable(jobs.get(jobId)); }
@@ -74,7 +104,7 @@ public final class DroneJobQueue {
 
     void readFromNbt(NBTTagList list, long worldTime) {
         jobs.clear();
-        for (int index = 0; index < Math.min(2048, list.tagCount()); index++) {
+        for (int index = 0; index < Math.min(MAX_JOBS, list.tagCount()); index++) {
             DroneJob job = DroneJob.readFromNbt(list.getCompoundTagAt(index));
             if (job == null || jobs.containsKey(job.getJobId())) continue;
             job.recoverAfterLoad(worldTime);

@@ -13,6 +13,8 @@ import com.drppp.drtech.common.drone.program.model.DroneProgramNode;
 import com.drppp.drtech.common.drone.program.registry.DroneNodeRegistry;
 import com.drppp.drtech.common.drone.program.registry.DrTechDroneNodes;
 import com.drppp.drtech.common.drone.program.runtime.DroneRuntimeMemory;
+import com.drppp.drtech.common.drone.api.DroneExtensionAvailability;
+import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 
@@ -75,7 +77,11 @@ public final class DroneProgramCompiler {
             if (definition == null) {
                 error(diagnostics, DroneDiagnosticCode.UNKNOWN_NODE_TYPE, node.getId(), null, node.getType().toString());
             } else {
-                definitions.put(node.getId(), definition);
+                DroneExtensionAvailability availability = DroneExtensionRegistry.availabilityForNode(node.getType());
+                if (availability != null && availability.isPlaceholder()) {
+                    error(diagnostics, DroneDiagnosticCode.EXTENSION_UNAVAILABLE, node.getId(), null,
+                            node.getType().toString(), availability.getStatus().name());
+                } else definitions.put(node.getId(), definition);
             }
         }
         return definitions;

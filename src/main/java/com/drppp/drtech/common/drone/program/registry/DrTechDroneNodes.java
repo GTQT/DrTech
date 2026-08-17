@@ -165,9 +165,15 @@ public final class DrTechDroneNodes {
     private DrTechDroneNodes() {}
 
     public static DroneNodeRegistry createDefaultRegistry() {
+        DroneNodeRegistry registry = createExtensibleRegistry();
+        registry.freeze();
+        return registry;
+    }
+
+    /** Mutable built-in registry used only during the Forge extension registration window. */
+    public static DroneNodeRegistry createExtensibleRegistry() {
         DroneNodeRegistry registry = new DroneNodeRegistry();
         registerDefaults(registry);
-        registry.freeze();
         return registry;
     }
 
@@ -553,7 +559,11 @@ public final class DrTechDroneNodes {
                 .property(DroneNodePropertyDefinition.string("Line4", 64)).build());
         registry.register(action(ATTACK_ENTITY, "entities")
                 .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))
-                .port(DronePortDefinition.input("filter", DronePortType.ENTITY_FILTER, false)).build());
+                .port(DronePortDefinition.input("filter", DronePortType.ENTITY_FILTER, false))
+                .property(DroneNodePropertyDefinition.enumeration("WeaponMode",
+                        "STRONGEST", "PRIMARY", "SECONDARY", "ALTERNATE"))
+                .property(DroneNodePropertyDefinition.integer("AttackIntervalTicks", 4, 40))
+                .build());
         registry.register(action(PATROL_ATTACK_AREA, "entities")
                 .port(DronePortDefinition.input("area", DronePortType.AREA, true))
                 .port(DronePortDefinition.input("filter", DronePortType.ENTITY_FILTER, false))
@@ -568,6 +578,9 @@ public final class DrTechDroneNodes {
                 .property(DroneNodePropertyDefinition.integer("RescanTicks", 1, 1_200))
                 .property(DroneNodePropertyDefinition.bool("ReacquireLostTarget"))
                 .property(DroneNodePropertyDefinition.bool("ReturnToAreaOnComplete"))
+                .property(DroneNodePropertyDefinition.enumeration("WeaponMode",
+                        "STRONGEST", "PRIMARY", "SECONDARY", "ALTERNATE"))
+                .property(DroneNodePropertyDefinition.integer("AttackIntervalTicks", 4, 40))
                 .build());
         registry.register(action(FISH_AT, "entities")
                 .port(DronePortDefinition.input("target", DronePortType.COORDINATE, true))

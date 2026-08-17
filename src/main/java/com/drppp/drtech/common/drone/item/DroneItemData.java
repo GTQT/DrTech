@@ -24,7 +24,7 @@ import java.util.List;
 /** Shared item/entity payload keys for lossless deployment and recall. */
 public final class DroneItemData {
 
-    public static final int CURRENT_DATA_VERSION = 11;
+    public static final int CURRENT_DATA_VERSION = 12;
 
     public static final String PROGRAM_TAG = "DrTechDroneProgram";
     public static final String INVENTORY_TAG = "DrTechDroneInventory";
@@ -32,6 +32,7 @@ public final class DroneItemData {
     public static final String FISHING_ROD_TAG = "DrTechDroneFishingRod";
     public static final String ALCHEMY_JAR_TAG = "DrTechDroneAlchemyJar";
     public static final String FLUID_TAG = "DrTechDroneFluid";
+    public static final String LOGISTICS_EU_TAG = "DrTechDroneLogisticsEu";
     public static final String DOCK_TAG = "DrTechDroneDock";
     public static final String RUNTIME_TAG = "DrTechDroneRuntime";
     public static final String UPGRADES_TAG = "DrTechDroneUpgrades";
@@ -44,6 +45,7 @@ public final class DroneItemData {
     public static final String SAFETY_FIRMWARE_TAG = "DrTechDroneSafetyFirmware";
     public static final String AUTO_PICKUP_MODE_TAG = "DrTechDroneAutoPickupMode";
     public static final String AUTO_PICKUP_FILTER_TAG = "DrTechDroneAutoPickupFilter";
+    public static final String CARGO_FULL_POLICY_TAG = "DrTechDroneCargoFullPolicy";
     public static final String FALLBACK_DOCKS_TAG = "DrTechDroneFallbackDocks";
     public static final String LOADED_ENTITY_TAG = "DrTechDroneLoadedEntity";
     public static final String LOADED_ENTITY_UUID_TAG = "DrTechDroneLoadedEntityUuid";
@@ -293,6 +295,18 @@ public final class DroneItemData {
         root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
     }
 
+    public static String getCargoFullPolicy(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root == null || !root.hasKey(CARGO_FULL_POLICY_TAG, 8)
+                ? "STOP" : root.getString(CARGO_FULL_POLICY_TAG);
+    }
+
+    public static void setCargoFullPolicy(ItemStack stack, String policy) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        root.setString(CARGO_FULL_POLICY_TAG, policy == null ? "STOP" : policy);
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
     static NBTTagCompound copySafetyFirmwarePayload(NBTTagCompound firmware) {
         return firmware == null ? new NBTTagCompound() : firmware.copy();
     }
@@ -371,6 +385,18 @@ public final class DroneItemData {
         NBTTagCompound root = getOrCreateRoot(stack);
         if (fluid == null || fluid.getKeySet().isEmpty()) root.removeTag(FLUID_TAG);
         else root.setTag(FLUID_TAG, fluid.copy());
+        root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
+    }
+
+    public static long getLogisticsEu(ItemStack stack) {
+        NBTTagCompound root = stack.getTagCompound();
+        return root == null ? 0L : Math.max(0L, root.getLong(LOGISTICS_EU_TAG));
+    }
+
+    public static void setLogisticsEu(ItemStack stack, long amount) {
+        NBTTagCompound root = getOrCreateRoot(stack);
+        if (amount <= 0L) root.removeTag(LOGISTICS_EU_TAG);
+        else root.setLong(LOGISTICS_EU_TAG, amount);
         root.setInteger(DATA_VERSION_TAG, CURRENT_DATA_VERSION);
     }
 

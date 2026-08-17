@@ -283,12 +283,17 @@ final class DroneWorldActions {
         return accepted == EnumActionResult.SUCCESS ? InteractionOutcome.SUCCESS : InteractionOutcome.DENIED;
     }
 
-    static boolean attackEntity(EntityProgrammableDrone drone, ItemStackHandler inventory, EntityLivingBase target) {
+    static int attackEntity(EntityProgrammableDrone drone, ItemStackHandler inventory, EntityLivingBase target,
+            String weaponMode, int alternateSlot) {
         if (!DrtConfig.EnableDroneCombat || !(drone.world instanceof WorldServer) || target == null
                 || !target.isEntityAlive() || !target.isNonBoss()
-                || target instanceof EntityPlayer && !DrtConfig.EnableDronePlayerAttack) return false;
+                || target instanceof EntityPlayer && !DrtConfig.EnableDronePlayerAttack) return -1;
         FakePlayer player = preparePlayer(drone);
-        int weaponSlot = selectBestWeapon(inventory, inventory.getSlots());
+        int weaponSlot = selectWeapon(inventory, weaponMode, alternateSlot);
+        if (weaponSlot < 0) {
+            clearPlayer(player);
+            return -1;
+        }
         ItemStack held = weaponSlot < 0 ? ItemStack.EMPTY
                 : inventory.extractItem(weaponSlot, inventory.getSlotLimit(weaponSlot), false);
         activateLightsaber(held);
@@ -300,11 +305,33 @@ final class DroneWorldActions {
             if (weaponSlot >= 0) inventory.setStackInSlot(weaponSlot, player.getHeldItemMainhand());
             clearPlayer(player);
         }
-        return !target.isEntityAlive() || target.getHealth() < healthBefore;
+        return !target.isEntityAlive() || target.getHealth() < healthBefore ? weaponSlot : -1;
     }
 
     static boolean hasUsableWeapon(ItemStackHandler inventory) {
         return inventory != null && selectBestWeapon(inventory, inventory.getSlots()) >= 0;
+    }
+
+    static boolean hasUsableWeapon(ItemStackHandler inventory, String weaponMode, int alternateSlot) {
+        return inventory != null && selectWeapon(inventory, weaponMode, alternateSlot) >= 0;
+    }
+
+    private static int selectWeapon(ItemStackHandler inventory, String weaponMode, int alternateSlot) {
+        if (inventory == null || inventory.getSlots() <= 0) return -1;
+        if ("PRIMARY".equalsIgnoreCase(weaponMode)) return usableWeaponSlot(inventory, 0) ? 0 : -1;
+        if ("SECONDARY".equalsIgnoreCase(weaponMode)) return usableWeaponSlot(inventory, 1) ? 1 : -1;
+        if ("ALTERNATE".equalsIgnoreCase(weaponMode)) {
+            int activeSlots = Math.min(2, inventory.getSlots());
+            int preferred = Math.max(0, alternateSlot) % activeSlots;
+            if (usableWeaponSlot(inventory, preferred)) return preferred;
+            int other = preferred == 0 ? 1 : 0;
+            return usableWeaponSlot(inventory, other) ? other : -1;
+        }
+        return selectBestWeapon(inventory, inventory.getSlots());
+    }
+
+    private static boolean usableWeaponSlot(ItemStackHandler inventory, int slot) {
+        return slot >= 0 && slot < inventory.getSlots() && weaponDamage(inventory.getStackInSlot(slot)) > 0.0D;
     }
 
     static boolean isWeapon(ItemStack stack) {
@@ -350,7 +377,8 @@ final class DroneWorldActions {
         EntityFishHook hook = new EntityFishHook(world, player,
                 target.getX() + 0.5D, target.getY() + 0.35D, target.getZ() + 0.5D);
         hook.getEntityData().setString("DrTechDroneFishingOwner", drone.getDroneId().toString());
-        hook.setLuck(EnchantmentHelper.getEnchantmentLevel(Enchantments.LUCK_OF_THE_SEA, rod));
+        int enchantmentLuck = EnchantmentHelper.getEnchantmentLevel(Enchantments.LUCK_OF_THE_SEA, rod);
+        hook.setLuck(enchantmentLuck + Math.max(0, Math.min(100, DrtConfig.DroneFishingLuckBonus)));
         hook.setLureSpeed(EnchantmentHelper.getEnchantmentLevel(Enchantments.LURE, rod));
         player.fishEntity = hook;
         if (!world.spawnEntity(hook)) {

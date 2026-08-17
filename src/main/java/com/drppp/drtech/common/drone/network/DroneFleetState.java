@@ -17,6 +17,8 @@ public final class DroneFleetState extends WorldSavedData {
     private final DroneJobQueue jobs = new DroneJobQueue();
     private final DroneReservationBook reservations = new DroneReservationBook();
     private long lastWorldTime;
+    private long lastDispatchTick = Long.MIN_VALUE;
+    private long lastEndpointPruneTick = Long.MIN_VALUE;
 
     public DroneFleetState() { this(DATA_NAME); }
     public DroneFleetState(String name) { super(name); }
@@ -66,12 +68,13 @@ public final class DroneFleetState extends WorldSavedData {
 
     /** Owner-scoped endpoint reservation that applies resource and inventory policy atomically. */
     public Optional<DroneReservation> reserveTarget(UUID requesterId, UUID jobId, DroneEndpoint endpoint,
-            String resourceId, boolean providing, long currentAmount, long worldTime, long leaseTicks) {
+            String resourceId, boolean providing, long currentAmount, long maximumAmount,
+            long worldTime, long leaseTicks) {
         DroneJob job = getJobForOwner(requesterId, jobId).orElse(null);
         if (job == null || job.getState() != DroneJob.State.RUNNING || endpoint == null
                 || !requesterId.equals(endpoint.getOwnerId())) return Optional.empty();
         Optional<DroneReservation> reservation = reservations.tryReserve(jobId, endpoint, resourceId,
-                providing, currentAmount, worldTime, leaseTicks);
+                providing, currentAmount, maximumAmount, worldTime, leaseTicks);
         if (reservation.isPresent()) markDirty();
         return reservation;
     }
@@ -96,7 +99,17 @@ public final class DroneFleetState extends WorldSavedData {
     }
 
     public boolean failJob(UUID requesterId, UUID jobId, long worldTime, String reason) {
-        if (!getJobForOwner(requesterId, jobId).isPresent() || !jobs.fail(jobId, worldTime, reason)) return false;
+        DroneJob job = getJobForOwner(requesterId, jobId).orElse(null);
+        if (job == null || !jobs.fail(jobId, worldTime, reason)) return false;
+        reservations.releaseForJob(jobId);
+        markDirty();
+        return true;
+    }
+
+    /** Defers resource contention without counting it as a failed execution attempt. */
+    public boolean deferJob(UUID requesterId, UUID jobId, long worldTime, String reason, long delayTicks) {
+        if (!getJobForOwner(requesterId, jobId).isPresent()
+                || !jobs.defer(jobId, worldTime, reason, delayTicks)) return false;
         reservations.releaseForJob(jobId);
         markDirty();
         return true;
@@ -118,11 +131,94 @@ public final class DroneFleetState extends WorldSavedData {
         markDirty();
     }
 
+    public void tick(World world) {
+        if (world == null || world.isRemote) return;
+        long worldTime = world.getTotalWorldTime();
+        tick(worldTime);
+        if (lastEndpointPruneTick == Long.MIN_VALUE || worldTime < lastEndpointPruneTick
+                || worldTime - lastEndpointPruneTick >= 1_200L) {
+            DroneEndpointNetwork.get(world).prune(worldTime);
+            lastEndpointPruneTick = worldTime;
+        }
+        if (lastDispatchTick == worldTime) return;
+        lastDispatchTick = worldTime;
+        DroneLogisticsDispatcher.tick(world, this, worldTime);
+    }
+
+    public Optional<DroneJob> findAssignedLogisticsJob(UUID ownerId, UUID droneId) {
+        if (ownerId == null || droneId == null) return Optional.empty();
+        return jobs.snapshot().stream().filter(DroneJob::isLogisticsJob)
+                .filter(job -> job.getState() == DroneJob.State.RUNNING)
+                .filter(job -> ownerId.equals(job.getOwnerId()) && droneId.equals(job.getAssignedDroneId()))
+                .findFirst();
+    }
+
+    public Optional<DroneJob> findAssignedLogisticsRecovery(UUID ownerId, UUID droneId) {
+        if (ownerId == null || droneId == null) return Optional.empty();
+        return jobs.snapshot().stream().filter(DroneJob::isLogisticsJob)
+                .filter(job -> (job.getState() == DroneJob.State.FAILED
+                                || job.getState() == DroneJob.State.CANCELLED)
+                        && job.getLogisticsStage() == DroneJob.LogisticsStage.RETURNING)
+                .filter(job -> ownerId.equals(job.getOwnerId()) && droneId.equals(job.getAssignedDroneId()))
+                .findFirst();
+    }
+
+    /** A carrying retry keeps the physical payload drone pinned while waiting for its backoff to expire. */
+    public Optional<DroneJob> findRetainedLogisticsJob(UUID ownerId, UUID droneId) {
+        if (ownerId == null || droneId == null) return Optional.empty();
+        return jobs.snapshot().stream().filter(DroneJob::isLogisticsJob)
+                .filter(job -> job.getState() == DroneJob.State.RETRY_WAIT
+                        && job.getPickedAmount() > job.getDeliveredAmount())
+                .filter(job -> ownerId.equals(job.getOwnerId()) && droneId.equals(job.getAssignedDroneId()))
+                .findFirst();
+    }
+
+    public boolean finishLogisticsRecovery(UUID ownerId, UUID jobId) {
+        DroneJob job = getJobForOwner(ownerId, jobId).orElse(null);
+        if (job == null || !job.finishLogisticsRecovery()) return false;
+        markDirty();
+        return true;
+    }
+
+    public Optional<DroneReservation> getReservationForJob(UUID ownerId, UUID jobId) {
+        return getJobForOwner(ownerId, jobId).isPresent() ? reservations.getForJob(jobId) : Optional.empty();
+    }
+
+    public boolean setLogisticsStage(UUID ownerId, UUID jobId, DroneJob.LogisticsStage stage) {
+        DroneJob job = getJobForOwner(ownerId, jobId).orElse(null);
+        if (job == null || job.getState() != DroneJob.State.RUNNING || !job.setLogisticsStage(stage)) return false;
+        markDirty();
+        return true;
+    }
+
+    /** Loaded assigned drones heartbeat their task so timeout means loss of progress/executor, not long work. */
+    public boolean touchLogisticsJob(UUID ownerId, UUID jobId, long worldTime) {
+        DroneJob job = getJobForOwner(ownerId, jobId).orElse(null);
+        if (job == null || !job.isLogisticsJob() || !job.touch(worldTime)) return false;
+        markDirty();
+        return true;
+    }
+
+    public boolean recordLogisticsPickup(UUID ownerId, UUID jobId, long amount) {
+        DroneJob job = getJobForOwner(ownerId, jobId).orElse(null);
+        if (job == null || job.getState() != DroneJob.State.RUNNING || !job.recordPickup(amount)) return false;
+        markDirty();
+        return true;
+    }
+
+    public boolean recordLogisticsDelivery(UUID ownerId, UUID jobId, long amount) {
+        DroneJob job = getJobForOwner(ownerId, jobId).orElse(null);
+        if (job == null || job.getState() != DroneJob.State.RUNNING || !job.recordDelivery(amount)) return false;
+        markDirty();
+        return true;
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         lastWorldTime = compound.getLong("SavedWorldTime");
         jobs.readFromNbt(compound.getTagList("Jobs", 10), lastWorldTime);
         reservations.readFromNbt(compound.getTagList("Reservations", 10), lastWorldTime);
+        reservations.releaseOrphanedJobs(jobs.snapshot());
         reservations.releaseRetryWaitingJobs(jobs.snapshot());
         reservations.releaseTerminalJobs(jobs.snapshot());
         reservations.releaseRestartedJobs(jobs.snapshot());

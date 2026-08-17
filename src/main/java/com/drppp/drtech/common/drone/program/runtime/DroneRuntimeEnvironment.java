@@ -11,6 +11,7 @@ import com.drppp.drtech.common.drone.program.runtime.service.DroneMachineService
 import com.drppp.drtech.common.drone.program.runtime.service.DroneSensorService;
 import com.drppp.drtech.common.drone.program.runtime.service.DroneSafetyService;
 import com.drppp.drtech.common.drone.program.compile.CompiledDroneProgram;
+import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
 import com.drppp.drtech.common.drone.program.model.DroneProgramReference;
 import com.drppp.drtech.common.drone.program.model.DroneArea;
 import net.minecraft.util.math.BlockPos;
@@ -39,6 +40,14 @@ public interface DroneRuntimeEnvironment extends DroneMovementService, DroneBloc
     /** Runtime area capacity of the physical chassis. */
     default int getAreaBlockLimit() {
         return DroneArea.MAX_BLOCKS;
+    }
+
+    /**
+     * Runtime hardware authority.  Generic/test environments remain permissive; physical drone
+     * entities override this with their live upgrade inventory.
+     */
+    default boolean hasUpgrade(DroneUpgradeType type) {
+        return true;
     }
 
     DroneRuntimeEnvironment EMPTY = new DroneRuntimeEnvironment() {

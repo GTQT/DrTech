@@ -34,12 +34,18 @@ public final class DroneEndpointPolicy {
     public static long requestCapacity(@Nullable DroneEndpoint endpoint, long currentAmount,
             long alreadyReserved) {
         if (endpoint == null) return 0L;
-        long current = Math.max(0L, currentAmount);
         long reserved = Math.max(0L, alreadyReserved);
         long maximum = endpoint.getMaximumInventory();
-        long occupied = current >= Long.MAX_VALUE - reserved ? Long.MAX_VALUE : current + reserved;
+        long totalStored = endpoint.getStoredAmount();
+        long occupied = totalStored >= Long.MAX_VALUE - reserved ? Long.MAX_VALUE : totalStored + reserved;
         long available = maximum > 0L && occupied < maximum
                 ? maximum - occupied : (maximum == 0L ? Long.MAX_VALUE : 0L);
+        long physicalCapacity = endpoint.getStorageCapacity();
+        long physicallyOccupied = totalStored >= Long.MAX_VALUE - reserved
+                ? Long.MAX_VALUE : totalStored + reserved;
+        long physicalAvailable = physicalCapacity > physicallyOccupied
+                ? physicalCapacity - physicallyOccupied : 0L;
+        available = Math.min(available, physicalAvailable);
         long requested = endpoint.getRequestAmount();
         return requested > 0L ? Math.min(available, requested) : available;
     }
