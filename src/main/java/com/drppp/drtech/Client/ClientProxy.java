@@ -6,6 +6,10 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.Client.drone.DroneWorldPreviewRenderer;
 import com.drppp.drtech.Client.drone.DroneWorldSelectionHandler;
+import com.drppp.drtech.Client.multiblock.mover.MultiblockMoverPreviewRenderer;
+import com.drppp.drtech.Client.multiblock.mover.MoverRotationKeyHandler;
+import com.drppp.drtech.Network.mover.ClearMoverPreviewPacket;
+import com.drppp.drtech.Network.mover.StartMoverPreviewPacket;
 import com.drppp.drtech.hooked.HookClientHooks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -22,6 +26,12 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new DroneWorldPreviewRenderer());
         MinecraftForge.EVENT_BUS.register(new DroneWorldSelectionHandler());
+        MinecraftForge.EVENT_BUS.register(new MultiblockMoverPreviewRenderer());
+    }
+
+    @Override
+    public void initClientControls() {
+        MoverRotationKeyHandler.init();
     }
     public void preLoad() {
         super.preLoad();
@@ -44,5 +54,15 @@ public class ClientProxy extends CommonProxy {
     @Override
     public String getHookKeyDisplayName() {
         return HookClientHooks.keyFire.getDisplayName();
+    }
+
+    @Override
+    public void startMultiblockMoverPreview(StartMoverPreviewPacket packet) {
+        MultiblockMoverPreviewRenderer.start(packet);
+    }
+
+    @Override
+    public void clearMultiblockMoverPreview(ClearMoverPreviewPacket packet) {
+        MultiblockMoverPreviewRenderer.clear(packet.getSessionId());
     }
 }

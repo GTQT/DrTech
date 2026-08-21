@@ -28,6 +28,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Collections;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.IdentityHashMap;
 
-@Mod.EventBusSubscriber(modid = Tags.MODID)
+@Mod.EventBusSubscriber(modid = Tags.MODID, value = Side.CLIENT)
 public final class WingsClientHandler {
     private static final ModelWingsAvian AVIAN_MODEL = new ModelWingsAvian();
     private static final ModelWingsInsectoid INSECTOID_MODEL = new ModelWingsInsectoid();

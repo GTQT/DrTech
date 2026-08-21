@@ -153,20 +153,10 @@ public final class RenderProgrammableDrone extends RenderLiving<EntityProgrammab
         GlStateManager.pushMatrix();
         droneModel.postRenderToolArm(scaleFactor);
         GlStateManager.translate(0.0F, 0.46F, -0.03F);
-        // Anchor the handle butt at the claw, turn the vanilla hand model side-on, then pitch
-        // the shaft outward and down to match the suspended profile shown by the device model.
         GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-        // Keep the handle pivot at the centre claw and use the reference pose: the shaft slopes down and
-        // outward to the right instead of leaning left. The generated third-person item model needs this
-        // negative in-plane angle after the drone's X/Y hand transform.
         GlStateManager.rotate(-38.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.translate(-0.045F, 0.015F, 0.0F);
-        // Item models assume alpha testing/blending has already been enabled by a hand renderer. The drone model
-        // does not guarantee that state, which made transparent fishing-rod pixels appear as a large solid card.
-        // Keep the third-person grip pivot (the rod butt) at the claw. Transparent pixels no longer create a card,
-        // Keep the rod proportional to the claw; the previous 0.78 scale made the generated item model larger
-        // than the whole drone at close range.
         GlStateManager.scale(0.78F, 0.78F, 0.78F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableAlpha();

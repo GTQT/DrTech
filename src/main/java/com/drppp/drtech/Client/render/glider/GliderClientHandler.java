@@ -21,12 +21,13 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = Tags.MODID)
+@Mod.EventBusSubscriber(modid = Tags.MODID, value = Side.CLIENT)
 public final class GliderClientHandler {
     private static final ModelGlider MODEL = new ModelGlider();
     private static final Set<RenderPlayer> LAYERED = Collections.newSetFromMap(new IdentityHashMap<RenderPlayer, Boolean>());

@@ -1,5 +1,7 @@
 package com.drppp.drtech.common;
 
+import com.drppp.drtech.Network.mover.ClearMoverPreviewPacket;
+import com.drppp.drtech.Network.mover.StartMoverPreviewPacket;
 import com.drppp.drtech.Tags;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
@@ -14,10 +16,19 @@ public class CommonProxy {
 
     }
 
+    public void initClientControls() {
+    }
+
     public void setAutoJump(EntityLivingBase entityLiving, boolean value) {
     }
 
     public String getHookKeyDisplayName() {
         return "C";
+    }
+
+    public void startMultiblockMoverPreview(StartMoverPreviewPacket packet) {
+    }
+
+    public void clearMultiblockMoverPreview(ClearMoverPreviewPacket packet) {
     }
 }

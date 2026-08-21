@@ -20,6 +20,8 @@ import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
+import com.drppp.drtech.common.multiblock.mover.MultiblockMoverRecoveryCommand;
+import com.drppp.drtech.common.multiblock.mover.MoverConfigMigration;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
 import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
@@ -114,6 +116,7 @@ public class DrTechMain {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        MoverConfigMigration.apply(event.getModConfigurationDirectory());
         MinecraftForge.EVENT_BUS.register(this);
         DrTechTab = new DrTechCreativeTabs("drtech");
         DrMetaItems.MetaItemsInit();
@@ -206,6 +209,7 @@ public class DrTechMain {
         CraftingReceipe.load();
         DrTechReceipeManager.init();
         SyncInit.init();
+        proxy.initClientControls();
         TopInit.init();
         if (FMLLaunchHandler.side() == Side.CLIENT) {
             OBJLoader.INSTANCE.addDomain(MODID);
@@ -244,6 +248,7 @@ public class DrTechMain {
 
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new MultiblockMoverRecoveryCommand());
         if (OpenComputersCompat.isAvailable()) event.registerServerCommand(new OpenComputersPairingCommand());
     }
 
