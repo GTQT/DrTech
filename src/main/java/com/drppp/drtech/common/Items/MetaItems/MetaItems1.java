@@ -4,7 +4,6 @@ import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.common.Items.Baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.common.Items.Baubles.ElectricLifeSupportRingBehavior;
 import com.drppp.drtech.common.Items.Behavior.*;
-import com.drppp.drtech.common.multiblock.mover.MoverEnergyService;
 import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
@@ -31,29 +30,6 @@ public class MetaItems1 extends StandardMetaItem {
         // Keep the container item enumerable even in JEI/HEI builds that query the
         // outer MetaItem before inspecting the creative tabs of its sub-items.
         setCreativeTab(DrTechMain.DrTechTab);
-    }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
-        super.getSubItems(tab, items);
-        if (DrMetaItems.MULTIBLOCK_MOVER == null
-                || (tab != CreativeTabs.SEARCH && tab != DrTechMain.DrTechTab)) {
-            return;
-        }
-
-        ItemStack mover = DrMetaItems.MULTIBLOCK_MOVER.getStackForm();
-        boolean alreadyListed = items.stream().anyMatch(stack ->
-                stack.getItem() == mover.getItem()
-                        && stack.getMetadata() == mover.getMetadata());
-        if (alreadyListed) return;
-
-        IElectricItem electricItem = mover.getCapability(
-                GregtechCapabilities.CAPABILITY_ELECTRIC_ITEM, null);
-        if (electricItem != null) {
-            electricItem.charge(electricItem.getMaxCharge(), electricItem.getTier(),
-                    true, false);
-        }
-        items.add(mover);
     }
 
     public void registerSubItems() {
@@ -410,11 +386,5 @@ public class MetaItems1 extends StandardMetaItem {
                 .addComponents(new ConnectorWireBehavior(2));
         DrMetaItems.HIGH_VOLTAGE_WIRE = this.addItem(133, "high_voltage_wire").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64)
                 .addComponents(new ConnectorWireBehavior(3));
-        DrMetaItems.MULTIBLOCK_MOVER = this.addItem(134, "multiblock_mover")
-                .setCreativeTabs(DrTechMain.DrTechTab)
-                .setMaxStackSize(1)
-                .addComponents(ElectricStats.createElectricItem(
-                        MoverEnergyService.CAPACITY, MoverEnergyService.TIER))
-                .addComponents(new MultiblockMoverBehavior());
     }
 }

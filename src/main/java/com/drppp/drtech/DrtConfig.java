@@ -54,68 +54,6 @@ public class DrtConfig {
     @Config.RequiresMcRestart
     public static int MaxRu = 192;
 
-    @Config.Comment("Multiblock mover limits and safety options")
-    public static MultiblockMoverConfig MultiblockMover = new MultiblockMoverConfig();
-
-    public static class MultiblockMoverConfig {
-        @Config.Comment("Internal mover configuration schema revision; do not edit")
-        @Config.RangeInt(min = 0)
-        public int configRevision = 1;
-
-        @Config.RangeInt(min = 1, max = 16384)
-        public int maxBlocks = 4096;
-
-        @Config.RangeInt(min = 1, max = 256)
-        public int maxAxisLength = 64;
-
-        @Config.RangeInt(min = 1, max = 1024)
-        public int maxDistance = 128;
-
-        @Config.Comment("Distance in blocks used when placing a mover preview while pointing at air")
-        @Config.RangeInt(min = 1, max = 64)
-        public int airTargetDistance = 8;
-
-        @Config.RangeInt(min = 100, max = 72000)
-        public int sessionTimeoutTicks = 1200;
-
-        @Config.Comment("Client ticks between destination collision preview refreshes")
-        @Config.RangeInt(min = 1, max = 20)
-        public int previewCollisionRefreshTicks = 5;
-
-        @Config.Comment("Enable multiblock mover sounds and particles")
-        public boolean enableEffects = true;
-
-        @Config.Comment("Render the destination as translucent block models in addition to collision outlines")
-        public boolean enableBlockModelPreview = true;
-
-        @Config.Comment("Structures above this size use outline-only preview to bound client VBO memory")
-        @Config.RangeInt(min = 0, max = 16384)
-        public int maxModelPreviewBlocks = 4096;
-
-        @Config.Comment("Enable server-authoritative horizontal 90-degree mover rotation")
-        public boolean enableRotation = true;
-
-        @Config.Comment("Additional EU consumed for each effective 90-degree rotation step; 270 degrees is charged as one reverse step")
-        @Config.RangeInt(min = 0)
-        public int rotationEnergyPerQuarterTurn = 250000;
-
-        @Config.Comment("Log a warning when a multiblock move transaction reaches this duration in milliseconds")
-        @Config.RangeInt(min = 1, max = 60000)
-        public int performanceWarnMillis = 50;
-
-        @Config.Comment("Base EU consumed by a successful multiblock move")
-        @Config.RangeInt(min = 0)
-        public int baseEnergyCost = 100000;
-
-        @Config.Comment("Additional EU consumed for each moved block")
-        @Config.RangeInt(min = 0)
-        public int energyPerBlock = 1000;
-
-        @Config.Comment("Additional EU consumed for each moved block entity")
-        @Config.RangeInt(min = 0)
-        public int energyPerTileEntity = 5000;
-    }
-
     @Config.Comment("Config options for DrTech")
     public static MachineSwitch MachineSwitch = new MachineSwitch();
 
