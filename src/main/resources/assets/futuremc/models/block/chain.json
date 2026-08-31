@@ -1,0 +1,6 @@
+{
+  "parent": "futuremc:block/template_chain",
+  "textures": {
+    "texture": "futuremc:blocks/chain"
+  }
+}

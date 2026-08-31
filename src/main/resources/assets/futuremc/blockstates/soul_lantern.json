@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "futuremc:soul_lantern"
+    },
+    "hanging=true": {
+      "model": "futuremc:soul_lantern_hanging"
+    }
+  }
+}

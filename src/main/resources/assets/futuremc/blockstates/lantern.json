@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "futuremc:lantern"
+    },
+    "hanging=true": {
+      "model": "futuremc:lantern_hanging"
+    }
+  }
+}

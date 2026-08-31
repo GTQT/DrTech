@@ -1,6 +1,0 @@
-{
-  "parent": "block/cross",
-  "textures": {
-    "cross": "drtech:blocks/small_amethyst_bud"
-  }
-}

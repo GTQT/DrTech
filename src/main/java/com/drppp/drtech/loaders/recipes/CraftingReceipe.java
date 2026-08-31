@@ -454,16 +454,6 @@ public class CraftingReceipe {
                 "XXX", "XCX", "XXX",
                 'X', Blocks.CHEST, 'C', MetaItems.ELECTRIC_PISTON_LV);
         ModHandler.addShapelessRecipe("advanced_cauldron", new ItemStack(ItemsInit.ITEM_BLOCK_ADVANCED_CAULDRON), Items.CAULDRON);
-        ModHandler.addShapedRecipe("happy_ghast_harness", new ItemStack(ItemsInit.HAPPY_GHAST_HARNESS),
-                "LGL", "LWL", " L ",
-                'L', Items.LEATHER,
-                'G', Blocks.GLASS,
-                'W', new ItemStack(Blocks.WOOL, 1, 0));
-
-        ModHandler.addShapedRecipe("composter", new ItemStack(BlocksInit.BLOCK_COMPOSTER),
-                "S S", "S S", "SSS",
-                'S', new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
-
     }
 
     private static ItemStack droneUpgrade(DroneUpgradeType type) {

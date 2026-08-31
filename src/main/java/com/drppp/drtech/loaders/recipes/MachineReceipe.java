@@ -105,7 +105,7 @@ public class MachineReceipe {
                 .buildAndRegister();
 
         MACERATOR_RECIPES.recipeBuilder()
-                .inputs(new ItemStack(BlocksInit.BLOCK_CALCITE))
+                .inputs(new ItemStack(com.drppp.futuremc.FutureMCMain.CALCITE))
                 .output(dust, Calcite, 4)
                 .duration(100)
                 .EUt(2)

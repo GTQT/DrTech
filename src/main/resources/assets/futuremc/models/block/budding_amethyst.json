@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "futuremc:blocks/budding_amethyst"
+  }
+}

@@ -1,7 +1,6 @@
 package com.drppp.drtech.common;
 
 import com.drppp.drtech.Client.render.Entity.EntityRemderFactory;
-import com.drppp.drtech.Client.render.Entity.RenderHappyGhast;
 import com.drppp.drtech.Client.render.Entity.RenderThrownLightsaber;
 import com.drppp.drtech.Client.render.Entity.RenderUTiGolem;
 import com.drppp.drtech.Client.render.Entity.RenderProgrammableDrone;
@@ -11,7 +10,6 @@ import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
 import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
 import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
-import com.drppp.drtech.common.Entity.moster.EntityHappyGhast;
 import com.drppp.drtech.common.Entity.moster.EntityUTiGolem;
 import com.drppp.drtech.common.Items.ItemsInit;
 import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
@@ -30,8 +28,6 @@ public class drtMetaEntities {
         if (initialized) return;
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "uti_golem"), EntityUTiGolem.class,"UTi Golem",4,DrTechMain.instance,64,3,true);
         EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "uti_golem"),0x48e06e, 0x199038);
-        EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "happy_ghast"), EntityHappyGhast.class, "happy_ghast", 5, DrTechMain.instance, 96, 3, true);
-        EntityRegistry.registerEgg(new ResourceLocation(Tags.MODID, "happy_ghast"), 0xF4F4F4, 0x7ED6E7);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "hyper_gun_bullet"), EntityHyperGunBullet.class, "hyper_gun_bullet", 6, DrTechMain.instance, 64, 1, true);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "plasma_bullet"), EntityPlasmaBullet.class, "plasma_bullet", 7, DrTechMain.instance, 64, 1, true);
         EntityRegistry.registerModEntity(new ResourceLocation(Tags.MODID, "tachyon_bullet"), EntityTachyonBullet.class, "tachyon_bullet", 8, DrTechMain.instance, 64, 1, true);
@@ -45,7 +41,6 @@ public class drtMetaEntities {
     public static synchronized void initRenderers() {
         if (renderersInitialized) return;
         RenderingRegistry.registerEntityRenderingHandler(EntityUTiGolem.class,new EntityRemderFactory<>(RenderUTiGolem.class));
-        RenderingRegistry.registerEntityRenderingHandler(EntityHappyGhast.class, RenderHappyGhast::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityThrownLightsaber.class, RenderThrownLightsaber::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityProgrammableDrone.class, RenderProgrammableDrone::new);
         renderersInitialized = true;

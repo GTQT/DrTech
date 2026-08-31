@@ -13,7 +13,6 @@ import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
 import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import com.drppp.drtech.common.Blocks.BlockComposter;
 import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.Items.DrtToolItems;
@@ -23,8 +22,6 @@ import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
 import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
-import com.drppp.drtech.common.world.AmethystGeodeWorldGenerator;
-import com.drppp.drtech.common.world.DriedGhastWorldGenerator;
 import com.drppp.drtech.hooked.HookCapability;
 import com.drppp.drtech.hooked.HookClientHooks;
 import com.drppp.drtech.hooked.HookNetwork;
@@ -134,8 +131,6 @@ public class DrTechMain {
         HookNetwork.init();
         HookTickHandler.init();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
-        GameRegistry.registerWorldGenerator(new DriedGhastWorldGenerator(), 0);
-        GameRegistry.registerWorldGenerator(new AmethystGeodeWorldGenerator(), 0);
 
         // LootGames init
         ModBlocks.registerTileEntities();
@@ -212,7 +207,6 @@ public class DrTechMain {
             OBJLoader.INSTANCE.addDomain(MODID);
         }
         CropInitHandler.init();
-        BlockComposter.registerDispenseBehaviors();
         OpenComputersCompat.initialize();
         if (OpenComputersCompat.isAvailable()) {
             MinecraftForge.EVENT_BUS.register(new OpenComputersPairingCleanupHandler());
