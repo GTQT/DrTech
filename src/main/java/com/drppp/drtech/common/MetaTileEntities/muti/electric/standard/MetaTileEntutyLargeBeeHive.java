@@ -55,13 +55,11 @@ import java.util.List;
 import static forestry.api.apiculture.BeeManager.beeRoot;
 import static gregtech.api.util.RelativeDirection.*;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable {
     private final SingleItemStackHandler inventory = new SingleItemStackHandler(1024,false);
@@ -228,17 +226,16 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         return Textures.BRONZE_PLATED_BRICKS;
     }
 
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:large_bee_hive",
-            MetaTileEntutyLargeBeeHive::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:large_bee_hive",
+                    MetaTileEntutyLargeBeeHive::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, DOWN)
                 .aisle("               ", "               ", "               ", "      HHH      ", "    HHAAAHH    ", "    HAPLPAH    ", "   HAPAAAPAH   ", "   HALAAALAH   ", "   HAPAAAPAH   ", "    HAPLPAH    ", "    HHAAAHH    ", "      HHH      ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "      GGG      ", "   GGG   GG    ", "   G       G   ", "   G       G   ", "  G         G  ", "  G         G  ", "  G         G  ", "   G       G   ", "   G       G   ", "    GG   GG    ", "      GGG      ", "               ", "               ")
@@ -257,28 +254,27 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                 .aisle("               ", "               ", "               ", "       G       ", "     GGBGG     ", "    GBBBBBG    ", "    GBBBBBG    ", "   GBBBBBBBG   ", "    GBBBBBG    ", "    GBBBBBG    ", "     GGBGG     ", "       G       ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "               ", "               ", "      HHH      ", "     HHHHH     ", "    HHBBBHH    ", "    HHBBBHH    ", "    HHBBBHH    ", "     HHBHH     ", "      HHH      ", "               ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "               ", "               ", "               ", "               ", "      GGG      ", "      GHG      ", "      GGG      ", "               ", "               ", "               ", "               ", "               ", "               ")
-                .where('S', selfPredicate(MetaTileEntutyLargeBeeHive.class))
-                .where('A', states(getGlassessCasingState()))
-                .where('B', blocks(Blocks.DIRT, Blocks.GRASS))
-                .where('H', blocks(Blocks.PLANKS))
-                .where('I', blocks(Blocks.WOODEN_SLAB))
-                .where('J', blocks(ModuleApiculture.getBlocks().apiary))
-                .where('K', blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN)))
-                .where('L', blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HYGRO)))
-                .where('N', blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.STABILISER)))
-                .where('O', blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HEATER)))
-                .where('P', blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.FAN)))
-                .where('F', blocks(Blocks.LOG))
-                .where('W', blocks(Blocks.WATER))
-
-                .where('G', states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.BRONZE_BRICKS)).or(
-                        abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(1).setPreviewCount(1)
-                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMaxGlobalLimited(1).setPreviewCount(1)
-                                        .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMaxGlobalLimited(1).setPreviewCount(1)
-                                                .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)))
-                                )))
-                .where(' ', any())
-                .buildTemplate();
+                .self('S', MetaTileEntutyLargeBeeHive.class)
+                .blocks('A', getGlassessCasingState())
+                .blocks('B', Blocks.DIRT, Blocks.GRASS)
+                .blocks('H', Blocks.PLANKS)
+                .blocks('I', Blocks.WOODEN_SLAB)
+                .blocks('J', ModuleApiculture.getBlocks().apiary)
+                .blocks('K', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN))
+                .blocks('L', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HYGRO))
+                .blocks('N', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.STABILISER))
+                .blocks('O', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HEATER))
+                .blocks('P', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.FAN))
+                .blocks('F', Blocks.LOG)
+                .blocks('W', Blocks.WATER)
+                .where('G', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(
+                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.BRONZE_BRICKS))),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 0, 1, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, 1, 1),
+                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, 1, 1),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1)))
+                .buildStructureDefinition();
 
     }
 

@@ -4,7 +4,6 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
-import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
@@ -18,13 +17,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithControl {
     public int level = 1;
@@ -123,33 +120,35 @@ public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithCont
         return false;
     }
 
-    private static SoftTemplate getTemplate(int level) {
-        return TemplatePool.getInstance().register(
-                "drtech:concrete_backfiller/" + level,
-                () -> buildTemplate(level)
-        );
-    }
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION_1 =
+            StructureDefinition.getOrBuild("drtech:concrete_backfiller/1",
+                    () -> buildTemplate(1));
+
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION_2 =
+            StructureDefinition.getOrBuild("drtech:concrete_backfiller/2",
+                    () -> buildTemplate(2));
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return getTemplate(level).get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return level == 2 ? STRUCTURE_DEFINITION_2 : STRUCTURE_DEFINITION_1;
     }
 
-    private static BlockPatternTemplate buildTemplate(int level) {
+    private static StructureDefinition<?> buildTemplate(int level) {
         return DeclarativePatternBuilder.start()
                 .aisle("XXX", "#F#", "#F#", "#F#", "###", "###", "###")
                 .aisle("XXX", "FCF", "FCF", "FCF", "#F#", "#F#", "#F#")
                 .aisle("XSX", "#F#", "#F#", "#F#", "###", "###", "###")
-                .where('S', selfPredicate(MetaTileentityConcreteBackfiller.class))
-                .where('X', states(getCasingState(level))
-                        .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setExactLimit(1).setPreviewCount(1))
-                        .or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(3).setPreviewCount(1))
-                        .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
-                )
-                .where('C', states(getCasingState(level)))
-                .where('F', getFramePredicate(level))
-                .where('#', any())
-                .buildTemplate();
+                .self('S', MetaTileentityConcreteBackfiller.class)
+                .where('X', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(getCasingState(level))),
+                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, 1, 1),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 3, 1),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
+                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1)))
+                .blocks('C', getCasingState(level))
+                .frames('F', level == 2 ? Materials.Titanium : Materials.Steel)
+                .any('#')
+                .buildStructureDefinition();
 
     }
 
@@ -169,19 +168,6 @@ public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithCont
         if (level == 2)
             return Textures.STABLE_TITANIUM_CASING;
         return Textures.SOLID_STEEL_CASING;
-    }
-
-    @NotNull
-    private TraceabilityPredicate getFramePredicate() {
-        return getFramePredicate(level);
-    }
-
-    @NotNull
-    private static TraceabilityPredicate getFramePredicate(int level) {
-        if (level == 2)
-            return frames(Materials.Titanium);
-        return frames(Materials.Steel);
-
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.drppp.drtech.glider;
 
-import gr8pefish.openglider.common.wind.generator.OpenSimplexNoise;
+import com.drppp.drtech.glider.OpenSimplexNoise;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 

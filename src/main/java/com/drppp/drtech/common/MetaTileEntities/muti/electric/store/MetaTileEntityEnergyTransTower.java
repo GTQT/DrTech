@@ -19,11 +19,10 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
-import gregtech.api.pattern.BlockPatternTemplate;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.SoftTemplate;
-import gregtech.api.pattern.TemplatePool;
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+import gregtech.api.pattern.element.Elements;
+import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.particle.GTParticleManager;
 import gregtech.client.renderer.ICubeRenderer;
@@ -167,33 +166,38 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         }
     }
 
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:trans_tower",
-            MetaTileEntityEnergyTransTower::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:trans_tower",
+                    MetaTileEntityEnergyTransTower::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
                 .aisle("CSC", "CCC", "CCC")
-                .aisleRepeatable(6, 6, "###", "GLG", "#G#")
+                // 原 6 层固定重复展开
+                .aisle("###", "GLG", "#G#")
+                .aisle("###", "GLG", "#G#")
+                .aisle("###", "GLG", "#G#")
+                .aisle("###", "GLG", "#G#")
+                .aisle("###", "GLG", "#G#")
+                .aisle("###", "GLG", "#G#")
                 .aisle("#C#", "CCC", "#C#")
                 .aisle("#G#", "GCG", "#G#")
                 .aisle("#G#", "GCG", "#G#")
                 .aisle("###", "#D#", "###")
-                .where('S', selfPredicate(MetaTileEntityEnergyTransTower.class))
-                .where('#', any())
-                .where('C', states(getCasingState())
-                        .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
-                )
-                .where('G', blocks(Blocks.IRON_BARS))
-                .where('L', frames(Materials.Steel))
-                .where('D', blocks(BlocksInit.BLOCK_CONNECTOR1, BlocksInit.BLOCK_CONNECTOR2, BlocksInit.BLOCK_CONNECTOR3))
-                .buildTemplate();
+                .self('S', MetaTileEntityEnergyTransTower.class)
+                .any('#')
+                .where('C', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(getCasingState())),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1)))
+                .blocks('G', Blocks.IRON_BARS)
+                .frames('L', Materials.Steel)
+                .blocks('D', BlocksInit.BLOCK_CONNECTOR1, BlocksInit.BLOCK_CONNECTOR2, BlocksInit.BLOCK_CONNECTOR3)
+                .buildStructureDefinition();
     }
 
     private static IBlockState getCasingState() {

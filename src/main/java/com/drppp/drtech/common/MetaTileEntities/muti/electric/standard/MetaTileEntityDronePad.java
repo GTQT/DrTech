@@ -26,15 +26,11 @@ import javax.annotation.Nonnull;
 
 import static com.drppp.drtech.loaders.recipes.DrtechReceipes.DRONE_PAD;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
-import gregtech.api.pattern.TraceabilityPredicate;
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
 
@@ -74,17 +70,16 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     }
 
     @NotNull
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:drone_pad",
-            MetaTileEntityDronePad::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:drone_pad",
+                    MetaTileEntityDronePad::buildTemplate);
 
     @Override
-    protected BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start()
                 .aisle("    F     F", "    F     F", "     FCCCF ", "     F   F ", "           ", "           ")
                 .aisle("F          ", "F          ", "FFFFFCXXXCF", " AAAF     F", " AAA       ", "           ")
@@ -93,19 +88,21 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
                 .aisle("           ", "           ", "FAAACXXXXXC", "P###P      ", "P###P      ", " AAA       ")
                 .aisle("F          ", "F          ", "FFFFFCXXXCF", " AAAF     F", " AAA       ", "           ")
                 .aisle("    F     F", "    F     F", "     FCSCF ", "     F   F ", "           ", "           ")
-                .where('S', selfPredicate(MetaTileEntityDronePad.class))
-                .where('C', states(getFirstCasingState()))
-                .where('X', states(getSecondCasingState()))
-                .where('A', states(getThirdCasingState())
-                        .setMinGlobalLimited(25)
-                        .or(staticRecipeMapAutoAbilities(true, true, true, true, true, false, false)))
-                .where('G', states(getFourthCasingState()))
-                .where('P', states(getBoilerCasingState()))
-                .where('F', states(getFrameState()))
-                .where('M', abilities(MultiblockAbility.MUFFLER_HATCH))
-                .where(' ', any())
-                .where('#', air())
-                .buildTemplate();
+                .self('S', MetaTileEntityDronePad.class)
+                .any('#')
+                .blocks('C', getFirstCasingState())
+                .blocks('X', getSecondCasingState())
+                .blocks('G', getFourthCasingState())
+                .blocks('P', getBoilerCasingState())
+                .blocks('F', getFrameState())
+                .hatch('M', MultiblockAbility.MUFFLER_HATCH)
+                .where('A', Elements.chain(
+                        Elements.counted(25, 4096, Elements.block(getThirdCasingState())),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, -1, 1),
+                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, -1, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 0, -1, 1)))
+                .buildStructureDefinition();
 
     }
 
@@ -158,61 +155,5 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     @Override
     public boolean allowsExtendedFacing() {
         return false;
-    }
-
-
-
-    private static TraceabilityPredicate staticDisplayAutoAbilities(boolean maintenance, boolean muffler) {
-        TraceabilityPredicate predicate = new TraceabilityPredicate();
-        if (maintenance && false) {
-            predicate = predicate.or(abilities(MultiblockAbility.MAINTENANCE_HATCH)
-                    .setMinGlobalLimited(gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0)
-                    .setMaxGlobalLimited(1));
-        }
-        if (muffler) {
-            predicate = predicate.or(abilities(MultiblockAbility.MUFFLER_HATCH)
-                    .setMinGlobalLimited(1)
-                    .setMaxGlobalLimited(1));
-        }
-        return predicate;
-    }
-    private static TraceabilityPredicate staticRecipeMapAutoAbilities(boolean energyIn,
-                                                                      boolean maintenance,
-                                                                      boolean itemIn,
-                                                                      boolean itemOut,
-                                                                      boolean fluidIn,
-                                                                      boolean fluidOut,
-                                                                      boolean muffler) {
-        return staticRecipeMapAutoAbilities(energyIn, maintenance, itemIn, itemOut, fluidIn, fluidOut, muffler, 2);
-    }
-
-    private static TraceabilityPredicate staticRecipeMapAutoAbilities(boolean energyIn,
-                                                                      boolean maintenance,
-                                                                      boolean itemIn,
-                                                                      boolean itemOut,
-                                                                      boolean fluidIn,
-                                                                      boolean fluidOut,
-                                                                      boolean muffler,
-                                                                      int maxEnergyInputs) {
-        TraceabilityPredicate predicate = staticDisplayAutoAbilities(maintenance, muffler);
-        if (energyIn) {
-            predicate = predicate.or(abilities(MultiblockAbility.INPUT_ENERGY)
-                    .setMinGlobalLimited(1)
-                    .setMaxGlobalLimited(maxEnergyInputs)
-                    .setPreviewCount(1));
-        }
-        if (itemIn) {
-            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_ITEMS).setPreviewCount(1));
-        }
-        if (itemOut) {
-            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_ITEMS).setPreviewCount(1));
-        }
-        if (fluidIn) {
-            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_FLUIDS).setPreviewCount(1));
-        }
-        if (fluidOut) {
-            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_FLUIDS).setPreviewCount(1));
-        }
-        return predicate;
     }
 }

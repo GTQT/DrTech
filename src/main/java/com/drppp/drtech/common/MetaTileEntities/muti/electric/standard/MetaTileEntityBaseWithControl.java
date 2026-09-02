@@ -32,7 +32,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase implements IControllable, IDataInfoProvider, IWorkable {
+public abstract class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase implements IControllable, IDataInfoProvider, IWorkable {
+
     public int process;
     public int maxProcess;
     protected IItemHandlerModifiable inputInventory;
@@ -261,6 +262,4 @@ public class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase imp
         this.outEnergyContainer.addEnergy(energy);
         return true;
     }
-
-
 }

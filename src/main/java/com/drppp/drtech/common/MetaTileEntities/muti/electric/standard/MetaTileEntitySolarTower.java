@@ -35,13 +35,11 @@ import java.util.List;
 
 import static gregtech.api.util.RelativeDirection.*;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
     public static int max_heat = 100000;
@@ -55,41 +53,44 @@ public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
         this.recipeMapWorkable = new SolarTowerRecipeLogic(this);
     }
 
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:solar_tower",
-            MetaTileEntitySolarTower::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:solar_tower",
+                    MetaTileEntitySolarTower::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
-                .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTTTTTTTT", "TTTTTTTTTTT", "TTTTTTTTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
-                .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTYYYTTTT", "TTTTYYYTTTT", "TTTTYYYTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
-                .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
-                .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
-                .aisle("###########", "###########", "#####T#####", "####TTT####", "###TYYYT###", "##TTYYYTT##", "###TYYYT###", "####TTT####", "#####T#####", "###########", "###########")
-                .aisle("###########", "###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTTYTTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########", "###########")
-                .aisleRepeatable(15, 15, "###########", "###########", "###########", "###########", "#####G#####", "####GYG####", "#####G#####", "###########", "###########", "###########", "###########")
-                .aisleRepeatable(5, 5, "###########", "###########", "###########", "#####R#####", "####RRR####", "###RRYRR###", "####RRR####", "#####R#####", "###########", "###########", "###########")
-                .aisle("###########", "###########", "###########", "###########", "#####Y#####", "####YYY####", "#####Y#####", "###########", "###########", "###########", "###########")
-                .aisle("###########", "###########", "###########", "###########", "###########", "#####S#####", "###########", "###########", "###########", "###########", "###########")
-                .where('S', selfPredicate(MetaTileEntitySolarTower.class))
-                .where('#', any())
-                .where('T', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING)).setMinGlobalLimited(210)
-                        .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
-                        .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1).setPreviewCount(1))
-                        .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
-                        .or(abilities(MultiblockAbility.INPUT_ENERGY).setExactLimit(1))
-
-                )
-                .where('Y', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING)))
-                .where('G', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING)))
-                .where('R', states(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_INHIBITION_CASING)))
-                .buildTemplate();
+                .piece("start")
+                    .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTTTTTTTT", "TTTTTTTTTTT", "TTTTTTTTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
+                    .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTYYYTTTT", "TTTTYYYTTTT", "TTTTYYYTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
+                    .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
+                    .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
+                    .aisle("###########", "###########", "#####T#####", "####TTT####", "###TYYYT###", "##TTYYYTT##", "###TYYYT###", "####TTT####", "#####T#####", "###########", "###########")
+                    .aisle("###########", "###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTTYTTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########", "###########")
+                .repeatablePiece("absorber", 15, 15)
+                    .aisle("###########", "###########", "###########", "###########", "#####G#####", "####GYG####", "#####G#####", "###########", "###########", "###########", "###########")
+                .repeatablePiece("reflector", 5, 5)
+                    .aisle("###########", "###########", "###########", "#####R#####", "####RRR####", "###RRYRR###", "####RRR####", "#####R#####", "###########", "###########", "###########")
+                .piece("end")
+                    .aisle("###########", "###########", "###########", "###########", "#####Y#####", "####YYY####", "#####Y#####", "###########", "###########", "###########", "###########")
+                    .aisle("###########", "###########", "###########", "###########", "###########", "#####S#####", "###########", "###########", "###########", "###########", "###########")
+                .self('S', MetaTileEntitySolarTower.class)
+                .any('#')
+                .where('T', Elements.chain(
+                        Elements.counted(210, 4096, Elements.block(
+                                BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING))),
+                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 1, -1, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, -1, 1),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 1)))
+                .blocks('Y', BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING))
+                .blocks('G', BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING))
+                .blocks('R', BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_INHIBITION_CASING))
+                .buildStructureDefinition();
 
     }
 

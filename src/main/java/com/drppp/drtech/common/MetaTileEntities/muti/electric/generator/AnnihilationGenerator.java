@@ -28,7 +28,6 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.api.worldgen.config.OreDepositDefinition;
@@ -67,17 +66,15 @@ import java.util.List;
 
 import static gregtech.common.blocks.BlockGlassCasing.CasingType.FUSION_GLASS;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
 import gregtech.api.pattern.casing.GTCasingGroups;
 
 import gregtech.api.pattern.casing.ICasing;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class AnnihilationGenerator extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable, IFastRenderMetaTileEntity {
     private final AnnihilationGeneratorLogic logic;
@@ -160,40 +157,39 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
 
     }
 
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:annihilation_generator",
-            AnnihilationGenerator::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:annihilation_generator",
+                    AnnihilationGenerator::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "BXXXB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B#W#B", "BXXXB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "BXXXB", "TTTTT")
                 .aisle("AASAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "TTTTT")
-                .where('S', selfPredicate(AnnihilationGenerator.class))
-                .where('T', states(getCasingState()))
-                .where('B', states(getGlassesState()))
-                .where('W', blocks(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY))
+                .self('S', AnnihilationGenerator.class)
+                .blocks('T', getCasingState())
+                .blocks('B', getGlassesState())
+                .blocks('W', BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY)
                 .tieredCasing('X', GTCasingGroups.heatingCoils().group())
                 .withChannel(GTCasingGroups.heatingCoils().channel())
-                .where('A',
-                        abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)
-                                .or(abilities(MultiblockAbility.OUTPUT_ENERGY).setMaxGlobalLimited(1))
-                                .or(abilities(MultiblockAbility.OUTPUT_LASER).setMaxGlobalLimited(1))
-                                .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1))
-                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMinGlobalLimited(1))
-                                .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMaxGlobalLimited(1))
-                                .or(states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE)))
-                )
-                .where('#', any())
-                .buildTemplate();
+                .where('A', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(
+                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE))),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1),
+                        Elements.hatch(MultiblockAbility.OUTPUT_ENERGY, 0, 1),
+                        Elements.hatch(MultiblockAbility.OUTPUT_LASER, 0, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, -1),
+                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, -1),
+                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, 1)))
+                .any('#')
+                .buildStructureDefinition();
 
     }
     @Override
@@ -290,8 +286,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
         this.itemImportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
         this.itemOutInventory = new ItemHandlerList(getAbilities(MultiblockAbility.EXPORT_ITEMS));
 
-        PatternMatchContext context = formed.copyLegacyCallbackContext();
-        ICasing matchedCoil = GTCasingGroups.heatingCoils().channel().getMatchedCasing(context);
+        ICasing matchedCoil = GTCasingGroups.heatingCoils().channel().getMatchedCasing(formed);
         IHeatingCoilBlockStats type = matchedCoil == null ? null :
                 matchedCoil.getPayloadAs(IHeatingCoilBlockStats.class);
         this.leve = type == null ? 1 : type.getLevel();

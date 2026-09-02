@@ -1,6 +1,6 @@
 package com.drppp.drtech.wings;
 
-import me.paulf.wings.util.CubicBezier;
+import com.drppp.drtech.Client.render.wings.CubicBezier;
 import net.minecraft.nbt.NBTTagCompound;
 
 public final class WingsFlightData {

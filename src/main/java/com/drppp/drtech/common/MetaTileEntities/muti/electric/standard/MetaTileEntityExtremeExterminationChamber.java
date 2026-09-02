@@ -58,13 +58,11 @@ import java.util.List;
 import static crafttweaker.mc1120.CraftTweaker.server;
 import static crazypants.enderio.base.fluid.Fluids.XP_JUICE;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBaseWithControl {
 
@@ -333,36 +331,37 @@ public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBas
         displayedLooting = 0;
     }
 
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:mob_killer",
-            MetaTileEntityExtremeExterminationChamber::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:mob_killer",
+                    MetaTileEntityExtremeExterminationChamber::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start()
                 .aisle("XXXXX", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXSXX", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "XXXXX")
-                .where('S', selfPredicate(MetaTileEntityExtremeExterminationChamber.class))
-                .where('X', states(getCasingState()).setMinGlobalLimited(10)
-                        .or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
-                        .or(abilities(MultiblockAbility.MUFFLER_HATCH).setExactLimit(1))
-                        .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMinGlobalLimited(1))
-                        .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMinGlobalLimited(1))
-                        .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMinGlobalLimited(1))
-                        .or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2)))
-                .where('G', states(getCasingState3()))
-                .where('F', frames(Materials.Steel))
-                .where('A', air())
-                .where('#', blocks(Blocks.END_ROD))
-                .buildTemplate();
+                .self('S', MetaTileEntityExtremeExterminationChamber.class)
+                .where('X', Elements.chain(
+                        Elements.counted(10, 4096, Elements.block(getCasingState())),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
+                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
+                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, -1),
+                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 1, -1),
+                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 1, -1),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2)))
+                .blocks('G', getCasingState3())
+                .frames('F', Materials.Steel)
+                .air('A')
+                .blocks('#', Blocks.END_ROD)
+                .buildStructureDefinition();
 
     }
 

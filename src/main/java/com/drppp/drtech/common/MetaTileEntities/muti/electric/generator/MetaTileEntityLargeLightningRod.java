@@ -34,13 +34,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Random;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+import gregtech.api.pattern.element.Elements;
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithControl {
     long MAX_ENERGY_STORE = 5000000000L;
@@ -57,17 +53,16 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
     public boolean usesMui2() {
         return false;
     }
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:large_lighting_rod",
-            MetaTileEntityLargeLightningRod::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:large_lighting_rod",
+                    MetaTileEntityLargeLightningRod::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start()
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
@@ -82,14 +77,14 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "     AAA     ", "             ", "             " )
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
-                .where('D', selfPredicate(MetaTileEntityLargeLightningRod.class))
-                .where('B', states(getCasingState())
-                        .or(abilities(MultiblockAbility.OUTPUT_ENERGY).setExactLimit(1).setPreviewCount(1).or(abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1))
-                        ))
-                .where('A',frames(Materials.Iron))
-                .where('C',blocks(Blocks.IRON_BARS))
-                .where(' ', any())
-                .buildTemplate();
+                .self('D', MetaTileEntityLargeLightningRod.class)
+                .where('B', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(getCasingState())),
+                        Elements.hatch(MultiblockAbility.OUTPUT_ENERGY, 1, 1, 1),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1)))
+                .frames('A', Materials.Iron)
+                .blocks('C', Blocks.IRON_BARS)
+                .buildStructureDefinition();
 
     }
     @Override

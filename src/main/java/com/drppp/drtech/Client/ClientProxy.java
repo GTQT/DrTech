@@ -1,6 +1,5 @@
 package com.drppp.drtech.Client;
 
-import com.brachy84.mechtech.MechTech;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.CommonProxy;

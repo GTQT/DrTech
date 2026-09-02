@@ -18,10 +18,9 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
-import gregtech.api.pattern.BlockPatternTemplate;
-import gregtech.api.pattern.SoftTemplate;
-import gregtech.api.pattern.TemplatePool;
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+import gregtech.api.pattern.element.Elements;
+import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.KeyUtil;
@@ -96,37 +95,37 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
         return new MetaTileentityCropsSimulateMachine(this.metaTileEntityId);
     }
 
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:crops_simulate_machine",
-            MetaTileentityCropsSimulateMachine::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:crops_simulate_machine",
+                    MetaTileentityCropsSimulateMachine::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "B###B", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXWXB", "B###B", "B###B", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "B###B", "AAAAA")
                 .aisle("AASAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "AAAAA")
-                .where('S', selfPredicate(MetaTileentityCropsSimulateMachine.class))
-                .where('B', states(getGlassesState()))
-                .where('X', blocks(Blocks.FARMLAND))
-                .where('W', blocks(Blocks.WATER))
-                .where('A',
-                        abilities(MultiblockAbility.MAINTENANCE_HATCH).setExactLimit(1)
-                                .or(abilities(MultiblockAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
-                                .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMinGlobalLimited(1).setMaxGlobalLimited(4))
-                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setMinGlobalLimited(1).setMaxGlobalLimited(4))
-                                .or(abilities(MultiblockAbility.EXPORT_ITEMS).setMinGlobalLimited(1).setMaxGlobalLimited(4))
-                                .or(states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN)))
-                )
-                .where('#', any())
-                .buildTemplate();
+                .self('S', MetaTileentityCropsSimulateMachine.class)
+                .blocks('B', getGlassesState())
+                .blocks('X', Blocks.FARMLAND)
+                .blocks('W', Blocks.WATER)
+                .where('A', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(
+                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN))),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
+                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 0, 2),
+                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, 4),
+                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, 4),
+                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 1, 4)))
+                .any('#')
+                .buildStructureDefinition();
     }
 
     protected static IBlockState getGlassesState() {

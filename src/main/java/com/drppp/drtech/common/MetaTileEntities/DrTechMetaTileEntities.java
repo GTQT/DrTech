@@ -17,6 +17,8 @@ import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEnti
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
 import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
+import com.drppp.drtech.common.MetaTileEntities.single.EnergySink;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityArmorWorkbench;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLaserPipeBending;
 import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLightsaberAssembler;
@@ -47,7 +49,6 @@ public class DrTechMetaTileEntities {
     public static AnnihilationGenerator ANNIHILATION_GENERATOR;
     public static MetaTileEntityDronePad DRONE_PAD;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
-    public static MetaTileEntityInfiniteFluidDrill INFINITE_FLUID_DRILLING_RIG;
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
 
     public static MetaTileEntityExtremeExterminationChamber MOB_KILLER;
@@ -59,7 +60,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
     public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static SimpleMachineMetaTileEntity[] LIGHTSABER_ASSEMBLER = new SimpleMachineMetaTileEntity[10];
-    public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
+    public static MetaTileEntityLargeExtruder LARGE_EXTRUDER;
 
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
@@ -72,6 +73,8 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
 
     public static MetaTileentityCropsSimulateMachine CROPS_SIMULATE;
+    public static MetaTileEntityArmorWorkbench ARMOR_WORKBENCH;
+    public static EnergySink ENERGY_SINK;
     public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
     public static MetaTileEntityDroneProgrammer DRONE_PROGRAMMER;
     public static MetaTileEntityDroneDock DRONE_DOCK;
@@ -131,7 +134,6 @@ public class DrTechMetaTileEntities {
         ANNIHILATION_GENERATOR = registerMetaTileEntity(getID(), new AnnihilationGenerator(getDrId("annihilation_generator")));
 
         DRONE_PAD = registerMetaTileEntity(getID(), new MetaTileEntityDronePad(getDrId("drone_pad")));
-        INFINITE_FLUID_DRILLING_RIG = registerMetaTileEntity(getID(), new MetaTileEntityInfiniteFluidDrill(getDrId("fluid_drilling_rig.iv"), 6));
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getDrId("large_alloy_smelter")));
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getDrId("large_bee_hive")));
 
@@ -157,7 +159,7 @@ public class DrTechMetaTileEntities {
             INDUSTRIAL_CABLE_PRESS = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCablePress(getDrId("industrial_cable_press")));
             INDUSTRIAL_SIEVE = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialSieve(getDrId("industrial_sieve")));
             INDUSTRIAL_CENTRIFUGE = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCentrifuge(getDrId("industrial_centrifuge")));
-            LARGE_EXTRUDER = registerMetaTileEntity(getID(), new MetaTileentityLargeExtruder(getDrId("large_extruder")));
+            LARGE_EXTRUDER = registerMetaTileEntity(getID(), new MetaTileEntityLargeExtruder(getDrId("large_extruder")));
         }
 
         DRONE_PROGRAMMER = registerMetaTileEntity(DRONE_PROGRAMMER_META_ID,
@@ -178,6 +180,10 @@ public class DrTechMetaTileEntities {
                 new MetaTileEntityDroneEndpoint(getDrId("drone_fluid_endpoint"), DroneEndpoint.Kind.FLUID));
         DRONE_EU_ENDPOINT = registerMetaTileEntity(DRONE_EU_ENDPOINT_META_ID,
                 new MetaTileEntityDroneEndpoint(getDrId("drone_eu_endpoint"), DroneEndpoint.Kind.EU));
+
+        // 模块化装甲（原 mechtech）
+        ARMOR_WORKBENCH = registerMetaTileEntity(getID(), new MetaTileEntityArmorWorkbench(getDrId("armor_workbench")));
+        ENERGY_SINK = registerMetaTileEntity(getID(), new EnergySink(getDrId("energy_sink")));
     }
 
 

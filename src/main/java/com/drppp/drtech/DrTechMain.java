@@ -1,13 +1,17 @@
 package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
+import com.drppp.drtech.Client.ClientEventHandler;
+import com.drppp.drtech.Client.ClientHandler;
 import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.Client.Keys;
 import com.drppp.drtech.Client.TesrTimeTable;
 import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.Client.render.TileEntityRendererConnector;
 import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.Client.render.wings.WingsClientHandler;
 import com.drppp.drtech.Client.render.glider.GliderClientHandler;
+import com.drppp.drtech.Network.ArmorNetworkHandler;
 import com.drppp.drtech.Network.SyncInit;
 import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
@@ -17,6 +21,7 @@ import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.Items.DrtToolItems;
 import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.Items.MTMetaItems;
 import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.drtMetaEntities;
@@ -114,6 +119,9 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(this);
         DrTechTab = new DrTechCreativeTabs("drtech");
         DrMetaItems.MetaItemsInit();
+        // 模块化装甲（原 mechtech）
+        MTMetaItems.init();
+        ArmorNetworkHandler.init();
         DrtechCapInit.init();
         HookCapability.init();
         WingsFlightCapability.init();
@@ -160,6 +168,10 @@ public class DrTechMain {
         drtMetaEntities.initRenderers();
         HookClientHooks.init();
         WingsClientHandler.init();
+        // 模块化装甲客户端（原 mechtech ClientProxy）
+        Keys.initClient();
+        ClientHandler.preInit();
+        MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
 
     }
 

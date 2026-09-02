@@ -25,8 +25,10 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.PatternMatchContext;
-import gregtech.api.pattern.TraceabilityPredicate;
+import gregtech.api.pattern.StructureContributionKey;
+import gregtech.api.pattern.element.Elements;
+import gregtech.api.pattern.element.IStructureElement;
+import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.TextComponentUtil;
@@ -61,12 +63,6 @@ import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
@@ -75,7 +71,6 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     private static final String NBT_FLUID_BANK = "FluidBank";
     private boolean isActive, isWorkingEnabled = true;
     // Match Context Headers
-    private static final String TFFT_PART_HEADER = "TfftPart_";
 
     private static final String NBT_FLUID = "Fluid";
     private FluidStack[] fluid = new FluidStack[25];
@@ -266,33 +261,54 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             }
         }
     }
+    private static final StructureContributionKey<ITfftData, List<ITfftData>> BATTERY_KEY =
+            StructureContributionKey.orderedList("drtech:tfft_battery_cells");
+
+    private static final IStructureElement BATTERY_ELEMENT = new BatteryContributionElement<>(
+            "drtech:tfft_battery_cells",
+            state -> {
+                if (!Datas.TFFT_CASINGS.containsKey(state)) return null;
+                ITfftData data = Datas.TFFT_CASINGS.get(state);
+                if (data.getTier() == -1 || data.getCapacity() <= 0) return null;
+                return data;
+            },
+            () -> Datas.TFFT_CASINGS.entrySet().stream()
+                    .sorted(java.util.Comparator.comparingInt(e -> e.getValue().getTier()))
+                    .map(e -> new BlockInfo(e.getKey(), null))
+                    .toArray(BlockInfo[]::new));
+
     @NotNull
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:tfft_tank",
-            MetatileEntityTwentyFiveFluidTank::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:tfft_tank",
+                    MetatileEntityTwentyFiveFluidTank::buildTemplate);
 
     @Override
-    protected BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, DOWN, FRONT)
-                .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
-                .aisleRepeatable(3, 14, "GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
-                .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
-                .where('S', selfPredicate(MetatileEntityTwentyFiveFluidTank.class))
-                .where('X', states(getCasingState())
-                        .or(staticDisplayAutoAbilities(true, true))
-                        .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
-                        .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1)
-                                .or(abilities(MultiblockAbility.IMPORT_ITEMS).setExactLimit(1))
-                                .or(abilities(MultiblockAbility.INPUT_ENERGY).setMinGlobalLimited(1).setPreviewCount(1)))
-                )
-                .where('G', states(getGlassState()))
-                .where('B', BATTERY_PREDICATE.get())
-                .buildTemplate();
+                .piece("start")
+                    .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
+                .repeatablePiece("body", 3, 14)
+                    .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
+                .piece("end")
+                    .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
+                .self('S', MetatileEntityTwentyFiveFluidTank.class)
+                .where('X', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(getCasingState())),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
+                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
+                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 0, 2, 1),
+                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 0, 2, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, 1),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, -1, 1)))
+                .blocks('G', getGlassState())
+                .where('B', Elements.withTooltips(BATTERY_ELEMENT,
+                        "gregtech.multiblock.pattern.error.batteries"))
+                .buildStructureDefinition();
 
     }
     protected static IBlockState getCasingState() {
@@ -312,25 +328,6 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected ICubeRenderer getFrontOverlay() {
         return Textures.TFFT_OVERLAY;
     }
-    protected static final Supplier<TraceabilityPredicate> BATTERY_PREDICATE = () -> new TraceabilityPredicate(
-            blockWorldState -> {
-                IBlockState state = blockWorldState.getBlockState();
-                if (Datas.TFFT_CASINGS.containsKey(state)) {
-                    ITfftData tfft_parts = Datas.TFFT_CASINGS.get(state);
-                    if (tfft_parts.getTier() != -1 && tfft_parts.getCapacity() > 0) {
-                        String key = TFFT_PART_HEADER + tfft_parts.getBatteryName();
-                        MetatileEntityTwentyFiveFluidTank.TfftPartMatchWrapper wrapper = blockWorldState.getMatchContext().get(key);
-                        if (wrapper == null) wrapper = new MetatileEntityTwentyFiveFluidTank.TfftPartMatchWrapper(tfft_parts);
-                        blockWorldState.getMatchContext().set(key, wrapper.increment());
-                    }
-                    return true;
-                }
-                return false;
-            }, () -> Datas.TFFT_CASINGS.entrySet().stream()
-            .sorted(Comparator.comparingInt(entry -> entry.getValue().getTier()))
-            .map(entry -> new BlockInfo(entry.getKey(), null))
-            .toArray(BlockInfo[]::new))
-            .addTooltips("gregtech.multiblock.pattern.error.batteries");
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -461,16 +458,8 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected void formStructure(@NotNull FormedStructureView formed) {
         super.formStructure(formed);
         initializeAbilities();
-        PatternMatchContext context = formed.copyLegacyCallbackContext();
-        List<ITfftData> parts = new ArrayList<>();
-        for (Map.Entry<String, Object> battery : context.entrySet()) {
-            if (battery.getKey().startsWith(TFFT_PART_HEADER) &&
-                    battery.getValue() instanceof TfftPartMatchWrapper wrapper) {
-                for (int i = 0; i < wrapper.amount; i++) {
-                    parts.add(wrapper.partType);
-                }
-            }
-        }
+        List<ITfftData> aggregate = formed.getAggregate(BATTERY_KEY);
+        List<ITfftData> parts = aggregate == null ? new ArrayList<>() : new ArrayList<>(aggregate);
         if (parts.isEmpty()) {
             invalidateStructure();
             return;
@@ -502,20 +491,6 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
 
 
 
-    private static class TfftPartMatchWrapper {
-
-        private final ITfftData partType;
-        private int amount;
-
-        public TfftPartMatchWrapper(ITfftData partType) {
-            this.partType = partType;
-        }
-
-        public TfftPartMatchWrapper increment() {
-            amount++;
-            return this;
-        }
-    }
     public static class TFFTTankFluidBank {
 
         private static final String NBT_SIZE = "Size";
@@ -660,19 +635,5 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 storage[circuit][i]=0;
             }
         }
-    }
-    private static TraceabilityPredicate staticDisplayAutoAbilities(boolean maintenance, boolean muffler) {
-        TraceabilityPredicate predicate = new TraceabilityPredicate();
-        if (maintenance && true) {
-            predicate = predicate.or(abilities(MultiblockAbility.MAINTENANCE_HATCH)
-                    .setMinGlobalLimited(gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0)
-                    .setMaxGlobalLimited(1));
-        }
-        if (muffler) {
-            predicate = predicate.or(abilities(MultiblockAbility.MUFFLER_HATCH)
-                    .setMinGlobalLimited(1)
-                    .setMaxGlobalLimited(1));
-        }
-        return predicate;
     }
 }

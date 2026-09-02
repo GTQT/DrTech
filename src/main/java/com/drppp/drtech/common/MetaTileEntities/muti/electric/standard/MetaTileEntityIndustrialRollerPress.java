@@ -33,15 +33,11 @@ import java.util.List;
 
 import static gregtech.api.util.RelativeDirection.*;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
-import gregtech.api.pattern.TraceabilityPredicate;
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntityIndustrialRollerPress extends MultiMapMultiblockController {
     public MetaTileEntityIndustrialRollerPress(ResourceLocation metaTileEntityId) {
@@ -49,28 +45,30 @@ public class MetaTileEntityIndustrialRollerPress extends MultiMapMultiblockContr
         this.recipeMapWorkable = new SelfRecipeLogic(this, false);
     }
 
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:industrial_roller_press",
-            MetaTileEntityIndustrialRollerPress::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:industrial_roller_press",
+                    MetaTileEntityIndustrialRollerPress::buildTemplate);
 
     @Override
-    protected @NotNull BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, UP, BACK)
                 .aisle("XXX", "XXX", "XXX")
                 .aisle("XXX", "X X", "XXX")
                 .aisle("XXX", "XSX", "XXX")
-                .where('S', selfPredicate(MetaTileEntityIndustrialRollerPress.class))
-                .where(' ', any())
-                .where('X', states(getCasingState()).setMinGlobalLimited(6)
-                        .or(staticRecipeMapAutoAbilities(true, true, true, true, false, false, false))
-                        .or(abilities(MultiblockAbility.MUFFLER_HATCH).setExactLimit(1))
-                )
-                .buildTemplate();
+                .self('S', MetaTileEntityIndustrialRollerPress.class)
+                .where('X', Elements.chain(
+                        Elements.counted(6, 4096, Elements.block(getCasingState())),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
+                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
+                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, -1, 1),
+                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, -1, 1),
+                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1)))
+                .buildStructureDefinition();
 
     }
 
@@ -131,58 +129,5 @@ public class MetaTileEntityIndustrialRollerPress extends MultiMapMultiblockContr
             }
             return tire * 4;
         }
-    }
-    private static TraceabilityPredicate staticDisplayAutoAbilities(boolean maintenance, boolean muffler) {
-        TraceabilityPredicate predicate = new TraceabilityPredicate();
-        if (maintenance && true) {
-            predicate = predicate.or(abilities(MultiblockAbility.MAINTENANCE_HATCH)
-                    .setMinGlobalLimited(gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0)
-                    .setMaxGlobalLimited(1));
-        }
-        if (muffler) {
-            predicate = predicate.or(abilities(MultiblockAbility.MUFFLER_HATCH)
-                    .setMinGlobalLimited(1)
-                    .setMaxGlobalLimited(1));
-        }
-        return predicate;
-    }
-    private static TraceabilityPredicate staticRecipeMapAutoAbilities(boolean energyIn,
-                                                                      boolean maintenance,
-                                                                      boolean itemIn,
-                                                                      boolean itemOut,
-                                                                      boolean fluidIn,
-                                                                      boolean fluidOut,
-                                                                      boolean muffler) {
-        return staticRecipeMapAutoAbilities(energyIn, maintenance, itemIn, itemOut, fluidIn, fluidOut, muffler, 2);
-    }
-
-    private static TraceabilityPredicate staticRecipeMapAutoAbilities(boolean energyIn,
-                                                                      boolean maintenance,
-                                                                      boolean itemIn,
-                                                                      boolean itemOut,
-                                                                      boolean fluidIn,
-                                                                      boolean fluidOut,
-                                                                      boolean muffler,
-                                                                      int maxEnergyInputs) {
-        TraceabilityPredicate predicate = staticDisplayAutoAbilities(maintenance, muffler);
-        if (energyIn) {
-            predicate = predicate.or(abilities(MultiblockAbility.INPUT_ENERGY)
-                    .setMinGlobalLimited(1)
-                    .setMaxGlobalLimited(maxEnergyInputs)
-                    .setPreviewCount(1));
-        }
-        if (itemIn) {
-            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_ITEMS).setPreviewCount(1));
-        }
-        if (itemOut) {
-            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_ITEMS).setPreviewCount(1));
-        }
-        if (fluidIn) {
-            predicate = predicate.or(abilities(MultiblockAbility.IMPORT_FLUIDS).setPreviewCount(1));
-        }
-        if (fluidOut) {
-            predicate = predicate.or(abilities(MultiblockAbility.EXPORT_FLUIDS).setPreviewCount(1));
-        }
-        return predicate;
     }
 }

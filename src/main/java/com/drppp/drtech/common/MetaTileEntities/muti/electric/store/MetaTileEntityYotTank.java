@@ -25,8 +25,10 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.PatternMatchContext;
-import gregtech.api.pattern.TraceabilityPredicate;
+import gregtech.api.pattern.StructureContributionKey;
+import gregtech.api.pattern.element.Elements;
+import gregtech.api.pattern.element.IStructureElement;
+import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
@@ -60,12 +62,6 @@ import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
 
-import gregtech.api.pattern.BlockPatternTemplate;
-
-import gregtech.api.pattern.SoftTemplate;
-
-import gregtech.api.pattern.TemplatePool;
-
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
@@ -74,7 +70,6 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     private static final String NBT_FLUID_BANK = "EnergyBank";
     private boolean isActive, isWorkingEnabled = true;
     // Match Context Headers
-    private static final String YOT_PART_HEADER = "YotPart_";
 
     private static final String NBT_FLUID = "Fluid";
 
@@ -261,37 +256,58 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         this.fluid = null;
         this.fluidBank.clearStore();
     }
+    private static final StructureContributionKey<IStoreData, List<IStoreData>> BATTERY_KEY =
+            StructureContributionKey.orderedList("drtech:yot_storage_cells");
+
+    private static final IStructureElement BATTERY_ELEMENT = new BatteryContributionElement<>(
+            "drtech:yot_storage_cells",
+            state -> {
+                if (!Datas.YOT_CASINGS.containsKey(state)) return null;
+                IStoreData data = Datas.YOT_CASINGS.get(state);
+                if (data.getTier() == -1 || data.getCapacity().compareTo(BigInteger.ZERO) <= 0) return null;
+                return data;
+            },
+            () -> Datas.YOT_CASINGS.entrySet().stream()
+                    .sorted(java.util.Comparator.comparingInt(e -> e.getValue().getTier()))
+                    .map(e -> new BlockInfo(e.getKey(), null))
+                    .toArray(BlockInfo[]::new));
+
     @NotNull
-    private static final SoftTemplate TEMPLATE = TemplatePool.getInstance().register(
-            "drtech:yot_tank",
-            MetaTileEntityYotTank::buildTemplate
-    );
+    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
+            StructureDefinition.getOrBuild("drtech:yot_tank",
+                    MetaTileEntityYotTank::buildTemplate);
 
     @Override
-    protected BlockPatternTemplate createStructureTemplate() {
-        return TEMPLATE.get();
+    protected StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
-    private static BlockPatternTemplate buildTemplate() {
+    private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
-                .aisle("#####", "#XXX#", "#XXX#", "#XXX#", "#####")
-                .aisle("XXSXX", "XCCCX", "XCCCX", "XCCCX", "XXXXX")
-                .aisleRepeatable(1, 14, "GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
-                .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
-                .aisle("LLLLL", "L###L", "L###L", "L###L", "LLLLL")
-                .where('S', selfPredicate(MetaTileEntityYotTank.class))
-                .where('#', any())
-                .where('C', states(getCasingState()))
-                .where('X', states(getCasingState())
-                        .or(staticDisplayAutoAbilities(true, true))
-                        .or(abilities(MultiblockAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
-                        .or(abilities(MultiblockAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2).setPreviewCount(1))
-                        .or(abilities(DrtechCapabilities.YOT_HATCH).setMaxGlobalLimited(1))
-                )
-                .where('G', states(getGlassState()))
-                .where('L', frames(Materials.Steel))
-                .where('B', BATTERY_PREDICATE.get())
-                .buildTemplate();
+                .piece("start")
+                    .aisle("#####", "#XXX#", "#XXX#", "#XXX#", "#####")
+                    .aisle("XXSXX", "XCCCX", "XCCCX", "XCCCX", "XXXXX")
+                .repeatablePiece("body", 1, 14)
+                    .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
+                .piece("end")
+                    .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
+                    .aisle("LLLLL", "L###L", "L###L", "L###L", "LLLLL")
+                .self('S', MetaTileEntityYotTank.class)
+                .any('#')
+                .blocks('C', getCasingState())
+                .where('X', Elements.chain(
+                        Elements.counted(0, 4096, Elements.block(getCasingState())),
+                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
+                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
+                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1),
+                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 0, 2, 1),
+                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 0, 2, 1),
+                        Elements.hatch(DrtechCapabilities.YOT_HATCH, 0, 1)))
+                .blocks('G', getGlassState())
+                .frames('L', Materials.Steel)
+                .where('B', Elements.withTooltips(BATTERY_ELEMENT,
+                        "gregtech.multiblock.pattern.error.batteries"))
+                .buildStructureDefinition();
 
     }
     protected static IBlockState getCasingState() {
@@ -305,25 +321,6 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.YOT_TANK_CASING;
     }
-    protected static final Supplier<TraceabilityPredicate> BATTERY_PREDICATE = () -> new TraceabilityPredicate(
-            blockWorldState -> {
-                IBlockState state = blockWorldState.getBlockState();
-                if (Datas.YOT_CASINGS.containsKey(state)) {
-                    IStoreData yot_parts = Datas.YOT_CASINGS.get(state);
-                    if (yot_parts.getTier() != -1 && yot_parts.getCapacity().compareTo(BigInteger.ZERO)==1) {
-                        String key = YOT_PART_HEADER + yot_parts.getStoreName();
-                        MetaTileEntityYotTank.YotPartMatchWrapper wrapper = blockWorldState.getMatchContext().get(key);
-                        if (wrapper == null) wrapper = new MetaTileEntityYotTank.YotPartMatchWrapper(yot_parts);
-                        blockWorldState.getMatchContext().set(key, wrapper.increment());
-                    }
-                    return true;
-                }
-                return false;
-            }, () -> Datas.YOT_CASINGS.entrySet().stream()
-            .sorted(Comparator.comparingInt(entry -> entry.getValue().getTier()))
-            .map(entry -> new BlockInfo(entry.getKey(), null))
-            .toArray(BlockInfo[]::new))
-            .addTooltips("gregtech.multiblock.pattern.error.batteries");
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -397,26 +394,12 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     protected void formStructure(@NotNull FormedStructureView formed) {
         super.formStructure(formed);
         initializeAbilities();
-        PatternMatchContext context = formed.copyLegacyCallbackContext();
-        List<IStoreData> parts = new ArrayList<>();
-        for (Map.Entry<String, Object> battery : context.entrySet()) {
-            if (battery.getKey().startsWith(YOT_PART_HEADER) &&
-                    battery.getValue() instanceof MetaTileEntityYotTank.YotPartMatchWrapper wrapper) {
-                for (int i = 0; i < wrapper.amount; i++) {
-                    parts.add(wrapper.partType);
-                }
-            }
-            else if(battery.getKey().startsWith("Multi")  ) {
-                HashSet set = (HashSet) battery.getValue();
-                for (var s: set
-                     ) {
-                    if(s instanceof MetaTileEntityYotHatch)
-                    {
-                        MetaTileEntityYotHatch yotHatch = (MetaTileEntityYotHatch)s;
-                        yotHatch.setYotTank(this);
-                    }
-                }
-
+        List<IStoreData> aggregate = formed.getAggregate(BATTERY_KEY);
+        List<IStoreData> parts = aggregate == null ? new ArrayList<>() : new ArrayList<>(aggregate);
+        // 关联结构内的 Yot 仓口（旧机制经 matchContext "Multi" 集合并入，现改由成型部件列表获得）
+        for (IMultiblockPart part : formed.getParts()) {
+            if (part instanceof MetaTileEntityYotHatch) {
+                ((MetaTileEntityYotHatch) part).setYotTank(this);
             }
         }
         if (parts.isEmpty()) {
@@ -446,20 +429,6 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
 
 
 
-    private static class YotPartMatchWrapper {
-
-        private final IStoreData partType;
-        private int amount;
-
-        public YotPartMatchWrapper(IStoreData partType) {
-            this.partType = partType;
-        }
-
-        public MetaTileEntityYotTank.YotPartMatchWrapper increment() {
-            amount++;
-            return this;
-        }
-    }
     public static class YotTankFluidBank {
 
         private static final String NBT_SIZE = "Size";
@@ -621,19 +590,5 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 storage[i] = BigInteger.ZERO;
             }
         }
-    }
-    private static TraceabilityPredicate staticDisplayAutoAbilities(boolean maintenance, boolean muffler) {
-        TraceabilityPredicate predicate = new TraceabilityPredicate();
-        if (maintenance && true) {
-            predicate = predicate.or(abilities(MultiblockAbility.MAINTENANCE_HATCH)
-                    .setMinGlobalLimited(gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0)
-                    .setMaxGlobalLimited(1));
-        }
-        if (muffler) {
-            predicate = predicate.or(abilities(MultiblockAbility.MUFFLER_HATCH)
-                    .setMinGlobalLimited(1)
-                    .setMaxGlobalLimited(1));
-        }
-        return predicate;
     }
 }
