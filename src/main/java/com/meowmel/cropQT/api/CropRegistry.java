@@ -1,9 +1,9 @@
 package com.meowmel.cropQT.api;
 
 import com.drppp.drtech.api.Utils.DrtechUtils;
-import com.drppp.drtech.common.Items.ItemsInit;
-import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
-import com.drppp.drtech.loaders.recipes.CraftingReceipe;
+import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
+import com.drppp.drtech.loaders.recipes.CraftingRecipes;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.common.blocks.MetaBlocks;
@@ -195,7 +195,7 @@ public class CropRegistry {
 
         register(new CropType.Builder("mercury_flower").displayName("水银花").tier(3)
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(24)
-                .addDrop(CraftingReceipe.getItemStack("thaumcraft:shimmerleaf", 3L))
+                .addDrop(CraftingRecipes.getItemStack("thaumcraft:shimmerleaf", 3L))
                 //.requiredBlocks()
                 .renderType(CropRenderType.CROSS).build());
 
@@ -225,7 +225,7 @@ public class CropRegistry {
         register(new CropType.Builder("stickreed").displayName("粘性甘蔗").tier(4)
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(26)
                 .addDrop(new ItemStack(Items.REEDS))
-                .addDrop(CraftingReceipe.getItemStack("gregtech:meta_item_1:438", 2L))
+                .addDrop(CraftingRecipes.getItemStack("gregtech:meta_item_1:438", 2L))
                 .waterRequirement(0.3f).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("blackthorn").displayName("黑荆棘").tier(4)
@@ -292,7 +292,7 @@ public class CropRegistry {
 
         // 神秘莓系列 (6种)
         {
-            ItemStack crystal_essence = CraftingReceipe.getItemStack("thaumcraft:crystal_essence");
+            ItemStack crystal_essence = CraftingRecipes.getItemStack("thaumcraft:crystal_essence");
             ItemStack ignis = crystal_essence.copy();
             DrtechUtils.addAspectsToItemStack(ignis, "ignis", 1);
             ItemStack aer = crystal_essence.copy();
@@ -343,18 +343,18 @@ public class CropRegistry {
             register(new CropType.Builder("mystic_flower_" + mysticColors[i][0])
                     .displayName(mysticColors[i][1] + "神秘花").tier(4)
                     .maxGrowthStage(4).harvestStage(4).stageRequirement(24)
-                    .addDrop(CraftingReceipe.getItemStack("botania:petal", i))
+                    .addDrop(CraftingRecipes.getItemStack("botania:petal", i))
                     .renderType(CropRenderType.CROSS).build());
         }
         // 盆栽树变种
         register(new CropType.Builder("livingwood_bonsai").displayName("活木盆栽树").tier(4)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(26)
-                .addDrop(CraftingReceipe.getItemStack("<botania:livingwood>"))
+                .addDrop(CraftingRecipes.getItemStack("<botania:livingwood>"))
                 .requiredBlocks("botania:livingwood")
                 .renderType(CropRenderType.CROSS).build());
         register(new CropType.Builder("livingrock_bonsai").displayName("活石盆栽树").tier(4)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(26)
-                .addDrop(CraftingReceipe.getItemStack("<botania:livingrock>"))
+                .addDrop(CraftingRecipes.getItemStack("<botania:livingrock>"))
                 .requiredBlocks("botania:livingrock")
                 .renderType(CropRenderType.CROSS).build());
         // 石莲系列 (6色)
@@ -436,13 +436,13 @@ public class CropRegistry {
         register(new CropType.Builder("oil_berry").displayName("石油浆果").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(30)
                 .addDrop(DrMetaItems.OIL_BERRY.getStackForm())
-                .addDrop(CraftingReceipe.getItemStack("<extrabees:propolis:1>", 4L))
+                .addDrop(CraftingRecipes.getItemStack("<extrabees:propolis:1>", 4L))
                 .requiredBlocks("gregtech:ore_oilsands_0")
                 .renderType(CropRenderType.CROSS).build());
 
         register(new CropType.Builder("corruption_wart").displayName("腐化瘤").tier(5)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(28)
-                .addDrop(CraftingReceipe.getItemStack("<thaumcraft:taint_fibre>"))
+                .addDrop(CraftingRecipes.getItemStack("<thaumcraft:taint_fibre>"))
                 .lightRequirement(0).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("lead_leaf").displayName("铅叶子").tier(5)
@@ -583,7 +583,7 @@ public class CropRegistry {
         register(new CropType.Builder("whale_claw").displayName("云鲸爪").tier(6)
                 .maxGrowthStage(5).harvestStage(5).stageRequirement(32)
                 .addChanceDrop(Materials.CertusQuartz.getItemForm(OrePrefix.dust, 2), 0.5f)
-                .addChanceDrop(CraftingReceipe.getItemStack("<appliedenergistics2:material:2>", 2L), 0.5f)
+                .addChanceDrop(CraftingRecipes.getItemStack("<appliedenergistics2:material:2>", 2L), 0.5f)
                 .requiredBlocks(MetaBlocks.COMPRESSED.get(Materials.CertusQuartz))
                 .renderType(CropRenderType.HASH).build());
 
@@ -731,8 +731,8 @@ public class CropRegistry {
 
         register(new CropType.Builder("black_lotus").displayName("黑莲花").tier(8)
                 .maxGrowthStage(6).harvestStage(6).stageRequirement(40)
-                .addDrop(CraftingReceipe.getItemStack("<botania:blacklotus>"))
-                .addChanceDrop(CraftingReceipe.getItemStack("<botania:blacklotus:1>"), 0.01f)
+                .addDrop(CraftingRecipes.getItemStack("<botania:blacklotus>"))
+                .addChanceDrop(CraftingRecipes.getItemStack("<botania:blacklotus:1>"), 0.01f)
                 .lightRequirement(0).renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("thunder_grass").displayName("雷鸣草").tier(8)
@@ -881,7 +881,7 @@ public class CropRegistry {
 
         register(new CropType.Builder("bedrock_heart").displayName("基岩之心").tier(10)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(52)
-                .addDrop(CraftingReceipe.getItemStack("<enderio:item_material:20>"))
+                .addDrop(CraftingRecipes.getItemStack("<enderio:item_material:20>"))
                 .requiredBlocks(Blocks.BEDROCK)
                 .renderType(CropRenderType.HASH).build());
 
@@ -941,7 +941,7 @@ public class CropRegistry {
 
         register(new CropType.Builder("heartfruit").displayName("心鸣果").tier(11)
                 .maxGrowthStage(7).harvestStage(7).stageRequirement(60)
-                .addDrop(CraftingReceipe.getItemStack("pollution:heartfruit"))
+                .addDrop(CraftingRecipes.getItemStack("pollution:heartfruit"))
                 .canBeBreedResult(false) // 不允许杂交产出
                 .renderType(CropRenderType.CROSS).build());
     }

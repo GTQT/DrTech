@@ -2,7 +2,7 @@ package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.Items.MTMetaItems;
+import com.drppp.drtech.common.items.MTMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.unification.material.Materials;
 import net.minecraft.entity.player.EntityPlayer;

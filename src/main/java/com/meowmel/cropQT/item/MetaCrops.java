@@ -5,7 +5,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static com.drppp.drtech.common.Items.MetaItems.DrMetaItems.*;
+import static com.drppp.drtech.common.items.MetaItems.DrMetaItems.*;
 
 public class MetaCrops extends StandardMetaItem {
     public static CreativeTabs LootCropTab = new CreativeTabs("loot_crop_tab") {

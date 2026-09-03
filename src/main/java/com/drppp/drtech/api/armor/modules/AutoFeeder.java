@@ -1,12 +1,11 @@
 package com.drppp.drtech.api.armor.modules;
 
-import com.drppp.drtech.Client.Keys;
+import com.drppp.drtech.client.Keys;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.Items.MTMetaItems;
-import com.drppp.drtech.Network.ArmorNetworkHandler;
-import com.drppp.drtech.Network.packets.CModularArmorSwitchModuleMode;
-import gregtech.api.items.armor.ArmorUtils;
+import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.network.ArmorNetworkHandler;
+import com.drppp.drtech.network.packets.CModularArmorSwitchModuleMode;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.items.metaitem.stats.IFoodBehavior;
 import gregtech.api.items.metaitem.stats.IItemComponent;

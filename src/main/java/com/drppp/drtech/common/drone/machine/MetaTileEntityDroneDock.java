@@ -621,9 +621,9 @@ public final class MetaTileEntityDroneDock extends TieredMetaTileEntity {
         IVertexOperation[] colouredPipeline = ArrayUtils.add(pipeline,
                 new ColourMultiplier(GTUtility.convertRGBtoOpaqueRGBA_CL(getPaintingColorForRendering())));
         Textures.VOLTAGE_CASINGS[getTier()].render(renderState, translation, colouredPipeline);
-        com.drppp.drtech.Client.Textures.DRONE_DOCK_CASING.render(renderState, translation, pipeline);
+        com.drppp.drtech.client.Textures.DRONE_DOCK_CASING.render(renderState, translation, pipeline);
         Textures.INFINITE_EMITTER_FACE.renderSided(EnumFacing.UP, renderState, translation, pipeline);
-        com.drppp.drtech.Client.Textures.DRONE_DOCK_OVERLAY.renderSided(
+        com.drppp.drtech.client.Textures.DRONE_DOCK_OVERLAY.renderSided(
                 EnumFacing.UP, renderState, translation, pipeline);
     }
 }

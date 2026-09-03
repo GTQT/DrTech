@@ -3,7 +3,7 @@ package com.drppp.drtech.api.armor.modules;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.Items.MTMetaItems;
+import com.drppp.drtech.common.items.MTMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.EntityEquipmentSlot;

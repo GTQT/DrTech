@@ -1,6 +1,6 @@
 package com.drppp.drtech.common.drone.hardware;
 
-import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.items.ItemsInit;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

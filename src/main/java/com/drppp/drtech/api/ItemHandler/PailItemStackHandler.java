@@ -1,6 +1,6 @@
 package com.drppp.drtech.api.ItemHandler;
 
-import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.items.ItemsInit;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.items.ItemStackHandler;

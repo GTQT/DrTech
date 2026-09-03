@@ -1,6 +1,6 @@
 package com.drppp.drtech.intergations.jei;
 
-import com.drppp.drtech.common.Items.MetaItems.MetaItemLootTable;
+import com.drppp.drtech.common.items.MetaItems.MetaItemLootTable;
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IGuiItemStackGroup;

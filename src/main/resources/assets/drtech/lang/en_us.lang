@@ -4,14 +4,13 @@ key.categories.drtech=DR Tech
 key.ctrl=Flight Ring Boost
 
 #recipemap
-recipemap.eimplosion_compressor.name=Electric Implosion Compressor
-recipemap.log_create.name=Log Synthesis
 recipemap.molecular_recombination.name=Molecular Recombination
-recipemap.mob_killer.name=Mob Slaughter
 recipemap.deep_ground_pump.name=Thermal Extraction
 recipemap.solar_tower.name=Solar Power
 recipemap.disassembler.name=Disassembler
 recipemap.combs_product.name=Comb Processing
+recipemap.drone_pad.name=无人机狩猎
+
 #Items
 metaitem.energy_element_1.name=Energy Element 1
 metaitem.energy_element_2.name=Energy Element 2
@@ -186,7 +185,6 @@ drtech.machine.advanced_process_array.name=Advanced Processing Array (Laser)
 drtech.machine.log_factory.name=Log Synthesis Plant
 drtech.machine.molecular_recombination.name=Large Molecular Recombiner
 drtech.machine.yot_tank.name=YOT Tank
-drtech.machine.mob_killer.name=Mob Simulation Chamber
 drtech.machine.deep_ground_pump.name=Deep Geothermal Pump
 drtech.machine.tfft_tank.name=T.F.F.T Tank
 drtech.machine.yot_hatch.name=YOT Hatch

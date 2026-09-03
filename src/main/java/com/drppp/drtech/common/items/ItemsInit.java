@@ -1,0 +1,286 @@
+package com.drppp.drtech.common.items;
+
+import com.drppp.drtech.Tags;
+import com.drppp.drtech.client.render.Items.RenderItemLightsaber;
+import com.drppp.drtech.client.render.Items.RenderItemDoubleLightsaber;
+import com.drppp.drtech.client.render.Items.RenderItemLightsaberPart;
+import com.drppp.drtech.common.blocks.BlocksInit;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.items.lightsaber.ItemFocusingCrystal;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaberCrystal;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaberPart;
+import com.drppp.drtech.common.items.lightsaber.LightsaberColor;
+import com.drppp.drtech.common.items.lightsaber.LightsaberHilt;
+import com.drppp.drtech.common.items.lightsaber.LightsaberPartType;
+import com.drppp.drtech.common.items.lightsaber.FocusingCrystal;
+import com.drppp.drtech.common.drone.item.ItemDroneProgramCard;
+import com.drppp.drtech.common.drone.item.ItemProgrammableDrone;
+import com.drppp.drtech.common.drone.hardware.DroneChassisTier;
+import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
+import com.drppp.drtech.common.drone.hardware.ItemDroneUpgradeModule;
+import com.drppp.drtech.common.items.foods.ItemSoarXpBerry;
+import com.drppp.drtech.common.items.foods.ItemXpBerry;
+import com.drppp.drtech.hooked.HookComponentType;
+import com.drppp.drtech.hooked.HookRegistry;
+import com.drppp.drtech.hooked.HookType;
+import com.drppp.drtech.common.wings.ItemWings;
+import com.drppp.drtech.common.wings.WingType;
+import com.drppp.drtech.common.glider.ItemHangGlider;
+import com.drppp.drtech.common.glider.ItemHangGliderPart;
+import com.meowmel.cropQT.item.ItemCropAnalyzer;
+import com.meowmel.cropQT.item.ItemCropSeed;
+import com.meowmel.cropQT.item.ItemWeedingShears;
+import gregtech.api.block.VariantItemBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.function.Function;
+
+import static com.drppp.drtech.common.blocks.BlocksInit.CROP_STICK;
+import static gregtech.common.blocks.MetaBlocks.statePropertiesToString;
+
+public class ItemsInit {
+    public static final Item ITEM_BLOCK_GRAVITATIONAL_ANOMALY = new ItemBlock(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY).setRegistryName(Tags.MODID, "gravitational_anomaly");
+    public static final Item ITEM_CONNECTOR1 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR1).setRegistryName(Tags.MODID, "connector_1");
+    public static final Item ITEM_CONNECTOR2 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR2).setRegistryName(Tags.MODID, "connector_2");
+    public static final Item ITEM_CONNECTOR3 = new ItemBlock(BlocksInit.BLOCK_CONNECTOR3).setRegistryName(Tags.MODID, "connector_3");
+    public static final Item ITEM_BLOCK_GOLDEN_SEA = new ItemBlock(BlocksInit.BLOCK_GOLDEN_SEA).setRegistryName(Tags.MODID, "golden_sea");
+    public static final Item ITEM_BLOCK_PEACEFUL_TABLE = new ItemBlock(BlocksInit.BLOCK_PEACEFUL_TABLE).setRegistryName(Tags.MODID, "peaceful_table");
+    public static final Item ITEM_BLOCK_STORAGE_PAIL = new ItemBlock(BlocksInit.BLOCK_STORAGE_PAIL).setRegistryName(Tags.MODID, BlocksInit.BLOCK_STORAGE_PAIL.getRegistryName().getPath());
+    public static final Item ITEM_BLOCK_WASTE_DIRT = new ItemBlock(BlocksInit.BLOCK_WASTE_DIRT).setRegistryName(Tags.MODID, BlocksInit.BLOCK_WASTE_DIRT.getRegistryName().getPath());
+    public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID, BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
+    public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID, BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
+    public static ItemCropSeed CROP_SEED = new ItemCropSeed();
+    public static ItemCropAnalyzer CROP_ANALYZER = new ItemCropAnalyzer();
+    public static ItemWeedingShears ITEM_WEEDING_SHEARS = new ItemWeedingShears();
+    public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
+    public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
+    public static final ItemSimpleDrTech WING_FAIRY_DUST = new ItemSimpleDrTech("fairy_dust");
+    public static final ItemSimpleDrTech WING_AMETHYST = new ItemSimpleDrTech("amethyst");
+    public static final ItemSimpleDrTech BAT_BLOOD = createBatBlood();
+    public static final ItemWings[] WINGS = createWings();
+    public static final ItemHangGliderPart HANG_GLIDER_PART = new ItemHangGliderPart();
+    public static final ItemHangGlider HANG_GLIDER = new ItemHangGlider("hang_glider", false);
+    public static final ItemHangGlider ADVANCED_HANG_GLIDER = new ItemHangGlider("advanced_hang_glider", true);
+    public static final ItemLightsaber[] LIGHTSABERS = createLightsabers();
+    public static final ItemLightsaber LIGHTSABER = LIGHTSABERS[LightsaberHilt.GRAFLEX.getMetadata()];
+    public static final ItemDoubleLightsaber DOUBLE_LIGHTSABER = new ItemDoubleLightsaber();
+    public static final ItemSimpleDrTech LIGHTSABER_CIRCUITRY = new ItemSimpleDrTech("lightsaber_circuitry");
+    public static final ItemLightsaberCrystal LIGHTSABER_CRYSTAL = new ItemLightsaberCrystal();
+    public static final ItemFocusingCrystal FOCUSING_CRYSTAL = new ItemFocusingCrystal();
+    public static final ItemLightsaberPart LIGHTSABER_EMITTER =
+            new ItemLightsaberPart("lightsaber_blade_emitter", LightsaberPartType.EMITTER);
+    public static final ItemLightsaberPart LIGHTSABER_SWITCH =
+            new ItemLightsaberPart("lightsaber_switch_module", LightsaberPartType.SWITCH_SECTION);
+    public static final ItemLightsaberPart LIGHTSABER_GRIP =
+            new ItemLightsaberPart("lightsaber_grip", LightsaberPartType.BODY);
+    public static final ItemLightsaberPart LIGHTSABER_POMMEL =
+            new ItemLightsaberPart("lightsaber_pommel", LightsaberPartType.POMMEL);
+    public static final Item HOOK_ITEM = HookRegistry.HOOK_ITEM;
+    public static final Item HOOK_COMPONENT_ITEM = HookRegistry.COMPONENT_ITEM;
+    public static final ItemProgrammableDrone PROGRAMMABLE_DRONE = new ItemProgrammableDrone();
+    public static final ItemDroneProgramCard DRONE_PROGRAM_CARD = new ItemDroneProgramCard();
+    public static final ItemDroneUpgradeModule DRONE_UPGRADE_MODULE = new ItemDroneUpgradeModule();
+
+    public static void init(RegistryEvent.Register<Item> event) {
+        event.getRegistry().register(ITEM_BLOCK_GRAVITATIONAL_ANOMALY);
+        event.getRegistry().register(ITEM_CONNECTOR1);
+        event.getRegistry().register(ITEM_CONNECTOR2);
+        event.getRegistry().register(ITEM_CONNECTOR3);
+        event.getRegistry().register(ITEM_BLOCK_GOLDEN_SEA);
+        event.getRegistry().register(ITEM_BLOCK_PEACEFUL_TABLE);
+        event.getRegistry().register(ITEM_BLOCK_STORAGE_PAIL);
+        event.getRegistry().register(ITEM_BLOCK_WASTE_DIRT);
+        event.getRegistry().register(ITEM_BLOCK_ADVANCED_CAULDRON);
+        event.getRegistry().register(ITEM_BLOCK_TIME_TABLE);
+        event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK, VariantItemBlock::new));
+        event.getRegistry().register(CROP_SEED);
+        event.getRegistry().register(CROP_ANALYZER);
+        event.getRegistry().register(ITEM_WEEDING_SHEARS);
+        event.getRegistry().register(ITEM_XP_BERRY);
+        event.getRegistry().register(ITEM_SOAR_XP_BERRY);
+        event.getRegistry().register(WING_FAIRY_DUST);
+        event.getRegistry().register(WING_AMETHYST);
+        event.getRegistry().register(BAT_BLOOD);
+        event.getRegistry().registerAll(WINGS);
+        event.getRegistry().register(HANG_GLIDER_PART);
+        event.getRegistry().register(HANG_GLIDER);
+        event.getRegistry().register(ADVANCED_HANG_GLIDER);
+        event.getRegistry().registerAll(LIGHTSABERS);
+        event.getRegistry().register(DOUBLE_LIGHTSABER);
+        event.getRegistry().register(LIGHTSABER_CIRCUITRY);
+        event.getRegistry().register(LIGHTSABER_CRYSTAL);
+        event.getRegistry().register(FOCUSING_CRYSTAL);
+        event.getRegistry().register(LIGHTSABER_EMITTER);
+        event.getRegistry().register(LIGHTSABER_SWITCH);
+        event.getRegistry().register(LIGHTSABER_GRIP);
+        event.getRegistry().register(LIGHTSABER_POMMEL);
+        event.getRegistry().register(HOOK_ITEM);
+        event.getRegistry().register(HOOK_COMPONENT_ITEM);
+        event.getRegistry().register(PROGRAMMABLE_DRONE);
+        event.getRegistry().register(DRONE_PROGRAM_CARD);
+        event.getRegistry().register(DRONE_UPGRADE_MODULE);
+        event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void registerItemModels() {
+        registerItemModel(BlocksInit.TRANSPARENT_CASING1);
+        registerItemModel(BlocksInit.COMMON_CASING);
+        registerItemModel(BlocksInit.COMMON_CASING1);
+        registerItemModel(BlocksInit.FUSION_REACTOR_CASING);
+        registerItemModel(BlocksInit.YOT_TANK);
+        registerItemModel(BlocksInit.TFFT_TANK);
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
+        ModelLoader.setCustomMeshDefinition(CROP_SEED, new ItemCropSeed.SeedMeshDefinition());
+        // 种子袋变体模型(含默认 + 8个自定义，硬编码避免依赖CropRegistry时序)
+        ModelLoader.registerItemVariants(CROP_SEED,
+                new ModelResourceLocation(CROP_SEED.getRegistryName(), "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_oreberry", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_flower", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_grains", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_magic", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_spore", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_bonsai", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_botania", "inventory"),
+                new ModelResourceLocation(Tags.MODID + ":crop_seed_vanilla", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(CROP_ANALYZER, 0, new ModelResourceLocation(CROP_ANALYZER.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_WEEDING_SHEARS, 0, new ModelResourceLocation(ITEM_WEEDING_SHEARS.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(WING_FAIRY_DUST, 0, new ModelResourceLocation(WING_FAIRY_DUST.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(WING_AMETHYST, 0, new ModelResourceLocation(WING_AMETHYST.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(BAT_BLOOD, 0, new ModelResourceLocation(BAT_BLOOD.getRegistryName(), "inventory"));
+        for (ItemWings wings : WINGS) {
+            ModelLoader.setCustomModelResourceLocation(wings, 0, new ModelResourceLocation(wings.getRegistryName(), "inventory"));
+        }
+        ModelLoader.setCustomModelResourceLocation(HANG_GLIDER, 0,
+                new ModelResourceLocation(HANG_GLIDER.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(ADVANCED_HANG_GLIDER, 0,
+                new ModelResourceLocation(ADVANCED_HANG_GLIDER.getRegistryName(), "inventory"));
+        for (int meta = 0; meta < ItemHangGliderPart.NAMES.length; meta++) {
+            ModelLoader.setCustomModelResourceLocation(HANG_GLIDER_PART, meta,
+                    new ModelResourceLocation(Tags.MODID + ":" + ItemHangGliderPart.NAMES[meta], "inventory"));
+        }
+        ModelResourceLocation lightsaberModel = new ModelResourceLocation(Tags.MODID + ":lightsaber", "inventory");
+        for (ItemLightsaber lightsaber : LIGHTSABERS) {
+            lightsaber.setTileEntityItemStackRenderer(new RenderItemLightsaber());
+            ModelLoader.setCustomModelResourceLocation(lightsaber, 0, lightsaberModel);
+        }
+        DOUBLE_LIGHTSABER.setTileEntityItemStackRenderer(new RenderItemDoubleLightsaber());
+        ModelLoader.setCustomModelResourceLocation(DOUBLE_LIGHTSABER, 0, lightsaberModel);
+        ModelLoader.setCustomModelResourceLocation(LIGHTSABER_CIRCUITRY, 0,
+                new ModelResourceLocation(LIGHTSABER_CIRCUITRY.getRegistryName(), "inventory"));
+        for (LightsaberColor color : LightsaberColor.values()) {
+            ModelLoader.setCustomModelResourceLocation(LIGHTSABER_CRYSTAL, color.getMetadata(),
+                    new ModelResourceLocation(LIGHTSABER_CRYSTAL.getRegistryName(), "inventory"));
+        }
+        for (FocusingCrystal crystal : FocusingCrystal.values()) {
+            ModelLoader.setCustomModelResourceLocation(FOCUSING_CRYSTAL, crystal.getMetadata(),
+                    new ModelResourceLocation(Tags.MODID + ":focusing_crystal_" + crystal.getSerializedName(), "inventory"));
+        }
+        for (ItemLightsaberPart part : new ItemLightsaberPart[] {
+                LIGHTSABER_EMITTER, LIGHTSABER_SWITCH, LIGHTSABER_GRIP, LIGHTSABER_POMMEL }) {
+            part.setTileEntityItemStackRenderer(new RenderItemLightsaberPart());
+            for (LightsaberHilt hilt : LightsaberHilt.values()) {
+                ModelLoader.setCustomModelResourceLocation(part, hilt.getMetadata(),
+                        new ModelResourceLocation(part.getRegistryName(), "inventory"));
+            }
+        }
+        for (HookType type : HookType.values()) {
+            ModelLoader.setCustomModelResourceLocation(HOOK_ITEM, type.ordinal(),
+                    new ModelResourceLocation(Tags.MODID + ":hook_" + type.name().toLowerCase(), "inventory"));
+        }
+        for (HookComponentType type : HookComponentType.values()) {
+            ModelLoader.setCustomModelResourceLocation(HOOK_COMPONENT_ITEM, type.ordinal(),
+                    new ModelResourceLocation(Tags.MODID + ":" + type.name().toLowerCase(), "inventory"));
+        }
+        for (DroneChassisTier chassis : DroneChassisTier.values()) {
+            ModelLoader.setCustomModelResourceLocation(PROGRAMMABLE_DRONE, chassis.getMetadata(),
+                    new ModelResourceLocation(Tags.MODID + ":programmable_drone_"
+                            + chassis.name().toLowerCase(), "inventory"));
+        }
+        ModelLoader.setCustomModelResourceLocation(DRONE_PROGRAM_CARD, 0,
+                new ModelResourceLocation(DRONE_PROGRAM_CARD.getRegistryName(), "inventory"));
+        for (DroneUpgradeType type : DroneUpgradeType.values()) {
+            ModelLoader.setCustomModelResourceLocation(DRONE_UPGRADE_MODULE, type.getMetadata(),
+                    new ModelResourceLocation(Tags.MODID + ":drone_upgrade_"
+                            + type.getSerializedName(), "inventory"));
+        }
+    }
+
+    /** 在CropRegistry.registerAll()之后调用，注册染色处理器 */
+    @SideOnly(Side.CLIENT)
+    public static void registerSeedModelsLate() {
+        net.minecraft.client.Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                new ItemCropSeed.SeedColorHandler(), CROP_SEED);
+        net.minecraft.client.Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                (stack, tintIndex) -> LightsaberColor.byMetadata(stack.getMetadata()).getPackedRgb(),
+                LIGHTSABER_CRYSTAL);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static void registerItemModel(@Nonnull Block block) {
+        for (IBlockState state : block.getBlockState().getValidStates()) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block),
+                    block.getMetaFromState(state),
+                    new ModelResourceLocation(block.getRegistryName(),
+                            statePropertiesToString(state.getProperties())));
+        }
+    }
+
+    private static <T extends Block> ItemBlock createItemBlock(@Nonnull T block, Function<T, ItemBlock> producer) {
+        ItemBlock itemBlock = producer.apply(block);
+        itemBlock.setRegistryName(Objects.requireNonNull(block.getRegistryName()));
+        return itemBlock;
+    }
+
+    public static ItemLightsaber getLightsaber(LightsaberHilt hilt) {
+        return LIGHTSABERS[hilt.getMetadata()];
+    }
+
+    private static ItemLightsaber[] createLightsabers() {
+        LightsaberHilt[] hilts = LightsaberHilt.values();
+        ItemLightsaber[] lightsabers = new ItemLightsaber[hilts.length];
+        for (LightsaberHilt hilt : hilts) {
+            String registryName = hilt == LightsaberHilt.GRAFLEX
+                    ? "lightsaber" : "lightsaber_" + hilt.getSerializedName();
+            lightsabers[hilt.getMetadata()] = new ItemLightsaber(registryName, hilt);
+        }
+        return lightsabers;
+    }
+
+    public static ItemWings getWings(WingType type) {
+        return WINGS[type.ordinal()];
+    }
+
+    private static ItemWings[] createWings() {
+        WingType[] types = WingType.values();
+        ItemWings[] wings = new ItemWings[types.length];
+        for (WingType type : types) {
+            wings[type.ordinal()] = new ItemWings(type);
+        }
+        return wings;
+    }
+
+    private static ItemSimpleDrTech createBatBlood() {
+        ItemSimpleDrTech batBlood = new ItemSimpleDrTech("bat_blood");
+        batBlood.setContainerItem(net.minecraft.init.Items.GLASS_BOTTLE);
+        return batBlood;
+    }
+}

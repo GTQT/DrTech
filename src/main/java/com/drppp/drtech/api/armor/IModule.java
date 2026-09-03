@@ -1,6 +1,5 @@
 package com.drppp.drtech.api.armor;
 
-import gregtech.api.items.armor.ArmorUtils;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.api.items.metaitem.stats.IItemComponent;
@@ -124,7 +123,7 @@ public interface IModule extends IItemBehaviour {
      *
      * @param slot              slot of the armor piece
      * @param modularArmorPiece armor piece
-     * @param modularSlots      item handler of the modular slots of the {@link com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityArmorWorkbench}
+     * @param modularSlots      item handler of the modular slots of the {@link com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityArmorWorkbench}
      * @return if the armor accepts this module
      */
     boolean canPlaceIn(EntityEquipmentSlot slot, ItemStack modularArmorPiece, IItemHandler modularSlots);

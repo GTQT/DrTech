@@ -27,9 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,9 +46,7 @@ public class MobInfoWrapper implements IRecipeWrapper, ITooltipCallback<ItemStac
     private static final int ENTITY_X = 37;
     private static final int ENTITY_Y = 100;
     private static final int TEXT_X = 98;
-    private static final int TEXT_Y_BIOME = 3;
-    private static final int TEXT_Y_LIGHT = 13;
-    private static final int TEXT_Y_XP = 23;
+    private static final int TEXT_Y_XP = 3;
     private static final int NAME_Y = 3;
 
     private final MobInfoEntry entry;
@@ -115,21 +111,7 @@ public class MobInfoWrapper implements IRecipeWrapper, ITooltipCallback<ItemStac
         MobRenderUtil.drawText(name,
                 ENTITY_X - MobRenderUtil.getTextWidth(name) / 2, NAME_Y);
 
-        // ---- 文字信息行 ----
-        List<String> biomes = entry.getBiomes();
-        String biomeText;
-        if (biomes.isEmpty()) {
-            biomeText = I18n.format("drtech.mob_info.spawn") + ": " + I18n.format("drtech.mob_info.unknown");
-        } else if (biomes.size() > 1) {
-            biomeText = I18n.format("drtech.mob_info.spawn") + ": " + I18n.format("drtech.mob_info.hover_biomes");
-        } else {
-            biomeText = I18n.format("drtech.mob_info.spawn") + ": " + biomes.get(0);
-        }
-        MobRenderUtil.drawText(biomeText, TEXT_X, TEXT_Y_BIOME);
-
-        MobRenderUtil.drawText(I18n.format("drtech.mob_info.light") + ": "
-                + I18n.format("drtech.mob_info.light.unknown"), TEXT_X, TEXT_Y_LIGHT);
-
+        // ---- 经验信息（右上） ----
         MobRenderUtil.drawText(I18n.format("drtech.mob_info.exp") + ": " + entry.getXp(), TEXT_X, TEXT_Y_XP);
 
         // ---- 无法识别横幅 ----
@@ -138,20 +120,6 @@ public class MobInfoWrapper implements IRecipeWrapper, ITooltipCallback<ItemStac
             int x = 136 - MobRenderUtil.getTextWidth(unrecognized) / 2;
             MobRenderUtil.drawText(unrecognized, x, 78);
         }
-    }
-
-    @Nullable
-    @Override
-    public List<String> getTooltipStrings(int mouseX, int mouseY) {
-        List<String> biomes = entry.getBiomes();
-        if (biomes.size() > 1 && isOnBiomeInfo(mouseX, mouseY)) {
-            return new ArrayList<>(biomes);
-        }
-        return Collections.emptyList();
-    }
-
-    private boolean isOnBiomeInfo(int mouseX, int mouseY) {
-        return mouseX >= 100 && mouseX < 165 && mouseY >= 3 && mouseY < 11;
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.drppp.drtech.api.armor.modules;
 import com.drppp.drtech.api.armor.AbsorbResult;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ISpecialArmorModule;
-import com.drppp.drtech.common.Items.MTMetaItems;
+import com.drppp.drtech.common.items.MTMetaItems;
 import gregtech.api.damagesources.DamageSources;
 import gregtech.api.items.metaitem.MetaItem;
 import net.minecraft.entity.EntityLivingBase;

@@ -1,14 +1,13 @@
 package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.IModule;
-import com.drppp.drtech.common.Items.MTMetaItems;
+import com.drppp.drtech.common.items.MTMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.util.input.KeyBind;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 

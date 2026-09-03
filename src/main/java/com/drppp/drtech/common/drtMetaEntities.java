@@ -1,17 +1,16 @@
 package com.drppp.drtech.common;
 
-import com.drppp.drtech.Client.render.Entity.EntityRemderFactory;
-import com.drppp.drtech.Client.render.Entity.RenderThrownLightsaber;
-import com.drppp.drtech.Client.render.Entity.RenderUTiGolem;
-import com.drppp.drtech.Client.render.Entity.RenderProgrammableDrone;
+import com.drppp.drtech.client.render.Entity.EntityRemderFactory;
+import com.drppp.drtech.client.render.Entity.RenderThrownLightsaber;
+import com.drppp.drtech.client.render.Entity.RenderUTiGolem;
+import com.drppp.drtech.client.render.Entity.RenderProgrammableDrone;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Entity.EntityHyperGunBullet;
-import com.drppp.drtech.common.Entity.EntityPlasmaBullet;
-import com.drppp.drtech.common.Entity.EntityTachyonBullet;
-import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
-import com.drppp.drtech.common.Entity.moster.EntityUTiGolem;
-import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.entity.EntityHyperGunBullet;
+import com.drppp.drtech.common.entity.EntityPlasmaBullet;
+import com.drppp.drtech.common.entity.EntityTachyonBullet;
+import com.drppp.drtech.common.entity.EntityThrownLightsaber;
+import com.drppp.drtech.common.entity.moster.EntityUTiGolem;
 import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;

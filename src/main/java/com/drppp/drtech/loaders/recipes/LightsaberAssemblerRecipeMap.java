@@ -1,14 +1,14 @@
 package com.drppp.drtech.loaders.recipes;
 
-import com.drppp.drtech.common.Items.ItemsInit;
-import com.drppp.drtech.common.Items.lightsaber.FocusingCrystal;
-import com.drppp.drtech.common.Items.lightsaber.ItemFocusingCrystal;
-import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
-import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
-import com.drppp.drtech.common.Items.lightsaber.ItemLightsaberPart;
-import com.drppp.drtech.common.Items.lightsaber.LightsaberColor;
-import com.drppp.drtech.common.Items.lightsaber.LightsaberHilt;
-import com.drppp.drtech.common.Items.lightsaber.LightsaberPartType;
+import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.items.lightsaber.FocusingCrystal;
+import com.drppp.drtech.common.items.lightsaber.ItemFocusingCrystal;
+import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaberPart;
+import com.drppp.drtech.common.items.lightsaber.LightsaberColor;
+import com.drppp.drtech.common.items.lightsaber.LightsaberHilt;
+import com.drppp.drtech.common.items.lightsaber.LightsaberPartType;
 import gregtech.api.GTValues;
 import gregtech.api.mui.GTGuiTextures;
 import gregtech.api.recipes.Recipe;

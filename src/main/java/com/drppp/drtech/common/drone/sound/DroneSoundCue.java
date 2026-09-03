@@ -1,6 +1,6 @@
 package com.drppp.drtech.common.drone.sound;
 
-import com.drppp.drtech.common.Sound.DrTechSounds;
+import com.drppp.drtech.common.sound.DrTechSounds;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.SoundEvent;
 

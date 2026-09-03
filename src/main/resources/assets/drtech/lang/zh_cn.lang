@@ -1162,14 +1162,14 @@ key.categories.drtech=Dr科技
 key.ctrl=飞行戒指加速
 
 #recipemap
-recipemap.eimplosion_compressor.name=电力聚爆压缩机
-recipemap.log_create.name=原木拟生
 recipemap.molecular_recombination.name=分子重组
 recipemap.mob_killer.name=怪物屠宰
 recipemap.deep_ground_pump.name=热能抽取
 recipemap.solar_tower.name=太阳之力
 recipemap.disassembler.name=拆解机
 recipemap.combs_product.name=蜂窝处理
+recipemap.drone_pad.name=无人机狩猎
+
 #Items
 metaitem.energy_element_1.name=1号能量元素
 metaitem.energy_element_2.name=2号能量元素

@@ -5,7 +5,7 @@ import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
 import com.drppp.drtech.api.armor.Modules;
 import com.drppp.drtech.api.armor.modules.OxygenMask;
-import com.drppp.drtech.common.loaders.recipes.Recipes;
+import com.drppp.drtech.loaders.recipes.Recipes;
 import micdoodle8.mods.galacticraft.api.event.oxygen.GCCoreOxygenSuffocationEvent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;

@@ -1,12 +1,12 @@
 package com.drppp.drtech.loaders.recipes;
 
-import com.drppp.drtech.common.Items.ItemsInit;
-import com.drppp.drtech.common.Items.lightsaber.FocusingCrystal;
-import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
-import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
-import com.drppp.drtech.common.Items.lightsaber.LightsaberColor;
-import com.drppp.drtech.common.Items.lightsaber.LightsaberHilt;
-import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
+import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.items.lightsaber.FocusingCrystal;
+import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.items.lightsaber.LightsaberColor;
+import com.drppp.drtech.common.items.lightsaber.LightsaberHilt;
+import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
 import gregtech.api.GTValues;
 import gregtech.api.recipes.RecipeMaps;
 import gregtech.api.unification.material.MarkerMaterials;
@@ -29,7 +29,7 @@ public final class LightsaberRecipes {
     }
 
     private static void registerComponents() {
-        DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+        DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                 .input(OrePrefix.circuit, MarkerMaterials.Tier.LV)
                 .input(OrePrefix.wireFine, Materials.Electrum, 4)
                 .input(OrePrefix.plate, Materials.Gold)
@@ -40,7 +40,7 @@ public final class LightsaberRecipes {
 
         for (LightsaberHilt hilt : LightsaberHilt.values()) {
             int circuit = hilt.getMetadata() + 1;
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .input(OrePrefix.plate, Materials.StainlessSteel, 2)
                     .input(OrePrefix.ring, Materials.Titanium)
                     .circuitMeta(circuit)
@@ -48,7 +48,7 @@ public final class LightsaberRecipes {
                     .duration(80)
                     .EUt(GTValues.VA[GTValues.LV])
                     .buildAndRegister();
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .input(OrePrefix.plate, Materials.StainlessSteel)
                     .input(OrePrefix.wireFine, Materials.Copper, 2)
                     .circuitMeta(circuit)
@@ -56,7 +56,7 @@ public final class LightsaberRecipes {
                     .duration(80)
                     .EUt(GTValues.VA[GTValues.LV])
                     .buildAndRegister();
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .input(OrePrefix.plate, Materials.Steel, 2)
                     .input(OrePrefix.ring, Materials.Rubber, 2)
                     .circuitMeta(circuit)
@@ -64,7 +64,7 @@ public final class LightsaberRecipes {
                     .duration(80)
                     .EUt(GTValues.VA[GTValues.LV])
                     .buildAndRegister();
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .input(OrePrefix.plate, Materials.Steel)
                     .input(OrePrefix.screw, Materials.StainlessSteel, 2)
                     .circuitMeta(circuit)
@@ -75,7 +75,7 @@ public final class LightsaberRecipes {
         }
 
         for (LightsaberColor color : LightsaberColor.values()) {
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .input(OrePrefix.gem, Materials.NetherQuartz)
                     .input(OrePrefix.dust, Materials.Redstone)
                     .circuitMeta(color.getMetadata() + 1)
@@ -86,7 +86,7 @@ public final class LightsaberRecipes {
         }
 
         for (FocusingCrystal crystal : FocusingCrystal.values()) {
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .input(OrePrefix.gem, Materials.Diamond)
                     .input(OrePrefix.dust, Materials.CertusQuartz)
                     .circuitMeta(crystal.getMetadata() + 1)
@@ -97,7 +97,7 @@ public final class LightsaberRecipes {
         }
 
         ItemStack mauler = new ItemStack(ItemsInit.getLightsaber(LightsaberHilt.MAULER));
-        DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+        DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                 .inputs(mauler.copy())
                 .inputs(mauler.copy())
                 .outputs(ItemDoubleLightsaber.create(mauler, mauler))
@@ -109,7 +109,7 @@ public final class LightsaberRecipes {
     private static void registerAssemblyExamples() {
         for (LightsaberHilt hilt : LightsaberHilt.values()) {
             LightsaberColor color = hilt.getDefaultColor();
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .inputs(new ItemStack(ItemsInit.LIGHTSABER_EMITTER, 1, hilt.getMetadata()))
                     .inputs(new ItemStack(ItemsInit.LIGHTSABER_SWITCH, 1, hilt.getMetadata()))
                     .inputs(new ItemStack(ItemsInit.LIGHTSABER_GRIP, 1, hilt.getMetadata()))
@@ -128,7 +128,7 @@ public final class LightsaberRecipes {
             ItemStack lightsaber = new ItemStack(ItemsInit.getLightsaber(LightsaberHilt.GRAFLEX));
             ItemStack output = lightsaber.copy();
             ItemLightsaber.setFocusingCrystalMask(output, crystal.getMask());
-            DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES.recipeBuilder()
                     .inputs(lightsaber)
                     .inputs(new ItemStack(ItemsInit.FOCUSING_CRYSTAL, 1, crystal.getMetadata()))
                     .outputs(output)
@@ -141,7 +141,7 @@ public final class LightsaberRecipes {
     private static void registerDisassemblyExamples() {
         for (LightsaberHilt hilt : LightsaberHilt.values()) {
             ItemStack lightsaber = new ItemStack(ItemsInit.getLightsaber(hilt));
-            DrtechReceipes.DISASSEMBLER_RECIPES.recipeBuilder()
+            DrtechRecipes.DISASSEMBLER_RECIPES.recipeBuilder()
                     .inputs(lightsaber)
                     .outputs(LightsaberDisassemblerRecipeMap.getDisassemblyOutputs(lightsaber))
                     .duration(200)
@@ -151,7 +151,7 @@ public final class LightsaberRecipes {
 
         ItemStack mauler = new ItemStack(ItemsInit.getLightsaber(LightsaberHilt.MAULER));
         ItemStack doubleLightsaber = ItemDoubleLightsaber.create(mauler, mauler);
-        DrtechReceipes.DISASSEMBLER_RECIPES.recipeBuilder()
+        DrtechRecipes.DISASSEMBLER_RECIPES.recipeBuilder()
                 .inputs(doubleLightsaber)
                 .outputs(LightsaberDisassemblerRecipeMap.getDisassemblyOutputs(doubleLightsaber))
                 .duration(400)

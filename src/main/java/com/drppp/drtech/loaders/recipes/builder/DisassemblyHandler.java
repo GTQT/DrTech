@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.*;
 
-import static com.drppp.drtech.loaders.recipes.DrtechReceipes.DISASSEMBLER_RECIPES;
+import static com.drppp.drtech.loaders.recipes.DrtechRecipes.DISASSEMBLER_RECIPES;
 import static gregtech.api.unification.material.Materials.Ash;
 import static gregtech.api.unification.ore.OrePrefix.dustTiny;
 

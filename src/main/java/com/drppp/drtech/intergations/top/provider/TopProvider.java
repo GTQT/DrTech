@@ -1,9 +1,9 @@
 package com.drppp.drtech.intergations.top.provider;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Items.ItemsInit;
-import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileentityCropsSimulateMachine;
-import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
+import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.metaTileEntities.muti.electric.standard.MetaTileentityCropsSimulateMachine;
+import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.tile.TileCropStick;
 import gregtech.api.util.GTUtility;

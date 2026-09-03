@@ -1,9 +1,9 @@
 package com.drppp.drtech.common.event;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
-import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
-import com.drppp.drtech.common.Sound.DrTechSounds;
+import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.sound.DrTechSounds;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;

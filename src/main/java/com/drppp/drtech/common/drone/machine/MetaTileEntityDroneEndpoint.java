@@ -109,21 +109,21 @@ public final class MetaTileEntityDroneEndpoint extends TieredMetaTileEntity {
         super.renderMetaTileEntity(renderState, translation, pipeline);
         switch (kind) {
             case ITEM -> {
-                com.drppp.drtech.Client.Textures.DRONE_ENDPOINT_ITEM_CASING.render(
+                com.drppp.drtech.client.Textures.DRONE_ENDPOINT_ITEM_CASING.render(
                         renderState, translation, pipeline);
-                com.drppp.drtech.Client.Textures.DRONE_ENDPOINT_ITEM_OVERLAY.renderSided(
+                com.drppp.drtech.client.Textures.DRONE_ENDPOINT_ITEM_OVERLAY.renderSided(
                         getFrontFacing(), renderState, translation, pipeline);
             }
             case FLUID -> {
-                com.drppp.drtech.Client.Textures.DRONE_ENDPOINT_FLUID_CASING.render(
+                com.drppp.drtech.client.Textures.DRONE_ENDPOINT_FLUID_CASING.render(
                         renderState, translation, pipeline);
-                com.drppp.drtech.Client.Textures.DRONE_ENDPOINT_FLUID_OVERLAY.renderSided(
+                com.drppp.drtech.client.Textures.DRONE_ENDPOINT_FLUID_OVERLAY.renderSided(
                         getFrontFacing(), renderState, translation, pipeline);
             }
             case EU -> {
-                com.drppp.drtech.Client.Textures.DRONE_ENDPOINT_EU_CASING.render(
+                com.drppp.drtech.client.Textures.DRONE_ENDPOINT_EU_CASING.render(
                         renderState, translation, pipeline);
-                com.drppp.drtech.Client.Textures.DRONE_ENDPOINT_EU_OVERLAY.renderSided(
+                com.drppp.drtech.client.Textures.DRONE_ENDPOINT_EU_OVERLAY.renderSided(
                         getFrontFacing(), renderState, translation, pipeline);
             }
         }

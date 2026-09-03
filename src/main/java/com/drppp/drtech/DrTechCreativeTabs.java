@@ -1,6 +1,6 @@
 package com.drppp.drtech;
 
-import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.items.ItemsInit;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 

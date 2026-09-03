@@ -1,20 +1,17 @@
 package com.drppp.drtech.loaders.recipes.chain;
 
-import com.drppp.drtech.common.Blocks.BlocksInit;
 import gregtech.api.metatileentity.multiblock.CleanroomType;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;
-import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 import net.minecraft.item.ItemStack;
 
-import static com.drppp.drtech.common.Blocks.BlocksInit.TFFT_TANK;
-import static com.drppp.drtech.common.Blocks.BlocksInit.YOT_TANK;
-import static com.drppp.drtech.common.Blocks.MetaBlocks.BlockFTTFPart.BlockYotTankPartType.*;
-import static com.drppp.drtech.common.Blocks.MetaBlocks.BlockYotTankPart.BlockYotTankPartType.*;
-import static com.drppp.drtech.common.Items.MetaItems.DrMetaItems.*;
+import static com.drppp.drtech.common.blocks.BlocksInit.TFFT_TANK;
+import static com.drppp.drtech.common.blocks.BlocksInit.YOT_TANK;
+import static com.drppp.drtech.common.blocks.MetaBlocks.BlockFTTFPart.BlockYotTankPartType.*;
+import static com.drppp.drtech.common.blocks.MetaBlocks.BlockYotTankPart.BlockYotTankPartType.*;
+import static com.drppp.drtech.common.items.MetaItems.DrMetaItems.*;
 import static gregtech.api.GTValues.*;
-import static gregtech.api.GTValues.OpV;
 import static gregtech.api.recipes.RecipeMaps.ASSEMBLER_RECIPES;
 import static gregtech.api.unification.material.Materials.*;
 import static gregtech.api.unification.material.Materials.Tritanium;

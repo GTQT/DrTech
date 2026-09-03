@@ -22,7 +22,7 @@ import com.drppp.drtech.common.drone.network.DroneEndpointNetwork;
 import com.drppp.drtech.common.drone.network.DroneEndpointRoute;
 import com.drppp.drtech.common.drone.network.DroneEndpointRoutePlanner;
 import com.drppp.drtech.common.drone.network.DroneEndpointWorldLink;
-import com.drppp.drtech.Client.drone.DroneWorldPreviewRenderer;
+import com.drppp.drtech.client.drone.DroneWorldPreviewRenderer;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.TieredMetaTileEntity;
@@ -445,12 +445,12 @@ public final class MetaTileEntityDroneFleetController extends TieredMetaTileEnti
         IVertexOperation[] colouredPipeline = ArrayUtils.add(pipeline,
                 new ColourMultiplier(GTUtility.convertRGBtoOpaqueRGBA_CL(getPaintingColorForRendering())));
         Textures.VOLTAGE_CASINGS[GTValues.EV].render(renderState, translation, colouredPipeline);
-        com.drppp.drtech.Client.Textures.DRONE_CONTROLLER_CASING.render(
+        com.drppp.drtech.client.Textures.DRONE_CONTROLLER_CASING.render(
                 renderState, translation, pipeline);
         Textures.INFINITE_EMITTER_FACE.renderSided(getFrontFacing(), renderState, translation, pipeline);
         Textures.INFINITE_EMITTER_FACE.renderSided(net.minecraft.util.EnumFacing.UP,
                 renderState, translation, pipeline);
-        com.drppp.drtech.Client.Textures.DRONE_CONTROLLER_OVERLAY.renderSided(
+        com.drppp.drtech.client.Textures.DRONE_CONTROLLER_OVERLAY.renderSided(
                 getFrontFacing(), renderState, translation, pipeline);
     }
 }

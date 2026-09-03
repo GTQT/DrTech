@@ -5,7 +5,7 @@ import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.item.ItemCropSeed;
-import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.items.ItemsInit;
 import gregtechfoodoption.common.machines.farmer.FarmerMode;
 import gregtechfoodoption.common.machines.farmer.MetaTileEntityFarmer;
 import net.minecraft.block.state.IBlockState;

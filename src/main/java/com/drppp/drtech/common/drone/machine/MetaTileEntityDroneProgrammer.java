@@ -18,15 +18,15 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
-import com.drppp.drtech.Client.drone.DroneProgramCanvasWidget;
-import com.drppp.drtech.Client.drone.DroneDiagnosticScrollWidget;
-import com.drppp.drtech.Client.drone.DronePropertyChoiceWidget;
-import com.drppp.drtech.Client.drone.DroneAreaPreviewWidget;
-import com.drppp.drtech.Client.drone.DroneWorldPreviewRenderer;
-import com.drppp.drtech.Client.drone.DroneWorldSelectionHandler;
-import com.drppp.drtech.Client.drone.DroneMultilineTextWidget;
-import com.drppp.drtech.Client.drone.DroneNodeLibraryButtonWidget;
-import com.drppp.drtech.Client.drone.DroneBilingualNodeSearch;
+import com.drppp.drtech.client.drone.DroneProgramCanvasWidget;
+import com.drppp.drtech.client.drone.DroneDiagnosticScrollWidget;
+import com.drppp.drtech.client.drone.DronePropertyChoiceWidget;
+import com.drppp.drtech.client.drone.DroneAreaPreviewWidget;
+import com.drppp.drtech.client.drone.DroneWorldPreviewRenderer;
+import com.drppp.drtech.client.drone.DroneWorldSelectionHandler;
+import com.drppp.drtech.client.drone.DroneMultilineTextWidget;
+import com.drppp.drtech.client.drone.DroneNodeLibraryButtonWidget;
+import com.drppp.drtech.client.drone.DroneBilingualNodeSearch;
 import com.drppp.drtech.common.drone.item.DroneItemData;
 import com.drppp.drtech.common.drone.hardware.DroneUpgradeDataCodec;
 import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
@@ -64,8 +64,6 @@ import com.drppp.drtech.common.drone.program.registry.DrTechDroneNodes;
 import com.drppp.drtech.common.drone.program.registry.DroneNodeLibraryIndex;
 import com.drppp.drtech.common.drone.program.registry.DroneNodeRegistry;
 import com.drppp.drtech.common.drone.program.edit.DroneProgramEditSession;
-import com.drppp.drtech.common.drone.program.runtime.DrTechDroneExecutors;
-import com.drppp.drtech.common.drone.program.runtime.DrTechDroneValueEvaluators;
 import com.drppp.drtech.common.drone.program.runtime.DroneExecutorRegistry;
 import com.drppp.drtech.common.drone.program.runtime.DroneProgramRuntime;
 import com.drppp.drtech.common.drone.program.runtime.DroneValueEvaluatorRegistry;
@@ -3937,9 +3935,9 @@ public final class MetaTileEntityDroneProgrammer extends TieredMetaTileEntity {
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation,
             IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        com.drppp.drtech.Client.Textures.DRONE_PROGRAMMER_CASING.render(
+        com.drppp.drtech.client.Textures.DRONE_PROGRAMMER_CASING.render(
                 renderState, translation, pipeline);
-        com.drppp.drtech.Client.Textures.DRONE_PROGRAMMER_OVERLAY.renderSided(
+        com.drppp.drtech.client.Textures.DRONE_PROGRAMMER_OVERLAY.renderSided(
                 getFrontFacing(), renderState, translation, pipeline);
     }
 

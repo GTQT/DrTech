@@ -1,10 +1,10 @@
 package com.drppp.drtech.loaders.recipes;
 
-import com.drppp.drtech.common.Items.ItemsInit;
-import com.drppp.drtech.common.Items.lightsaber.FocusingCrystal;
-import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
-import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
-import com.drppp.drtech.common.Items.lightsaber.LightsaberPartType;
+import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.items.lightsaber.FocusingCrystal;
+import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.items.lightsaber.LightsaberPartType;
 import gregtech.api.GTValues;
 import gregtech.api.mui.GTGuiTextures;
 import gregtech.api.recipes.Recipe;
