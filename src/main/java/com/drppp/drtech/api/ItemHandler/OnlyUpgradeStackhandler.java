@@ -1,10 +1,7 @@
 package com.drppp.drtech.api.ItemHandler;
 
-import com.drppp.drtech.api.Utils.GT_ApiaryUpgrade;
-import forestry.api.apiculture.BeeManager;
-import forestry.api.apiculture.EnumBeeType;
+import com.drppp.drtech.api.utils.GT_ApiaryUpgrade;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.items.ItemStackHandler;

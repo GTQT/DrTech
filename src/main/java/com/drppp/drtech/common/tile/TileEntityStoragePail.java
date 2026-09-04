@@ -15,7 +15,7 @@ import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.ItemHandler.PailItemStackHandler;
-import com.drppp.drtech.api.TileEntity.TileEntityWithUI;
+import com.drppp.drtech.api.tileEntity.TileEntityWithUI;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;

@@ -2,7 +2,7 @@ package com.drppp.drtech.client.render;
 
 
 import com.drppp.drtech.client.Particle.XCustomizedParticle;
-import com.drppp.drtech.api.Utils.DrtechMathUtils;
+import com.drppp.drtech.api.utils.DrtechMathUtils;
 import com.drppp.drtech.common.entity.EntityPlasmaBullet;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;

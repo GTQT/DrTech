@@ -7,7 +7,7 @@ import com.drppp.drtech.common.tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
-import com.drppp.drtech.common.metaTileEntities.Logic.AnnihilationGeneratorLogic;
+import com.drppp.drtech.api.capability.ipml.AnnihilationGeneratorLogic;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
 import gregtech.api.capability.GregtechTileCapabilities;

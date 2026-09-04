@@ -1,12 +1,12 @@
 package com.drppp.drtech.client.render.Entity;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
-import com.drppp.drtech.common.drone.firmware.DroneSafetyState;
-import com.drppp.drtech.common.drone.program.runtime.DroneRuntimeStatus;
-import com.drppp.drtech.common.drone.hardware.DroneChassisTier;
-import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
-import com.drppp.drtech.common.drone.visual.DroneVisualState;
+import com.drppp.drtech.drone.entity.EntityProgrammableDrone;
+import com.drppp.drtech.drone.firmware.DroneSafetyState;
+import com.drppp.drtech.drone.program.runtime.DroneRuntimeStatus;
+import com.drppp.drtech.drone.hardware.DroneChassisTier;
+import com.drppp.drtech.drone.hardware.DroneUpgradeType;
+import com.drppp.drtech.drone.visual.DroneVisualState;
 import com.drppp.drtech.client.render.Items.LightsaberRenderHelper;
 import com.drppp.drtech.client.render.Items.RenderItemDoubleLightsaber;
 import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;

@@ -1,7 +1,7 @@
 package com.drppp.drtech.api.armor;
 
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.MTConfig;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import gregtech.api.GTValues;
@@ -74,7 +74,7 @@ public class ModularArmor implements ISpecialArmorLogic {
 
     @Override
     public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase entityLivingBase, @Nonnull ItemStack itemStack, DamageSource damageSource, double damage, EntityEquipmentSlot entityEquipmentSlot) {
-        if (MTConfig.debug) {
+        if (DrtConfig.debug) {
             GTLog.logger.info("Get Properties for source {}, damage {}, slot {}", damageSource.damageType, damage, slot);
         }
         NBTTagCompound nbt = itemStack.getTagCompound();
@@ -121,7 +121,7 @@ public class ModularArmor implements ISpecialArmorLogic {
                 absorbResult.ratio = moduleDamage / originalDamage;
             }
             properties.AbsorbRatio += absorbResult.ratio;
-            if (MTConfig.debug) {
+            if (DrtConfig.debug) {
                 GTLog.logger.info("  do {} special armor module damage", moduleDamage);
             }
             if (absorbResult.module instanceof IDurabilityModule) {
@@ -148,7 +148,7 @@ public class ModularArmor implements ISpecialArmorLogic {
             ta *= 4;
             float moduleDamage = (float) (damage - getDamageAfterAbsorb((float) damage, ta, tt));
             moduleDamage /= armorModules.size();
-            if (MTConfig.debug) {
+            if (DrtConfig.debug) {
                 GTLog.logger.info("  do {} armor module damage * {}", moduleDamage, armorModules.size());
             }
             for (AbsorbResult absorbResult : armorModules) {
@@ -161,7 +161,7 @@ public class ModularArmor implements ISpecialArmorLogic {
         }
         damage = Math.max(damage, 0);
         properties.AbsorbRatio = 1 - (damage / originalDamage);
-        if (MTConfig.debug) {
+        if (DrtConfig.debug) {
             GTLog.logger.info("  damage left {}, ratio {}", damage, properties.AbsorbRatio);
         }
         return properties;

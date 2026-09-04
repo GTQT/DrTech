@@ -2,7 +2,7 @@ package com.drppp.drtech.client.drone;
 
 import com.drppp.drtech.network.SyncInit;
 import com.drppp.drtech.network.UpdateTileEntityPacket;
-import com.drppp.drtech.common.drone.program.model.DroneArea;
+import com.drppp.drtech.drone.program.model.DroneArea;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;

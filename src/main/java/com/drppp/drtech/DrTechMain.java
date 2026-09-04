@@ -5,20 +5,21 @@ import com.drppp.drtech.client.ClientEventHandler;
 import com.drppp.drtech.client.ClientHandler;
 import com.drppp.drtech.client.ClientProxy;
 import com.drppp.drtech.client.Keys;
-import com.drppp.drtech.client.TesrTimeTable;
+import com.drppp.drtech.client.render.TesrTimeTable;
 import com.drppp.drtech.client.Textures;
 import com.drppp.drtech.client.render.TileEntityRendererConnector;
 import com.drppp.drtech.client.render.TileEntityRendererGravitationalAnomaly;
 import com.drppp.drtech.client.render.wings.WingsClientHandler;
 import com.drppp.drtech.client.render.glider.GliderClientHandler;
-import com.drppp.drtech.common.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion;
+import com.drppp.drtech.common.DrTechCreativeTabs;
+import com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion;
 import com.drppp.drtech.common.tile.TileEntityConnector;
 import com.drppp.drtech.common.tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.common.tile.TileEntityTimeTable;
 import com.drppp.drtech.network.ArmorNetworkHandler;
 import com.drppp.drtech.network.SyncInit;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
-import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.api.utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapInit;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.CommonProxy;
@@ -27,9 +28,9 @@ import com.drppp.drtech.common.items.ItemsInit;
 import com.drppp.drtech.common.items.MTMetaItems;
 import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
 import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
-import com.drppp.drtech.common.drtMetaEntities;
+import com.drppp.drtech.common.DrtechMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
-import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
+import com.drppp.drtech.drone.api.DroneExtensionRegistry;
 import com.drppp.drtech.hooked.HookCapability;
 import com.drppp.drtech.hooked.HookClientHooks;
 import com.drppp.drtech.hooked.HookNetwork;
@@ -51,20 +52,20 @@ import com.drppp.drtech.loaders.recipes.CraftingRecipes;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
 import com.drppp.drtech.loaders.ModRewardBoxes;
 import com.drppp.drtech.loaders.recipes.builder.DisassemblyHandler;
-import com.drppp.drtech.common.lootgames.LootGames;
-import com.drppp.drtech.common.lootgames.api.minigame.GameManager;
-import com.drppp.drtech.common.lootgames.api.task.TaskCreateExplosion;
-import com.drppp.drtech.common.lootgames.api.task.TaskRegistry;
-import com.drppp.drtech.common.lootgames.loot.ModLootTables;
-import com.drppp.drtech.common.lootgames.world.gen.LootGamesWorldGen;
-import com.drppp.drtech.common.lootgames.minigame.gameoflight.GameOfLight;
-import com.drppp.drtech.common.lootgames.minigame.minesweeper.GameMineSweeper;
-import com.drppp.drtech.common.lootgames.minigame.minesweeper.client.TESRMSMaster;
-import com.drppp.drtech.common.lootgames.minigame.minesweeper.tileentity.TileEntityMSMaster;
-import com.drppp.drtech.common.lootgames.minigame.gameoflight.client.TESRGOLMaster;
-import com.drppp.drtech.common.lootgames.minigame.gameoflight.TileEntityGOLMaster;
-import com.drppp.drtech.common.lootgames.packets.NetworkHandler;
-import com.drppp.drtech.common.lootgames.registry.ModBlocks;
+import com.drppp.drtech.lootgames.LootGames;
+import com.drppp.drtech.lootgames.api.minigame.GameManager;
+import com.drppp.drtech.lootgames.api.task.TaskCreateExplosion;
+import com.drppp.drtech.lootgames.api.task.TaskRegistry;
+import com.drppp.drtech.lootgames.loot.ModLootTables;
+import com.drppp.drtech.lootgames.world.gen.LootGamesWorldGen;
+import com.drppp.drtech.lootgames.minigame.gameoflight.GameOfLight;
+import com.drppp.drtech.lootgames.minigame.minesweeper.GameMineSweeper;
+import com.drppp.drtech.lootgames.minigame.minesweeper.client.TESRMSMaster;
+import com.drppp.drtech.lootgames.minigame.minesweeper.tileentity.TileEntityMSMaster;
+import com.drppp.drtech.lootgames.minigame.gameoflight.client.TESRGOLMaster;
+import com.drppp.drtech.lootgames.minigame.gameoflight.TileEntityGOLMaster;
+import com.drppp.drtech.lootgames.packets.NetworkHandler;
+import com.drppp.drtech.lootgames.registry.ModBlocks;
 import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import gregtech.api.metatileentity.registry.MTEManager;
@@ -105,7 +106,12 @@ public class DrTechMain {
     public static CreativeTabs DrTechTab;
     @Mod.Instance(MODID)
     public static DrTechMain instance;
-    @SidedProxy(modId = MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
+
+    @SidedProxy(modId = MODID,
+            clientSide = "com.drppp.drtech.client.ClientProxy",
+            serverSide = "com.drppp.drtech.common.CommonProxy"
+    )
+
     public static CommonProxy proxy;
     public static ClientProxy cproxy;
 
@@ -130,7 +136,7 @@ public class DrTechMain {
         GliderNetwork.init();
         WingsBaublesCompat.init();
         Textures.init();
-        drtMetaEntities.init();
+        DrtechMetaEntities.init();
         TileEntityUIFactory.INSTANCE.init();
         DrtToolItems.init();
         DroneExtensionRegistry.bootstrap();
@@ -165,7 +171,7 @@ public class DrTechMain {
     @SideOnly(Side.CLIENT)
     public void ClientpreInit(FMLPreInitializationEvent event) {
         TexturesInit();
-        drtMetaEntities.initRenderers();
+        DrtechMetaEntities.initRenderers();
         HookClientHooks.init();
         WingsClientHandler.init();
         // 模块化装甲客户端（原 mechtech ClientProxy）
@@ -235,7 +241,7 @@ public class DrTechMain {
     @EventHandler
     public void Clientinit(FMLInitializationEvent event) {
         SyncInit.init();
-        drtMetaEntities.initRenderers();
+        DrtechMetaEntities.initRenderers();
         CropInitHandler.clienInit();
         WingsClientHandler.initRenderLayers();
         GliderClientHandler.initRenderLayers();
@@ -243,7 +249,7 @@ public class DrTechMain {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        if (DrtConfig.EnableDisassembly)
+        if (DrtConfig.machine.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         FarmerModeRegistry.registerFarmerMode(new TileCropFarmerMode());
         DrtechUtils.initCropsList();

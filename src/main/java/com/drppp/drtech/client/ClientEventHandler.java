@@ -1,10 +1,10 @@
 package com.drppp.drtech.client;
 
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
 import com.drppp.drtech.api.armor.modules.Binoculars;
-import com.drppp.drtech.common.MTConfig;
 import com.drppp.drtech.common.items.MTMetaItems;
 import gregtech.api.items.armor.ArmorUtils;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -89,7 +89,7 @@ public class ClientEventHandler {
 
         EntityPlayerSP player = Minecraft.getMinecraft().player;
 
-        float zoom = (float) (1 / MTConfig.modularArmor.modules.binocularZoom);
+        float zoom = (float) (1 / DrtConfig.armor.binocularZoom);
 
         if (Mouse.isButtonDown(1)) {
             ItemStack binoculars = MTMetaItems.BINOCULARS.getStackForm();

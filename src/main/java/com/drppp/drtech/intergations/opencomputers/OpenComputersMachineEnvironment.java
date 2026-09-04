@@ -1,21 +1,21 @@
 package com.drppp.drtech.intergations.opencomputers;
 
-import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
+import com.drppp.drtech.drone.api.DroneExtensionRegistry;
 
-import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
-import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
-import com.drppp.drtech.common.drone.network.DroneEndpoint;
-import com.drppp.drtech.common.drone.network.DroneEndpointNetwork;
-import com.drppp.drtech.common.drone.network.DroneEndpointResource;
-import com.drppp.drtech.common.drone.network.DroneFleetState;
-import com.drppp.drtech.common.drone.network.DroneJob;
-import com.drppp.drtech.common.drone.network.DroneRegistry;
-import com.drppp.drtech.common.drone.network.DroneRegistryRecord;
-import com.drppp.drtech.common.drone.program.library.DroneProgramLibrary;
-import com.drppp.drtech.common.drone.program.library.DroneProgramLibraryRecord;
-import com.drppp.drtech.common.drone.program.codec.DroneProgramFormatException;
-import com.drppp.drtech.common.drone.program.codec.DroneProgramTransferCodec;
-import com.drppp.drtech.common.drone.program.model.DroneProgramGraph;
+import com.drppp.drtech.drone.entity.EntityProgrammableDrone;
+import com.drppp.drtech.drone.machine.MetaTileEntityDroneDock;
+import com.drppp.drtech.drone.network.DroneEndpoint;
+import com.drppp.drtech.drone.network.DroneEndpointNetwork;
+import com.drppp.drtech.drone.network.DroneEndpointResource;
+import com.drppp.drtech.drone.network.DroneFleetState;
+import com.drppp.drtech.drone.network.DroneJob;
+import com.drppp.drtech.drone.network.DroneRegistry;
+import com.drppp.drtech.drone.network.DroneRegistryRecord;
+import com.drppp.drtech.drone.program.library.DroneProgramLibrary;
+import com.drppp.drtech.drone.program.library.DroneProgramLibraryRecord;
+import com.drppp.drtech.drone.program.codec.DroneProgramFormatException;
+import com.drppp.drtech.drone.program.codec.DroneProgramTransferCodec;
+import com.drppp.drtech.drone.program.model.DroneProgramGraph;
 import gregtech.api.metatileentity.MetaTileEntity;
 import li.cil.oc.api.Network;
 import li.cil.oc.api.machine.Arguments;

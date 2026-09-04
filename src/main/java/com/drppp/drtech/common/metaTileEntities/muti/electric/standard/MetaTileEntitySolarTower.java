@@ -1,7 +1,7 @@
 package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
 
 import com.drppp.drtech.client.Textures;
-import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
+import com.drppp.drtech.api.unification.material.DrtechMaterials;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.loaders.recipes.DrtechRecipes;

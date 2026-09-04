@@ -1,6 +1,6 @@
 package com.drppp.drtech.loaders.recipes.chain;
 
-import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
+import com.drppp.drtech.api.unification.material.DrtechMaterials;
 import net.minecraft.init.Items;
 
 import static gregtech.api.GTValues.EV;

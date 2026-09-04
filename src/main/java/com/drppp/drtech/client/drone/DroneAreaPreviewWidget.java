@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.Widget;
-import com.drppp.drtech.common.drone.program.model.DroneArea;
+import com.drppp.drtech.drone.program.model.DroneArea;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 

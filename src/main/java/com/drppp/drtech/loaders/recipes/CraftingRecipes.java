@@ -4,8 +4,8 @@ import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.items.ItemsInit;
 import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
-import com.drppp.drtech.common.drone.hardware.DroneChassisTier;
-import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
+import com.drppp.drtech.drone.hardware.DroneChassisTier;
+import com.drppp.drtech.drone.hardware.DroneUpgradeType;
 import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.material.MarkerMaterials;
@@ -478,7 +478,7 @@ public class CraftingRecipes {
                 'S', FISHER[3].getStackForm(),
                 'D', new UnificationEntry(OrePrefix.plate, Materials.StainlessSteel)
         );
-        if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {
+        if (DrtConfig.machine.EnableIndustrialMachines) {
             ModHandler.addShapedRecipe(true, "large_extruder", DrTechMetaTileEntities.LARGE_EXTRUDER.getStackForm(),
                     "LCL", "PSP", "OWO",
                     'L', new UnificationEntry(pipeLargeItem, Ultimet),

@@ -5,7 +5,7 @@ import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.client.Particle.DrtechLaserBeamParticle;
 import com.drppp.drtech.common.tile.TileEntityConnector;
-import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.api.utils.DrtechUtils;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;

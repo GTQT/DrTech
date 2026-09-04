@@ -12,12 +12,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MetaTileEntityFarmer.class)
 public abstract  class MixinMetaTileEntityFarmer {
-    @Shadow
+    @Shadow(remap = false)
     private BlockPos.MutableBlockPos operationPosition;
     @Inject(
             method = "isCropSpaceEmpty",
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            remap = false
     )
     private void onIsCropSpaceEmpty(CallbackInfoReturnable<Boolean> cir)
     {

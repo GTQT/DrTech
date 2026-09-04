@@ -32,7 +32,6 @@ dependencies {
     implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848") // CCL 3.2.3.358
     implementation rfg.deobf("curse.maven:had-enough-items-557549:7515497")
     implementation rfg.deobf('curse.maven:top-245211:2667280') // TOP 1.4.28
-    implementation rfg.deobf("curse.maven:mixin-booter-419286:7049694")
     implementation "curse.maven:crafttweaker-239197:6929088"
     // OC is an optional integration. Its API is linked only from the isolated compat package.
     compileOnly rfg.deobf("curse.maven:opencomputers-223008:8582726")

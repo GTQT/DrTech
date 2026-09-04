@@ -3,13 +3,13 @@ package com.drppp.drtech.common.metaTileEntities;
 import com.drppp.drtech.client.Textures;
 import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.api.Utils.DrtechUtils;
-import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
-import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneFleetController;
-import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneEndpoint;
-import com.drppp.drtech.common.drone.network.DroneEndpoint;
-import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneProgrammer;
-import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneRedstoneEmitter;
+import com.drppp.drtech.api.utils.DrtechUtils;
+import com.drppp.drtech.drone.machine.MetaTileEntityDroneDock;
+import com.drppp.drtech.drone.machine.MetaTileEntityDroneFleetController;
+import com.drppp.drtech.drone.machine.MetaTileEntityDroneEndpoint;
+import com.drppp.drtech.drone.network.DroneEndpoint;
+import com.drppp.drtech.drone.machine.MetaTileEntityDroneProgrammer;
+import com.drppp.drtech.drone.machine.MetaTileEntityDroneRedstoneEmitter;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.generator.AnnihilationGenerator;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.standard.*;
@@ -153,7 +153,7 @@ public class DrTechMetaTileEntities {
         CROPS_SIMULATE = registerMetaTileEntity(getID(), new MetaTileentityCropsSimulateMachine(getDrId("crops_simulate_machine")));
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialApiary(getDrId("industrial_apiary"), Textures.INDUSTRIAL_APIARY));
 
-        if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {
+        if (DrtConfig.machine.EnableIndustrialMachines) {
             INDUSTRIAL_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialMixer(getDrId("industrial_mixer")));
             INDUSTRIAL_ROLLER_PRESS = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialRollerPress(getDrId("industrial_roller_press")));
             INDUSTRIAL_CABLE_PRESS = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCablePress(getDrId("industrial_cable_press")));

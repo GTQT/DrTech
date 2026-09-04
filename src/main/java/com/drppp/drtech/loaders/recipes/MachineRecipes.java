@@ -1,6 +1,6 @@
 package com.drppp.drtech.loaders.recipes;
 
-import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
+import com.drppp.drtech.api.unification.material.DrtechMaterials;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
 

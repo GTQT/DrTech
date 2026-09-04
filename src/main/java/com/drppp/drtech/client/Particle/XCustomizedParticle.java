@@ -1,7 +1,7 @@
 package com.drppp.drtech.client.Particle;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.api.Utils.DrtechMathUtils;
+import com.drppp.drtech.api.utils.DrtechMathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.BufferBuilder;

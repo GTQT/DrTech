@@ -1,7 +1,7 @@
 package com.drppp.drtech.common.entity;
 
 import com.drppp.drtech.client.Particle.EntityParticleSpray;
-import com.drppp.drtech.api.Utils.DrtechMathUtils;
+import com.drppp.drtech.api.utils.DrtechMathUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;

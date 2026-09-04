@@ -1,6 +1,6 @@
 package com.meowmel.cropQT.api;
 
-import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.api.utils.DrtechUtils;
 import com.drppp.drtech.common.items.ItemsInit;
 import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
 import com.drppp.drtech.loaders.recipes.CraftingRecipes;

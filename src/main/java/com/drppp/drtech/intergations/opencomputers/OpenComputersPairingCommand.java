@@ -1,6 +1,6 @@
 package com.drppp.drtech.intergations.opencomputers;
 
-import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
+import com.drppp.drtech.drone.machine.MetaTileEntityDroneDock;
 import gregtech.api.metatileentity.MetaTileEntity;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;

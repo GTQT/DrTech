@@ -1,12 +1,12 @@
 package com.drppp.drtech.common.items;
 
+import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
 import com.drppp.drtech.api.armor.ModularArmorStats;
 import com.drppp.drtech.api.armor.modules.ApiaristShield;
 import com.drppp.drtech.api.armor.modules.RevealingGoggles;
 import com.drppp.drtech.api.armor.modules.VisOptimizer;
-import com.drppp.drtech.common.MTConfig;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
 import gregtech.api.items.armor.ArmorMetaItem;
@@ -97,10 +97,10 @@ public class MTArmorItem extends ArmorMetaItem<ArmorMetaItem<?>.ArmorMetaValueIt
 
     @Override
     public void registerSubItems() {
-        MODULAR_HELMET = addItem(0, "modular_helmet").setArmorLogic(new ModularArmor(EntityEquipmentSlot.HEAD, MTConfig.modularArmor.helmetSlots, 8000));
-        MODULAR_CHESTPLATE = addItem(1, "modular_chestplate").setArmorLogic(new ModularArmor(EntityEquipmentSlot.CHEST, MTConfig.modularArmor.chestPlateSlots, 512000));
-        MODULAR_LEGGINGS = addItem(2, "modular_leggings").setArmorLogic(new ModularArmor(EntityEquipmentSlot.LEGS, MTConfig.modularArmor.leggingsSlots, 64000));
-        MODULAR_BOOTS = addItem(3, "modular_boots").setArmorLogic(new ModularArmor(EntityEquipmentSlot.FEET, MTConfig.modularArmor.bootsSlot, 0));
+        MODULAR_HELMET = addItem(0, "modular_helmet").setArmorLogic(new ModularArmor(EntityEquipmentSlot.HEAD, DrtConfig.armor.helmetSlots, 8000));
+        MODULAR_CHESTPLATE = addItem(1, "modular_chestplate").setArmorLogic(new ModularArmor(EntityEquipmentSlot.CHEST, DrtConfig.armor.chestPlateSlots, 512000));
+        MODULAR_LEGGINGS = addItem(2, "modular_leggings").setArmorLogic(new ModularArmor(EntityEquipmentSlot.LEGS, DrtConfig.armor.leggingsSlots, 64000));
+        MODULAR_BOOTS = addItem(3, "modular_boots").setArmorLogic(new ModularArmor(EntityEquipmentSlot.FEET, DrtConfig.armor.bootsSlot, 0));
     }
 
     @Override

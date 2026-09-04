@@ -7,7 +7,7 @@ import codechicken.lib.vec.Matrix4;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
 import com.drppp.drtech.client.Textures;
-import com.drppp.drtech.api.Utils.Datas;
+import com.drppp.drtech.api.utils.Datas;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.FluidTankList;

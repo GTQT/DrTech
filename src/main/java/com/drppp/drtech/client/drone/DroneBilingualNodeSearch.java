@@ -1,6 +1,6 @@
 package com.drppp.drtech.client.drone;
 
-import com.drppp.drtech.common.drone.program.model.DroneNodeDefinition;
+import com.drppp.drtech.drone.program.model.DroneNodeDefinition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.I18n;

@@ -10,9 +10,9 @@ import com.drppp.drtech.network.UpdateTileEntityPacket;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
 import com.drppp.drtech.api.ItemHandler.OnlyBeesStackhandler;
 import com.drppp.drtech.api.ItemHandler.OnlyUpgradeStackhandler;
-import com.drppp.drtech.api.Utils.DrtechUtils;
-import com.drppp.drtech.api.Utils.GT_ApiaryUpgrade;
-import com.drppp.drtech.api.Utils.ItemId;
+import com.drppp.drtech.api.utils.DrtechUtils;
+import com.drppp.drtech.api.utils.GT_ApiaryUpgrade;
+import com.drppp.drtech.api.utils.ItemId;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 import forestry.apiculture.ModuleApiculture;
@@ -456,7 +456,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     @Override
     public void update() {
         super.update();
-        if (getWorld().isRemote && DrtConfig.MachineSwitch.EnableIndustrialApiaryTx)
+        if (getWorld().isRemote && DrtConfig.machine.EnableIndustrialApiaryTx)
         {
             if (isWorking()) {
                 if (usedQueen != null && !usedQueen.isEmpty()) {

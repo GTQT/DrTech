@@ -1,6 +1,6 @@
 package com.drppp.drtech.client;
 
-import com.drppp.drtech.client.Custome.CentrifugeRender;
+import com.drppp.drtech.client.render.CentrifugeRender;
 import com.drppp.drtech.Tags;
 import gregtech.api.GTValues;
 import gregtech.api.gui.resources.AdoptableTextureArea;

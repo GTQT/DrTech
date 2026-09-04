@@ -1,7 +1,7 @@
 package com.drppp.drtech.common.items.Baubles;
 
 import baubles.api.BaubleType;
-import com.drppp.drtech.DrtechEventHandler;
+import com.drppp.drtech.common.DrtechEventHandler;
 import gregtech.integration.baubles.BaubleBehavior;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;

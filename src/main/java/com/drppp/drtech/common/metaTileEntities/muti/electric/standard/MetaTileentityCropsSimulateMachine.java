@@ -3,7 +3,7 @@ package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
 import codechicken.lib.raytracer.CuboidRayTraceResult;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
-import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.api.utils.DrtechUtils;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.items.ItemsInit;
 import com.meowmel.cropQT.api.CompareMode;
