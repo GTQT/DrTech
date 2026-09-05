@@ -1,8 +1,8 @@
-package com.drppp.drtech.common.entity;
+package com.drppp.drtech.common.Entity;
 
-import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
-import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
-import com.drppp.drtech.common.sound.DrTechSounds;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.Sound.DrTechSounds;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;

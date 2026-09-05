@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.MetaItems;
+package com.drppp.drtech.common.Items.MetaItems;
 
 import com.meowmel.cropQT.item.MetaCrops;
 import gregtech.api.items.metaitem.MetaItem;

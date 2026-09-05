@@ -1,8 +1,12 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.drppp.drtech.api.ItemHandler.SingleItemStackHandler;
 import forestry.api.apiculture.*;
 import forestry.apiculture.ModuleApiculture;
@@ -222,18 +226,14 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
         return Textures.BRONZE_PLATED_BRICKS;
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:large_bee_hive",
-                    MetaTileEntutyLargeBeeHive::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, DOWN)
-                .aisle("               ", "               ", "               ", "      HHH      ", "    HHAAAHH    ", "    HAPLPAH    ", "   HAPAAAPAH   ", "   HALAAALAH   ", "   HAPAAAPAH   ", "    HAPLPAH    ", "    HHAAAHH    ", "      HHH      ", "               ", "               ", "               ")
+.aisle("               ", "               ", "               ", "      HHH      ", "    HHAAAHH    ", "    HAPLPAH    ", "   HAPAAAPAH   ", "   HALAAALAH   ", "   HAPAAAPAH   ", "    HAPLPAH    ", "    HHAAAHH    ", "      HHH      ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "      GGG      ", "   GGG   GG    ", "   G       G   ", "   G       G   ", "  G         G  ", "  G         G  ", "  G         G  ", "   G       G   ", "   G       G   ", "    GG   GG    ", "      GGG      ", "               ", "               ")
                 .aisle("               ", "      HHH      ", "   HHH   HHH   ", "  H        GH  ", "  H         H  ", "  H         H  ", " H           H ", " H           H ", " H           H ", "  H         H  ", "  H         H  ", "  HG       GH  ", "   HHH   HHH   ", "      HHH      ", "               ")
                 .aisle("      GGG      ", "   GGG   GGG   ", "  G         G  ", " G           G ", " G           G ", " G           G ", "G             G", "G             G", "G             G", " G           G ", " G           G ", " G           G ", "  G         G  ", "   GGG   GGG   ", "      GGG      ")
@@ -250,28 +250,27 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
                 .aisle("               ", "               ", "               ", "       G       ", "     GGBGG     ", "    GBBBBBG    ", "    GBBBBBG    ", "   GBBBBBBBG   ", "    GBBBBBG    ", "    GBBBBBG    ", "     GGBGG     ", "       G       ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "               ", "               ", "      HHH      ", "     HHHHH     ", "    HHBBBHH    ", "    HHBBBHH    ", "    HHBBBHH    ", "     HHBHH     ", "      HHH      ", "               ", "               ", "               ", "               ")
                 .aisle("               ", "               ", "               ", "               ", "               ", "               ", "      GGG      ", "      GHG      ", "      GGG      ", "               ", "               ", "               ", "               ", "               ", "               ")
-                .self('S', MetaTileEntutyLargeBeeHive.class)
-                .blocks('A', getGlassessCasingState())
-                .blocks('B', Blocks.DIRT, Blocks.GRASS)
-                .blocks('H', Blocks.PLANKS)
-                .blocks('I', Blocks.WOODEN_SLAB)
-                .blocks('J', ModuleApiculture.getBlocks().apiary)
-                .blocks('K', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN))
-                .blocks('L', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HYGRO))
-                .blocks('N', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.STABILISER))
-                .blocks('O', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HEATER))
-                .blocks('P', ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.FAN))
-                .blocks('F', Blocks.LOG)
-                .blocks('W', Blocks.WATER)
-                .where('G', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(
-                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.BRONZE_BRICKS))),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 0, 1, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, 1, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, 1, 1),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1)))
+                .where('S', Elements.self(MetaTileEntutyLargeBeeHive.class))
+                .where('A', Elements.block(getGlassessCasingState()))
+                .where('B', Elements.blocks(Blocks.DIRT, Blocks.GRASS))
+                .where('H', Elements.block(Blocks.PLANKS.getDefaultState()))
+                .where('I', Elements.block(Blocks.WOODEN_SLAB.getDefaultState()))
+                .where('J', Elements.blocks(ModuleApiculture.getBlocks().apiary))
+                .where('K', Elements.blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.PLAIN)))
+                .where('L', Elements.blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HYGRO)))
+                .where('N', Elements.blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.STABILISER)))
+                .where('O', Elements.blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.HEATER)))
+                .where('P', Elements.blocks(ModuleApiculture.getBlocks().getAlvearyBlock(BlockAlvearyType.FAN)))
+                .where('F', Elements.block(Blocks.LOG.getDefaultState()))
+                .where('W', Elements.block(Blocks.WATER.getDefaultState()))
+                .casing('G', MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.BRONZE_BRICKS))
+                        .energyInput(0, 1)
+                        .itemInput(0, 1)
+                        .itemOutput(0, 1)
+                        .maintenance()
+                .done()
+                .where(' ', Elements.any())
                 .buildStructureDefinition();
-
     }
 
     @Override

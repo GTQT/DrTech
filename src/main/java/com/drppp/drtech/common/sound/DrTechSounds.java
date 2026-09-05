@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.sound;
+package com.drppp.drtech.common.Sound;
 
 import com.drppp.drtech.Tags;
 import net.minecraft.util.ResourceLocation;

@@ -42,7 +42,7 @@ public class SingleItemStackHandler extends ItemStackHandler {
 
     @Override
     public NBTTagCompound serializeNBT() {
-        var nbt = super.serializeNBT();
+        NBTTagCompound nbt = super.serializeNBT();
         nbt.setBoolean("lockCap",lockCap);
         for (int i = 0; i < this.getSlots(); i++) {
             nbt.setInteger("slotCap"+i,getIntMapCap(slotCaps[i]));

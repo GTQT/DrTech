@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.Particle;
+package com.drppp.drtech.Client.Particle;
 
 public interface IXCustomizedEffect {
 	void onRender(float partialTicks);

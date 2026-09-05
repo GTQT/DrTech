@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down": { "model": "drtech:amethyst_cluster", "x": 180 },
+    "facing=east": { "model": "drtech:amethyst_cluster", "x": 90, "y": 90 },
+    "facing=north": { "model": "drtech:amethyst_cluster", "x": 90 },
+    "facing=south": { "model": "drtech:amethyst_cluster", "x": 90, "y": 180 },
+    "facing=up": { "model": "drtech:amethyst_cluster" },
+    "facing=west": { "model": "drtech:amethyst_cluster", "x": 90, "y": 270 }
+  }
+}

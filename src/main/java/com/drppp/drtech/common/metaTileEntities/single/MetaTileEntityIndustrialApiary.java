@@ -1,18 +1,22 @@
-package com.drppp.drtech.common.metaTileEntities.single;
+package com.drppp.drtech.common.MetaTileEntities.single;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.drppp.drtech.client.Textures;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.DrtConfig;
-import com.drppp.drtech.network.SyncInit;
-import com.drppp.drtech.network.UpdateTileEntityPacket;
+import com.drppp.drtech.Network.SyncInit;
+import com.drppp.drtech.Network.UpdateTileEntityPacket;
 import com.drppp.drtech.api.ItemHandler.InOutItemStackHandler;
 import com.drppp.drtech.api.ItemHandler.OnlyBeesStackhandler;
 import com.drppp.drtech.api.ItemHandler.OnlyUpgradeStackhandler;
-import com.drppp.drtech.api.utils.DrtechUtils;
-import com.drppp.drtech.api.utils.GT_ApiaryUpgrade;
-import com.drppp.drtech.api.utils.ItemId;
+import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.api.Utils.GT_ApiaryUpgrade;
+import com.drppp.drtech.api.Utils.ItemId;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 import forestry.apiculture.ModuleApiculture;
@@ -22,6 +26,7 @@ import gregtech.api.GTValues;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IWorkable;
+import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.*;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -456,7 +461,7 @@ public class MetaTileEntityIndustrialApiary extends TieredMetaTileEntity impleme
     @Override
     public void update() {
         super.update();
-        if (getWorld().isRemote && DrtConfig.machine.EnableIndustrialApiaryTx)
+        if (getWorld().isRemote && DrtConfig.MachineSwitch.EnableIndustrialApiaryTx)
         {
             if (isWorking()) {
                 if (usedQueen != null && !usedQueen.isEmpty()) {

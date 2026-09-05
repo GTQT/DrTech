@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.blocks.MetaBlocks;
+package com.drppp.drtech.common.Blocks.MetaBlocks;
 
 
 import com.drppp.drtech.DrTechMain;

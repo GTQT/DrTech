@@ -1,30 +1,30 @@
-package com.drppp.drtech.common.metaTileEntities;
+package com.drppp.drtech.common.MetaTileEntities;
 
-import com.drppp.drtech.client.Textures;
+import com.drppp.drtech.Client.Textures;
 import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.api.utils.DrtechUtils;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneDock;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneFleetController;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneEndpoint;
-import com.drppp.drtech.drone.network.DroneEndpoint;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneProgrammer;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneRedstoneEmitter;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.generator.AnnihilationGenerator;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.standard.*;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityEnergyTransTower;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityYotTank;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
-import com.drppp.drtech.common.metaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
-import com.drppp.drtech.common.metaTileEntities.single.EnergySink;
-import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityArmorWorkbench;
-import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityIndustrialApiary;
-import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityLaserPipeBending;
-import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityLightsaberAssembler;
-import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityUniversalCollector;
-import com.drppp.drtech.loaders.recipes.DrtechRecipes;
+import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneFleetController;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneEndpoint;
+import com.drppp.drtech.common.drone.network.DroneEndpoint;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneProgrammer;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneRedstoneEmitter;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.AnnihilationGenerator;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityFusionReactor;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityEnergyTransTower;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.*;
+import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLaserPipeBending;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityLightsaberAssembler;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityUniversalCollector;
+import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.GTValues;
+import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.util.GTUtility;
 import net.minecraft.util.ResourceLocation;
@@ -46,25 +46,29 @@ public class DrTechMetaTileEntities {
     private static final int DRONE_FLUID_ENDPOINT_META_ID = 907;
     private static final int DRONE_EU_ENDPOINT_META_ID = 908;
 
-    public static AnnihilationGenerator ANNIHILATION_GENERATOR;
-    public static MetaTileEntityDronePad DRONE_PAD;
-    public static MetaTileEntityEnergyTransTower TRANS_TOWER;
-    public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
+    // 已全部适配 gregtech-gtqt-1.12.2-1.9.0 标准 API 并恢复启用的机器字段
+    public static MetaTileEntity ANNIHILATION_GENERATOR;
+    public static MetaTileEntityFusionReactor FUSION_REACTOR;
+    public static MetaTileEntity DRONE_PAD;
+    public static MetaTileEntity TRANS_TOWER;
+    public static MetaTileEntity INFINITE_FLUID_DRILLING_RIG;
+    public static MetaTileEntity LARGE_ALLOY_SMELTER;
 
-    public static MetaTileEntityExtremeExterminationChamber MOB_KILLER;
-    public static MetaTileEntitySolarTower SOLAR_TOWER;
-    public static MetatileEntityTwentyFiveFluidTank TFFT;
+    public static MetaTileEntity MOB_KILLER;
+    public static MetaTileEntity SOLAR_TOWER;
+    public static MetaTileEntity PLAYER_BEACON;
+    public static MetaTileEntity TFFT;
     public static MetaTileEntityUniversalCollector[] UNIVERSAL_COLLECTORS = new MetaTileEntityUniversalCollector[10];
-    public static MetaTileEntityYotHatch YOT_HARCH;
-    public static MetaTileEntityYotTank YOUT_TANK;
-    public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
+    public static MetaTileEntity YOT_HARCH;
+    public static MetaTileEntity YOUT_TANK;
+    public static MetaTileEntity LARGE_BEE_HIVE;
     public static SimpleMachineMetaTileEntity[] DISASSEMBLY = new SimpleMachineMetaTileEntity[10];
     public static SimpleMachineMetaTileEntity[] LIGHTSABER_ASSEMBLER = new SimpleMachineMetaTileEntity[10];
-    public static MetaTileEntityLargeExtruder LARGE_EXTRUDER;
+    public static MetaTileentityLargeExtruder LARGE_EXTRUDER;
 
-    public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
-    public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
-    public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
+    public static MetaTileEntity CONCRETE_BACK_FILLER1;
+    public static MetaTileEntity CONCRETE_BACK_FILLER2;
+    public static MetaTileEntity LARGE_LIGHTING_ROD;
     public static MetaTileEntityCombProcess COMB_PROVESS;
     public static MetaTileEntityIndustrialMixer INDUSTRIAL_MIXER;
     public static MetaTileEntityIndustrialRollerPress INDUSTRIAL_ROLLER_PRESS;
@@ -72,9 +76,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityIndustrialSieve INDUSTRIAL_SIEVE;
     public static MetaTileEntityIndustrialCentrifuge INDUSTRIAL_CENTRIFUGE;
 
-    public static MetaTileentityCropsSimulateMachine CROPS_SIMULATE;
-    public static MetaTileEntityArmorWorkbench ARMOR_WORKBENCH;
-    public static EnergySink ENERGY_SINK;
+    public static MetaTileEntity CROPS_SIMULATE;
     public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
     public static MetaTileEntityDroneProgrammer DRONE_PROGRAMMER;
     public static MetaTileEntityDroneDock DRONE_DOCK;
@@ -108,11 +110,11 @@ public class DrTechMetaTileEntities {
             UNIVERSAL_COLLECTORS[i] = registerMetaTileEntity(100 + i, new MetaTileEntityUniversalCollector(getDrId("universal_collector." + tierName), i + 1));
         }
 
-        registerSimpleMetaTileEntity(DISASSEMBLY, 110, "disassembly", DrtechRecipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
+        registerSimpleMetaTileEntity(DISASSEMBLY, 110, "disassembly", DrtechReceipes.DISASSEMBLER_RECIPES, Textures.DISASSEMBLY, true, DrtechUtils::getRL, GTUtility.hvCappedTankSizeFunction);
         registerMetaTileEntities(LIGHTSABER_ASSEMBLER, 120, "lightsaber_assembler", (tier, tierName) ->
                 new MetaTileEntityLightsaberAssembler(
                         DrtechUtils.getRL(String.format("lightsaber_assembler.%s", tierName)),
-                        DrtechRecipes.LIGHTSABER_ASSEMBLER_RECIPES,
+                        DrtechReceipes.LIGHTSABER_ASSEMBLER_RECIPES,
                         gregtech.client.renderer.texture.Textures.ASSEMBLER_OVERLAY,
                         tier, true, GTUtility.hvCappedTankSizeFunction));
 
@@ -131,13 +133,18 @@ public class DrTechMetaTileEntities {
         //Common ID
         startID = 500;
 
+        // Common ID 段：恢复启用的机器注册（详见 PROGRESS.md）
         ANNIHILATION_GENERATOR = registerMetaTileEntity(getID(), new AnnihilationGenerator(getDrId("annihilation_generator")));
 
+        FUSION_REACTOR = registerMetaTileEntity(getID(), new MetaTileEntityFusionReactor(getDrId("fusion_reactor")));
+
         DRONE_PAD = registerMetaTileEntity(getID(), new MetaTileEntityDronePad(getDrId("drone_pad")));
+        INFINITE_FLUID_DRILLING_RIG = registerMetaTileEntity(getID(), new MetaTileEntityInfiniteFluidDrill(getDrId("fluid_drilling_rig.iv"), 6));
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getDrId("large_alloy_smelter")));
         LARGE_BEE_HIVE = registerMetaTileEntity(getID(), new MetaTileEntutyLargeBeeHive(getDrId("large_bee_hive")));
 
         MOB_KILLER = registerMetaTileEntity(getID(), new MetaTileEntityExtremeExterminationChamber(getDrId("mob_killer")));
+        PLAYER_BEACON = registerMetaTileEntity(getID(), new MetaTileEntityPlayerBeacon(getDrId("player_beacon")));
 
         SOLAR_TOWER = registerMetaTileEntity(getID(), new MetaTileEntitySolarTower(getDrId("solar_tower")));
         TFFT = registerMetaTileEntity(getID(), new MetatileEntityTwentyFiveFluidTank(getDrId("tfft_tank")));
@@ -153,13 +160,13 @@ public class DrTechMetaTileEntities {
         CROPS_SIMULATE = registerMetaTileEntity(getID(), new MetaTileentityCropsSimulateMachine(getDrId("crops_simulate_machine")));
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialApiary(getDrId("industrial_apiary"), Textures.INDUSTRIAL_APIARY));
 
-        if (DrtConfig.machine.EnableIndustrialMachines) {
+        if (DrtConfig.MachineSwitch.EnableIndustrialMachines) {
             INDUSTRIAL_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialMixer(getDrId("industrial_mixer")));
             INDUSTRIAL_ROLLER_PRESS = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialRollerPress(getDrId("industrial_roller_press")));
             INDUSTRIAL_CABLE_PRESS = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCablePress(getDrId("industrial_cable_press")));
             INDUSTRIAL_SIEVE = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialSieve(getDrId("industrial_sieve")));
             INDUSTRIAL_CENTRIFUGE = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCentrifuge(getDrId("industrial_centrifuge")));
-            LARGE_EXTRUDER = registerMetaTileEntity(getID(), new MetaTileEntityLargeExtruder(getDrId("large_extruder")));
+            LARGE_EXTRUDER = registerMetaTileEntity(getID(), new MetaTileentityLargeExtruder(getDrId("large_extruder")));
         }
 
         DRONE_PROGRAMMER = registerMetaTileEntity(DRONE_PROGRAMMER_META_ID,
@@ -180,10 +187,6 @@ public class DrTechMetaTileEntities {
                 new MetaTileEntityDroneEndpoint(getDrId("drone_fluid_endpoint"), DroneEndpoint.Kind.FLUID));
         DRONE_EU_ENDPOINT = registerMetaTileEntity(DRONE_EU_ENDPOINT_META_ID,
                 new MetaTileEntityDroneEndpoint(getDrId("drone_eu_endpoint"), DroneEndpoint.Kind.EU));
-
-        // 模块化装甲（原 mechtech）
-        ARMOR_WORKBENCH = registerMetaTileEntity(getID(), new MetaTileEntityArmorWorkbench(getDrId("armor_workbench")));
-        ENERGY_SINK = registerMetaTileEntity(getID(), new EnergySink(getDrId("energy_sink")));
     }
 
 

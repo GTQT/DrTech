@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "drtech:soul_lantern"
+    },
+    "hanging=true": {
+      "model": "drtech:soul_lantern_hanging"
+    }
+  }
+}

@@ -1,15 +1,21 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.store;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.store;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Matrix4;
 
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.client.Textures;
-import com.drppp.drtech.common.metaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
-import com.drppp.drtech.api.utils.Datas;
-import com.drppp.drtech.api.utils.DrtechUtils;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.BlockYotTankPart;
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.common.MetaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
+import com.drppp.drtech.api.Utils.Datas;
+import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapabilities;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.FluidTankList;
@@ -21,10 +27,6 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.StructureContributionKey;
-import gregtech.api.pattern.element.Elements;
-import gregtech.api.pattern.element.IStructureElement;
-import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
@@ -45,6 +47,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -53,10 +56,20 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
 
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
+
+import gregtech.api.pattern.casing.CasingDefinition;
+
+import gregtech.api.pattern.casing.CasingRegistration;
+import gregtech.api.pattern.casing.ICasing;
 
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 
@@ -64,6 +77,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     private static final String NBT_FLUID_BANK = "EnergyBank";
     private boolean isActive, isWorkingEnabled = true;
     // Match Context Headers
+    private static final String YOT_PART_HEADER = "YotPart_";
 
     private static final String NBT_FLUID = "Fluid";
 
@@ -250,60 +264,43 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         this.fluid = null;
         this.fluidBank.clearStore();
     }
-    private static final StructureContributionKey<IStoreData, List<IStoreData>> BATTERY_KEY =
-            StructureContributionKey.orderedList("drtech:yot_storage_cells");
-
-    private static final IStructureElement BATTERY_ELEMENT = new BatteryContributionElement<>(
-            "drtech:yot_storage_cells",
-            state -> {
-                if (!Datas.YOT_CASINGS.containsKey(state)) return null;
-                IStoreData data = Datas.YOT_CASINGS.get(state);
-                if (data.getTier() == -1 || data.getCapacity().compareTo(BigInteger.ZERO) <= 0) return null;
-                return data;
-            },
-            () -> Datas.YOT_CASINGS.entrySet().stream()
-                    .sorted(java.util.Comparator.comparingInt(e -> e.getValue().getTier()))
-                    .map(e -> new BlockInfo(e.getKey(), null))
-                    .toArray(BlockInfo[]::new));
-
-    @NotNull
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:yot_tank",
-                    MetaTileEntityYotTank::buildTemplate);
-
     @Override
-    protected StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
-                .piece("start")
-                    .aisle("#####", "#XXX#", "#XXX#", "#XXX#", "#####")
-                    .aisle("XXSXX", "XCCCX", "XCCCX", "XCCCX", "XXXXX")
-                .repeatablePiece("body", 1, 14)
-                    .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
-                .piece("end")
-                    .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
-                    .aisle("LLLLL", "L###L", "L###L", "L###L", "LLLLL")
-                .self('S', MetaTileEntityYotTank.class)
-                .any('#')
-                .blocks('C', getCasingState())
-                .where('X', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 0, 2, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 0, 2, 1),
-                        Elements.hatch(DrtechCapabilities.YOT_HATCH, 0, 1)))
-                .blocks('G', getGlassState())
-                .frames('L', Materials.Steel)
-                .where('B', Elements.withTooltips(BATTERY_ELEMENT,
-                        "gregtech.multiblock.pattern.error.batteries"))
+                .aisle("#####", "#XXX#", "#XXX#", "#XXX#", "#####")
+                .aisle("XXSXX", "XCCCX", "XCCCX", "XCCCX", "XXXXX")
+                .aisleRepeated(6, "GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
+                .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
+                .aisle("LLLLL", "L###L", "L###L", "L###L", "LLLLL")
+                .where('S', Elements.self(MetaTileEntityYotTank.class))
+                .where('#', Elements.any())
+                .where('C', Elements.block(getCasingState()))
+                .casing('X', getCasingState())
+                        .maintenance()
+                        .fluidInput(0, 2)
+                        .fluidOutput(0, 2)
+                        .hatch(DrtechCapabilities.YOT_HATCH, 0, 1)
+                .done()
+                .where('G', Elements.block(getGlassState()))
+                .where('L', Elements.frames(Materials.Steel))
+                .tieredCasing('B', yotCasingGroup().group())
+                .withChannel(yotCasingGroup().channel())
                 .buildStructureDefinition();
-
     }
+
+    /** Yot 电池档位 CasingRegistration（1.9.0 tieredCasing 单档降级） */
+    private static CasingRegistration yotCasingGroup() {
+        if (yotReg == null) {
+            yotReg = CasingDefinition.fromMap("drtech_yot_battery", true,
+                    Datas.YOT_CASINGS, IStoreData::getTier, IStoreData::getStoreName);
+        }
+        return yotReg;
+    }
+    private static CasingRegistration yotReg;
     protected static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.YOT_TANK_CASING);
     }
@@ -315,6 +312,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.YOT_TANK_CASING;
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -372,7 +370,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), this.isActive(),
+        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, Cuboid6.full, getFrontFacing(), this.isActive(),
                 this.isWorkingEnabled());
     }
     @Override
@@ -388,17 +386,27 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     protected void formStructure(@NotNull FormedStructureView formed) {
         super.formStructure(formed);
         initializeAbilities();
-        List<IStoreData> aggregate = formed.getAggregate(BATTERY_KEY);
-        List<IStoreData> parts = aggregate == null ? new ArrayList<>() : new ArrayList<>(aggregate);
-        // 关联结构内的 Yot 仓口（旧机制经 matchContext "Multi" 集合并入，现改由成型部件列表获得）
+        // 1.9.0 降级：tieredCasing 单档读取 Yot 电池档位；块数 = 6 重复层 x 每层 9 块
+        ICasing matched = yotCasingGroup().channel().getMatchedCasing(formed);
+        if (matched == null) {
+            invalidateStructure();
+            return;
+        }
+        IStoreData storeData = matched.getPayloadAs(BlockYotTankPart.BlockYotTankPartType.class);
+        if (storeData == null) {
+            invalidateStructure();
+            return;
+        }
+        int batteryCount = 6 * 9;
+        List<IStoreData> parts = new ArrayList<>();
+        for (int i = 0; i < batteryCount; i++) {
+            parts.add(storeData);
+        }
+        // 绑定 YotHatch 仓口（formed.getParts 遍历）
         for (IMultiblockPart part : formed.getParts()) {
             if (part instanceof MetaTileEntityYotHatch) {
                 ((MetaTileEntityYotHatch) part).setYotTank(this);
             }
-        }
-        if (parts.isEmpty()) {
-            invalidateStructure();
-            return;
         }
         if (this.fluidBank == null) {
             this.fluidBank = new YotTankFluidBank(parts);
@@ -585,4 +593,5 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             }
         }
     }
+
 }

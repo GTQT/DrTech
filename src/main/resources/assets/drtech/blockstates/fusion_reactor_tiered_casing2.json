@@ -1,0 +1,50 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "neutron_capture_2": {
+        "textures": {
+          "all": "gregtech:blocks/casings/solid/machine_casing_clean_stainless_steel"
+        }
+      },
+      "neutron_capture_3": {
+        "textures": {
+          "all": "gregtech:blocks/casings/solid/machine_casing_clean_stainless_steel"
+        }
+      },
+      "neutron_capture_4": {
+        "textures": {
+          "all": "gregtech:blocks/casings/solid/machine_casing_clean_stainless_steel"
+        }
+      },
+      "neutron_capture_5": {
+        "textures": {
+          "all": "gregtech:blocks/casings/solid/machine_casing_clean_stainless_steel"
+        }
+      },
+      "tritium_breeding_blanket_2": {
+        "textures": {
+          "all": "gregtech:blocks/casings/firebox/machine_casing_firebox_tungstensteel"
+        }
+      },
+      "tritium_breeding_blanket_3": {
+        "textures": {
+          "all": "gregtech:blocks/casings/firebox/machine_casing_firebox_tungstensteel"
+        }
+      },
+      "tritium_breeding_blanket_4": {
+        "textures": {
+          "all": "gregtech:blocks/casings/firebox/machine_casing_firebox_tungstensteel"
+        }
+      },
+      "tritium_breeding_blanket_5": {
+        "textures": {
+          "all": "gregtech:blocks/casings/firebox/machine_casing_firebox_tungstensteel"
+        }
+      }
+    }
+  }
+}

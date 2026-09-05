@@ -1,13 +1,17 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.generator;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.generator;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
-import com.drppp.drtech.common.tile.TileEntityGravitationalAnomaly;
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
-import com.drppp.drtech.api.capability.ipml.AnnihilationGeneratorLogic;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.MetaTileEntities.Logic.AnnihilationGeneratorLogic;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
 import gregtech.api.capability.GregtechTileCapabilities;
@@ -64,13 +68,13 @@ import static gregtech.common.blocks.BlockGlassCasing.CasingType.FUSION_GLASS;
 
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
-import gregtech.api.pattern.casing.GTCasingGroups;
-
-import gregtech.api.pattern.casing.ICasing;
-
 import gregtech.api.pattern.element.Elements;
 
 import gregtech.api.pattern.element.StructureDefinition;
+
+import gregtech.api.pattern.casing.GTCasingGroups;
+
+import gregtech.api.pattern.casing.ICasing;
 
 public class AnnihilationGenerator extends MultiblockWithDisplayBase implements IDataInfoProvider, IWorkable, IControllable, IFastRenderMetaTileEntity {
     private final AnnihilationGeneratorLogic logic;
@@ -98,7 +102,7 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
                 this.entity = this.getWorld().getTileEntity(new BlockPos(pos.getX(), pos.getY() + 3, pos.getZ() - 2));
             if (this.frontFacing == EnumFacing.NORTH)
                 this.entity = this.getWorld().getTileEntity(new BlockPos(pos.getX(), pos.getY() + 3, pos.getZ() + 2));
-            var slots = itemImportInventory.getSlots();
+            int slots = itemImportInventory.getSlots();
             for (int i = 0; i < slots; i++) {
                 ItemStack item = itemImportInventory.getStackInSlot(i);
                 if (item.getItem() == DrMetaItems.ENERGY_ELEMENT_1.getMetaItem() && item.getMetadata() == DrMetaItems.ENERGY_ELEMENT_1.getMetaValue()) {
@@ -141,8 +145,8 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
             List<GTOreInfo> oreInfoList = new ArrayList<>();
             for (OreDepositDefinition vein : oreVeins) {
                 if (vein.getDimensionFilter().equals(this.getWorld().provider)) {
-                    var ore = new GTOreInfo(vein);
-                    var items = ore.findComponentBlocksAsItemStacks();
+                    GTOreInfo ore = new GTOreInfo(vein);
+                    List<ItemStack> items = ore.findComponentBlocksAsItemStacks();
                     if (this.itemOutInventory != null && this.itemOutInventory.getSlots() > 0)
                         GTTransferUtils.addItemsToItemHandler(this.itemOutInventory, false, items);
                 }
@@ -153,42 +157,35 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
 
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:annihilation_generator",
-                    AnnihilationGenerator::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "BXXXB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B#W#B", "BXXXB", "TTTTT")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "BXXXB", "TTTTT")
                 .aisle("AASAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "TTTTT")
-                .self('S', AnnihilationGenerator.class)
-                .blocks('T', getCasingState())
-                .blocks('B', getGlassesState())
-                .blocks('W', BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY)
+                .where('S', Elements.self(AnnihilationGenerator.class))
+                .where('T', Elements.block(getCasingState()))
+                .where('B', Elements.block(getGlassesState()))
+                .where('W', Elements.blocks(BlocksInit.BLOCK_GRAVITATIONAL_ANOMALY))
                 .tieredCasing('X', GTCasingGroups.heatingCoils().group())
                 .withChannel(GTCasingGroups.heatingCoils().channel())
-                .where('A', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(
-                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE))),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1),
-                        Elements.hatch(MultiblockAbility.OUTPUT_ENERGY, 0, 1),
-                        Elements.hatch(MultiblockAbility.OUTPUT_LASER, 0, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, -1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, -1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, 1)))
-                .any('#')
+                .casing('A', MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TITANIUM_STABLE))
+                        .maintenance()
+                        .energyOutput(0, 1)
+                        .laserOutput(0, 1)
+                        .fluidInput(1)
+                        .itemInput(1)
+                        .itemOutput(0, 1)
+                .done()
+                .where('#', Elements.any())
                 .buildStructureDefinition();
-
-    }
-    @Override
+    }    @Override
     public boolean usesMui2() {
         return false;
     }

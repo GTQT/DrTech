@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.Particle;
+package com.drppp.drtech.Client.Particle;
 
 import codechicken.lib.vec.Vector3;
 import com.drppp.drtech.Tags;

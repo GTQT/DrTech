@@ -1,7 +1,7 @@
-package com.drppp.drtech.client.render.Entity;
+package com.drppp.drtech.Client.render.Entity;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.entity.moster.EntityUTiGolem;
+import com.drppp.drtech.common.Entity.moster.EntityUTiGolem;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;

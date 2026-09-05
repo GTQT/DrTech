@@ -1,8 +1,8 @@
-package com.drppp.drtech.common.items.MetaItems.behaviors;
+package com.drppp.drtech.common.Items.MetaItems.behaviors;
 
-import com.drppp.drtech.client.sound.SoundManager;
-import com.drppp.drtech.api.utils.RewardBoxManager;
-import com.drppp.drtech.api.utils.RewardEntry;
+import com.drppp.drtech.Client.Sound.SoundManager;
+import com.drppp.drtech.api.Utils.RewardBoxManager;
+import com.drppp.drtech.api.Utils.RewardEntry;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;

@@ -1,4 +1,4 @@
-package com.drppp.drtech.api.tileEntity;
+package com.drppp.drtech.api.TileEntity;
 
 import gregtech.api.gui.IUIHolder;
 import gregtech.api.gui.ModularUI;

@@ -1,11 +1,11 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import codechicken.lib.raytracer.CuboidRayTraceResult;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
-import com.drppp.drtech.api.utils.DrtechUtils;
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Items.ItemsInit;
 import com.meowmel.cropQT.api.CompareMode;
 import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
@@ -19,7 +19,9 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
 import gregtech.api.pattern.element.Elements;
+
 import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
@@ -95,36 +97,30 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
         return new MetaTileentityCropsSimulateMachine(this.metaTileEntityId);
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:crops_simulate_machine",
-                    MetaTileentityCropsSimulateMachine::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "B###B", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXWXB", "B###B", "B###B", "AAAAA")
                 .aisle("AAAAA", "AAAAA", "BXXXB", "B###B", "B###B", "AAAAA")
                 .aisle("AASAA", "AAAAA", "BBBBB", "BBBBB", "BBBBB", "AAAAA")
-                .self('S', MetaTileentityCropsSimulateMachine.class)
-                .blocks('B', getGlassesState())
-                .blocks('X', Blocks.FARMLAND)
-                .blocks('W', Blocks.WATER)
-                .where('A', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(
-                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN))),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 0, 2),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, 4),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, 4),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 1, 4)))
-                .any('#')
+                .where('S', Elements.self(MetaTileentityCropsSimulateMachine.class))
+                .where('B', Elements.block(getGlassesState()))
+                .where('X', Elements.block(Blocks.FARMLAND.getDefaultState()))
+                .where('W', Elements.block(Blocks.WATER.getDefaultState()))
+                .casing('A', MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN))
+                        .maintenance()
+                        .energyInput(0, 2)
+                        .fluidInput(1, 4)
+                        .itemInput(1, 4)
+                        .itemOutput(1, 4)
+                .done()
+                .where('#', Elements.any())
                 .buildStructureDefinition();
     }
 

@@ -1,9 +1,9 @@
-package com.drppp.drtech.client.render.Entity;
+package com.drppp.drtech.Client.render.Entity;
 
-import com.drppp.drtech.client.render.Items.LightsaberRenderHelper;
-import com.drppp.drtech.client.render.Items.RenderItemDoubleLightsaber;
-import com.drppp.drtech.common.entity.EntityThrownLightsaber;
-import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.Client.render.Items.LightsaberRenderHelper;
+import com.drppp.drtech.Client.render.Items.RenderItemDoubleLightsaber;
+import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;

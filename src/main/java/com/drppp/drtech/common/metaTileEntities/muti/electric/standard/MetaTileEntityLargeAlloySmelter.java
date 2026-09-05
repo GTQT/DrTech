@@ -1,6 +1,10 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import gregtech.api.GTValues;
 import gregtech.api.GregTechAPI;
 import gregtech.api.block.IHeatingCoilBlockStats;
@@ -35,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities.LARGE_ALLOY_SMELTER;
+import static com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities.LARGE_ALLOY_SMELTER;
 import static gregtech.api.util.RelativeDirection.*;
 
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
@@ -56,34 +60,27 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
         this.recipeMapWorkable = new SelfRecipeLogic(this, true);
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:large_alloy_smelter",
-                    MetaTileEntityLargeAlloySmelter::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, UP, BACK)
                 .aisle(" AAA ", " BBB ", " CCC ", " BBB ", " AAA ")
                 .aisle("AAAAA", "B   B", "C   C", "B   B", "AAAAA")
                 .aisle("AAAAA", "B   B", "C   C", "B   B", "AAMAA")
                 .aisle("AAAAA", "B   B", "C   C", "B   B", "AAAAA")
                 .aisle(" ASA ", " BBB ", " CCC ", " BBB ", " AAA ")
-                .self('S', MetaTileEntityLargeAlloySmelter.class)
-                .blocks('C', MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE))
-                .hatch('M', MultiblockAbility.MUFFLER_HATCH)
+                .where('S', Elements.self(MetaTileEntityLargeAlloySmelter.class))
+                .where('C', Elements.block(MetaBlocks.BOILER_CASING.getState(BlockBoilerCasing.BoilerCasingType.STEEL_PIPE)))
+                .casing('A', getCasingState())
+                        .auto(false, true, true, true, true, false, false)
+                .done()
                 .tieredCasing('B', GTCasingGroups.heatingCoils().group())
                 .withChannel(GTCasingGroups.heatingCoils().channel())
-                .where('A', Elements.chain(
-                        Elements.counted(20, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, -1, 1)))
+                .hatch('M', MultiblockAbility.MUFFLER_HATCH)
+                .where(' ', Elements.any())
                 .buildStructureDefinition();
 
     }

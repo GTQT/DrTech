@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -147,7 +147,7 @@ public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBas
     protected MultiblockUIFactory createUIFactory() {
         return super.createUIFactory()
                 .createFlexButton((guiData, syncManager) -> {
-                    var throttle = syncManager.panel("throttle_panel", this::makeThrottlePanel, true);
+                    IPanelHandler throttle = syncManager.panel("throttle_panel", this::makeThrottlePanel, true);
 
                     return new ButtonWidget<>()
                             .size(18)
@@ -331,36 +331,31 @@ public class MetaTileEntityExtremeExterminationChamber extends MetaTileEntityBas
         displayedLooting = 0;
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:mob_killer",
-                    MetaTileEntityExtremeExterminationChamber::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start()
                 .aisle("XXXXX", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXXXX", "G###G", "GAAAG", "GAAAG", "GAAAG", "GAAAG", "XXXXX")
                 .aisle("XXSXX", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "FGGGF", "XXXXX")
-                .self('S', MetaTileEntityExtremeExterminationChamber.class)
-                .where('X', Elements.chain(
-                        Elements.counted(10, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, -1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 1, -1),
-                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 1, -1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2)))
-                .blocks('G', getCasingState3())
-                .frames('F', Materials.Steel)
-                .air('A')
-                .blocks('#', Blocks.END_ROD)
+                .where('S', Elements.self(MetaTileEntityExtremeExterminationChamber.class))
+                .casing('X', getCasingState())
+                        .maintenance()
+                        .muffler()
+                        .itemInput(1)
+                        .itemOutput(1)
+                        .fluidOutput(1)
+                        .energyInput(1, 2)
+                .done()
+                .where('G', Elements.block(getCasingState3()))
+                .where('F', Elements.frames(Materials.Steel))
+                .where('A', Elements.air())
+                .where('#', Elements.block(Blocks.END_ROD.getDefaultState()))
                 .buildStructureDefinition();
 
     }

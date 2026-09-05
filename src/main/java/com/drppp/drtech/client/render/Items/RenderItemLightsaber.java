@@ -1,6 +1,6 @@
-package com.drppp.drtech.client.render.Items;
+package com.drppp.drtech.Client.render.Items;
 
-import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -141,7 +141,7 @@ public class RenderItemLightsaber extends TileEntityItemStackRenderer {
         buffer.pos(0.0F, size, 0.0F).endVertex();
         tessellator.draw();
         if ((ItemLightsaber.getFocusingCrystalMask(stack)
-                & com.drppp.drtech.common.items.lightsaber.FocusingCrystal.INVERTING.getMask()) != 0) {
+                & com.drppp.drtech.common.Items.lightsaber.FocusingCrystal.INVERTING.getMask()) != 0) {
             float inner = size / 1.5F;
             GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
             GL11.glPushMatrix();

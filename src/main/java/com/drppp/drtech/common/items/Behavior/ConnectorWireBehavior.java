@@ -1,6 +1,6 @@
-package com.drppp.drtech.common.items.Behavior;
+package com.drppp.drtech.common.Items.Behavior;
 
-import com.drppp.drtech.common.tile.TileEntityConnector;
+import com.drppp.drtech.Tile.TileEntityConnector;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;

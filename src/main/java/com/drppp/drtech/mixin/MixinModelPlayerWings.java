@@ -1,8 +1,8 @@
-package com.drppp.drtech.mixin;
+package com.drppp.drtech.Mixin;
 
-import com.drppp.drtech.common.wings.WingsFlightCapability;
-import com.drppp.drtech.common.wings.WingsFlightData;
-import com.drppp.drtech.client.render.wings.Mth;
+import com.drppp.drtech.wings.WingsFlightCapability;
+import com.drppp.drtech.wings.WingsFlightData;
+import me.paulf.wings.util.Mth;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;

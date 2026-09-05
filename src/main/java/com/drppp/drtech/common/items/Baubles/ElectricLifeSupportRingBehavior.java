@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.Baubles;
+package com.drppp.drtech.common.Items.Baubles;
 
 import baubles.api.BaubleType;
 import gregtech.integration.baubles.BaubleBehavior;

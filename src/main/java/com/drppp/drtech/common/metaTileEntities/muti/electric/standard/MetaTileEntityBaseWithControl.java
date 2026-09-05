@@ -1,7 +1,8 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Matrix4;
 import com.google.common.collect.Lists;
 import gregtech.api.capability.*;
@@ -17,6 +18,7 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.FormedStructureView;
 import gregtech.client.renderer.ICubeRenderer;
+import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
@@ -33,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class MetaTileEntityBaseWithControl extends MultiblockWithDisplayBase implements IControllable, IDataInfoProvider, IWorkable {
-
     public int process;
     public int maxProcess;
     protected IItemHandlerModifiable inputInventory;
@@ -190,8 +191,12 @@ public abstract class MetaTileEntityBaseWithControl extends MultiblockWithDispla
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), isActive(),
-                isWorkingEnabled());
+        if (this.getFrontOverlay() instanceof OrientedOverlayRenderer) {
+            ((OrientedOverlayRenderer) this.getFrontOverlay()).renderOrientedState(renderState, translation, pipeline,
+                    Cuboid6.full, getFrontFacing(), isActive(), isWorkingEnabled());
+        } else {
+            this.getFrontOverlay().render(renderState, translation, pipeline);
+        }
     }
 
     @Override
@@ -262,4 +267,6 @@ public abstract class MetaTileEntityBaseWithControl extends MultiblockWithDispla
         this.outEnergyContainer.addEnergy(energy);
         return true;
     }
+
+
 }

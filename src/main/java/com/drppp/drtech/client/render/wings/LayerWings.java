@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.render.wings;
+package com.drppp.drtech.Client.render.wings;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.RenderPlayer;

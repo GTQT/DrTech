@@ -1,0 +1,6 @@
+{
+  "parent": "drtech:block/template_chain",
+  "textures": {
+    "texture": "drtech:blocks/chain"
+  }
+}

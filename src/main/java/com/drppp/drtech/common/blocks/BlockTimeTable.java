@@ -1,14 +1,20 @@
-package com.drppp.drtech.common.blocks;
+package com.drppp.drtech.common.Blocks;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.tile.TileEntityTimeTable;
+import com.drppp.drtech.Tile.TileEntityTimeTable;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

@@ -1,6 +1,6 @@
 package com.meowmel.cropQT.api;
 
-import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.Items.ItemsInit;
 import com.meowmel.cropQT.block.BlockCropStick;
 import com.meowmel.cropQT.event.CropTickHandler;
 import net.minecraftforge.common.MinecraftForge;

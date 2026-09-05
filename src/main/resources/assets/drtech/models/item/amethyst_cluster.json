@@ -1,0 +1,11 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "drtech:blocks/amethyst_cluster"
+  },
+  "display": {
+    "head": {
+      "translation": [0, 14, -5]
+    }
+  }
+}

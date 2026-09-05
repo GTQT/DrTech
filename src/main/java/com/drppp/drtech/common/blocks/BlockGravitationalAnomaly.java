@@ -1,8 +1,8 @@
-package com.drppp.drtech.common.blocks;
+package com.drppp.drtech.common.Blocks;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.tile.TileEntityGravitationalAnomaly;
+import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

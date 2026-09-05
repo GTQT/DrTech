@@ -1,13 +1,19 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.store;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.store;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Matrix4;
 
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.client.Textures;
-import com.drppp.drtech.api.utils.Datas;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.BlockFTTFPart;
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.api.Utils.Datas;
 import gregtech.api.capability.*;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.FluidTankList;
@@ -21,11 +27,6 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.StructureContributionKey;
-import gregtech.api.pattern.element.Elements;
-import gregtech.api.pattern.element.IStructureElement;
-import gregtech.api.pattern.element.StructureDefinition;
-import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
@@ -46,6 +47,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -59,12 +61,22 @@ import static gregtech.api.util.RelativeDirection.*;
 
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
+import gregtech.api.pattern.casing.CasingDefinition;
+
+import gregtech.api.pattern.casing.CasingRegistration;
+import gregtech.api.pattern.casing.ICasing;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
+
+import gregtech.api.pattern.casing.GTCasingGroups;
+
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 
 public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase implements IControllable, IProgressBarMultiblock {
     private static final String NBT_FLUID_BANK = "FluidBank";
     private boolean isActive, isWorkingEnabled = true;
-    // Match Context Headers
 
     private static final String NBT_FLUID = "Fluid";
     private FluidStack[] fluid = new FluidStack[25];
@@ -255,56 +267,39 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             }
         }
     }
-    private static final StructureContributionKey<ITfftData, List<ITfftData>> BATTERY_KEY =
-            StructureContributionKey.orderedList("drtech:tfft_battery_cells");
-
-    private static final IStructureElement BATTERY_ELEMENT = new BatteryContributionElement<>(
-            "drtech:tfft_battery_cells",
-            state -> {
-                if (!Datas.TFFT_CASINGS.containsKey(state)) return null;
-                ITfftData data = Datas.TFFT_CASINGS.get(state);
-                if (data.getTier() == -1 || data.getCapacity() <= 0) return null;
-                return data;
-            },
-            () -> Datas.TFFT_CASINGS.entrySet().stream()
-                    .sorted(java.util.Comparator.comparingInt(e -> e.getValue().getTier()))
-                    .map(e -> new BlockInfo(e.getKey(), null))
-                    .toArray(BlockInfo[]::new));
-
-    @NotNull
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:tfft_tank",
-                    MetatileEntityTwentyFiveFluidTank::buildTemplate);
-
     @Override
-    protected StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, DOWN, FRONT)
-                .piece("start")
-                    .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
-                .repeatablePiece("body", 3, 14)
-                    .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
-                .piece("end")
-                    .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
-                .self('S', MetatileEntityTwentyFiveFluidTank.class)
-                .where('X', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 0, 2, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 0, 2, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 1, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, -1, 1)))
-                .blocks('G', getGlassState())
-                .where('B', Elements.withTooltips(BATTERY_ELEMENT,
-                        "gregtech.multiblock.pattern.error.batteries"))
+                .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
+                .aisleRepeated(6, "GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
+                .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
+                .where('S', Elements.self(MetatileEntityTwentyFiveFluidTank.class))
+                .casing('X', getCasingState())
+                        .maintenance()
+                        .fluidInput(0, 2)
+                        .fluidOutput(0, 2)
+                        .itemInput(1, 1)
+                        .energyInput(1, 2)
+                .done()
+                .where('G', Elements.block(getGlassState()))
+                .tieredCasing('B', tfftCasingGroup().group())
+                .withChannel(tfftCasingGroup().channel())
                 .buildStructureDefinition();
-
     }
+
+    /** TFFT 电池档位 CasingRegistration（1.9.0 tieredCasing 单档降级） */
+    private static CasingRegistration tfftCasingGroup() {
+        if (tfftReg == null) {
+            tfftReg = CasingDefinition.fromMap("drtech_tfft_battery", true,
+                    Datas.TFFT_CASINGS, ITfftData::getTier, ITfftData::getBatteryName);
+        }
+        return tfftReg;
+    }
+    private static CasingRegistration tfftReg;
     protected static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.TFFT_CASING);
     }
@@ -322,6 +317,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected ICubeRenderer getFrontOverlay() {
         return Textures.TFFT_OVERLAY;
     }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
                                boolean advanced) {
@@ -436,7 +432,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), this.isActive(),
+        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, Cuboid6.full, getFrontFacing(), this.isActive(),
                 this.isWorkingEnabled());
     }
     @Override
@@ -452,11 +448,21 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected void formStructure(@NotNull FormedStructureView formed) {
         super.formStructure(formed);
         initializeAbilities();
-        List<ITfftData> aggregate = formed.getAggregate(BATTERY_KEY);
-        List<ITfftData> parts = aggregate == null ? new ArrayList<>() : new ArrayList<>(aggregate);
-        if (parts.isEmpty()) {
+        // 1.9.0 降级：tieredCasing 单档读取 TFFT 电池档位；块数 = 6 重复层 x 每层 9 块
+        ICasing matched = tfftCasingGroup().channel().getMatchedCasing(formed);
+        if (matched == null) {
             invalidateStructure();
             return;
+        }
+        ITfftData storeData = matched.getPayloadAs(BlockFTTFPart.BlockYotTankPartType.class);
+        if (storeData == null) {
+            invalidateStructure();
+            return;
+        }
+        int batteryCount = 6 * 9;
+        List<ITfftData> parts = new ArrayList<>();
+        for (int i = 0; i < batteryCount; i++) {
+            parts.add(storeData);
         }
         if (this.fluidBank == null) {
             this.fluidBank = new TFFTTankFluidBank(parts);
@@ -630,4 +636,5 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             }
         }
     }
+
 }

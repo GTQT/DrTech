@@ -1,7 +1,7 @@
-package com.drppp.drtech.common.entity;
+package com.drppp.drtech.common.Entity;
 
-import com.drppp.drtech.client.Particle.EntityParticleSpray;
-import com.drppp.drtech.api.utils.DrtechMathUtils;
+import com.drppp.drtech.Client.Particle.EntityParticleSpray;
+import com.drppp.drtech.api.Utils.DrtechMathUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import net.minecraft.block.Block;

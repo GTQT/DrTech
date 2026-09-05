@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.lightsaber;
+package com.drppp.drtech.common.Items.lightsaber;
 
 public enum FocusingCrystal {
     COMPRESSED("compressed"),

@@ -1,8 +1,11 @@
-package com.drppp.drtech.api.utils;
+package com.drppp.drtech.api.Utils;
 
-import com.drppp.drtech.network.SyncInit;
-import com.drppp.drtech.network.UpdateTileEntityPacket;
+import com.drppp.drtech.Network.SyncInit;
+import com.drppp.drtech.Network.UpdateTileEntityPacket;
 import com.drppp.drtech.Tags;
+import gregtech.api.items.metaitem.MetaItem;
+import gregtech.api.unification.material.Material;
+import gregtech.api.unification.material.Materials;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockNetherWart;
@@ -25,21 +28,27 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static com.drppp.drtech.loaders.recipes.DrtechReceipes.LOG_CREATE;
+import static gregtech.api.GregTechAPI.materialManager;
 
 public class DrtechUtils {
     public static Map<Item, IBlockState> ItemCrops = new HashMap<>();
-
     @Nonnull
     public static ResourceLocation getRL(@Nonnull String path) {
         return new ResourceLocation(Tags.MODID, path);
     }
 
-    public static void initCropsList() {
+    public static void initCropsList()
+    {
         for (Block block : GameRegistry.findRegistry(Block.class).getValues()) {
-            if (block instanceof BlockCrops crop) {
-                var seed = getSeedFromCropReflection(crop);
+            if (block instanceof BlockCrops) {
+                BlockCrops crop = (BlockCrops)block;
+                Item seed = getSeedFromCropReflection(crop);
                 if (seed != null) {
                     registerCrop(seed, crop.withAge(crop.getMaxAge()));
                 }
@@ -80,7 +89,6 @@ public class DrtechUtils {
             return null; // 反射失败
         }
     }
-
     public static void addAspectsToItemStack(ItemStack stack, String aspectKey, int amount) {
         if (stack.isEmpty()) return;
 
@@ -109,8 +117,26 @@ public class DrtechUtils {
         tag.setTag("Aspects", aspectsList);
         stack.setTagCompound(tag);
     }
-
-    public static BigInteger getBigIntegerMin(BigInteger a, BigInteger b) {
+    public static void addLogCreate(int EUt, int tick, int outNum, int meta)
+    {
+        LOG_CREATE.recipeBuilder()
+                .notConsumable(new ItemStack(Blocks.SAPLING,1,meta))
+                .outputs(new ItemStack(Blocks.LOG,outNum,meta))
+                .EUt(EUt)
+                .duration(tick)
+                .buildAndRegister();
+    }
+    public static void addLog2Create(int EUt, int tick, int outNum, int meta)
+    {
+        LOG_CREATE.recipeBuilder()
+                .notConsumable(new ItemStack(Blocks.SAPLING,1,meta+4))
+                .outputs(new ItemStack(Blocks.LOG2,outNum,meta))
+                .EUt(EUt)
+                .duration(tick)
+                .buildAndRegister();
+    }
+    public static BigInteger getBigIntegerMin(BigInteger a,BigInteger b)
+    {
         int comparisonResult = a.compareTo(b);
 
         BigInteger minValue;
@@ -119,21 +145,21 @@ public class DrtechUtils {
         } else {
             minValue = b;
         }
-        return minValue;
+        return  minValue;
     }
 
-    public static void sendTileEntityUpdate(TileEntity tileEntity, NBTTagCompound nbt) {
+    public static void sendTileEntityUpdate(TileEntity tileEntity,NBTTagCompound nbt) {
         tileEntity.writeToNBT(nbt);
         UpdateTileEntityPacket packet = new UpdateTileEntityPacket(tileEntity.getPos(), nbt);
         SyncInit.NETWORK.sendToServer(packet);
     }
+    public static int getPosDist(BlockPos a,BlockPos b)
+    {
+        int x = (int)Math.pow(a.getX()-b.getX(),2);
+        int y = (int)Math.pow(a.getY()-b.getY(),2);
+        int z = (int)Math.pow(a.getZ()-b.getZ(),2);
 
-    public static int getPosDist(BlockPos a, BlockPos b) {
-        int x = (int) Math.pow(a.getX() - b.getX(), 2);
-        int y = (int) Math.pow(a.getY() - b.getY(), 2);
-        int z = (int) Math.pow(a.getZ() - b.getZ(), 2);
-
-        return (int) Math.sqrt(x + y + z);
+        return  (int)Math.sqrt(x+y+z);
     }
 
     public static EnumFacing getDirectionFromB1ToB2(BlockPos b1, BlockPos b2) {
@@ -165,7 +191,7 @@ public class DrtechUtils {
     }
 
     public abstract class ItemIdManager {
-        public static ItemId create(NBTTagCompound tag) {
+        public  static ItemId create(NBTTagCompound tag) {
             return new ItemId(
                     Item.getItemById(tag.getShort("item")),
                     tag.getShort("meta"),
@@ -178,7 +204,7 @@ public class DrtechUtils {
         public static ItemId create(ItemStack itemStack) {
             NBTTagCompound nbt = itemStack.getTagCompound();
             if (nbt != null) {
-                nbt = nbt.copy();
+                nbt = (NBTTagCompound) nbt.copy();
             }
 
             return new ItemId(itemStack.getItem(), itemStack.getMetadata(), nbt);
@@ -189,7 +215,7 @@ public class DrtechUtils {
          */
         public static ItemId create(Item item, int metaData, @Nullable NBTTagCompound nbt) {
             if (nbt != null) {
-                nbt = nbt.copy();
+                nbt = (NBTTagCompound) nbt.copy();
             }
             return new ItemId(item, metaData, nbt);
         }

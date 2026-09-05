@@ -1,8 +1,8 @@
 package com.drppp.drtech.intergations.jei;
 
-import com.drppp.drtech.api.utils.RewardBoxManager;
-import com.drppp.drtech.api.utils.RewardEntry;
-import com.drppp.drtech.common.items.MetaItems.MetaItemLootTable;
+import com.drppp.drtech.api.Utils.RewardBoxManager;
+import com.drppp.drtech.api.Utils.RewardEntry;
+import com.drppp.drtech.common.Items.MetaItems.MetaItemLootTable;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;

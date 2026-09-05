@@ -1,7 +1,8 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import com.drppp.drtech.api.Utils.DrtechUtils;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
 import gregtech.api.gui.GuiTextures;
@@ -17,6 +18,7 @@ import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -32,6 +34,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
@@ -52,33 +55,28 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
         super(metaTileEntityId);
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:player_beacon",
-                    MetaTileEntityPlayerBeacon::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start()
                 .aisle("AAAAA", "GGGGG", "     ")
                 .aisle("ACCCA", "GTTTG", "     ")
                 .aisle("ACCCA", "GTTTG", "  X  ")
                 .aisle("ACCCA", "GTTTG", "     ")
                 .aisle("AASAA", "GGGGG", "     ")
-                .self('S', MetaTileEntityPlayerBeacon.class)
-                .blocks('X', Blocks.BEACON)
-                .blocks('T', Blocks.IRON_BLOCK)
+                .where('S', Elements.self(MetaTileEntityPlayerBeacon.class))
+                .where('X', Elements.block(Blocks.BEACON.getDefaultState()))
+                .where('T', Elements.block(Blocks.IRON_BLOCK.getDefaultState()))
+                .where(' ', Elements.any())
                 .tieredCasing('C', GTCasingGroups.heatingCoils().group())
                 .withChannel(GTCasingGroups.heatingCoils().channel())
-                .frames('G', Materials.Steel)
-                .where('A', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(
-                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID))),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1)))
+                .where('G', Elements.frames(Materials.Steel))
+                .casing('A', MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID))
+                        .maintenance()
+                .done()
                 .buildStructureDefinition();
 
     }
@@ -143,7 +141,7 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
                 tick = 0;
                 if (this.energyStore > 0 && players.size() > 0) {
                     for (UUID ID : players) {
-                        var p = this.getWorld().getMinecraftServer().getPlayerList().getPlayerByUUID(ID);
+                        EntityPlayerMP p = this.getWorld().getMinecraftServer().getPlayerList().getPlayerByUUID(ID);
                         if (p != null && p.inventory != null) {
                             IInventory inventoryPlayer = p.inventory;
                             for (int i = 0; i < inventoryPlayer.getSizeInventory(); i++) {

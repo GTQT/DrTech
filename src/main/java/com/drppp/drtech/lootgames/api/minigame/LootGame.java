@@ -1,5 +1,6 @@
 package com.drppp.drtech.lootgames.api.minigame;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
@@ -12,6 +13,8 @@ import com.drppp.drtech.lootgames.api.packet.SMessageGameUpdate;
 import com.drppp.drtech.lootgames.api.task.TEPostponeTaskScheduler;
 import com.drppp.drtech.lootgames.api.tileentity.TileEntityGameMaster;
 import com.drppp.drtech.lootgames.packets.NetworkHandler;
+
+import java.util.List;
 
 public abstract class LootGame {
     protected TileEntityGameMaster<?> masterTileEntity;

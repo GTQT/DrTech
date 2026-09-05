@@ -1,54 +1,48 @@
 package com.drppp.drtech;
 
 import codechicken.lib.texture.TextureUtils;
-import com.drppp.drtech.client.ClientEventHandler;
-import com.drppp.drtech.client.ClientHandler;
-import com.drppp.drtech.client.ClientProxy;
-import com.drppp.drtech.client.Keys;
-import com.drppp.drtech.client.render.TesrTimeTable;
-import com.drppp.drtech.client.Textures;
-import com.drppp.drtech.client.render.TileEntityRendererConnector;
-import com.drppp.drtech.client.render.TileEntityRendererGravitationalAnomaly;
-import com.drppp.drtech.client.render.wings.WingsClientHandler;
-import com.drppp.drtech.client.render.glider.GliderClientHandler;
-import com.drppp.drtech.common.DrTechCreativeTabs;
-import com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion;
-import com.drppp.drtech.common.tile.TileEntityConnector;
-import com.drppp.drtech.common.tile.TileEntityGravitationalAnomaly;
-import com.drppp.drtech.common.tile.TileEntityTimeTable;
-import com.drppp.drtech.network.ArmorNetworkHandler;
-import com.drppp.drtech.network.SyncInit;
+import com.drppp.drtech.Client.ClientProxy;
+import com.drppp.drtech.Client.TesrTimeTable;
+import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.Client.render.TileEntityRendererConnector;
+import com.drppp.drtech.Client.render.TileEntityRendererGravitationalAnomaly;
+import com.drppp.drtech.Client.render.wings.WingsClientHandler;
+import com.drppp.drtech.Client.render.glider.GliderClientHandler;
+import com.drppp.drtech.Network.SyncInit;
+import com.drppp.drtech.Tile.*;
 import com.drppp.drtech.api.ItemHandler.TileEntityUIFactory;
-import com.drppp.drtech.api.utils.DrtechUtils;
+import com.drppp.drtech.api.Utils.DrtechUtils;
 import com.drppp.drtech.api.capability.DrtechCapInit;
-import com.drppp.drtech.common.blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.BlockComposter;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import com.drppp.drtech.common.CommonProxy;
-import com.drppp.drtech.common.items.DrtToolItems;
-import com.drppp.drtech.common.items.ItemsInit;
-import com.drppp.drtech.common.items.MTMetaItems;
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
-import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
-import com.drppp.drtech.common.DrtechMetaEntities;
+import com.drppp.drtech.common.Items.DrtToolItems;
+import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities;
+import com.drppp.drtech.common.drtMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;
-import com.drppp.drtech.drone.api.DroneExtensionRegistry;
+import com.drppp.drtech.common.drone.api.DroneExtensionRegistry;
+import com.drppp.drtech.common.world.AmethystGeodeWorldGenerator;
+import com.drppp.drtech.common.world.DriedGhastWorldGenerator;
 import com.drppp.drtech.hooked.HookCapability;
 import com.drppp.drtech.hooked.HookClientHooks;
 import com.drppp.drtech.hooked.HookNetwork;
 import com.drppp.drtech.hooked.HookTickHandler;
-import com.drppp.drtech.common.wings.WingsFlightCapability;
-import com.drppp.drtech.common.wings.WingsNetwork;
-import com.drppp.drtech.common.glider.GliderFlightCapability;
-import com.drppp.drtech.common.glider.GliderNetwork;
-import com.drppp.drtech.common.wings.WingsBaublesCompat;
+import com.drppp.drtech.wings.WingsFlightCapability;
+import com.drppp.drtech.wings.WingsNetwork;
+import com.drppp.drtech.glider.GliderFlightCapability;
+import com.drppp.drtech.glider.GliderNetwork;
+import com.drppp.drtech.wings.WingsBaublesCompat;
 import com.drppp.drtech.intergations.top.TopInit;
-import com.drppp.drtech.intergations.opencomputers.OpenComputersCompat;
-import com.drppp.drtech.intergations.opencomputers.OpenComputersPairingCommand;
-import com.drppp.drtech.intergations.opencomputers.OpenComputersPairingCleanupHandler;
+import com.drppp.drtech.compat.opencomputers.OpenComputersCompat;
+import com.drppp.drtech.compat.opencomputers.OpenComputersPairingCommand;
+import com.drppp.drtech.compat.opencomputers.OpenComputersPairingCleanupHandler;
 import com.meowmel.cropQT.api.CropInitHandler;
 import com.meowmel.cropQT.client.CropStickTESR;
 import com.meowmel.cropQT.gtfo.TileCropFarmerMode;
 import com.meowmel.cropQT.tile.TileCropStick;
-import com.drppp.drtech.loaders.recipes.CraftingRecipes;
+import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import com.drppp.drtech.loaders.DrTechReceipeManager;
 import com.drppp.drtech.loaders.ModRewardBoxes;
 import com.drppp.drtech.loaders.recipes.builder.DisassemblyHandler;
@@ -73,7 +67,9 @@ import gregtech.api.unification.material.event.MaterialRegistryEvent;
 import gregtechfoodoption.common.machines.farmer.FarmerModeRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -94,6 +90,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import static com.drppp.drtech.Tags.MODID;
 
@@ -106,12 +103,7 @@ public class DrTechMain {
     public static CreativeTabs DrTechTab;
     @Mod.Instance(MODID)
     public static DrTechMain instance;
-
-    @SidedProxy(modId = MODID,
-            clientSide = "com.drppp.drtech.client.ClientProxy",
-            serverSide = "com.drppp.drtech.common.CommonProxy"
-    )
-
+    @SidedProxy(modId = MODID, clientSide = "com.drppp.drtech.Client.ClientProxy", serverSide = "com.drppp.drtech.common.CommonProxy")
     public static CommonProxy proxy;
     public static ClientProxy cproxy;
 
@@ -125,9 +117,6 @@ public class DrTechMain {
         MinecraftForge.EVENT_BUS.register(this);
         DrTechTab = new DrTechCreativeTabs("drtech");
         DrMetaItems.MetaItemsInit();
-        // 模块化装甲（原 mechtech）
-        MTMetaItems.init();
-        ArmorNetworkHandler.init();
         DrtechCapInit.init();
         HookCapability.init();
         WingsFlightCapability.init();
@@ -136,7 +125,7 @@ public class DrTechMain {
         GliderNetwork.init();
         WingsBaublesCompat.init();
         Textures.init();
-        DrtechMetaEntities.init();
+        drtMetaEntities.init();
         TileEntityUIFactory.INSTANCE.init();
         DrtToolItems.init();
         DroneExtensionRegistry.bootstrap();
@@ -145,6 +134,8 @@ public class DrTechMain {
         HookNetwork.init();
         HookTickHandler.init();
         MinecraftForge.EVENT_BUS.register(new CommonHandler());
+        GameRegistry.registerWorldGenerator(new DriedGhastWorldGenerator(), 0);
+        GameRegistry.registerWorldGenerator(new AmethystGeodeWorldGenerator(), 0);
 
         // LootGames init
         ModBlocks.registerTileEntities();
@@ -171,13 +162,9 @@ public class DrTechMain {
     @SideOnly(Side.CLIENT)
     public void ClientpreInit(FMLPreInitializationEvent event) {
         TexturesInit();
-        DrtechMetaEntities.initRenderers();
+        drtMetaEntities.initRenderers();
         HookClientHooks.init();
         WingsClientHandler.init();
-        // 模块化装甲客户端（原 mechtech ClientProxy）
-        Keys.initClient();
-        ClientHandler.preInit();
-        MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
 
     }
 
@@ -216,7 +203,7 @@ public class DrTechMain {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        CraftingRecipes.load();
+        CraftingReceipe.load();
         DrTechReceipeManager.init();
         SyncInit.init();
         proxy.initClientControls();
@@ -225,6 +212,7 @@ public class DrTechMain {
             OBJLoader.INSTANCE.addDomain(MODID);
         }
         CropInitHandler.init();
+        BlockComposter.registerDispenseBehaviors();
         OpenComputersCompat.initialize();
         if (OpenComputersCompat.isAvailable()) {
             MinecraftForge.EVENT_BUS.register(new OpenComputersPairingCleanupHandler());
@@ -234,14 +222,14 @@ public class DrTechMain {
         LootGames.gameManager.registerGame(GameOfLight.class, new GameOfLight.Factory());
         LootGames.gameManager.registerGame(GameMineSweeper.class, new GameMineSweeper.Factory());
         TaskRegistry.registerTask(TaskCreateExplosion.class);
-        TaskRegistry.registerTask(TaskMSCreateExplosion.class);
+        TaskRegistry.registerTask(com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion.class);
     }
 
     @SideOnly(Side.CLIENT)
     @EventHandler
     public void Clientinit(FMLInitializationEvent event) {
         SyncInit.init();
-        DrtechMetaEntities.initRenderers();
+        drtMetaEntities.initRenderers();
         CropInitHandler.clienInit();
         WingsClientHandler.initRenderLayers();
         GliderClientHandler.initRenderLayers();
@@ -249,7 +237,7 @@ public class DrTechMain {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        if (DrtConfig.machine.EnableDisassembly)
+        if (DrtConfig.EnableDisassembly)
             DisassemblyHandler.buildDisassemblerRecipes();
         FarmerModeRegistry.registerFarmerMode(new TileCropFarmerMode());
         DrtechUtils.initCropsList();

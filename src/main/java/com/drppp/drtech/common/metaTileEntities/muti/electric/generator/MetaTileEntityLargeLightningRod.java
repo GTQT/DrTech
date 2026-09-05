@@ -1,9 +1,6 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.generator;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.generator;
 
-import codechicken.lib.render.CCRenderState;
-import codechicken.lib.render.pipeline.IVertexOperation;
-import codechicken.lib.vec.Matrix4;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.standard.MetaTileEntityBaseWithControl;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileEntityBaseWithControl;
 import gregtech.api.GTValues;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -33,7 +30,9 @@ import java.util.List;
 import java.util.Random;
 
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
 import gregtech.api.pattern.element.Elements;
+
 import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithControl {
@@ -51,16 +50,12 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
     public boolean usesMui2() {
         return false;
     }
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:large_lighting_rod",
-                    MetaTileEntityLargeLightningRod::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start()
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
@@ -75,13 +70,14 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "     AAA     ", "             ", "             " )
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
                 .aisle("             ", "             ", "             ", "             ", "             ", "             ", "      A      ", "             ", "             " )
-                .self('D', MetaTileEntityLargeLightningRod.class)
-                .where('B', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.OUTPUT_ENERGY, 1, 1, 1),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1)))
-                .frames('A', Materials.Iron)
-                .blocks('C', Blocks.IRON_BARS)
+                .where('D', Elements.self(MetaTileEntityLargeLightningRod.class))
+                .casing('B', getCasingState())
+                        .energyOutput(1, 1)
+                        .maintenance()
+                .done()
+                .where('A', Elements.frames(Materials.Iron))
+                .where('C', Elements.block(Blocks.IRON_BARS.getDefaultState()))
+                .where(' ', Elements.any())
                 .buildStructureDefinition();
 
     }
@@ -94,14 +90,7 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
     }
     @SideOnly(Side.CLIENT)
     protected @NotNull ICubeRenderer getFrontOverlay() {
-        return com.drppp.drtech.client.Textures.LIGHTING_ROD_OVERLAY;
-    }
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
-        super.renderMetaTileEntity(renderState, translation, pipeline);
-        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), isActive(),
-                isWorkingEnabled());
+        return com.drppp.drtech.Client.Textures.LIGHTING_ROD_OVERLAY;
     }
     @Override
     protected void updateFormedValid() {

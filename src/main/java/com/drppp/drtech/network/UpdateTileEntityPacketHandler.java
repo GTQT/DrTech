@@ -1,7 +1,7 @@
-package com.drppp.drtech.network;
+package com.drppp.drtech.Network;
 
-import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityIndustrialApiary;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneProgrammer;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneProgrammer;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import net.minecraft.nbt.NBTTagCompound;

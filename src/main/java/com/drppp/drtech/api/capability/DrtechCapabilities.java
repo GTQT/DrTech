@@ -1,5 +1,6 @@
 package com.drppp.drtech.api.capability;
 
+import appeng.api.storage.data.IAEFluidStack;
 import gregtech.api.capability.IObjectHolder;
 import gregtech.api.capability.IWorkable;
 import gregtech.api.metatileentity.MetaTileEntity;

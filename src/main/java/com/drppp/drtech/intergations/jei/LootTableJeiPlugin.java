@@ -1,8 +1,8 @@
 package com.drppp.drtech.intergations.jei;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.api.utils.RewardBoxManager;
-import com.drppp.drtech.common.items.MetaItems.MetaItemLootTable;
+import com.drppp.drtech.api.Utils.RewardBoxManager;
+import com.drppp.drtech.common.Items.MetaItems.MetaItemLootTable;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;

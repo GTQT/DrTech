@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items;
+package com.drppp.drtech.common.Items;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;

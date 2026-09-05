@@ -1,6 +1,9 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
@@ -20,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
-import static com.drppp.drtech.loaders.recipes.DrtechRecipes.DRONE_PAD;
+import static com.drppp.drtech.loaders.recipes.DrtechReceipes.DRONE_PAD;
 
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 
@@ -65,17 +68,12 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         return false;
     }
 
-    @NotNull
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:drone_pad",
-                    MetaTileEntityDronePad::buildTemplate);
-
     @Override
-    protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+    protected StructureDefinition<?> createStructureDefinition() {
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start()
                 .aisle("    F     F", "    F     F", "     FCCCF ", "     F   F ", "           ", "           ")
                 .aisle("F          ", "F          ", "FFFFFCXXXCF", " AAAF     F", " AAA       ", "           ")
@@ -84,20 +82,18 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
                 .aisle("           ", "           ", "FAAACXXXXXC", "P###P      ", "P###P      ", " AAA       ")
                 .aisle("F          ", "F          ", "FFFFFCXXXCF", " AAAF     F", " AAA       ", "           ")
                 .aisle("    F     F", "    F     F", "     FCSCF ", "     F   F ", "           ", "           ")
-                .self('S', MetaTileEntityDronePad.class)
-                .any('#')
-                .blocks('C', getFirstCasingState())
-                .blocks('X', getSecondCasingState())
-                .blocks('G', getFourthCasingState())
-                .blocks('P', getBoilerCasingState())
-                .blocks('F', getFrameState())
+                .where('S', Elements.self(MetaTileEntityDronePad.class))
+                .where('C', Elements.block(getFirstCasingState()))
+                .where('X', Elements.block(getSecondCasingState()))
+                .casing('A', getThirdCasingState())
+                        .auto(false, true, true, true, true, true, false)
+                .done()
+                .where('G', Elements.block(getFourthCasingState()))
+                .where('P', Elements.block(getBoilerCasingState()))
+                .where('F', Elements.block(getFrameState()))
                 .hatch('M', MultiblockAbility.MUFFLER_HATCH)
-                .where('A', Elements.chain(
-                        Elements.counted(25, 4096, Elements.block(getThirdCasingState())),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 0, -1, 1)))
+                .where(' ', Elements.any())
+                .where('#', Elements.air())
                 .buildStructureDefinition();
 
     }
@@ -152,4 +148,5 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
     public boolean allowsExtendedFacing() {
         return false;
     }
+
 }

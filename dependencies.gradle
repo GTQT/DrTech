@@ -26,12 +26,18 @@ dependencies {
     api("com.cleanroommc:modularui:3.1.5") { transitive = false }
 
     implementation rfg.deobf(files("libs/gregtech-gtqt-1.12.2-1.9.0.jar"))
+    //implementation rfg.deobf(files("libs/gregicalitymultiblocks-gtqt-1.9.0.jar"))
     implementation rfg.deobf(files("libs/gregtechfoodoption-gtqt-1.12.2-1.9.0.jar"))
+    implementation rfg.deobf(files("libs/ae2fc-2.7.10-unofficial.jar"))
+    implementation rfg.deobf(files("libs/appliedenergistics2-v1.0.5-gtqt.jar"))
+
+    //implementation rfg.deobf(files("libs/geckolib-forge-1.12.2-3.0.31.jar"))
 
     api rfg.deobf("curse.maven:ctm-267602:2915363") // CTM 1.0.2.31
     implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848") // CCL 3.2.3.358
     implementation rfg.deobf("curse.maven:had-enough-items-557549:7515497")
     implementation rfg.deobf('curse.maven:top-245211:2667280') // TOP 1.4.28
+    implementation rfg.deobf("curse.maven:mixin-booter-419286:7049694")
     implementation "curse.maven:crafttweaker-239197:6929088"
     // OC is an optional integration. Its API is linked only from the isolated compat package.
     compileOnly rfg.deobf("curse.maven:opencomputers-223008:8582726")
@@ -44,7 +50,13 @@ dependencies {
     implementation rfg.deobf("curse.maven:forestry-59751:2684780")
     implementation rfg.deobf("curse.maven:Binnie's Mods-223525:2916129")
     implementation rfg.deobf("curse.maven:gendustry-70492:2516215")
-    implementation rfg.deobf("curse.maven:endercore-231868:4671384")
-    implementation rfg.deobf("curse.maven:enderio-64578:4674244")
+    // EnderIO/EnderCore 仅用于兼容（代码只以配方字符串引用）；其 coremod 在开发运行时
+    // 因 ContainedDeps 嵌套 jar 无法加载而崩溃（ClassNotFoundException: EnderCorePlugin），
+    // 故改为 compileOnly 移出开发运行时类路径；整合包运行时由 mods 文件夹提供。
+    compileOnly rfg.deobf("curse.maven:endercore-231868:4671384")
+    compileOnly rfg.deobf("curse.maven:enderio-64578:4674244")
     implementation rfg.deobf(files("libs/modelloader-1.0.0.jar"))
+    //embed files("libs/personalworlds-1.12.2-1.0.6.jar")
+
+
 }

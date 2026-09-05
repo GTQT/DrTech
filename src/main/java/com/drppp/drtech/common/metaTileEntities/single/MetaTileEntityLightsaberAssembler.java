@@ -1,6 +1,6 @@
-package com.drppp.drtech.common.metaTileEntities.single;
+package com.drppp.drtech.common.MetaTileEntities.single;
 
-import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
 import gregtech.api.capability.impl.AbstractRecipeLogic;
 import gregtech.api.capability.impl.RecipeLogicEnergy;
 import gregtech.api.metatileentity.MetaTileEntity;

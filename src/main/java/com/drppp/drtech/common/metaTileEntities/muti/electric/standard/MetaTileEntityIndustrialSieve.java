@@ -1,8 +1,12 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.drppp.drtech.client.Textures;
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing1;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing1;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -38,32 +42,24 @@ public class MetaTileEntityIndustrialSieve extends RecipeMapMultiblockController
         this.recipeMapWorkable = new SelfRecipeLogic(this, false);
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:industrial_sieve",
-                    MetaTileEntityIndustrialSieve::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, UP, BACK)
                 .aisle("XXXXX", "XXXXX", "XXXXX")
                 .aisle("XXXXX", "XAAAX", "XAAAX")
                 .aisle("XXXXX", "XAAAX", "XAAAX")
                 .aisle("XXXXX", "XAAAX", "XAAAX")
                 .aisle("XXXXX", "XXSXX", "XXXXX")
-                .self('S', MetaTileEntityIndustrialSieve.class)
-                .blocks('A', getCasingState1())
-                .where('X', Elements.chain(
-                        Elements.counted(35, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1)))
+                .where('S', Elements.self(MetaTileEntityIndustrialSieve.class))
+                .where('A', Elements.block(getCasingState1()))
+                .casing('X', getCasingState())
+                        .auto(false, true, true, true, true, false, false)
+                        .muffler()
+                .done()
                 .buildStructureDefinition();
 
     }

@@ -1,12 +1,13 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.store;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.store;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
+import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Matrix4;
-import com.drppp.drtech.client.Particle.DrtechLaserBeamParticle;
-import com.drppp.drtech.common.tile.TileEntityConnector;
-import com.drppp.drtech.api.utils.DrtechUtils;
-import com.drppp.drtech.common.blocks.BlocksInit;
+import com.drppp.drtech.Client.Particle.DrtechLaserBeamParticle;
+import com.drppp.drtech.Tile.TileEntityConnector;
+import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.common.Blocks.BlocksInit;
 import gregtech.api.capability.GregtechDataCodes;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IControllable;
@@ -20,9 +21,6 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.casing.DeclarativePatternBuilder;
-import gregtech.api.pattern.element.Elements;
-import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.particle.GTParticleManager;
 import gregtech.client.renderer.ICubeRenderer;
@@ -56,6 +54,12 @@ import java.util.List;
 import static gregtech.api.util.RelativeDirection.FRONT;
 import static gregtech.api.util.RelativeDirection.RIGHT;
 import static gregtech.api.util.RelativeDirection.UP;
+
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+
+import gregtech.api.pattern.element.Elements;
+
+import gregtech.api.pattern.element.StructureDefinition;
 
 public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase implements IControllable {
     private boolean isActive = true;
@@ -113,7 +117,7 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
 
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, this.getFrontFacing(), this.isActive(), this.isWorkingEnabled());
+        this.getFrontOverlay().renderOrientedState(renderState, translation, pipeline, Cuboid6.full, this.getFrontFacing(), this.isActive(), this.isWorkingEnabled());
     }
 
     @Override
@@ -166,37 +170,27 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
         }
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:trans_tower",
-                    MetaTileEntityEnergyTransTower::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
                 .aisle("CSC", "CCC", "CCC")
-                // 原 6 层固定重复展开
-                .aisle("###", "GLG", "#G#")
-                .aisle("###", "GLG", "#G#")
-                .aisle("###", "GLG", "#G#")
-                .aisle("###", "GLG", "#G#")
-                .aisle("###", "GLG", "#G#")
-                .aisle("###", "GLG", "#G#")
+                .aisleRepeated(6, "###", "GLG", "#G#")
                 .aisle("#C#", "CCC", "#C#")
                 .aisle("#G#", "GCG", "#G#")
                 .aisle("#G#", "GCG", "#G#")
                 .aisle("###", "#D#", "###")
-                .self('S', MetaTileEntityEnergyTransTower.class)
-                .any('#')
-                .where('C', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1)))
-                .blocks('G', Blocks.IRON_BARS)
-                .frames('L', Materials.Steel)
-                .blocks('D', BlocksInit.BLOCK_CONNECTOR1, BlocksInit.BLOCK_CONNECTOR2, BlocksInit.BLOCK_CONNECTOR3)
+                .where('S', Elements.self(MetaTileEntityEnergyTransTower.class))
+                .where('#', Elements.any())
+                .casing('C', getCasingState())
+                        .maintenance()
+                .done()
+                .where('G', Elements.block(Blocks.IRON_BARS.getDefaultState()))
+                .where('L', Elements.frames(Materials.Steel))
+                .where('D', Elements.blocks(BlocksInit.BLOCK_CONNECTOR1, BlocksInit.BLOCK_CONNECTOR2, BlocksInit.BLOCK_CONNECTOR3))
                 .buildStructureDefinition();
     }
 

@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.entity.moster;
+package com.drppp.drtech.common.Entity.moster;
 
 import com.drppp.drtech.Tags;
 import com.google.common.base.Predicate;

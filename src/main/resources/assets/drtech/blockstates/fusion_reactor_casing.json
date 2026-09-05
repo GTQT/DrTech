@@ -7,62 +7,62 @@
     "variant": {
       "plasma_containment_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/plasma_containment_casing"
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion"
         }
       },
       "first_wall_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/first_wall_casing"
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_2"
         }
       },
       "superconducting_magnet_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/superconducting_magnet_casing"
+          "all": "gregtech:blocks/casings/fusion/machine_coil_superconductor"
         }
       },
       "cooling_channel_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/cooling_channel_casing"
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_3"
         }
       },
       "tritium_breeding_blanket_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/tritium_breeding_blanket_casing"
+          "all": "gregtech:blocks/casings/firebox/machine_casing_firebox_tungstensteel"
         }
       },
       "neutron_capture_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/neutron_capture_casing"
+          "all": "gregtech:blocks/casings/solid/machine_casing_clean_stainless_steel"
         }
       },
       "radiation_shielding_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/radiation_shielding_casing"
+          "all": "gregtech:blocks/casings/solid/machine_casing_robust_tungstensteel"
         }
       },
       "rf_device_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_device_casing"
+          "all": "gregtech:blocks/casings/mechanic/machine_casing_assembly_control"
         }
       },
       "rf_waveguide_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_waveguide_casing"
+          "all": "gregtech:blocks/casings/mechanic/machine_casing_turbine_tungstensteel"
         }
       },
       "rf_capacitor_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_capacitor_casing"
+          "all": "gregtech:blocks/casings/gearbox/machine_casing_gearbox_tungstensteel"
         }
       },
       "rf_phase_synchronizer_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_phase_synchronizer_casing"
+          "all": "gregtech:blocks/casings/mechanic/machine_casing_assembly_line"
         }
       },
       "rf_ceramic_window_casing": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_ceramic_window_casing"
+          "all": "gregtech:blocks/casings/transparent/fusion_glass"
         }
       }
     }

@@ -1,6 +1,6 @@
-package com.drppp.drtech.client.render;
+package com.drppp.drtech.Client.render;
 
-import com.drppp.drtech.common.tile.TileEntityGravitationalAnomaly;
+import com.drppp.drtech.Tile.TileEntityGravitationalAnomaly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;

@@ -1,10 +1,15 @@
-package com.drppp.drtech.common.metaTileEntities.muti.mutipart;
+package com.drppp.drtech.common.MetaTileEntities.muti.mutipart;
 
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityYotTank;
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.drppp.drtech.api.Utils.DrtechUtils;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.drppp.drtech.api.capability.DrtechCapabilities;
 import gregtech.api.GTValues;
 import gregtech.api.gui.ModularUI;
@@ -27,6 +32,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePart implements IMultiblockAbilityPart<IFluidTank>{
     private MetaTileEntityYotTank yotTank;
@@ -43,7 +49,7 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
 
     @Override
     public ICubeRenderer getBaseTexture() {
-        return com.drppp.drtech.client.Textures.YOT_TANK_CASING;
+        return com.drppp.drtech.Client.Textures.YOT_TANK_CASING;
     }
 
     @Override
@@ -184,8 +190,8 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
                 fillamount = super.fill(resource,false);
                 if(this.fluid.amount==Integer.MAX_VALUE)
                 {
-                   var cap =  this.yotTank.getFluidBank().getCapacity();
-                   var store = this.yotTank.getFluidBank().getStored();
+                   BigInteger cap =  this.yotTank.getFluidBank().getCapacity();
+                   BigInteger store = this.yotTank.getFluidBank().getStored();
                    if(cap.subtract(store).compareTo(BigInteger.valueOf(resource.amount))>0)
                    {
                        fillamount = resource.amount;
