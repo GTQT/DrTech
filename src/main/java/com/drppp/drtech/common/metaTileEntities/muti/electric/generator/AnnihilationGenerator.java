@@ -3,10 +3,11 @@ package com.drppp.drtech.common.metaTileEntities.muti.electric.generator;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.drppp.drtech.common.tile.TileEntityGravitationalAnomaly;
 import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.blocks.metaBlocks.MetaCasing;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.api.capability.ipml.AnnihilationGeneratorLogic;
 import gregtech.api.GTValues;
 import gregtech.api.block.IHeatingCoilBlockStats;
@@ -23,9 +24,11 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
+import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
 import gregtech.api.pattern.FormedStructureView;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
+import gregtech.api.util.KeyUtil;
 import gregtech.api.worldgen.config.OreDepositDefinition;
 import gregtech.api.worldgen.config.WorldGenRegistry;
 import gregtech.client.renderer.ICubeRenderer;
@@ -227,42 +230,60 @@ public class AnnihilationGenerator extends MultiblockWithDisplayBase implements 
     }
 
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        super.addDisplayText(textList);
-        if (!isStructureFormed()) {
-            TextComponentTranslation textComponentTranslation = new TextComponentTranslation("gregtech.multiblock.invalid_structure.tooltip");
-            textComponentTranslation.setStyle((new Style()).setColor(TextFormatting.GRAY));
-            textList.add((new TextComponentTranslation("gregtech.multiblock.invalid_structure"))
-                    .setStyle((new Style()).setColor(TextFormatting.RED)
-                            .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, textComponentTranslation))));
-        } else {
+    protected void configureDisplayText(MultiblockUIBuilder builder) {
+        super.configureDisplayText(builder);
+        builder.setWorkingStatus(this.isWorkingEnabled(), this.isActive())
+                .addCustom((keyManager, syncer) -> {
+                    if (!isStructureFormed()) {
+                        return;
+                    }
+                    boolean active = syncer.syncBoolean(this::isActive);
+                    boolean working = syncer.syncBoolean(this::isWorkingEnabled);
+                    long capacity = syncer.syncLong(
+                            () -> this.energyContainer == null ? 0 : this.energyContainer.getEnergyCapacity());
+                    long maxVoltage = syncer.syncLong(() -> this.energyContainer == null ? 0
+                            : Math.max(this.energyContainer.getInputVoltage(), this.energyContainer.getOutputVoltage()));
+                    int progress = syncer.syncInt(this::getProgress);
+                    int maxProgress = syncer.syncInt(this::getMaxProgress);
+                    int leve = syncer.syncInt(() -> this.leve);
+                    int weight = syncer.syncInt(() -> this.logic.weight);
+                    long mEUt = syncer.syncLong(this.logic::getmEUt);
 
-            IEnergyContainer energyContainer = this.energyContainer;
-            if (energyContainer != null && energyContainer.getEnergyCapacity() > 0L) {
-                long maxVoltage = Math.max(energyContainer.getInputVoltage(), energyContainer.getOutputVoltage());
-                String voltageName = GTValues.VN[GTUtility.getFloorTierByVoltage(maxVoltage)];
-                textList.add(new TextComponentTranslation("gregtech.multiblock.max_energy_per_tick", maxVoltage, voltageName));
-            }
-
-            if (!this.isWorkingEnabled()) {
-                textList.add(new TextComponentTranslation("gregtech.multiblock.work_paused"));
-            } else if (this.isActive()) {
-                textList.add(new TextComponentTranslation("gregtech.multiblock.running"));
-                int currentProgress = (int) (((float) getProgress() / (float) getMaxProgress()) * 100);
-                textList.add(new TextComponentTranslation("gregtech.multiblock.progress", currentProgress));
-
-            } else {
-                textList.add(new TextComponentTranslation("gregtech.multiblock.idling"));
-            }
-            textList.add(new TextComponentTranslation("drtech.multiblock.tire", this.leve));
-            textList.add(new TextComponentTranslation("drtech.multiblock.beilv", this.leve * 0.25));
-            textList.add(new TextComponentTranslation("gregtech.multiblock.weight", this.logic.weight)
-                    .setStyle((new Style()).setColor(TextFormatting.YELLOW))
-            );
-            textList.add(new TextComponentTranslation("gregtech.multiblock.mEUt", this.logic.getmEUt(), "EU/T")
-                    .setStyle((new Style()).setColor(TextFormatting.YELLOW))
-            );
-        }
+                    keyManager.add(richText -> {
+                        if (capacity > 0) {
+                            String voltageName = GTValues.VN[GTUtility.getFloorTierByVoltage(maxVoltage)];
+                            richText.add(KeyUtil.lang(TextFormatting.GRAY, "gregtech.multiblock.max_energy_per_tick",
+                                    KeyUtil.number(TextFormatting.WHITE, maxVoltage),
+                                    KeyUtil.string(TextFormatting.WHITE, voltageName)))
+                                    .newLine();
+                        }
+                        if (!working) {
+                            richText.add(IKey.lang("gregtech.multiblock.work_paused")).newLine();
+                        } else if (active) {
+                            richText.add(IKey.lang("gregtech.multiblock.running")).newLine();
+                            int currentProgress = maxProgress <= 0 ? 0
+                                    : (int) (((float) progress / (float) maxProgress) * 100);
+                            richText.add(IKey.lang("gregtech.multiblock.progress",
+                                    KeyUtil.number(TextFormatting.WHITE, currentProgress)))
+                                    .newLine();
+                        } else {
+                            richText.add(IKey.lang("gregtech.multiblock.idling")).newLine();
+                        }
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY, "drtech.multiblock.tire",
+                                KeyUtil.number(TextFormatting.WHITE, leve)))
+                                .newLine();
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY, "drtech.multiblock.beilv",
+                                KeyUtil.string(TextFormatting.WHITE, String.valueOf(leve * 0.25))))
+                                .newLine();
+                        richText.add(KeyUtil.lang(TextFormatting.YELLOW, "gregtech.multiblock.weight",
+                                KeyUtil.number(TextFormatting.WHITE, weight)))
+                                .newLine();
+                        richText.add(KeyUtil.lang(TextFormatting.YELLOW, "gregtech.multiblock.mEUt",
+                                KeyUtil.number(TextFormatting.WHITE, mEUt),
+                                KeyUtil.string(TextFormatting.WHITE, "EU/T")))
+                                .newLine();
+                    });
+                });
     }
 
     @Override

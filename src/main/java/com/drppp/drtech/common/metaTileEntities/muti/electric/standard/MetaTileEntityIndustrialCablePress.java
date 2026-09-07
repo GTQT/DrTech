@@ -3,7 +3,7 @@ package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
 
 import com.drppp.drtech.client.Textures;
 import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing1;
+import com.drppp.drtech.common.blocks.metaBlocks.MetaCasing1;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;

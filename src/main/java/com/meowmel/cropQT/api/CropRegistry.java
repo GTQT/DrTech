@@ -2,7 +2,7 @@ package com.meowmel.cropQT.api;
 
 import com.drppp.drtech.api.utils.DrtechUtils;
 import com.drppp.drtech.common.items.ItemsInit;
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.loaders.recipes.CraftingRecipes;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.unification.ore.OrePrefix;

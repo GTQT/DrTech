@@ -4,8 +4,10 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.utils.serialization.ByteBufAdapters;
 import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.common.blocks.metaBlocks.MetaCasing;
 import com.drppp.drtech.client.Textures;
 import com.drppp.drtech.common.metaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.api.utils.Datas;
@@ -20,6 +22,7 @@ import gregtech.api.gui.widgets.WidgetGroup;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
+import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
 import gregtech.api.pattern.FormedStructureView;
 import gregtech.api.pattern.StructureContributionKey;
 import gregtech.api.pattern.element.Elements;
@@ -28,6 +31,7 @@ import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.unification.material.Materials;
 import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
+import gregtech.api.util.KeyUtil;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.renderer.ICubeRenderer;
@@ -322,50 +326,52 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         tooltip.add(I18n.format("gregtech.machine.yot_tank.tooltip2"));
     }
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        MultiblockDisplayText.builder(textList, isStructureFormed())
-                .setWorkingStatus(true, isActive() && isWorkingEnabled()) // transform into two-state system for display
+    protected void configureDisplayText(MultiblockUIBuilder builder) {
+        super.configureDisplayText(builder);
+        builder.setWorkingStatus(true, isActive() && isWorkingEnabled()) // transform into two-state system for display
                 .setWorkingStatusKeys(
                         "gregtech.multiblock.idling",
                         "gregtech.multiblock.idling",
                         "gregtech.machine.active_transformer.routing")
-                .addCustom(tl -> {
-                    if (isStructureFormed() && fluidBank != null) {
-                        BigInteger energyStored = fluidBank.getStored();
-                        BigInteger energyCapacity = fluidBank.getCapacity();
-
-                        // Stored EU line
-                        ITextComponent storedFormatted = TextComponentUtil.stringWithColor(
-                                TextFormatting.GOLD,
-                                TextFormattingUtil.formatNumbers(energyStored) + " L");
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GRAY,
-                                "gregtech.multiblock.power_substation.stored",
-                                storedFormatted));
-
-                        // EU Capacity line
-                        ITextComponent capacityFormatted = TextComponentUtil.stringWithColor(
-                                TextFormatting.GOLD,
-                                TextFormattingUtil.formatNumbers(energyCapacity) + " L");
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GRAY,
-                                "gregtech.multiblock.power_substation.capacity",
-                                capacityFormatted));
-
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GOLD,
-                                "drtech.multiblock.yot_tank.fluid_type",
-                                this.fluid==null?"空":this.fluid.getLocalizedName())
-                        );
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GRAY,
-                                "drtech.multiblock.power_substation.output",this.outputflag==0?"禁用":"启用"));
+                .addCustom((keyManager, syncer) -> {
+                    if (!isStructureFormed()) {
+                        return;
                     }
+                    boolean hasBank = syncer.syncBoolean(() -> this.fluidBank != null);
+                    String storedText = syncer.<String>syncObject(() -> this.fluidBank == null ? "0 L"
+                            : TextFormattingUtil.formatNumbers(this.fluidBank.getStored()) + " L",
+                            ByteBufAdapters.STRING);
+                    String capacityText = syncer.<String>syncObject(() -> this.fluidBank == null ? "0 L"
+                            : TextFormattingUtil.formatNumbers(this.fluidBank.getCapacity()) + " L",
+                            ByteBufAdapters.STRING);
+                    String fluidName = syncer.<String>syncObject(() -> this.fluid == null
+                            ? "空" : this.fluid.getLocalizedName(), ByteBufAdapters.STRING);
+                    int outputflag = syncer.syncInt(() -> this.outputflag);
+
+                    keyManager.add(richText -> {
+                        if (!hasBank) {
+                            return;
+                        }
+                        // Stored line
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY,
+                                "gregtech.multiblock.power_substation.stored",
+                                KeyUtil.string(TextFormatting.GOLD, storedText)))
+                                .newLine();
+                        // Capacity line
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY,
+                                "gregtech.multiblock.power_substation.capacity",
+                                KeyUtil.string(TextFormatting.GOLD, capacityText)))
+                                .newLine();
+                        richText.add(KeyUtil.lang(TextFormatting.GOLD, "drtech.multiblock.yot_tank.fluid_type",
+                                KeyUtil.string(TextFormatting.WHITE, fluidName)))
+                                .newLine();
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY,
+                                "drtech.multiblock.power_substation.output",
+                                KeyUtil.string(TextFormatting.WHITE, outputflag == 0 ? "禁用" : "启用")))
+                                .newLine();
+                    });
                 })
                 .addWorkingStatusLine();
-        //textList.add(TextComponentUtil.translationWithColor(
-               // TextFormatting.GOLD,
-               // "drtech.multiblock.yot_tank.fluid_type", fluidBank.fluid.getUnlocalizedName()));
     }
 
     @SideOnly(Side.CLIENT)

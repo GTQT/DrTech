@@ -113,11 +113,6 @@ public abstract class MetaTileEntityBaseWithControl extends MultiblockWithDispla
     }
 
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        super.addDisplayText(textList);
-    }
-
-    @Override
     protected void updateFormedValid() {
 
     }
@@ -151,7 +146,7 @@ public abstract class MetaTileEntityBaseWithControl extends MultiblockWithDispla
 
     @Override
     public boolean usesMui2() {
-        return false;
+        return true;
     }
 
     protected void initializeAbilities() {

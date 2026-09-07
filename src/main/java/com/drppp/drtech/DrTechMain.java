@@ -26,7 +26,7 @@ import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.items.DrtToolItems;
 import com.drppp.drtech.common.items.ItemsInit;
 import com.drppp.drtech.common.items.MTMetaItems;
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.DrtechMetaEntities;
 import com.drppp.drtech.common.event.CommonHandler;

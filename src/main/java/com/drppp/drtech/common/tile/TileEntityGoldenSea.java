@@ -1,6 +1,6 @@
 package com.drppp.drtech.common.tile;
 
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;

@@ -3,6 +3,7 @@ package com.drppp.drtech.common.metaTileEntities.muti.electric.store;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.drppp.drtech.client.Particle.DrtechLaserBeamParticle;
 import com.drppp.drtech.common.tile.TileEntityConnector;
 import com.drppp.drtech.api.utils.DrtechUtils;
@@ -19,6 +20,8 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
+import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
+import gregtech.api.util.KeyUtil;
 import gregtech.api.pattern.FormedStructureView;
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 import gregtech.api.pattern.element.Elements;
@@ -40,7 +43,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
@@ -222,16 +225,47 @@ public class MetaTileEntityEnergyTransTower extends MultiblockWithDisplayBase im
     }
 
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        super.addDisplayText(textList);
-        if (this.connector != null) {
-            BlockPos targetPos = getPrimaryConnectionTarget();
-            textList.add(new TextComponentTranslation("drtech.machine.energytrans.connect", targetPos == null ? ":None" :
-                    ": X:" + targetPos.getX() + " Y:" + targetPos.getY() + " Z:" + targetPos.getZ()));
-            textList.add(new TextComponentTranslation("drtech.machine.energytrans.energy", String.valueOf(this.connector.StoredEnergy)));
-            textList.add(new TextComponentTranslation("drtech.machine.energytrans.posdist", targetPos == null ? "0" :
-                    String.valueOf(DrtechUtils.getPosDist(targetPos, this.connector.getPos()))));
+    protected void configureDisplayText(MultiblockUIBuilder builder) {
+        super.configureDisplayText(builder);
+        builder.addCustom((keyManager, syncer) -> {
+            if (!isStructureFormed()) {
+                return;
+            }
+            boolean hasConnector = syncer.syncBoolean(() -> this.connector != null);
+            String connectText = syncer.syncString(buildConnectionText());
+            long storedEnergy = syncer.syncLong(() -> this.connector == null ? 0 : this.connector.StoredEnergy);
+            String distText = syncer.syncString(buildDistanceText());
+            keyManager.add(richText -> {
+                if (hasConnector) {
+                    richText.add(KeyUtil.lang(TextFormatting.GRAY, "drtech.machine.energytrans.connect",
+                            KeyUtil.string(TextFormatting.WHITE, connectText)))
+                            .newLine();
+                    richText.add(KeyUtil.lang(TextFormatting.GRAY, "drtech.machine.energytrans.energy",
+                            KeyUtil.string(TextFormatting.WHITE, String.valueOf(storedEnergy))))
+                            .newLine();
+                    richText.add(KeyUtil.lang(TextFormatting.GRAY, "drtech.machine.energytrans.posdist",
+                            KeyUtil.string(TextFormatting.WHITE, distText)))
+                            .newLine();
+                }
+            });
+        });
+    }
+
+    private String buildConnectionText() {
+        if (this.connector == null) {
+            return ":None";
         }
+        BlockPos targetPos = getPrimaryConnectionTarget();
+        return targetPos == null ? ":None"
+                : ": X:" + targetPos.getX() + " Y:" + targetPos.getY() + " Z:" + targetPos.getZ();
+    }
+
+    private String buildDistanceText() {
+        if (this.connector == null) {
+            return "0";
+        }
+        BlockPos targetPos = getPrimaryConnectionTarget();
+        return targetPos == null ? "0" : String.valueOf(DrtechUtils.getPosDist(targetPos, this.connector.getPos()));
     }
 
     @Override

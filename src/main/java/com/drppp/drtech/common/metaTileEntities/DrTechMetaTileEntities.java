@@ -4,6 +4,7 @@ import com.drppp.drtech.client.Textures;
 import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.utils.DrtechUtils;
+import com.drppp.drtech.common.metaTileEntities.muti.electric.generator.MetaTileEntityAdvancedFusionReactor;
 import com.drppp.drtech.drone.machine.MetaTileEntityDroneDock;
 import com.drppp.drtech.drone.machine.MetaTileEntityDroneFleetController;
 import com.drppp.drtech.drone.machine.MetaTileEntityDroneEndpoint;
@@ -47,6 +48,8 @@ public class DrTechMetaTileEntities {
     private static final int DRONE_EU_ENDPOINT_META_ID = 908;
 
     public static AnnihilationGenerator ANNIHILATION_GENERATOR;
+    public static MetaTileEntityAdvancedFusionReactor ADVANCED_FUSION_REACTOR;
+
     public static MetaTileEntityDronePad DRONE_PAD;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
     public static MetaTileEntityLargeAlloySmelter LARGE_ALLOY_SMELTER;
@@ -132,6 +135,7 @@ public class DrTechMetaTileEntities {
         startID = 500;
 
         ANNIHILATION_GENERATOR = registerMetaTileEntity(getID(), new AnnihilationGenerator(getDrId("annihilation_generator")));
+        ADVANCED_FUSION_REACTOR = registerMetaTileEntity(getID(), new MetaTileEntityAdvancedFusionReactor(getDrId("advanced_fusion_reactor")));
 
         DRONE_PAD = registerMetaTileEntity(getID(), new MetaTileEntityDronePad(getDrId("drone_pad")));
         LARGE_ALLOY_SMELTER = registerMetaTileEntity(getID(), new MetaTileEntityLargeAlloySmelter(getDrId("large_alloy_smelter")));

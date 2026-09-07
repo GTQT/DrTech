@@ -8,9 +8,9 @@ import net.minecraft.item.ItemStack;
 
 import static com.drppp.drtech.common.blocks.BlocksInit.TFFT_TANK;
 import static com.drppp.drtech.common.blocks.BlocksInit.YOT_TANK;
-import static com.drppp.drtech.common.blocks.MetaBlocks.BlockFTTFPart.BlockYotTankPartType.*;
-import static com.drppp.drtech.common.blocks.MetaBlocks.BlockYotTankPart.BlockYotTankPartType.*;
-import static com.drppp.drtech.common.items.MetaItems.DrMetaItems.*;
+import static com.drppp.drtech.common.blocks.metaBlocks.BlockFTTFPart.BlockYotTankPartType.*;
+import static com.drppp.drtech.common.blocks.metaBlocks.BlockYotTankPart.BlockYotTankPartType.*;
+import static com.drppp.drtech.common.items.metaItems.DrMetaItems.*;
 import static gregtech.api.GTValues.*;
 import static gregtech.api.recipes.RecipeMaps.ASSEMBLER_RECIPES;
 import static gregtech.api.unification.material.Materials.*;

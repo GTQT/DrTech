@@ -2,6 +2,8 @@ package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.utils.serialization.ByteBufAdapters;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
 import gregtech.api.gui.GuiTextures;
@@ -12,11 +14,14 @@ import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
+import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
+import gregtech.api.util.KeyUtil;
 import gregtech.api.unification.material.Materials;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -24,7 +29,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
 
@@ -94,15 +99,47 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
     }
 
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        super.addDisplayText(textList);
-        textList.add(new TextComponentString("绑定网络:" + this.networkUid));
-        //textList.add(new TextComponentString("网络存储能量:" + WirelessNetworkManager.getUserEU(this.networkUid).toString()));
-        textList.add(new TextComponentString("机器存储能量:" + this.energyStore));
-        if (players.size() > 0)
-            for (int i = 0; i < players.size(); i++) {
-                textList.add(new TextComponentString("存储玩家:" + this.getWorld().getMinecraftServer().getPlayerList().getPlayerByUUID(players.get(i)).getDisplayNameString()));
-            }
+    protected void configureDisplayText(MultiblockUIBuilder builder) {
+        super.configureDisplayText(builder);
+        builder.setWorkingStatus(this.isWorkingEnabled(), this.isActive())
+                .addCustom((keyManager, syncer) -> {
+                    if (!isStructureFormed()) {
+                        return;
+                    }
+                    String uidText = syncer.syncString(this.networkUid == null ? "" : this.networkUid.toString());
+                    long stored = syncer.syncLong(() -> this.energyStore);
+                    int count = syncer.syncInt(() -> this.players.size());
+                    List<String> playerNames = new ArrayList<>();
+                    for (int i = 0; i < count; i++) {
+                        final int index = i;
+                        playerNames.add(syncer.<String>syncObject(() -> {
+                            if (index >= this.players.size()) {
+                                return "";
+                            }
+                            UUID id = this.players.get(index);
+                            EntityPlayerMP player = this.getWorld().getMinecraftServer().getPlayerList().getPlayerByUUID(id);
+                            return player == null ? id.toString() : player.getDisplayNameString();
+                        }, ByteBufAdapters.STRING));
+                    }
+                    keyManager.add(richText -> {
+                        if (!uidText.isEmpty()) {
+                            richText.add(IKey.comp(
+                                    KeyUtil.string(TextFormatting.GRAY, "绑定网络:"),
+                                    KeyUtil.string(TextFormatting.WHITE, uidText)))
+                                    .newLine();
+                        }
+                        richText.add(IKey.comp(
+                                KeyUtil.string(TextFormatting.GRAY, "机器存储能量:"),
+                                KeyUtil.string(TextFormatting.WHITE, String.valueOf(stored))))
+                                .newLine();
+                        for (String name : playerNames) {
+                            richText.add(IKey.comp(
+                                    KeyUtil.string(TextFormatting.GRAY, "存储玩家:"),
+                                    KeyUtil.string(TextFormatting.WHITE, name)))
+                                    .newLine();
+                        }
+                    });
+                });
     }
 
     @Override

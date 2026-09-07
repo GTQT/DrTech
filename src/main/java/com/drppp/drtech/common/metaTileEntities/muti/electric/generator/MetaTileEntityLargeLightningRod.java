@@ -47,10 +47,7 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
         return new MetaTileEntityLargeLightningRod(this.metaTileEntityId);
     }
-    @Override
-    public boolean usesMui2() {
-        return false;
-    }
+
     private static final StructureDefinition<?> STRUCTURE_DEFINITION =
             StructureDefinition.getOrBuild("drtech:large_lighting_rod",
                     MetaTileEntityLargeLightningRod::buildTemplate);
@@ -158,12 +155,6 @@ public class MetaTileEntityLargeLightningRod extends MetaTileEntityBaseWithContr
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
         this.energy_store = data.getLong("EnergyStored");
-    }
-
-    @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        super.addDisplayText(textList);
-        textList.add(new TextComponentString("内部缓存:"+energy_store +"/"+MAX_ENERGY_STORE));
     }
 
     @Override

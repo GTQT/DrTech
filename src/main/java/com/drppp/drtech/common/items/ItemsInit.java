@@ -107,6 +107,8 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING2, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING3, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK, VariantItemBlock::new));
         event.getRegistry().register(CROP_SEED);
@@ -144,6 +146,8 @@ public class ItemsInit {
         registerItemModel(BlocksInit.COMMON_CASING);
         registerItemModel(BlocksInit.COMMON_CASING1);
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING);
+        registerItemModel(BlocksInit.FUSION_REACTOR_CASING2);
+        registerItemModel(BlocksInit.FUSION_REACTOR_CASING3);
         registerItemModel(BlocksInit.YOT_TANK);
         registerItemModel(BlocksInit.TFFT_TANK);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));

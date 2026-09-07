@@ -2,7 +2,7 @@ package com.drppp.drtech.loaders.recipes;
 
 import com.drppp.drtech.api.unification.material.DrtechMaterials;
 import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 
 import gregtech.api.unification.ore.OrePrefix;
 import gregtech.common.items.MetaItems;

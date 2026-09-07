@@ -5,6 +5,7 @@ key.ctrl=Flight Ring Boost
 
 #recipemap
 recipemap.molecular_recombination.name=Molecular Recombination
+recipemap.mob_killer.name=怪物屠宰
 recipemap.deep_ground_pump.name=Thermal Extraction
 recipemap.solar_tower.name=Solar Power
 recipemap.disassembler.name=Disassembler
@@ -181,10 +182,15 @@ tile.tfft_part.tfft_part_tier_t9.name=Fluid Unit Block (T9)
 tile.tfft_part.tfft_part_tier_t10.name=Fluid Unit Block (T10)
 #Machine
 drtech.machine.annihilation_generator.name=Annihilation Generator
+drtech.machine.advanced_fusion_reactor.name=Advanced Fusion Reactor
+drtech.machine.fusion_reactor.tooltip.1=Advanced Fusion Reactor: requires a complete fusion structure; the five tiered casing families set the module tier (1~5).
+drtech.machine.fusion_reactor.tooltip.2=Output = First Wall base output × coolant multiplier; Neutron Capture adds bonus output, Tritium Breeding Blanket lowers DT fuel consumption.
+drtech.machine.fusion_reactor.tooltip.3=Startup: magnetize (total set by superconducting magnet tier) → inject DT fuel → ignite with RF assist heating.
 drtech.machine.advanced_process_array.name=Advanced Processing Array (Laser)
 drtech.machine.log_factory.name=Log Synthesis Plant
 drtech.machine.molecular_recombination.name=Large Molecular Recombiner
 drtech.machine.yot_tank.name=YOT Tank
+drtech.machine.mob_killer.name=怪物模拟仓
 drtech.machine.deep_ground_pump.name=Deep Geothermal Pump
 drtech.machine.tfft_tank.name=T.F.F.T Tank
 drtech.machine.yot_hatch.name=YOT Hatch
@@ -288,7 +294,7 @@ gtqtcore.multiblock.tfft.threshold_increment=Move fluid forward
 gtqtcore.multiblock.tfft.clearfluid=Clear current fluid
 gtqtcore.multiblock.tfft.isoutput=Toggle output state
 drtech.multiblock.power_substation.output=Fluid output state: %s
-drtech.multiblock.power_substation.eut=Power consumption: 闂?%d EU/t
+drtech.multiblock.power_substation.eut=Power consumption: %s EU/t
 drtech.universal.tooltip.energy_eut=闂佸綊妫跨粩顤沶it power: 闂佸綊妫块幏?d EU/t
 drtech.machine.energytrans.connect=Connected position: %s
 drtech.machine.energytrans.energy=Capacitor stored energy: %s
@@ -494,18 +500,56 @@ drtech.machine.laser_bending_1048576.max.name=1048576A Laser Bender
 entity.UTi Golem.name=Uranium-Titanium Alloy Golem
 entity.Advanced Rocket.name=Advanced Rocket
 # Fusion Reactor Casings
-tile.fusion_reactor_casing.plasma_containment_casing.name=Plasma Containment Chamber
-tile.fusion_reactor_casing.first_wall_casing.name=Fusion Reactor First Wall
-tile.fusion_reactor_casing.superconducting_magnet_casing.name=Superconducting Magnet Material
-tile.fusion_reactor_casing.cooling_channel_casing.name=Coolant Circuit
-tile.fusion_reactor_casing.tritium_breeding_blanket_casing.name=Tritium Breeding Blanket
-tile.fusion_reactor_casing.neutron_capture_casing.name=Neutron Capture Module
-tile.fusion_reactor_casing.radiation_shielding_casing.name=Radiation Shielding Shell
-tile.fusion_reactor_casing.rf_device_casing.name=RF Device Casing
-tile.fusion_reactor_casing.rf_waveguide_casing.name=RF Waveguide
-tile.fusion_reactor_casing.rf_capacitor_casing.name=RF High Voltage Storage Array
-tile.fusion_reactor_casing.rf_phase_synchronizer_casing.name=RF Phase Synchronizer
-tile.fusion_reactor_casing.rf_ceramic_window_casing.name=RF Ceramic Vacuum Window
+tile.fusion_reactor_casing.first_wall_1.name=Fusion Reactor First Wall
+tile.fusion_reactor_casing.first_wall_2.name=碳化硅第一壁
+tile.fusion_reactor_casing.first_wall_3.name=钒钛合金第一壁
+tile.fusion_reactor_casing.first_wall_4.name=纳米陶瓷第一壁
+tile.fusion_reactor_casing.first_wall_5.name=中子强化第一壁
+tile.fusion_reactor_casing.cooling_channel_1.name=Coolant Circuit
+tile.fusion_reactor_casing.cooling_channel_2.name=液态钠钾冷却回路
+tile.fusion_reactor_casing.cooling_channel_3.name=熔融盐冷却回路
+tile.fusion_reactor_casing.cooling_channel_4.name=液态锂铅冷却回路
+tile.fusion_reactor_casing.cooling_channel_5.name=超临界氦冷却回路
+tile.fusion_reactor_casing.superconducting_magnet_1.name=Superconducting Magnet Material
+tile.fusion_reactor_casing.superconducting_magnet_2.name=高温超导磁体
+tile.fusion_reactor_casing.superconducting_magnet_3.name=强场超导磁体
+tile.fusion_reactor_casing.superconducting_magnet_4.name=极限超导磁体
+tile.fusion_reactor_casing.superconducting_magnet_5.name=聚变级超导磁体
+
+tile.fusion_reactor_casing2.neutron_capture_1.name=Neutron Capture Module
+tile.fusion_reactor_casing2.neutron_capture_2.name=高密度吸收阵列
+tile.fusion_reactor_casing2.neutron_capture_3.name=硼化物转换模块
+tile.fusion_reactor_casing2.neutron_capture_4.name=锂铅复合捕获模块
+tile.fusion_reactor_casing2.neutron_capture_5.name=高能中子直转模块
+tile.fusion_reactor_casing2.tritium_breeding_blanket_1.name=Tritium Breeding Blanket
+tile.fusion_reactor_casing2.tritium_breeding_blanket_2.name=富集锂包层
+tile.fusion_reactor_casing2.tritium_breeding_blanket_3.name=锂陶瓷包层
+tile.fusion_reactor_casing2.tritium_breeding_blanket_4.name=锂铅包层
+tile.fusion_reactor_casing2.tritium_breeding_blanket_5.name=中子倍增锂包层
+
+tile.fusion_reactor_casing3.plasma_containment_casing.name=Plasma Containment Chamber
+tile.fusion_reactor_casing3.radiation_shielding_casing.name=Radiation Shielding Shell
+tile.fusion_reactor_casing3.rf_device_casing.name=RF Device Casing
+tile.fusion_reactor_casing3.rf_waveguide_casing.name=RF Waveguide
+tile.fusion_reactor_casing3.rf_capacitor_casing.name=RF High Voltage Storage Array
+tile.fusion_reactor_casing3.rf_phase_synchronizer_casing.name=RF Phase Synchronizer
+tile.fusion_reactor_casing3.rf_ceramic_window_casing.name=RF Ceramic Vacuum Window
+
+# Fusion Reactor GUI Text
+drtech.multiblock.fusion.state=State: %s
+drtech.multiblock.fusion.state.magnetizing=Magnetizing
+drtech.multiblock.fusion.state.injecting=Injecting Fuel
+drtech.multiblock.fusion.state.heating=RF Heating
+drtech.multiblock.fusion.state.ignited=Ignited
+drtech.multiblock.fusion.state.running=Running
+drtech.multiblock.fusion.state.offline=Standby
+drtech.multiblock.fusion.output=Current Output: %s EU/t
+drtech.multiblock.fusion.core_output=Core Output: %s EU/t
+drtech.multiblock.fusion.heat=Heat: %s/%s
+drtech.multiblock.fusion.magnetize=Magnetizing: %s/%s EU
+drtech.multiblock.fusion.fuel=DT Fuel Burn: %s mB/t
+drtech.multiblock.fusion.rf=RF Assist Power: %s EU/t
+drtech.multiblock.fusion.tier=Module Tiers (Wall/Coolant/Capture/Breeding/Magnet): %s/%s/%s/%s/%s
 
 # Fusion Reactor Meta Items
 metaitem.fusion_first_wall_plate.name=Fusion Reactor First Wall Plate
@@ -2167,6 +2211,14 @@ mechtech.modules.binoculars.name=Binoculars
 mechtech.modules.auto_feeder.name=Auto Feeder
 mechtech.modules.oxygen_mask.name=Oxygen Mask
 mechtech.modules.wireless_cover.name=Wireless Receiver
+metaitem.anti_gravity.name=反重力单元
+mechtech.anti_gravity.tooltip.1=创造飞行
+mechtech.anti_gravity.tooltip.2=耗电:%s EU/t
+metaitem.sprint_module.name=助行推进器
+metaitem.energy_shield.name=能量护盾
+metaitem.healing_module.name=治愈器
+
+
 # --- Anti-Gravity Module ---
 mechtech.modules.anti_gravity.name=Anti-Gravity Module
 mechtech.anti_gravity.mode=Anti-Gravity: %s

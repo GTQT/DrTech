@@ -5,64 +5,79 @@
   },
   "variants": {
     "variant": {
-      "plasma_containment_casing": {
+      "first_wall_1": {
         "textures": {
-          "all": "drtech:blocks/fusion/plasma_containment_casing"
+          "all": "drtech:blocks/fusion/first_wall_1"
         }
       },
-      "first_wall_casing": {
+      "first_wall_2": {
         "textures": {
-          "all": "drtech:blocks/fusion/first_wall_casing"
+          "all": "drtech:blocks/fusion/first_wall_2"
         }
       },
-      "superconducting_magnet_casing": {
+      "first_wall_3": {
         "textures": {
-          "all": "drtech:blocks/fusion/superconducting_magnet_casing"
+          "all": "drtech:blocks/fusion/first_wall_3"
         }
       },
-      "cooling_channel_casing": {
+      "first_wall_4": {
         "textures": {
-          "all": "drtech:blocks/fusion/cooling_channel_casing"
+          "all": "drtech:blocks/fusion/first_wall_4"
         }
       },
-      "tritium_breeding_blanket_casing": {
+      "first_wall_5": {
         "textures": {
-          "all": "drtech:blocks/fusion/tritium_breeding_blanket_casing"
+          "all": "drtech:blocks/fusion/first_wall_5"
         }
       },
-      "neutron_capture_casing": {
+      "cooling_channel_1": {
         "textures": {
-          "all": "drtech:blocks/fusion/neutron_capture_casing"
+          "all": "drtech:blocks/fusion/cooling_channel_1"
         }
       },
-      "radiation_shielding_casing": {
+      "cooling_channel_2": {
         "textures": {
-          "all": "drtech:blocks/fusion/radiation_shielding_casing"
+          "all": "drtech:blocks/fusion/cooling_channel_2"
         }
       },
-      "rf_device_casing": {
+      "cooling_channel_3": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_device_casing"
+          "all": "drtech:blocks/fusion/cooling_channel_3"
         }
       },
-      "rf_waveguide_casing": {
+      "cooling_channel_4": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_waveguide_casing"
+          "all": "drtech:blocks/fusion/cooling_channel_4"
         }
       },
-      "rf_capacitor_casing": {
+      "cooling_channel_5": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_capacitor_casing"
+          "all": "drtech:blocks/fusion/cooling_channel_5"
         }
       },
-      "rf_phase_synchronizer_casing": {
+      "superconducting_magnet_1": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_phase_synchronizer_casing"
+          "all": "drtech:blocks/fusion/superconducting_magnet_1"
         }
       },
-      "rf_ceramic_window_casing": {
+      "superconducting_magnet_2": {
         "textures": {
-          "all": "drtech:blocks/fusion/rf_ceramic_window_casing"
+          "all": "drtech:blocks/fusion/superconducting_magnet_2"
+        }
+      },
+      "superconducting_magnet_3": {
+        "textures": {
+          "all": "drtech:blocks/fusion/superconducting_magnet_3"
+        }
+      },
+      "superconducting_magnet_4": {
+        "textures": {
+          "all": "drtech:blocks/fusion/superconducting_magnet_4"
+        }
+      },
+      "superconducting_magnet_5": {
+        "textures": {
+          "all": "drtech:blocks/fusion/superconducting_magnet_5"
         }
       }
     }

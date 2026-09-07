@@ -1338,8 +1338,13 @@ tile.tfft_part.tfft_part_tier_t7.name=流体单元方块(T7)
 tile.tfft_part.tfft_part_tier_t8.name=流体单元方块(T8)
 tile.tfft_part.tfft_part_tier_t9.name=流体单元方块(T9)
 tile.tfft_part.tfft_part_tier_t10.name=流体单元方块(T10)
+
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
+drtech.machine.advanced_fusion_reactor.name=聚变发电机
+drtech.machine.fusion_reactor.tooltip.1=聚变发电机：需要完整的聚变堆结构，五类分级外壳决定各模块档位(1~5)。
+drtech.machine.fusion_reactor.tooltip.2=输出 = 第一壁最大输出 × 冷却剂倍率；中子捕获模块提供额外收益，氚增殖包层降低DT燃料消耗。
+drtech.machine.fusion_reactor.tooltip.3=启动流程：建磁(总量由超导磁体档位决定) → 注入DT燃料 → RF辅助加热点火。
 drtech.machine.advanced_process_array.name=进阶处理阵列(激光)
 drtech.machine.log_factory.name=原木拟生厂
 drtech.machine.molecular_recombination.name=大型分子重组仪
@@ -1448,7 +1453,7 @@ gtqtcore.multiblock.tfft.threshold_increment=流体向前一
 gtqtcore.multiblock.tfft.clearfluid=清空当前流体
 gtqtcore.multiblock.tfft.isoutput=输出状态切换
 drtech.multiblock.power_substation.output=流体输出状态:%s
-drtech.multiblock.power_substation.eut=耗电量:§3%d EU/T
+drtech.multiblock.power_substation.eut=耗电量:§3%s EU/T
 drtech.universal.tooltip.energy_eut=§c单元耗电：§r%d EU/T
 drtech.machine.energytrans.connect=连接位置%s
 drtech.machine.energytrans.energy=电容存储能量:%s
@@ -1654,18 +1659,56 @@ drtech.machine.laser_bending_1048576.max.name=1048576A激光折弯器（§4MAX§
 entity.UTi Golem.name=铀钛合金傀儡
 entity.Advanced Rocket.name=高级火箭
 # Fusion Reactor Casings
-tile.fusion_reactor_casing.plasma_containment_casing.name=等离子约束腔体
-tile.fusion_reactor_casing.first_wall_casing.name=聚变堆第一壁
-tile.fusion_reactor_casing.superconducting_magnet_casing.name=超导磁体材料
-tile.fusion_reactor_casing.cooling_channel_casing.name=冷却剂回路
-tile.fusion_reactor_casing.tritium_breeding_blanket_casing.name=氚增殖包层
-tile.fusion_reactor_casing.neutron_capture_casing.name=中子捕获模块
-tile.fusion_reactor_casing.radiation_shielding_casing.name=辐射屏蔽外壳
-tile.fusion_reactor_casing.rf_device_casing.name=RF装置外壳
-tile.fusion_reactor_casing.rf_waveguide_casing.name=RF波导管
-tile.fusion_reactor_casing.rf_capacitor_casing.name=RF高压储能阵列
-tile.fusion_reactor_casing.rf_phase_synchronizer_casing.name=RF相位同步器
-tile.fusion_reactor_casing.rf_ceramic_window_casing.name=RF陶瓷真空窗
+tile.fusion_reactor_casing.first_wall_1.name=聚变堆第一壁
+tile.fusion_reactor_casing.first_wall_2.name=碳化硅第一壁
+tile.fusion_reactor_casing.first_wall_3.name=钒钛合金第一壁
+tile.fusion_reactor_casing.first_wall_4.name=纳米陶瓷第一壁
+tile.fusion_reactor_casing.first_wall_5.name=中子强化第一壁
+tile.fusion_reactor_casing.cooling_channel_1.name=冷却剂回路
+tile.fusion_reactor_casing.cooling_channel_2.name=液态钠钾冷却回路
+tile.fusion_reactor_casing.cooling_channel_3.name=熔融盐冷却回路
+tile.fusion_reactor_casing.cooling_channel_4.name=液态锂铅冷却回路
+tile.fusion_reactor_casing.cooling_channel_5.name=超临界氦冷却回路
+tile.fusion_reactor_casing.superconducting_magnet_1.name=超导磁体材料
+tile.fusion_reactor_casing.superconducting_magnet_2.name=高温超导磁体
+tile.fusion_reactor_casing.superconducting_magnet_3.name=强场超导磁体
+tile.fusion_reactor_casing.superconducting_magnet_4.name=极限超导磁体
+tile.fusion_reactor_casing.superconducting_magnet_5.name=聚变级超导磁体
+
+tile.fusion_reactor_casing2.neutron_capture_1.name=中子捕获模块
+tile.fusion_reactor_casing2.neutron_capture_2.name=高密度吸收阵列
+tile.fusion_reactor_casing2.neutron_capture_3.name=硼化物转换模块
+tile.fusion_reactor_casing2.neutron_capture_4.name=锂铅复合捕获模块
+tile.fusion_reactor_casing2.neutron_capture_5.name=高能中子直转模块
+tile.fusion_reactor_casing2.tritium_breeding_blanket_1.name=氚增殖包层
+tile.fusion_reactor_casing2.tritium_breeding_blanket_2.name=富集锂包层
+tile.fusion_reactor_casing2.tritium_breeding_blanket_3.name=锂陶瓷包层
+tile.fusion_reactor_casing2.tritium_breeding_blanket_4.name=锂铅包层
+tile.fusion_reactor_casing2.tritium_breeding_blanket_5.name=中子倍增锂包层
+
+tile.fusion_reactor_casing3.plasma_containment_casing.name=等离子约束腔体
+tile.fusion_reactor_casing3.radiation_shielding_casing.name=辐射屏蔽外壳
+tile.fusion_reactor_casing3.rf_device_casing.name=RF装置外壳
+tile.fusion_reactor_casing3.rf_waveguide_casing.name=RF波导管
+tile.fusion_reactor_casing3.rf_capacitor_casing.name=RF高压储能阵列
+tile.fusion_reactor_casing3.rf_phase_synchronizer_casing.name=RF相位同步器
+tile.fusion_reactor_casing3.rf_ceramic_window_casing.name=RF陶瓷真空窗
+
+# Fusion Reactor GUI Text
+drtech.multiblock.fusion.state=状态:%s
+drtech.multiblock.fusion.state.magnetizing=建磁中
+drtech.multiblock.fusion.state.injecting=燃料注入中
+drtech.multiblock.fusion.state.heating=RF加热中
+drtech.multiblock.fusion.state.ignited=已点火
+drtech.multiblock.fusion.state.running=运行中
+drtech.multiblock.fusion.state.offline=待机
+drtech.multiblock.fusion.output=当前输出:%s EU/t
+drtech.multiblock.fusion.core_output=核心输出:%s EU/t
+drtech.multiblock.fusion.heat=热量:%s/%s
+drtech.multiblock.fusion.magnetize=建磁进度:%s/%s EU
+drtech.multiblock.fusion.fuel=DT燃料消耗:%s mB/t
+drtech.multiblock.fusion.rf=RF辅助功率:%s EU/t
+drtech.multiblock.fusion.tier=模块档位(壁/冷/捕获/氚/磁):%s/%s/%s/%s/%s
 
 # Fusion Reactor Meta Items
 metaitem.fusion_first_wall_plate.name=聚变堆第一壁板

@@ -1,0 +1,60 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "neutron_capture_1": {
+        "textures": {
+          "all": "drtech:blocks/fusion/neutron_capture_1"
+        }
+      },
+      "neutron_capture_2": {
+        "textures": {
+          "all": "drtech:blocks/fusion/neutron_capture_2"
+        }
+      },
+      "neutron_capture_3": {
+        "textures": {
+          "all": "drtech:blocks/fusion/neutron_capture_3"
+        }
+      },
+      "neutron_capture_4": {
+        "textures": {
+          "all": "drtech:blocks/fusion/neutron_capture_4"
+        }
+      },
+      "neutron_capture_5": {
+        "textures": {
+          "all": "drtech:blocks/fusion/neutron_capture_5"
+        }
+      },
+      "tritium_breeding_blanket_1": {
+        "textures": {
+          "all": "drtech:blocks/fusion/tritium_breeding_blanket_1"
+        }
+      },
+      "tritium_breeding_blanket_2": {
+        "textures": {
+          "all": "drtech:blocks/fusion/tritium_breeding_blanket_2"
+        }
+      },
+      "tritium_breeding_blanket_3": {
+        "textures": {
+          "all": "drtech:blocks/fusion/tritium_breeding_blanket_3"
+        }
+      },
+      "tritium_breeding_blanket_4": {
+        "textures": {
+          "all": "drtech:blocks/fusion/tritium_breeding_blanket_4"
+        }
+      },
+      "tritium_breeding_blanket_5": {
+        "textures": {
+          "all": "drtech:blocks/fusion/tritium_breeding_blanket_5"
+        }
+      }
+    }
+  }
+}

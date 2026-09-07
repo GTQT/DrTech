@@ -1,8 +1,8 @@
 package com.drppp.drtech.api.utils;
 
 import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.BlockFTTFPart;
-import com.drppp.drtech.common.blocks.MetaBlocks.BlockYotTankPart;
+import com.drppp.drtech.common.blocks.metaBlocks.BlockFTTFPart;
+import com.drppp.drtech.common.blocks.metaBlocks.BlockYotTankPart;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.store.IStoreData;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.store.ITfftData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;

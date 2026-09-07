@@ -4,8 +4,10 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.utils.serialization.ByteBufAdapters;
 import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.common.blocks.metaBlocks.MetaCasing;
 import com.drppp.drtech.client.Textures;
 import com.drppp.drtech.api.utils.Datas;
 import gregtech.api.capability.*;
@@ -20,6 +22,7 @@ import gregtech.api.gui.widgets.WidgetGroup;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.*;
+import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
 import gregtech.api.pattern.FormedStructureView;
 import gregtech.api.pattern.StructureContributionKey;
 import gregtech.api.pattern.element.Elements;
@@ -27,6 +30,7 @@ import gregtech.api.pattern.element.IStructureElement;
 import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
+import gregtech.api.util.KeyUtil;
 import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.renderer.ICubeRenderer;
@@ -330,50 +334,72 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         tooltip.add(I18n.format("在UI中通过按钮进行流体操作"));
     }
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        MultiblockDisplayText.builder(textList, isStructureFormed())
-                .setWorkingStatus(true, isActive() && isWorkingEnabled()) // transform into two-state system for display
-                .addCustom(tl -> {
-                    if (isStructureFormed() && fluidBank != null) {
-
-                        BigInteger energyCapacity = fluidBank.getCapacity(this.circuit);
-                        ITextComponent capacityFormatted = TextComponentUtil.stringWithColor(
-                                TextFormatting.GOLD,
-                                TextFormattingUtil.formatNumbers(energyCapacity) + " L");
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GRAY,
-                                "gtqt.multiblock.power_substation.stored",capacityFormatted));
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GRAY,
-                                "drtech.multiblock.power_substation.eut",this.fluidBank.eut));
-                        tl.add(TextComponentUtil.translationWithColor(
-                                TextFormatting.GRAY,
-                                "drtech.multiblock.power_substation.output",this.outputflag==0?"禁用":"启用"));
-                        tl.add(TextComponentUtil.translationWithColor(TextFormatting.GOLD, "======================"));
-                        for(int i=-2;i<=2;i++)
-                        {
-
-                            if(i==0) {
-
-                                tl.add(TextComponentUtil.translationWithColor(TextFormatting.GOLD, "gtqt.multiblock.yot_tank.fluid_type", circuit, this.fluid[circuit] == null ? "空" : this.fluid[circuit].getLocalizedName(), getstoredFormatted(circuit+i)));
-                            }
-                            else if(circuit+i>=0&&circuit+i<25)
-                            {
-                                tl.add(TextComponentUtil.translationWithColor(TextFormatting.GRAY, "gtqt.multiblock.yot_tank.fluid_type", circuit + i, this.fluid[circuit + i] == null ? "空" : this.fluid[circuit + i].getLocalizedName(), getstoredFormatted(circuit+i)));
-                            }
-                        }
-                        tl.add(TextComponentUtil.translationWithColor(TextFormatting.GOLD, "======================"));
+    protected void configureDisplayText(MultiblockUIBuilder builder) {
+        super.configureDisplayText(builder);
+        builder.setWorkingStatus(true, isActive() && isWorkingEnabled()) // transform into two-state system for display
+                .addCustom((keyManager, syncer) -> {
+                    if (!isStructureFormed()) {
+                        return;
                     }
-                });
-    }
-    ITextComponent getstoredFormatted(int x) {
-        BigInteger energyStored = null;
-        if (x >= 0) {
-            energyStored = fluidBank.getStored(x);
-        }
-        ITextComponent storedFormatted = TextComponentUtil.stringWithColor(TextFormatting.GOLD, TextFormattingUtil.formatNumbers(energyStored) + " L");
-        return storedFormatted;
+                    boolean hasBank = syncer.syncBoolean(() -> this.fluidBank != null);
+                    int circuit = syncer.syncInt(() -> this.circuit);
+                    int outputflag = syncer.syncInt(() -> this.outputflag);
+                    int eut = syncer.syncInt(() -> this.fluidBank == null ? 0 : this.fluidBank.eut);
+                    String capacityText = syncer.<String>syncObject(() -> this.fluidBank == null ? "0 L"
+                            : TextFormattingUtil.formatNumbers(this.fluidBank.getCapacity(circuit)) + " L",
+                            ByteBufAdapters.STRING);
+                    int[] slotIndex = new int[5];
+                    String[] slotFluid = new String[5];
+                    String[] slotStored = new String[5];
+                    for (int j = 0; j < 5; j++) {
+                        final int idx = circuit - 2 + j;
+                        slotIndex[j] = idx;
+                        slotFluid[j] = syncer.<String>syncObject(() -> {
+                            if (idx < 0 || idx >= 25 || this.fluid == null || this.fluid[idx] == null) {
+                                return "空";
+                            }
+                            return this.fluid[idx].getLocalizedName();
+                        }, ByteBufAdapters.STRING);
+                        slotStored[j] = syncer.<String>syncObject(() -> {
+                            if (idx < 0 || idx >= 25 || this.fluidBank == null) {
+                                return "";
+                            }
+                            return TextFormattingUtil.formatNumbers(this.fluidBank.getStored(idx)) + " L";
+                        }, ByteBufAdapters.STRING);
+                    }
 
+                    keyManager.add(richText -> {
+                        if (!hasBank) {
+                            return;
+                        }
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY,
+                                "gtqt.multiblock.power_substation.stored",
+                                KeyUtil.string(TextFormatting.GOLD, capacityText)))
+                                .newLine();
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY,
+                                "drtech.multiblock.power_substation.eut",
+                                KeyUtil.string(TextFormatting.AQUA, String.valueOf(eut))))
+                                .newLine();
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY,
+                                "drtech.multiblock.power_substation.output",
+                                KeyUtil.string(TextFormatting.WHITE, outputflag == 0 ? "禁用" : "启用")))
+                                .newLine();
+                        richText.add(IKey.str(TextFormatting.GOLD + "======================")).newLine();
+                        for (int j = 0; j < 5; j++) {
+                            int idx = slotIndex[j];
+                            if (idx < 0 || idx >= 25) {
+                                continue;
+                            }
+                            TextFormatting color = idx == circuit ? TextFormatting.GOLD : TextFormatting.GRAY;
+                            richText.add(KeyUtil.lang(color, "gtqt.multiblock.yot_tank.fluid_type",
+                                    KeyUtil.string(TextFormatting.WHITE, String.valueOf(idx)),
+                                    KeyUtil.string(TextFormatting.WHITE, slotFluid[j]),
+                                    KeyUtil.string(TextFormatting.WHITE, slotStored[j])))
+                                    .newLine();
+                        }
+                        richText.add(IKey.str(TextFormatting.GOLD + "======================")).newLine();
+                    });
+                });
     }
     @Override
     public TextureArea getProgressBarTexture(int index) {

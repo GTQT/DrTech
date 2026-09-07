@@ -3,6 +3,7 @@ package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.drppp.drtech.api.ItemHandler.SingleItemStackHandler;
 import forestry.api.apiculture.*;
 import forestry.apiculture.ModuleApiculture;
@@ -21,6 +22,7 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
+import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
 import gregtech.api.pattern.FormedStructureView;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.client.renderer.ICubeRenderer;
@@ -296,19 +298,20 @@ public class MetaTileEntutyLargeBeeHive extends MultiblockWithDisplayBase implem
     }
 
     @Override
-    protected void addDisplayText(List<ITextComponent> textList) {
-        super.addDisplayText(textList);
-        if (this.productType == 0)
-            textList.add(new TextComponentString("生产方式:" + "蜂窝"));
-        else
-            textList.add(new TextComponentString("生产方式:" + "蜂群"));
-        if (this.workType == 0)
-            textList.add(new TextComponentString("工作方式:" + "输入"));
-        else if (this.workType == 1)
-            textList.add(new TextComponentString("工作方式:" + "工作"));
-        else
-            textList.add(new TextComponentString("工作方式:" + "输出"));
-
+    protected void configureDisplayText(MultiblockUIBuilder builder) {
+        super.configureDisplayText(builder);
+        builder.addCustom((keyManager, syncer) -> {
+            if (!isStructureFormed()) {
+                return;
+            }
+            int productType = syncer.syncInt(() -> this.productType);
+            int workType = syncer.syncInt(() -> this.workType);
+            keyManager.add(richText -> {
+                richText.add(IKey.str("生产方式:" + (productType == 0 ? "蜂窝" : "蜂群"))).newLine();
+                String workMode = workType == 0 ? "输入" : workType == 1 ? "工作" : "输出";
+                richText.add(IKey.str("工作方式:" + workMode)).newLine();
+            });
+        });
     }
 
     @Override

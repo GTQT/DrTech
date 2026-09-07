@@ -3,7 +3,7 @@ package com.drppp.drtech.loaders.recipes;
 import com.drppp.drtech.DrtConfig;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.items.ItemsInit;
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.drone.hardware.DroneChassisTier;
 import com.drppp.drtech.drone.hardware.DroneUpgradeType;
 import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
