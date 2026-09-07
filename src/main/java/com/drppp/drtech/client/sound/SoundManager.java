@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.sound;
+package com.drppp.drtech.Client.Sound;
 
 
 import com.drppp.drtech.Tags;

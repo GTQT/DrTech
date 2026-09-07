@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.render.Items.lightsaber.model;
+package com.drppp.drtech.Client.render.Items.lightsaber.model;
 
 import org.lwjgl.opengl.GL11;
 

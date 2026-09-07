@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.metaTileEntities.single;
+package com.drppp.drtech.common.MetaTileEntities.single;
 
 import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
@@ -57,6 +57,8 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -183,19 +185,19 @@ public class MetaTileEntityUniversalCollector extends TieredMetaTileEntity {
             BlockPos adjacentPos = center.offset(facing);
             if (world.getTileEntity(adjacentPos) != null
                     && world.getTileEntity(adjacentPos).hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)) {
-                var iInventory = world.getTileEntity(adjacentPos)
+                IItemHandler iInventory = world.getTileEntity(adjacentPos)
                         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
                 GTTransferUtils.moveInventoryItems(this.exportItems, iInventory);
             }
             if (world.getTileEntity(adjacentPos) != null
                     && world.getTileEntity(adjacentPos).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)) {
-                var fluidInventory = world.getTileEntity(adjacentPos)
+                IFluidHandler fluidInventory = world.getTileEntity(adjacentPos)
                         .getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing);
                 GTTransferUtils.transferFluids(this.exportFluids, fluidInventory);
             }
             if (GTUtility.getMetaTileEntity(this.getWorld(), adjacentPos) != null
                     && GTUtility.getMetaTileEntity(this.getWorld(), adjacentPos) instanceof MetaTileEntityQuantumTank) {
-                var s = GTUtility.getMetaTileEntity(this.getWorld(), adjacentPos);
+                MetaTileEntity s = GTUtility.getMetaTileEntity(this.getWorld(), adjacentPos);
                 GTTransferUtils.transferFluids(this.exportFluids, s.getFluidInventory());
             }
         }

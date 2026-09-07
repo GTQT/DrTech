@@ -1,4 +1,5 @@
 package com.meowmel.cropQT.mixin;
+import net.minecraft.tileentity.TileEntity;
 
 import com.meowmel.cropQT.tile.TileCropStick;
 import gregtechfoodoption.common.machines.farmer.MetaTileEntityFarmer;
@@ -12,18 +13,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MetaTileEntityFarmer.class)
 public abstract  class MixinMetaTileEntityFarmer {
-    @Shadow(remap = false)
+    @Shadow
     private BlockPos.MutableBlockPos operationPosition;
     @Inject(
             method = "isCropSpaceEmpty",
             at = @At("HEAD"),
-            cancellable = true,
-            remap = false
+            cancellable = true
     )
     private void onIsCropSpaceEmpty(CallbackInfoReturnable<Boolean> cir)
     {
         MetaTileEntityFarmer farmer = (MetaTileEntityFarmer)(Object)this;
-        var tile = farmer.getWorld().getTileEntity(operationPosition);
+        TileEntity tile = farmer.getWorld().getTileEntity(operationPosition);
         if(tile!=null && tile instanceof TileCropStick)
         {
             cir.setReturnValue(true);

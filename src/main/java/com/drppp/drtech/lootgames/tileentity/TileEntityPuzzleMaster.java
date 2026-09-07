@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.lootgames.LootGames;
 import com.drppp.drtech.lootgames.world.gen.DungeonGenerator;

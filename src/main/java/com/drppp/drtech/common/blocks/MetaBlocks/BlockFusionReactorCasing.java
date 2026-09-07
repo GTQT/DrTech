@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.blocks.MetaBlocks;
+package com.drppp.drtech.common.Blocks.MetaBlocks;
 
 import com.drppp.drtech.DrTechMain;
 import gregtech.api.block.VariantBlock;
@@ -12,6 +12,11 @@ import net.minecraft.world.IBlockAccess;
 
 import javax.annotation.Nonnull;
 
+/**
+ * 聚变堆基础外壳。注意：VariantBlock 最多支持 16 个变种（MC 方块 metadata 4 bit），
+ * 分级外壳（第一壁/冷却剂/中子捕获/氚增殖/超导磁体各档位）见
+ * {@link BlockFusionReactorTieredCasing} 与 {@link BlockFusionReactorTieredCasing2}。
+ */
 public class BlockFusionReactorCasing extends VariantBlock<BlockFusionReactorCasing.CasingType> {
 
     public BlockFusionReactorCasing() {

@@ -1,8 +1,8 @@
 package com.drppp.drtech.common.event;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;

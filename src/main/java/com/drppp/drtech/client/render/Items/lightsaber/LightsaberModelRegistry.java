@@ -1,9 +1,9 @@
-package com.drppp.drtech.client.render.Items.lightsaber;
+package com.drppp.drtech.Client.render.Items.lightsaber;
 
-import com.drppp.drtech.client.render.Items.lightsaber.model.*;
+import com.drppp.drtech.Client.render.Items.lightsaber.model.*;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.items.lightsaber.LightsaberHilt;
-import com.drppp.drtech.common.items.lightsaber.LightsaberPartType;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberHilt;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberPartType;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.util.ResourceLocation;
 

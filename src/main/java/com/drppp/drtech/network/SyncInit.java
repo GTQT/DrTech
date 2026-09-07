@@ -1,4 +1,4 @@
-package com.drppp.drtech.network;
+package com.drppp.drtech.Network;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;

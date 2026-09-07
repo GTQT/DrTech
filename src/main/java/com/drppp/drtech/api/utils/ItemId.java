@@ -1,4 +1,4 @@
-package com.drppp.drtech.api.utils;
+package com.drppp.drtech.api.Utils;
 
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;

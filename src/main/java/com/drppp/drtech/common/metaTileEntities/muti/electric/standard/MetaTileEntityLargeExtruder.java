@@ -1,6 +1,10 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -30,11 +34,9 @@ import gregtech.api.pattern.element.Elements;
 
 import gregtech.api.pattern.element.StructureDefinition;
 
-import gregtech.api.metatileentity.multiblock.MultiblockAbility;
+public class MetaTileentityLargeExtruder extends RecipeMapMultiblockController {
 
-public class MetaTileEntityLargeExtruder extends RecipeMapMultiblockController {
-
-    public MetaTileEntityLargeExtruder(ResourceLocation metaTileEntityId) {
+    public MetaTileentityLargeExtruder(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, RecipeMaps.EXTRUDER_RECIPES);
         this.recipeMapWorkable = new SelfRecipeLogic(this, true);
     }
@@ -51,42 +53,32 @@ public class MetaTileEntityLargeExtruder extends RecipeMapMultiblockController {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:large_extruder",
-                    MetaTileEntityLargeExtruder::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start()
                 .aisle("##XXX", "##XXX", "##XXX")
-                .aisle("##XXX", "##XPX", "##XGX")
-                .aisle("##XXX", "##XPX", "##XGX")
+                .aisleRepeated(2, "##XXX", "##XPX", "##XGX")
                 .aisle("XXXXX", "XXXPX", "XXXGX")
                 .aisle("XXXXX", "XXXPX", "XXXGX")
                 .aisle("XXXXX", "XSXXX", "XXXXX")
-                .self('S', MetaTileEntityLargeExtruder.class)
-                .any('#')
-                .blocks('P', getCasingState2())
-                .blocks('G', getCasingState3())
-                .where('X', Elements.chain(
-                        Elements.counted(40, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.MUFFLER_HATCH, 1, 1)))
+                .where('S', Elements.self(MetaTileentityLargeExtruder.class))
+                .casing('X', getCasingState())
+                        .auto(true, true, true, true, true, false, false)
+                .done()
+                .where('P', Elements.block(getCasingState2()))
+                .where('G', Elements.block(getCasingState3()))
+                .where('#', Elements.any())
                 .buildStructureDefinition();
 
     }
 
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
-        return new MetaTileEntityLargeExtruder(this.metaTileEntityId);
+        return new MetaTileentityLargeExtruder(this.metaTileEntityId);
     }
 
     @Override

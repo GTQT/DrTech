@@ -1,13 +1,19 @@
-package com.drppp.drtech.client.render.wings;
+package com.drppp.drtech.Client.render.wings;
 
-import com.drppp.drtech.client.audio.WingsSound;
+import com.drppp.drtech.Client.audio.WingsSound;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.wings.ItemWings;
-import com.drppp.drtech.common.wings.WingType;
-import com.drppp.drtech.common.wings.WingsFlightCapability;
-import com.drppp.drtech.common.wings.WingsFlightData;
-import com.drppp.drtech.common.wings.WingsFlightHandler;
-import com.drppp.drtech.common.wings.WingsNetwork;
+import com.drppp.drtech.wings.ItemWings;
+import com.drppp.drtech.wings.WingType;
+import com.drppp.drtech.wings.WingsFlightCapability;
+import com.drppp.drtech.wings.WingsFlightData;
+import com.drppp.drtech.wings.WingsFlightHandler;
+import com.drppp.drtech.wings.WingsNetwork;
+import me.paulf.wings.client.flight.Animator;
+import me.paulf.wings.client.flight.AnimatorAvian;
+import me.paulf.wings.client.flight.AnimatorInsectoid;
+import me.paulf.wings.client.model.ModelWingsAvian;
+import me.paulf.wings.client.model.ModelWingsInsectoid;
+import me.paulf.wings.util.Mth;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;

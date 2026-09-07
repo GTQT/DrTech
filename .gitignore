@@ -88,3 +88,8 @@ libs/TheBetweenlands-3.9.6-universal.jar
 libs/TheBetweenlands-3.9.6-core.jar
 /libs
 /src/test/
+
+# DrTech 本地工作区保留内容（不提交）
+/src_broken_backup/
+/art_source/
+/build/classes/java/javac-check/

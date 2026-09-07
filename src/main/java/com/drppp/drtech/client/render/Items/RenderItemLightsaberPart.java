@@ -1,9 +1,9 @@
-package com.drppp.drtech.client.render.Items;
+package com.drppp.drtech.Client.render.Items;
 
-import com.drppp.drtech.client.render.Items.lightsaber.LightsaberModelRegistry;
-import com.drppp.drtech.common.items.lightsaber.ItemLightsaberPart;
-import com.drppp.drtech.common.items.lightsaber.LightsaberHilt;
-import com.drppp.drtech.common.items.lightsaber.LightsaberPartType;
+import com.drppp.drtech.Client.render.Items.lightsaber.LightsaberModelRegistry;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaberPart;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberHilt;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberPartType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;

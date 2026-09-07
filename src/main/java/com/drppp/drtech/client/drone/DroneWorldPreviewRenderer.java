@@ -1,13 +1,13 @@
-package com.drppp.drtech.client.drone;
+package com.drppp.drtech.Client.drone;
 
-import com.drppp.drtech.drone.entity.EntityProgrammableDrone;
-import com.drppp.drtech.drone.program.model.DroneArea;
-import com.drppp.drtech.drone.program.model.DroneWorldMarkerStyle;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneDock;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneEndpoint;
-import com.drppp.drtech.drone.machine.MetaTileEntityDroneFleetController;
-import com.drppp.drtech.drone.network.DroneEndpoint;
-import com.drppp.drtech.drone.network.DroneEndpointWorldLink;
+import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
+import com.drppp.drtech.common.drone.program.model.DroneArea;
+import com.drppp.drtech.common.drone.program.model.DroneWorldMarkerStyle;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneDock;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneEndpoint;
+import com.drppp.drtech.common.drone.machine.MetaTileEntityDroneFleetController;
+import com.drppp.drtech.common.drone.network.DroneEndpoint;
+import com.drppp.drtech.common.drone.network.DroneEndpointWorldLink;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import net.minecraft.client.Minecraft;

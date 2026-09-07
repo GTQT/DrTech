@@ -1,16 +1,28 @@
-package com.drppp.drtech.common.items.MetaItems;
+package com.drppp.drtech.common.Items.MetaItems;
 
 import com.drppp.drtech.DrTechMain;
-import com.drppp.drtech.common.items.Baubles.ElectricFlightRingBehavior;
-import com.drppp.drtech.common.items.Baubles.ElectricLifeSupportRingBehavior;
-import com.drppp.drtech.common.items.Behavior.*;
+import com.drppp.drtech.common.Items.Baubles.ElectricFlightRingBehavior;
+import com.drppp.drtech.common.Items.Baubles.ElectricLifeSupportRingBehavior;
+import com.drppp.drtech.common.Items.Behavior.*;
 import gregtech.api.GTValues;
+import gregtech.api.capability.GregtechCapabilities;
+import gregtech.api.capability.IElectricItem;
 import gregtech.api.items.metaitem.ElectricStats;
 import gregtech.api.items.metaitem.FilteredFluidStats;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
+import org.jetbrains.annotations.NotNull;
 
 
 public class MetaItems1 extends StandardMetaItem {

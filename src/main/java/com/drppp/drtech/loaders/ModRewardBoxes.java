@@ -1,7 +1,7 @@
 package com.drppp.drtech.loaders;
 
-import com.drppp.drtech.api.utils.RewardBoxManager;
-import com.drppp.drtech.api.utils.RewardEntry;
+import com.drppp.drtech.api.Utils.RewardBoxManager;
+import com.drppp.drtech.api.Utils.RewardEntry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;

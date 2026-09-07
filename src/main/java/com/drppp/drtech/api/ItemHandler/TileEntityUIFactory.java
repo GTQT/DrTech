@@ -1,6 +1,7 @@
 package com.drppp.drtech.api.ItemHandler;
 
-import com.drppp.drtech.api.tileEntity.TileEntityWithUI;
+import com.drppp.drtech.api.TileEntity.TileEntityWithUI;
+import com.drppp.drtech.api.Utils.DrtechUtils;
 import gregtech.api.GregTechAPI;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.UIFactory;
@@ -8,6 +9,7 @@ import gregtech.api.util.GTUtility;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

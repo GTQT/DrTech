@@ -8,8 +8,11 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import com.drppp.drtech.lootgames.api.block.BlockGame;
+import com.drppp.drtech.lootgames.config.LGConfigMinesweeper;
 import com.drppp.drtech.lootgames.registry.ModBlocks;
-import com.drppp.drtech.client.sound.SoundManager;
+import com.drppp.drtech.Client.Sound.SoundManager;
+
+import java.util.Objects;
 
 public class BlockMSActivator extends BlockGame {
 

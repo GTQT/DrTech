@@ -1,9 +1,9 @@
 package com.drppp.drtech.intergations.top.provider;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.items.ItemsInit;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.standard.MetaTileentityCropsSimulateMachine;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityYotTank;
+import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.standard.MetaTileentityCropsSimulateMachine;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.tile.TileCropStick;
 import gregtech.api.util.GTUtility;
@@ -30,6 +30,7 @@ public class TopProvider implements IProbeInfoProvider {
     @Override
     public void addProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, EntityPlayer entityPlayer, World world,
                              IBlockState iBlockState, IProbeHitData iProbeHitData) {
+        // CropsSimulateMachine TOP 显示
         if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileentityCropsSimulateMachine) {
             MetaTileentityCropsSimulateMachine machine =
                     (MetaTileentityCropsSimulateMachine) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
@@ -54,7 +55,7 @@ public class TopProvider implements IProbeInfoProvider {
             iProbeInfo.text(new TextComponentString(
                     TextFormatting.YELLOW + "已部署: " + TextFormatting.WHITE + machine.getTotalDeployedCount() +
                             TextFormatting.GRAY + " / " + TextFormatting.WHITE + machine.getDeployedVarietyCount() + " 种").getFormattedText());
-
+        
             List<ItemStack> previewStacks = machine.getPreviewOutputStacks(4);
             if (previewStacks.isEmpty()) {
                 iProbeInfo.text(new TextComponentString(
@@ -69,8 +70,9 @@ public class TopProvider implements IProbeInfoProvider {
                 }
             }
         }
+        // YotTank TOP 显示
         if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityYotTank) {
-            var s = (MetaTileEntityYotTank) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
+            MetaTileEntityYotTank s = (MetaTileEntityYotTank) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
             if (s.isActive() && s.isWorkingEnabled()) {
                 iProbeInfo.text("流体:" + s.getFluid().getLocalizedName());
                 iProbeInfo.text("容量" + s.getFluidBank().getStored() + "/" + s.getFluidBank().getCapacity());

@@ -1,0 +1,11 @@
+{
+  "parent": "drtech:item/amethyst_bud",
+  "textures": {
+    "layer0": "drtech:blocks/large_amethyst_bud"
+  },
+  "display": {
+    "fixed": {
+      "translation": [0, 4, 0]
+    }
+  }
+}

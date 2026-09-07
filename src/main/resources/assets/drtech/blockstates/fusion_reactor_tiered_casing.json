@@ -1,0 +1,65 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "first_wall_2": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_2"
+        }
+      },
+      "first_wall_3": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_2"
+        }
+      },
+      "first_wall_4": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_2"
+        }
+      },
+      "first_wall_5": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_2"
+        }
+      },
+      "cooling_channel_2": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_3"
+        }
+      },
+      "cooling_channel_3": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_3"
+        }
+      },
+      "cooling_channel_4": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_3"
+        }
+      },
+      "cooling_channel_5": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_casing_fusion_3"
+        }
+      },
+      "superconducting_magnet_2": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_coil_superconductor"
+        }
+      },
+      "superconducting_magnet_3": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_coil_superconductor"
+        }
+      },
+      "superconducting_magnet_4": {
+        "textures": {
+          "all": "gregtech:blocks/casings/fusion/machine_coil_superconductor"
+        }
+      }
+    }
+  }
+}

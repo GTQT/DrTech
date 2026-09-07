@@ -1,10 +1,14 @@
 package com.drppp.drtech.lootgames.minigame.minesweeper;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -15,12 +19,14 @@ import com.drppp.drtech.lootgames.api.util.GameUtils;
 import com.drppp.drtech.lootgames.loot.ModLootTables;
 import com.drppp.drtech.lootgames.api.util.NBTUtils;
 import com.drppp.drtech.lootgames.api.util.Pos2i;
+import com.drppp.drtech.lootgames.block.BlockDungeonLamp;
 import com.drppp.drtech.lootgames.minigame.minesweeper.MSBoard.MSField;
 import com.drppp.drtech.lootgames.minigame.minesweeper.block.BlockMSActivator;
 import com.drppp.drtech.lootgames.minigame.minesweeper.task.TaskMSCreateExplosion;
 import com.drppp.drtech.lootgames.registry.ModBlocks;
-import com.drppp.drtech.client.sound.SoundManager;
+import com.drppp.drtech.Client.Sound.SoundManager;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 

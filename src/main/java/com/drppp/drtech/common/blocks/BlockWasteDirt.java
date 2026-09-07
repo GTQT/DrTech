@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.blocks;
+package com.drppp.drtech.common.Blocks;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;

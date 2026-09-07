@@ -1,6 +1,5 @@
 package com.drppp.drtech.lootgames.registry;
 
-import com.drppp.drtech.client.DrTechModelRegister;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemMultiTexture;
@@ -65,6 +64,6 @@ public class ModBlocks {
 
     @SideOnly(Side.CLIENT)
     public static void registerRenderers(net.minecraftforge.client.event.ModelRegistryEvent event) {
-        DrTechModelRegister.onModelRegistration();
+        com.drppp.drtech.DrTechModelRegister.onModelRegistration();
     }
 }

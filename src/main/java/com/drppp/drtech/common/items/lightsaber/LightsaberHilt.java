@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.lightsaber;
+package com.drppp.drtech.common.Items.lightsaber;
 
 public enum LightsaberHilt {
     GRAFLEX("graflex", "Graflex", LightsaberColor.DEEP_BLUE, 16.0F, 8.8F, 16.0F, 1.0F),

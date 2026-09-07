@@ -1,13 +1,16 @@
-package com.drppp.drtech.api.utils;
+package com.drppp.drtech.api.Utils;
 
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.BlockFTTFPart;
-import com.drppp.drtech.common.blocks.MetaBlocks.BlockYotTankPart;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.IStoreData;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.ITfftData;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.BlockFTTFPart;
+import com.drppp.drtech.common.Blocks.MetaBlocks.BlockYotTankPart;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.IStoreData;
+import com.drppp.drtech.common.MetaTileEntities.muti.electric.store.ITfftData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.state.IBlockState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Datas {

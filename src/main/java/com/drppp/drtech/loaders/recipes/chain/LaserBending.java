@@ -2,7 +2,7 @@ package com.drppp.drtech.loaders.recipes.chain;
 
 import gregtech.api.items.metaitem.MetaItem;
 
-import static com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities.*;
+import static com.drppp.drtech.common.MetaTileEntities.DrTechMetaTileEntities.*;
 import static gregtech.api.GTValues.*;
 import static gregtech.api.recipes.RecipeMaps.ASSEMBLER_RECIPES;
 import static gregtech.api.unification.material.Materials.*;

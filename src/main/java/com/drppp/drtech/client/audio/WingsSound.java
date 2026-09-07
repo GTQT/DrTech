@@ -1,7 +1,7 @@
-package com.drppp.drtech.client.audio;
+package com.drppp.drtech.Client.audio;
 
-import com.drppp.drtech.common.wings.WingsFlightCapability;
-import com.drppp.drtech.common.wings.WingsFlightData;
+import com.drppp.drtech.wings.WingsFlightCapability;
+import com.drppp.drtech.wings.WingsFlightData;
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;

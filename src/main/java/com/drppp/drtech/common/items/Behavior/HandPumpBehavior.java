@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.Behavior;
+package com.drppp.drtech.common.Items.Behavior;
 
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -6,6 +6,7 @@ import gregtech.api.metatileentity.MetaTileEntityHolder;
 import gregtech.api.metatileentity.multiblock.IMaintenance;
 import gregtech.api.util.GTUtility;
 import gregtech.common.metatileentities.multi.MetaTileEntityTankValve;
+import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMaintenanceHatch;
 import gregtech.common.metatileentities.storage.MetaTileEntityDrum;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;

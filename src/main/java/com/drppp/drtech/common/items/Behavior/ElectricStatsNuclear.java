@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.Behavior;
+package com.drppp.drtech.common.Items.Behavior;
 
 import gregtech.api.GTValues;
 import gregtech.api.capability.FeCompat;

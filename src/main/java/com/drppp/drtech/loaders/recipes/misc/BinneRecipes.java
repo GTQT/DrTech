@@ -6,7 +6,7 @@ import binnie.core.liquid.ManagerLiquid;
 import binnie.genetics.item.GeneticsItems;
 import binnie.genetics.machine.GeneticMachine;
 import binnie.genetics.machine.LaboratoryMachine;
-import com.drppp.drtech.loaders.recipes.CraftingRecipes;
+import com.drppp.drtech.loaders.recipes.CraftingReceipe;
 import forestry.api.recipes.RecipeManagers;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.unification.stack.UnificationEntry;
@@ -34,7 +34,7 @@ public class BinneRecipes {
                 'C', GeneticsItems.LaboratoryCasing.get(1),
                 'F', Blocks.FURNACE,
                 'X', GeneticsItems.IntegratedCircuit.get(1),
-                'G', CraftingRecipes.getItemStack("gregtech:machine", 1611),
+                'G', CraftingReceipe.getItemStack("gregtech:machine", 1611),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
 
@@ -56,7 +56,7 @@ public class BinneRecipes {
                 'C', GeneticsItems.LaboratoryCasing.get(1),
                 'F', Blocks.CHEST,
                 'X', GeneticsItems.IntegratedCircuit.get(1),
-                'G', CraftingRecipes.getItemStack("gregtech:machine", 1611),
+                'G', CraftingReceipe.getItemStack("gregtech:machine", 1611),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
 
@@ -78,7 +78,7 @@ public class BinneRecipes {
                 'C', GeneticsItems.LaboratoryCasing.get(1),
                 'F', Blocks.CHEST,
                 'X', GeneticsItems.IntegratedCircuit.get(1),
-                'G', CraftingRecipes.getItemStack("genetics:misc", 3),
+                'G', CraftingReceipe.getItemStack("genetics:misc", 3),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
         ModHandler.addShapedRecipe("polymeriser", GeneticMachine.Polymeriser.get(1),
@@ -88,7 +88,7 @@ public class BinneRecipes {
                 'C', GeneticsItems.LaboratoryCasing.get(1),
                 'F', Blocks.CHEST,
                 'X', GeneticsItems.IntegratedCircuit.get(1),
-                'G', CraftingRecipes.getItemStack("genetics:misc", 7),
+                'G', CraftingReceipe.getItemStack("genetics:misc", 7),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
 
@@ -99,11 +99,11 @@ public class BinneRecipes {
                 'C', GeneticsItems.LaboratoryCasing.get(1),
                 'F', Blocks.CHEST,
                 'X', GeneticsItems.IntegratedCircuit.get(1),
-                'G', CraftingRecipes.getItemStack("genetics:misc", 2),
+                'G', CraftingReceipe.getItemStack("genetics:misc", 2),
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
 
-        ModHandler.addShapedRecipe("inoculator", CraftingRecipes.getItemStack("<genetics:adv_machine>"),
+        ModHandler.addShapedRecipe("inoculator", CraftingReceipe.getItemStack("<genetics:adv_machine>"),
                 "GFG",
                 "XCX",
                 "APA",
@@ -114,13 +114,13 @@ public class BinneRecipes {
                 'P', ELECTRIC_MOTOR_MV,
                 'A', new UnificationEntry(gearSmall,StainlessSteel));
 
-        ModHandler.addShapedRecipe("splicer", CraftingRecipes.getItemStack("genetics:adv_machine"),
+        ModHandler.addShapedRecipe("splicer", CraftingReceipe.getItemStack("genetics:adv_machine"),
                 "GBG",
                         "XCX",
                         "APA",
                 'C', GeneticsItems.IntegratedCasing.get(1),
                 'X', GeneticsItems.IntegratedCPU.get(1),
-                'B', CraftingRecipes.getItemStack("gregtech:machine", 1629),
+                'B', CraftingReceipe.getItemStack("gregtech:machine", 1629),
                 'G',  new UnificationEntry(plate,Diamond),
                 'P', ELECTRIC_MOTOR_HV,
                 'A', new UnificationEntry(gearSmall,Diamond));
@@ -136,9 +136,9 @@ public class BinneRecipes {
         //物品
         //laboratory casing id 0
          ASSEMBLER_RECIPES.recipeBuilder()
-                .inputs(CraftingRecipes.getItemStack("forestry:sturdy_machine"))
+                .inputs(CraftingReceipe.getItemStack("forestry:sturdy_machine"))
                 .input(plate,Aluminium,4)
-                 .outputs(CraftingRecipes.getItemStack("<genetics:misc>"))
+                 .outputs(CraftingReceipe.getItemStack("<genetics:misc>"))
                  .EUt(120)
                  .duration(1200)
                  .buildAndRegister();
@@ -176,7 +176,7 @@ public class BinneRecipes {
 
         //8  基板
         ASSEMBLER_RECIPES.recipeBuilder()
-                .inputs(CraftingRecipes.getItemStack("forestry:chipsets",1))
+                .inputs(CraftingReceipe.getItemStack("forestry:chipsets",1))
                 .input(circuit, HV, 2)
                 .fluidInputs(StainlessSteel.getFluid(576))
                 .outputs(GeneticsItems.IntegratedCircuit.get(itemGenetics, 1))
@@ -184,8 +184,8 @@ public class BinneRecipes {
 
         //9  电路
         CIRCUIT_ASSEMBLER_RECIPES.recipeBuilder()
-                .inputs(CraftingRecipes.getItemStack("gregtech:meta_item_1", 403))
-                .inputs(CraftingRecipes.getItemStack("forestry:thermionic_tubes", 5))
+                .inputs(CraftingReceipe.getItemStack("gregtech:meta_item_1", 403))
+                .inputs(CraftingReceipe.getItemStack("forestry:thermionic_tubes", 5))
                 .fluidInputs(Gold.getFluid(144))
                 .circuitMeta(23)
                 .outputs(GeneticsItems.IntegratedCPU.get(itemGenetics, 1))

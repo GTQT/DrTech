@@ -1,4 +1,4 @@
-package com.drppp.drtech.api.utils;
+package com.drppp.drtech.api.Utils;
 
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;

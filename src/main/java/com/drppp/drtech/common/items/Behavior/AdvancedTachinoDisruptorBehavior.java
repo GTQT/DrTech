@@ -1,7 +1,7 @@
-package com.drppp.drtech.common.items.Behavior;
+package com.drppp.drtech.common.Items.Behavior;
 
-import com.drppp.drtech.client.sound.SoundManager;
-import com.drppp.drtech.common.entity.EntityTachyonBullet;
+import com.drppp.drtech.Client.Sound.SoundManager;
+import com.drppp.drtech.common.Entity.EntityTachyonBullet;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;

@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.drone;
+package com.drppp.drtech.Client.drone;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;

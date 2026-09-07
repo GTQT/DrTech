@@ -1,122 +1,78 @@
 package com.drppp.drtech;
 
 import net.minecraftforge.common.config.Config;
-import com.drppp.drtech.drone.entity.DroneFakePlayerIdentity;
+import com.drppp.drtech.common.drone.entity.DroneFakePlayerIdentity;
 
 @Config(modid = Tags.MODID)
 public class DrtConfig {
 
-    // ========== 全局 ==========
-    @Config.Comment("启用调试模式，会在日志中输出更多辅助排查信息")
-    @Config.Name("调试模式")
-    public static boolean debug = false;
+    @Config.LangKey("drone_fake_player_identity")
+    @Config.Comment({"Drone FakePlayer identity: PER_DRONE, OWNER, or SHARED.",
+            "OWNER inherits the owner's UUID; unowned drones fall back to PER_DRONE."})
+    public static DroneFakePlayerIdentity DroneFakePlayerIdentityStrategy = DroneFakePlayerIdentity.PER_DRONE;
 
-    // ========== 无人机模块 ==========
-    @Config.Comment("无人机相关配置")
-    @Config.Name("无人机")
-    public static DroneConfig drone = new DroneConfig();
+    @Config.LangKey("enable_drone_audit_log")
+    @Config.Comment("Write terminal state-changing drone actions to the server log with drone, owner and program ids.")
+    public static boolean EnableDroneAuditLog = true;
 
-    // ========== 机器模块 ==========
-    @Config.Comment("机器相关配置（拆解机、核电站、工业蜂箱等）")
-    @Config.Name("机器")
-    public static MachineConfig machine = new MachineConfig();
+    @Config.LangKey("enable_drone_combat")
+    @Config.Comment("Allow programmable drones to execute attack-entity nodes. Bosses remain protected.")
+    public static boolean EnableDroneCombat = true;
 
-    // ========== 模块化装甲模块 ==========
-    @Config.Comment("模块化装甲相关配置（槽位数与模块参数）")
-    @Config.Name("模块化装甲")
-    public static ModularArmorConfig armor = new ModularArmorConfig();
+    @Config.LangKey("enable_drone_player_attack")
+    @Config.Comment("Allow drone attack nodes to target players when drone combat is enabled.")
+    public static boolean EnableDronePlayerAttack = false;
 
-    // --------------------------------------------
-    // 无人机配置类
-    // --------------------------------------------
-    public static class DroneConfig {
-        @Config.Comment({
-                "无人机假玩家身份策略：",
-                "  PER_DRONE  - 每个无人机独立身份",
-                "  OWNER      - 继承拥有者的 UUID（无归属时回退为 PER_DRONE）",
-                "  SHARED     - 共享身份"
-        })
-        @Config.Name("假玩家身份策略")
-        public DroneFakePlayerIdentity DroneFakePlayerIdentityStrategy = DroneFakePlayerIdentity.PER_DRONE;
+    @Config.LangKey("drone_fishing_luck_bonus")
+    @Config.Comment({"Additional vanilla fishing luck applied to drone bobbers.",
+            "This stacks with Luck of the Sea; 8 strongly favors treasure and suppresses junk."})
+    @Config.RangeInt(min = 0, max = 100)
+    public static int DroneFishingLuckBonus = 8;
 
-        @Config.Comment("是否将无人机终端状态变更（如程序切换）写入服务器日志，包含无人机、拥有者及程序 ID")
-        @Config.Name("启用审计日志")
-        public boolean EnableDroneAuditLog = true;
+    @Config.LangKey("enable_disassembly")
+    @Config.Comment("开启拆解机")
+    @Config.RequiresMcRestart
+    public static boolean EnableDisassembly = false;
+    @Config.LangKey("nuclear_explosion_range")
+    @Config.Comment("核电爆炸范围")
+    @Config.RequiresMcRestart
+    public static float NuclearExplosionRange = 10;
+    @Config.LangKey("enable_industrial_Apiary_Tx")
+    @Config.Comment("开启工业蜂箱粒子特效")
+    @Config.RequiresMcRestart
+    public static boolean EnableIndustrialApiaryTx = true;
+    @Config.LangKey("enable_industrial_machines")
+    @Config.Comment("启用更便宜的大机器")
+    @Config.RequiresMcRestart
+    public static boolean EnableIndustrialMachines = false;
+    @Config.LangKey("mill_exchange_rate")
+    @Config.Comment("水车推力转换效率")
+    @Config.RequiresMcRestart
+    public static double MillExchangeRate = 10.0d;
+    @Config.LangKey("water_mill_max_ru")
+    @Config.Comment("木质水车和轴承最大承受RU")
+    @Config.RequiresMcRestart
+    public static int MaxRu = 192;
 
-        @Config.Comment("是否允许可编程无人机执行攻击实体的指令（Boss 类生物仍受保护）")
-        @Config.Name("启用无人机战斗")
-        public boolean EnableDroneCombat = true;
+    @Config.Comment("Config options for DrTech")
+    public static MachineSwitch MachineSwitch = new MachineSwitch();
 
-        @Config.Comment("当无人机战斗启用时，是否允许无人机攻击玩家")
-        @Config.Name("允许攻击玩家")
-        public boolean EnableDronePlayerAttack = false;
-
-        @Config.Comment({
-                "额外施加于无人机浮标的原版钓鱼幸运值，与「海之眷顾」附魔叠加。",
-                "数值 8 时强烈偏向宝藏，并大幅抑制垃圾。取值范围 0 ~ 100"
-        })
-        @Config.Name("无人机钓鱼幸运加成")
-        @Config.RangeInt(min = 0, max = 100)
-        public int DroneFishingLuckBonus = 8;
-    }
-
-    // --------------------------------------------
-    // 机器配置类
-    // --------------------------------------------
-    public static class MachineConfig {
-        @Config.Comment("是否启用拆解机（需要重启游戏生效）")
-        @Config.Name("启用拆解机")
+    public static class MachineSwitch {
+        @Config.LangKey("enable_disassembly")
+        @Config.Comment("开启拆解机")
         @Config.RequiresMcRestart
-        public boolean EnableDisassembly = false;
-
-        @Config.Comment("核爆炸的影响半径（单位：格，需要重启生效）")
-        @Config.Name("核爆炸范围")
+        public static boolean EnableDisassembly = DrtConfig.EnableDisassembly;
+        @Config.LangKey("nuclear_explosion_range")
+        @Config.Comment("核电爆炸范围")
         @Config.RequiresMcRestart
-        public float NuclearExplosionRange = 10;
-
-        @Config.Comment("是否开启工业蜂箱的粒子特效（需要重启生效）")
-        @Config.Name("工业蜂箱粒子特效")
+        public static float NuclearExplosionRange = DrtConfig.NuclearExplosionRange;
+        @Config.LangKey("enable_industrial_Apiary_Tx")
+        @Config.Comment("开启工业蜂箱粒子特效")
         @Config.RequiresMcRestart
-        public boolean EnableIndustrialApiaryTx = true;
-
-        @Config.Comment("是否启用更廉价的大型机器合成配方（需要重启生效）")
-        @Config.Name("启用便宜大机器")
+        public static boolean EnableIndustrialApiaryTx = DrtConfig.EnableIndustrialApiaryTx;
+        @Config.LangKey("enable_industrial_machines")
+        @Config.Comment("启用更便宜的大机器")
         @Config.RequiresMcRestart
-        public boolean EnableIndustrialMachines = false;
-    }
-
-    // --------------------------------------------
-    // 模块化装甲配置类
-    // --------------------------------------------
-    public static class ModularArmorConfig {
-        // 原本单独的 Modules 类中的缩放倍数，直接合并到此处
-        @Config.Comment("望远镜模块的缩放倍数（默认 5 倍）")
-        @Config.Name("望远镜缩放倍数")
-        @Config.RangeDouble
-        public double binocularZoom = 5;
-
-        @Config.Comment("头盔可安装的模块槽位数（0~12，需要重启生效）")
-        @Config.Name("头盔槽位")
-        @Config.RequiresMcRestart
-        @Config.RangeInt(min = 0, max = 12)
-        public int helmetSlots = 3;
-
-        @Config.Comment("胸甲可安装的模块槽位数（0~12，需要重启生效）")
-        @Config.Name("胸甲槽位")
-        @Config.RequiresMcRestart
-        @Config.RangeInt(min = 0, max = 12)
-        public int chestPlateSlots = 5;
-
-        @Config.Comment("护腿可安装的模块槽位数（0~12，需要重启生效）")
-        @Config.Name("护腿槽位")
-        @Config.RequiresMcRestart
-        @Config.RangeInt(min = 0, max = 12)
-        public int leggingsSlots = 4;
-
-        @Config.Comment("靴子可安装的模块槽位数（0~12，需要重启生效）")
-        @Config.Name("靴子槽位")
-        @Config.RequiresMcRestart
-        @Config.RangeInt(min = 0, max = 12)
-        public int bootsSlot = 2;
+        public static boolean EnableIndustrialMachines = DrtConfig.EnableIndustrialMachines;
     }
 }

@@ -1,10 +1,10 @@
-package com.drppp.drtech.common.items.lightsaber;
+package com.drppp.drtech.common.Items.lightsaber;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.entity.EntityThrownLightsaber;
-import com.drppp.drtech.common.items.ItemsInit;
-import com.drppp.drtech.common.sound.DrTechSounds;
+import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
+import com.drppp.drtech.common.Items.ItemsInit;
+import com.drppp.drtech.common.Sound.DrTechSounds;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.resources.I18n;

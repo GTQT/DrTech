@@ -1,7 +1,7 @@
-package com.drppp.drtech.client.render.Items;
+package com.drppp.drtech.Client.render.Items;
 
-import com.drppp.drtech.client.obj.AdvancedModelLoader;
-import com.drppp.drtech.client.obj.IModelCustom;
+import com.drppp.drtech.Client.lib.obj.AdvancedModelLoader;
+import com.drppp.drtech.Client.lib.obj.IModelCustom;
 import com.drppp.drtech.Tags;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;

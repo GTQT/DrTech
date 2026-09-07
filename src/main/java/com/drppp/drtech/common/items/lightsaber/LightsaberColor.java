@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.lightsaber;
+package com.drppp.drtech.common.Items.lightsaber;
 
 public enum LightsaberColor {
     DEEP_BLUE(0, "deep_blue", 0x0000FF),

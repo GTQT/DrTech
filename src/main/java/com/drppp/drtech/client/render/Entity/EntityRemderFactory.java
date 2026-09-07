@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.render.Entity;
+package com.drppp.drtech.Client.render.Entity;
 
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;

@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.render.Items;
+package com.drppp.drtech.Client.render.Items;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;

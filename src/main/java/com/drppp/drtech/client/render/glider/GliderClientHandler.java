@@ -1,11 +1,11 @@
-package com.drppp.drtech.client.render.glider;
+package com.drppp.drtech.Client.render.glider;
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.glider.GliderFlightCapability;
-import com.drppp.drtech.common.glider.GliderFlightData;
-import com.drppp.drtech.common.glider.GliderFlightHandler;
-import com.drppp.drtech.common.glider.GliderNetwork;
-import com.drppp.drtech.common.glider.ItemHangGlider;
+import com.drppp.drtech.glider.GliderFlightCapability;
+import com.drppp.drtech.glider.GliderFlightData;
+import com.drppp.drtech.glider.GliderFlightHandler;
+import com.drppp.drtech.glider.GliderNetwork;
+import com.drppp.drtech.glider.ItemHangGlider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;

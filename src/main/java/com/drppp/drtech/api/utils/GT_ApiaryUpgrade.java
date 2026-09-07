@@ -1,7 +1,7 @@
-package com.drppp.drtech.api.utils;
+package com.drppp.drtech.api.Utils;
 
-import com.drppp.drtech.common.items.MetaItems.DrMetaItems;
-import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityIndustrialApiary;
+import com.drppp.drtech.common.Items.MetaItems.DrMetaItems;
+import com.drppp.drtech.common.MetaTileEntities.single.MetaTileEntityIndustrialApiary;
 import net.minecraft.init.Biomes;
 import net.minecraft.item.ItemStack;
 

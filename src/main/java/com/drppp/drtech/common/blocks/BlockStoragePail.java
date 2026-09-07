@@ -1,8 +1,8 @@
-package com.drppp.drtech.common.blocks;
+package com.drppp.drtech.common.Blocks;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.tile.TileEntityStoragePail;
+import com.drppp.drtech.Tile.TileEntityStoragePail;
 import com.cleanroommc.modularui.factory.TileEntityGuiFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

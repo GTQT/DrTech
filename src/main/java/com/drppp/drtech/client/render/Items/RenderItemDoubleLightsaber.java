@@ -1,9 +1,9 @@
-package com.drppp.drtech.client.render.Items;
+package com.drppp.drtech.Client.render.Items;
 
-import com.drppp.drtech.common.items.lightsaber.FocusingCrystal;
-import com.drppp.drtech.common.items.lightsaber.ItemDoubleLightsaber;
-import com.drppp.drtech.common.items.lightsaber.ItemLightsaber;
-import com.drppp.drtech.common.items.lightsaber.LightsaberPartType;
+import com.drppp.drtech.common.Items.lightsaber.FocusingCrystal;
+import com.drppp.drtech.common.Items.lightsaber.ItemDoubleLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.ItemLightsaber;
+import com.drppp.drtech.common.Items.lightsaber.LightsaberPartType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;

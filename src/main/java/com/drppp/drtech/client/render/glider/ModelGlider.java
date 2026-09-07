@@ -1,6 +1,6 @@
-package com.drppp.drtech.client.render.glider;
+package com.drppp.drtech.Client.render.glider;
 
-import com.drppp.drtech.common.glider.GliderFlightHandler;
+import com.drppp.drtech.glider.GliderFlightHandler;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;

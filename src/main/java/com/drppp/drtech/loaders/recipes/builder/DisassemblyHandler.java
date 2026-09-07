@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.*;
 
-import static com.drppp.drtech.loaders.recipes.DrtechRecipes.DISASSEMBLER_RECIPES;
+import static com.drppp.drtech.loaders.recipes.DrtechReceipes.DISASSEMBLER_RECIPES;
 import static gregtech.api.unification.material.Materials.Ash;
 import static gregtech.api.unification.ore.OrePrefix.dustTiny;
 
@@ -53,7 +53,7 @@ public class DisassemblyHandler {
         Map<MetaTileEntity, IRecipe> recipeMap = new HashMap<>();
         GregTechAPI.mteManager.getRegistries().forEach(mter -> {
             mter.getKeys().forEach(item->{
-                var mte = mter.getObject(item);
+                MetaTileEntity mte = mter.getObject(item);
                 if ((mte instanceof EnergyContainerHandler.IEnergyChangeListener
                         || mte instanceof MultiblockControllerBase
                         || mte instanceof SteamMetaTileEntity

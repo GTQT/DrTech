@@ -32,7 +32,7 @@ public class FilterItemStackHandler  extends ItemStackHandler {
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
         if(OreDictUnifier.getPrefix(stack) != null && orePrefix!=null)
         {
-            var fix = OreDictUnifier.getPrefix(stack);
+            OrePrefix fix = OreDictUnifier.getPrefix(stack);
             if(!orePrefix.equals(fix))
                 return stack;
         }

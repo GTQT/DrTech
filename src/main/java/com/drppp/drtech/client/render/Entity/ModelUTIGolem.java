@@ -1,6 +1,6 @@
-package com.drppp.drtech.client.render.Entity;
+package com.drppp.drtech.Client.render.Entity;
 
-import com.drppp.drtech.common.entity.moster.EntityUTiGolem;
+import com.drppp.drtech.common.Entity.moster.EntityUTiGolem;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;

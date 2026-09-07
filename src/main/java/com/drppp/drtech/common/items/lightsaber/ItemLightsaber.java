@@ -1,9 +1,9 @@
-package com.drppp.drtech.common.items.lightsaber;
+package com.drppp.drtech.common.Items.lightsaber;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.entity.EntityThrownLightsaber;
-import com.drppp.drtech.common.sound.DrTechSounds;
+import com.drppp.drtech.common.Entity.EntityThrownLightsaber;
+import com.drppp.drtech.common.Sound.DrTechSounds;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.resources.I18n;
@@ -162,7 +162,7 @@ public class ItemLightsaber extends Item {
 
     public static ItemStack create(LightsaberColor color, LightsaberHilt emitter, LightsaberHilt switchSection,
                                    LightsaberHilt body, LightsaberHilt pommel, int focusingCrystals) {
-        ItemStack stack = new ItemStack(com.drppp.drtech.common.items.ItemsInit.getLightsaber(emitter));
+        ItemStack stack = new ItemStack(com.drppp.drtech.common.Items.ItemsInit.getLightsaber(emitter));
         getOrCreateTag(stack).setInteger(BLADE_COLOR_TAG, color.getMetadata());
         setParts(stack, emitter, switchSection, body, pommel);
         setFocusingCrystalMask(stack, focusingCrystals);

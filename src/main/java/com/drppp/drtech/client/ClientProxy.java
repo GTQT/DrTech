@@ -1,9 +1,11 @@
-package com.drppp.drtech.client;
+package com.drppp.drtech.Client;
 
+import com.brachy84.mechtech.MechTech;
+import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.CommonProxy;
-import com.drppp.drtech.client.drone.DroneWorldPreviewRenderer;
-import com.drppp.drtech.client.drone.DroneWorldSelectionHandler;
+import com.drppp.drtech.Client.drone.DroneWorldPreviewRenderer;
+import com.drppp.drtech.Client.drone.DroneWorldSelectionHandler;
 import com.drppp.drtech.hooked.HookClientHooks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;

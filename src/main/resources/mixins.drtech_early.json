@@ -1,5 +1,5 @@
 {
-  "package": "com.drppp.drtech.mixin",
+  "package": "com.drppp.drtech.Mixin",
   "required": true,
   "refmap": "${mixin_refmap}",
   "target": "@env(DEFAULT)",

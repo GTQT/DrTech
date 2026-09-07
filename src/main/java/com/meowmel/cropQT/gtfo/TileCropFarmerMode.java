@@ -5,7 +5,7 @@ import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.item.ItemCropSeed;
-import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.common.Items.ItemsInit;
 import gregtechfoodoption.common.machines.farmer.FarmerMode;
 import gregtechfoodoption.common.machines.farmer.MetaTileEntityFarmer;
 import net.minecraft.block.state.IBlockState;
@@ -23,7 +23,7 @@ import static com.meowmel.cropQT.block.BlockCropStick.VANILLA_SEED_MAP;
 public class TileCropFarmerMode implements FarmerMode {
     @Override
     public boolean canOperate(IBlockState iBlockState, MetaTileEntityFarmer metaTileEntityFarmer, BlockPos blockPos, World world) {
-        var te = world.getTileEntity(blockPos);
+        TileEntity te = world.getTileEntity(blockPos);
         if(te!=null && te instanceof TileCropStick)
         {
             TileCropStick crop = (TileCropStick)te;
@@ -38,7 +38,7 @@ public class TileCropFarmerMode implements FarmerMode {
 
     @Override
     public void harvest(IBlockState state, World world, BlockPos.MutableBlockPos pos, MetaTileEntityFarmer farmer) {
-        var te = world.getTileEntity(pos);
+        TileEntity te = world.getTileEntity(pos);
         if(te!=null && te instanceof TileCropStick)
         {
             TileCropStick crop = (TileCropStick)te;
@@ -48,11 +48,11 @@ public class TileCropFarmerMode implements FarmerMode {
 
     @Override
     public List<ItemStack> getDrops(IBlockState state, World world, BlockPos.MutableBlockPos pos, MetaTileEntityFarmer farmer) {
-        var te = world.getTileEntity(pos);
+        TileEntity te = world.getTileEntity(pos);
         if(te!=null && te instanceof TileCropStick)
         {
             TileCropStick crop = (TileCropStick)te;
-           var list = crop.getHarvestDrops();
+           List<ItemStack> list = crop.getHarvestDrops();
            return list;
         }
         return FarmerMode.super.getDrops(state, world, pos, farmer);
@@ -67,7 +67,7 @@ public class TileCropFarmerMode implements FarmerMode {
     public boolean canPlaceAt(BlockPos.MutableBlockPos operationPos, BlockPos.MutableBlockPos farmerPos, EnumFacing facing, World world)
     {
         if(world.isRemote) return false;
-       var te =  world.getTileEntity(operationPos);
+       TileEntity te =  world.getTileEntity(operationPos);
         if(te!=null && te instanceof TileCropStick)
         {
             TileCropStick tile = (TileCropStick)te;

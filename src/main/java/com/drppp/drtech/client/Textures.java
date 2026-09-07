@@ -1,8 +1,9 @@
-package com.drppp.drtech.client;
+package com.drppp.drtech.Client;
 
-import com.drppp.drtech.client.render.CentrifugeRender;
+import com.drppp.drtech.Client.Custome.CentrifugeRender;
 import com.drppp.drtech.Tags;
 import gregtech.api.GTValues;
+import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.resources.AdoptableTextureArea;
 import gregtech.api.gui.resources.TextureArea;
 import gregtech.client.renderer.texture.cube.OrientedOverlayRenderer;
@@ -87,6 +88,7 @@ public class Textures {
     public static final CentrifugeRender CENTRIFUGE_RENDER = new CentrifugeRender();
     public static final SimpleSidedCubeRenderer[] MACHINE_CASINGS = new SimpleSidedCubeRenderer[4];
     public static final SimpleSidedCubeRenderer BASE_BURRING_BOX_TEXTURE = new SimpleSidedCubeRenderer("casings/drtmachine/base");
+    public static SimpleSidedCubeRenderer FUSION_REACTOR_CASING;
     public static void init()
     {
         MULTIPART_WIRELESS_ENERGY = new SimpleOverlayRenderer("wireless_hatch/overlay_front");
@@ -141,6 +143,7 @@ public class Textures {
         BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/background.png", 176, 256, 3, 3);
         PAIL_BACKGROUND = AdoptableTextureArea.fullImage("textures/overgui/pail_background.png", 500, 500, 3, 3);
         WIRELESS_HATCH_HATCH = new SimpleOverlayRenderer("overlay/wireless_hatch/overlay_front");
+        FUSION_REACTOR_CASING = new SimpleSidedCubeRenderer("drtech:blocks/fusion/plasma_containment_casing");
         DRONE_DOCK_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/dock");
         DRONE_PROGRAMMER_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/programmer");
         DRONE_CONTROLLER_OVERLAY = new SimpleOverlayRenderer("drtech:overlay/drone/controller");

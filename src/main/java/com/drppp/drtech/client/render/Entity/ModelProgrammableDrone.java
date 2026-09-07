@@ -1,7 +1,7 @@
-package com.drppp.drtech.client.render.Entity;
+package com.drppp.drtech.Client.render.Entity;
 
-import com.drppp.drtech.drone.entity.EntityProgrammableDrone;
-import com.drppp.drtech.drone.hardware.DroneUpgradeType;
+import com.drppp.drtech.common.drone.entity.EntityProgrammableDrone;
+import com.drppp.drtech.common.drone.hardware.DroneUpgradeType;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;

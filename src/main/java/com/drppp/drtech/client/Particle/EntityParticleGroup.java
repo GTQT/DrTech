@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.Particle;
+package com.drppp.drtech.Client.Particle;
 
 
 import net.minecraft.block.Block;

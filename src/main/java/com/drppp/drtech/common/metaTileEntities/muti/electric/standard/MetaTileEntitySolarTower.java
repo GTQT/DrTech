@@ -1,10 +1,10 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
-import com.drppp.drtech.client.Textures;
-import com.drppp.drtech.api.unification.material.DrtechMaterials;
-import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.common.blocks.MetaBlocks.MetaCasing;
-import com.drppp.drtech.loaders.recipes.DrtechRecipes;
+import com.drppp.drtech.Client.Textures;
+import com.drppp.drtech.api.unification.Materials.DrtechMaterials;
+import com.drppp.drtech.common.Blocks.BlocksInit;
+import com.drppp.drtech.common.Blocks.MetaBlocks.MetaCasing;
+import com.drppp.drtech.loaders.recipes.DrtechReceipes;
 import gregtech.api.capability.impl.NoEnergyMultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -49,47 +49,38 @@ public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
     private int reflectAmount = 0;
 
     public MetaTileEntitySolarTower(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId, DrtechRecipes.SOLAR_TOWER);
+        super(metaTileEntityId, DrtechReceipes.SOLAR_TOWER);
         this.recipeMapWorkable = new SolarTowerRecipeLogic(this);
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:solar_tower",
-                    MetaTileEntitySolarTower::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
-                .piece("start")
-                    .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTTTTTTTT", "TTTTTTTTTTT", "TTTTTTTTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
-                    .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTYYYTTTT", "TTTTYYYTTTT", "TTTTYYYTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
-                    .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
-                    .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
-                    .aisle("###########", "###########", "#####T#####", "####TTT####", "###TYYYT###", "##TTYYYTT##", "###TYYYT###", "####TTT####", "#####T#####", "###########", "###########")
-                    .aisle("###########", "###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTTYTTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########", "###########")
-                .repeatablePiece("absorber", 15, 15)
-                    .aisle("###########", "###########", "###########", "###########", "#####G#####", "####GYG####", "#####G#####", "###########", "###########", "###########", "###########")
-                .repeatablePiece("reflector", 5, 5)
-                    .aisle("###########", "###########", "###########", "#####R#####", "####RRR####", "###RRYRR###", "####RRR####", "#####R#####", "###########", "###########", "###########")
-                .piece("end")
-                    .aisle("###########", "###########", "###########", "###########", "#####Y#####", "####YYY####", "#####Y#####", "###########", "###########", "###########", "###########")
-                    .aisle("###########", "###########", "###########", "###########", "###########", "#####S#####", "###########", "###########", "###########", "###########", "###########")
-                .self('S', MetaTileEntitySolarTower.class)
-                .any('#')
-                .where('T', Elements.chain(
-                        Elements.counted(210, 4096, Elements.block(
-                                BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING))),
-                        Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 1, -1, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, -1, 1),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 1)))
-                .blocks('Y', BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING))
-                .blocks('G', BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING))
-                .blocks('R', BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_INHIBITION_CASING))
+                .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTTTTTTTT", "TTTTTTTTTTT", "TTTTTTTTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
+                .aisle("####TTT####", "###TTTTT###", "##TTTTTTT##", "#TTTTTTTTT#", "TTTTYYYTTTT", "TTTTYYYTTTT", "TTTTYYYTTTT", "#TTTTTTTTT#", "##TTTTTTT##", "###TTTTT###", "####TTT####")
+                .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
+                .aisle("###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTYYYTT##", "#TTTYYYTTT#", "##TTYYYTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########")
+                .aisle("###########", "###########", "#####T#####", "####TTT####", "###TYYYT###", "##TTYYYTT##", "###TYYYT###", "####TTT####", "#####T#####", "###########", "###########")
+                .aisle("###########", "###########", "#####T#####", "####TTT####", "###TTTTT###", "##TTTYTTT##", "###TTTTT###", "####TTT####", "#####T#####", "###########", "###########")
+                .aisleRepeated(15, "###########", "###########", "###########", "###########", "#####G#####", "####GYG####", "#####G#####", "###########", "###########", "###########", "###########")
+                .aisleRepeated(5, "###########", "###########", "###########", "#####R#####", "####RRR####", "###RRYRR###", "####RRR####", "#####R#####", "###########", "###########", "###########")
+                .aisle("###########", "###########", "###########", "###########", "#####Y#####", "####YYY####", "#####Y#####", "###########", "###########", "###########", "###########")
+                .aisle("###########", "###########", "###########", "###########", "###########", "#####S#####", "###########", "###########", "###########", "###########", "###########")
+                .where('S', Elements.self(MetaTileEntitySolarTower.class))
+                .where('#', Elements.any())
+                .casing('T', BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING))
+                        .fluidOutput(1, 4)
+                        .fluidInput(1, 4)
+                        .maintenance()
+                        .energyInput(1, 1)
+                .done()
+                .where('Y', Elements.block(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SALT_INHIBITION_CASING)))
+                .where('G', Elements.block(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_CUT_OFF_CASING)))
+                .where('R', Elements.block(BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.HEAT_INHIBITION_CASING)))
                 .buildStructureDefinition();
 
     }

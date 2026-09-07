@@ -1,7 +1,7 @@
-package com.drppp.drtech.client.render.glider;
+package com.drppp.drtech.Client.render.glider;
 
-import com.drppp.drtech.common.glider.GliderFlightHandler;
-import com.drppp.drtech.common.glider.ItemHangGlider;
+import com.drppp.drtech.glider.GliderFlightHandler;
+import com.drppp.drtech.glider.ItemHangGlider;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;

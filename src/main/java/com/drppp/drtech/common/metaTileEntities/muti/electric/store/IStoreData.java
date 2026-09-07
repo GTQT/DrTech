@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.store;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.store;
 
 import org.jetbrains.annotations.NotNull;
 

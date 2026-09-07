@@ -1,6 +1,6 @@
-package com.drppp.drtech.common.items.MetaItems;
+package com.drppp.drtech.common.Items.MetaItems;
 
-import com.drppp.drtech.common.items.MetaItems.behaviors.LootTableBehavior;
+import com.drppp.drtech.common.Items.MetaItems.behaviors.LootTableBehavior;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import net.minecraft.creativetab.CreativeTabs;
@@ -8,9 +8,10 @@ import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.drppp.drtech.common.items.MetaItems.DrMetaItems.*;
+import static com.drppp.drtech.common.Items.MetaItems.DrMetaItems.*;
 
 public class MetaItemLootTable extends StandardMetaItem {
 

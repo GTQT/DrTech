@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
@@ -120,34 +120,25 @@ public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithCont
         return false;
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION_1 =
-            StructureDefinition.getOrBuild("drtech:concrete_backfiller/1",
-                    () -> buildTemplate(1));
-
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION_2 =
-            StructureDefinition.getOrBuild("drtech:concrete_backfiller/2",
-                    () -> buildTemplate(2));
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return level == 2 ? STRUCTURE_DEFINITION_2 : STRUCTURE_DEFINITION_1;
+        return buildStructureDefinition(level);
     }
 
-    private static StructureDefinition<?> buildTemplate(int level) {
+    private static StructureDefinition<?> buildStructureDefinition(int level) {
         return DeclarativePatternBuilder.start()
                 .aisle("XXX", "#F#", "#F#", "#F#", "###", "###", "###")
                 .aisle("XXX", "FCF", "FCF", "FCF", "#F#", "#F#", "#F#")
                 .aisle("XSX", "#F#", "#F#", "#F#", "###", "###", "###")
-                .self('S', MetaTileentityConcreteBackfiller.class)
-                .where('X', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(getCasingState(level))),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, 1, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 3, 1),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1)))
-                .blocks('C', getCasingState(level))
-                .frames('F', level == 2 ? Materials.Titanium : Materials.Steel)
-                .any('#')
+                .where('S', Elements.self(MetaTileentityConcreteBackfiller.class))
+                .casing('X', getCasingState(level))
+                        .fluidInput(1, 1)
+                        .energyInput(1, 3)
+                        .maintenance()
+                .done()
+                .where('C', Elements.block(getCasingState(level)))
+                .where('F', Elements.frames(level == 2 ? Materials.Titanium : Materials.Steel))
+                .where('#', Elements.any())
                 .buildStructureDefinition();
 
     }

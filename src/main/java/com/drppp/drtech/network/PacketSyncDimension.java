@@ -1,4 +1,4 @@
-package com.drppp.drtech.network;
+package com.drppp.drtech.Network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;

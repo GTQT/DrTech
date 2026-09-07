@@ -1,4 +1,4 @@
-package com.drppp.drtech.client.drone;
+package com.drppp.drtech.Client.drone;
 
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widgets.textfield.TextEditorWidget;

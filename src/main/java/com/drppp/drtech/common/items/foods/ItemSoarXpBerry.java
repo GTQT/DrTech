@@ -1,4 +1,4 @@
-package com.drppp.drtech.common.items.foods;
+package com.drppp.drtech.common.Items.foods;
 
 import com.drppp.drtech.Tags;
 import net.minecraft.creativetab.CreativeTabs;

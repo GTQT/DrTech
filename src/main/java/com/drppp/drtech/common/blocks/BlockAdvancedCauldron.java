@@ -1,9 +1,9 @@
-package com.drppp.drtech.common.blocks;
+package com.drppp.drtech.common.Blocks;
 
 import com.drppp.drtech.DrTechMain;
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.tile.TileEntityAdvancedCauldron;
-import com.drppp.drtech.common.items.ItemsInit;
+import com.drppp.drtech.Tile.TileEntityAdvancedCauldron;
+import com.drppp.drtech.common.Items.ItemsInit;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;

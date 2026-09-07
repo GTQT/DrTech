@@ -1,6 +1,10 @@
-package com.drppp.drtech.common.metaTileEntities.muti.electric.standard;
+package com.drppp.drtech.common.MetaTileEntities.muti.electric.standard;
 
 
+import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.MultiblockRecipeLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -38,34 +42,26 @@ public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN);
     }
 
-    private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:comb_process",
-                    MetaTileEntityCombProcess::buildTemplate);
-
     @Override
     protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+        return buildStructureDefinition();
     }
 
-    private static StructureDefinition<?> buildTemplate() {
+    private static StructureDefinition<?> buildStructureDefinition() {
         return DeclarativePatternBuilder.start(RIGHT, UP, BACK)
                 .aisle("AAAAA", "B   B", "B   B", "B   B", "AAAAA")
                 .aisle("AAAAA", " CCC ", " BBB ", " CCC ", "AAAAA")
                 .aisle("AAAAA", " CCC ", " BBB ", " CCC ", "AAAAA")
                 .aisle("AAAAA", " CCC ", " BBB ", " CCC ", "AAAAA")
                 .aisle("AASAA", "B   B", "B   B", "B   B", "AAAAA")
-                .self('S', MetaTileEntityCombProcess.class)
-                .blocks('C', MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.PTFE_INERT_CASING))
+                .where('S', Elements.self(MetaTileEntityCombProcess.class))
+                .where('C', Elements.block(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.PTFE_INERT_CASING)))
+                .casing('A', getCasingState())
+                        .auto(false, true, true, true, true, true, false)
+                .done()
+                .where('B', Elements.frames(Materials.StainlessSteel))
                 .hatch('M', MultiblockAbility.MUFFLER_HATCH)
-                .frames('B', Materials.StainlessSteel)
-                .where('A', Elements.chain(
-                        Elements.counted(20, 4096, Elements.block(getCasingState())),
-                        Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
-                                gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
-                        Elements.hatch(MultiblockAbility.INPUT_ENERGY, 1, 2, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.EXPORT_ITEMS, 0, -1, 1),
-                        Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 0, -1, 1)))
+                .where(' ', Elements.any())
                 .buildStructureDefinition();
 
     }
