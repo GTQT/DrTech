@@ -15,12 +15,17 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.ui.MultiblockUIBuilder;
-import gregtech.api.util.KeyUtil;
+import gregtech.api.pattern.casing.DeclarativePatternBuilder;
+import gregtech.api.pattern.casing.GTCasingGroups;
+import gregtech.api.pattern.element.Elements;
+import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.unification.material.Materials;
+import gregtech.api.util.KeyUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
@@ -28,7 +33,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
@@ -38,32 +42,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import gregtech.api.pattern.casing.DeclarativePatternBuilder;
-
-import gregtech.api.pattern.casing.GTCasingGroups;
-
-import gregtech.api.pattern.element.Elements;
-
-import gregtech.api.pattern.element.StructureDefinition;
-
 public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
-    private final long maxEnergyStore = 100000000;
-    private long energyStore = 0;
-    private UUID networkUid = null;
-    private int tick = 0;
-    private final List<UUID> players = new ArrayList<>();
-
-    public MetaTileEntityPlayerBeacon(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId);
-    }
-
     private static final StructureDefinition<?> STRUCTURE_DEFINITION =
             StructureDefinition.getOrBuild("drtech:player_beacon",
                     MetaTileEntityPlayerBeacon::buildTemplate);
+    private final long maxEnergyStore = 100000000;
+    private final List<UUID> players = new ArrayList<>();
+    private long energyStore = 0;
+    private UUID networkUid = null;
+    private int tick = 0;
 
-    @Override
-    protected @NotNull StructureDefinition<?> createStructureDefinition() {
-        return STRUCTURE_DEFINITION;
+    public MetaTileEntityPlayerBeacon(ResourceLocation metaTileEntityId) {
+        super(metaTileEntityId);
     }
 
     private static StructureDefinition<?> buildTemplate() {
@@ -81,11 +71,20 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
                 .frames('G', Materials.Steel)
                 .where('A', Elements.chain(
                         Elements.counted(0, 4096, Elements.block(
-                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID))),
+                                getCasingState())),
                         Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
                                 gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1)))
                 .buildStructureDefinition();
 
+    }
+
+    public static IBlockState getCasingState() {
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
+    }
+
+    @Override
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
+        return STRUCTURE_DEFINITION;
     }
 
     @Override
@@ -124,18 +123,18 @@ public class MetaTileEntityPlayerBeacon extends MetaTileEntityBaseWithControl {
                     keyManager.add(richText -> {
                         if (!uidText.isEmpty()) {
                             richText.add(IKey.comp(
-                                    KeyUtil.string(TextFormatting.GRAY, "绑定网络:"),
-                                    KeyUtil.string(TextFormatting.WHITE, uidText)))
+                                            KeyUtil.string(TextFormatting.GRAY, "绑定网络:"),
+                                            KeyUtil.string(TextFormatting.WHITE, uidText)))
                                     .newLine();
                         }
                         richText.add(IKey.comp(
-                                KeyUtil.string(TextFormatting.GRAY, "机器存储能量:"),
-                                KeyUtil.string(TextFormatting.WHITE, String.valueOf(stored))))
+                                        KeyUtil.string(TextFormatting.GRAY, "机器存储能量:"),
+                                        KeyUtil.string(TextFormatting.WHITE, String.valueOf(stored))))
                                 .newLine();
                         for (String name : playerNames) {
                             richText.add(IKey.comp(
-                                    KeyUtil.string(TextFormatting.GRAY, "存储玩家:"),
-                                    KeyUtil.string(TextFormatting.WHITE, name)))
+                                            KeyUtil.string(TextFormatting.GRAY, "存储玩家:"),
+                                            KeyUtil.string(TextFormatting.WHITE, name)))
                                     .newLine();
                         }
                     });

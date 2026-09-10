@@ -36,7 +36,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         super(metaTileEntityId, DRONE_PAD);
     }
 
-    private static IBlockState getFirstCasingState() {
+    private static IBlockState getCasingState() {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
     }
 
@@ -86,7 +86,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
                 .aisle("    F     F", "    F     F", "     FCSCF ", "     F   F ", "           ", "           ")
                 .self('S', MetaTileEntityDronePad.class)
                 .any('#')
-                .blocks('C', getFirstCasingState())
+                .blocks('C', getCasingState())
                 .blocks('X', getSecondCasingState())
                 .blocks('G', getFourthCasingState())
                 .blocks('P', getBoilerCasingState())

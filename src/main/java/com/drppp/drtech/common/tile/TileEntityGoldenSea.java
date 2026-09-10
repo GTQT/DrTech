@@ -12,12 +12,13 @@ import java.util.List;
 
 public class TileEntityGoldenSea extends TileEntity implements ITickable {
 
-    private int tick=0;
+    private int tick = 0;
+
     @Override
     public void update() {
         // 每tick调用一次
-        if (!this.world.isRemote && tick++>10) { // 确保在服务器端运行
-            this.tick=0;
+        if (!this.world.isRemote && tick++ > 10) { // 确保在服务器端运行
+            this.tick = 0;
             // 检查方块上方
             BlockPos above = pos.up();
             List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(above));
@@ -26,7 +27,7 @@ public class TileEntityGoldenSea extends TileEntity implements ITickable {
                 ItemStack stack = entityItem.getItem();
 
                 // 检查是否为金元宝
-                if (stack.getItem()== DrMetaItems.GOLD_COIN.getMetaItem() && stack.getMetadata()==DrMetaItems.GOLD_COIN.getMetaValue()) {
+                if (stack.getItem() == DrMetaItems.GOLD_COIN.getMetaItem() && stack.getMetadata() == DrMetaItems.GOLD_COIN.getMetaValue()) {
                     // 复制金元宝并喷射出去
                     ItemStack doubleApple = stack.copy();
                     doubleApple.setCount(2); // 设置数量为2

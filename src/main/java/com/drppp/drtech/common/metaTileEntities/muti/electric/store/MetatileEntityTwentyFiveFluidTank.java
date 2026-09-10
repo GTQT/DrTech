@@ -66,31 +66,52 @@ import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 
 public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase implements IControllable, IProgressBarMultiblock {
-    private static final String NBT_FLUID_BANK = "FluidBank";
-    private boolean isActive, isWorkingEnabled = true;
-    // Match Context Headers
 
+    public static final int FLUID_SLOTS = 25;
+    public static final int DISPLAY_SLOTS = 5;
+
+    private static final String NBT_FLUID_BANK = "FluidBank";
     private static final String NBT_FLUID = "Fluid";
-    private FluidStack[] fluid = new FluidStack[25];
+
+    private static final String NBT_KEY_ACTIVE = "isActive";
+    private static final String NBT_KEY_WORKING = "isWorkingEnabled";
+    private static final String NBT_KEY_OUTPUT_FLAG = "OutFlag";
+    private static final String NBT_KEY_CIRCUIT = "Circuit";
+
+    private boolean isActive;
+    private boolean isWorkingEnabled = true;
+    private int circuit = 0;
+    private int time = 0;
+    private int outputflag = 0;
+
+    private final FluidStack[] fluid = new FluidStack[FLUID_SLOTS];
+
     public IMultipleTankHandler inputFluidInventory;
     public IMultipleTankHandler outputFluidInventory;
     protected ItemHandlerList itemImportInventory;
     protected IEnergyContainer energyContainer;
     private TFFTTankFluidBank fluidBank;
-    private int circuit=0;
-    private int time=0;
-    private int outputflag = 0;
-    public int getCircuitNo()
-    {
-        return  this.circuit;
-    }
+
     public MetatileEntityTwentyFiveFluidTank(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId);
     }
 
+    public int getCircuitNo() {
+        return circuit;
+    }
+
+    // ---------------------------------------------------------------------
+    // Working / active state
+    // ---------------------------------------------------------------------
+
     @Override
     public boolean isWorkingEnabled() {
-        return this.isWorkingEnabled;
+        return isWorkingEnabled;
+    }
+
+    @Override
+    public boolean usesMui2() {
+        return false;
     }
 
     @Override
@@ -102,25 +123,28 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(isWorkingEnabled));
         }
     }
-    @Override
-    public boolean usesMui2() {
-        return false;
-    }
+
     @Override
     public boolean isActive() {
-        return super.isActive() && this.isActive;
+        return super.isActive() && isActive;
     }
 
     public void setActive(boolean active) {
-        if (this.isActive != active) {
-            this.isActive = active;
-            markDirty();
-            World world = getWorld();
-            if (world != null && !world.isRemote) {
-                writeCustomData(GregtechDataCodes.WORKABLE_ACTIVE, buf -> buf.writeBoolean(active));
-            }
+        if (this.isActive == active) {
+            return;
+        }
+        this.isActive = active;
+        markDirty();
+        World world = getWorld();
+        if (world != null && !world.isRemote) {
+            writeCustomData(GregtechDataCodes.WORKABLE_ACTIVE, buf -> buf.writeBoolean(active));
         }
     }
+
+    // ---------------------------------------------------------------------
+    // Sync
+    // ---------------------------------------------------------------------
+
     @Override
     public void writeInitialSyncData(PacketBuffer buf) {
         super.writeInitialSyncData(buf);
@@ -146,20 +170,26 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             scheduleRenderUpdate();
         }
     }
+
+    // ---------------------------------------------------------------------
+    // NBT
+    // ---------------------------------------------------------------------
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
-        data.setBoolean("isActive", isActive);
-        data.setBoolean("isWorkingEnabled", isWorkingEnabled);
-        data.setInteger("OutFlag",this.outputflag);
-        data.setInteger("Circuit",this.circuit);
-        for (int i = 0; i < 25; i++) {
-            if(fluid[i]!=null)
-            {
-                NBTTagCompound fluidNBT = new NBTTagCompound();
-                fluid[i].writeToNBT(fluidNBT);
-                data.setTag(NBT_FLUID+i,fluidNBT);
+        data.setBoolean(NBT_KEY_ACTIVE, isActive);
+        data.setBoolean(NBT_KEY_WORKING, isWorkingEnabled);
+        data.setInteger(NBT_KEY_OUTPUT_FLAG, outputflag);
+        data.setInteger(NBT_KEY_CIRCUIT, circuit);
+
+        for (int i = 0; i < FLUID_SLOTS; i++) {
+            if (fluid[i] == null) {
+                continue;
             }
+            NBTTagCompound fluidNBT = new NBTTagCompound();
+            fluid[i].writeToNBT(fluidNBT);
+            data.setTag(NBT_FLUID + i, fluidNBT);
         }
         if (fluidBank != null) {
             data.setTag(NBT_FLUID_BANK, fluidBank.writeToNBT(new NBTTagCompound()));
@@ -170,22 +200,22 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     @Override
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
-        isActive = data.getBoolean("isActive");
-        isWorkingEnabled = data.getBoolean("isWorkingEnabled");
-        this.outputflag = data.getInteger("OutFlag");
-        this.circuit = data.getInteger("Circuit");
-        for (int i = 0; i < 25; i++) {
-            if(data.hasKey(NBT_FLUID+i))
-            {
-                NBTTagCompound fluidNBT= (NBTTagCompound) data.getTag(NBT_FLUID+i);
-                fluid[i] = FluidStack.loadFluidStackFromNBT(fluidNBT);
+        isActive = data.getBoolean(NBT_KEY_ACTIVE);
+        isWorkingEnabled = data.getBoolean(NBT_KEY_WORKING);
+        outputflag = data.getInteger(NBT_KEY_OUTPUT_FLAG);
+        circuit = data.getInteger(NBT_KEY_CIRCUIT);
 
+        for (int i = 0; i < FLUID_SLOTS; i++) {
+            if (!data.hasKey(NBT_FLUID + i)) {
+                continue;
             }
+            fluid[i] = FluidStack.loadFluidStackFromNBT((NBTTagCompound) data.getTag(NBT_FLUID + i));
         }
         if (data.hasKey(NBT_FLUID_BANK)) {
             fluidBank = new TFFTTankFluidBank(data.getCompoundTag(NBT_FLUID_BANK));
         }
     }
+
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
         if (capability == GregtechTileCapabilities.CAPABILITY_CONTROLLABLE) {
@@ -193,106 +223,146 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         }
         return super.getCapability(capability, side);
     }
+
+    // ---------------------------------------------------------------------
+    // Tick logic
+    // ---------------------------------------------------------------------
+
     @Override
     protected void updateFormedValid() {
-        if (!this.getWorld().isRemote ) {
-            //getCircuit();
-            if (getOffsetTimer() % 20 == 0) {
-                // active here is just used for rendering
-                for (int i = 0; i < 25; i++) {
-                    if(fluidBank.hasFluid(i))
-                    {
-                        setActive(true);
+        if (getWorld().isRemote) {
+            return;
+        }
+
+        updateActiveState();
+        consumeEnergy();
+
+        if (!isWorkingEnabled() || time++ <= 20) {
+            return;
+        }
+
+        importFluids();
+        exportFluids();
+
+        if (!fluidBank.hasFluid(circuit)) {
+            fluid[circuit] = null;
+        }
+        time = 0;
+    }
+
+    private void updateActiveState() {
+        if (getOffsetTimer() % 20 != 0) {
+            return;
+        }
+        boolean anyStored = false;
+        for (int i = 0; i < FLUID_SLOTS; i++) {
+            if (fluidBank.hasFluid(i)) {
+                anyStored = true;
+                break;
+            }
+        }
+        setActive(anyStored);
+    }
+
+    private void consumeEnergy() {
+        if (energyContainer == null || fluidBank == null) {
+            return;
+        }
+        long availableInput = energyContainer.getInputVoltage() * energyContainer.getInputAmperage();
+        if (availableInput > fluidBank.eut && energyContainer.getEnergyStored() > fluidBank.eut) {
+            energyContainer.changeEnergy(-fluidBank.eut);
+            setWorkingEnabled(true);
+        }
+    }
+
+    private void importFluids() {
+        if (inputFluidInventory.getTanks() <= 0) {
+            return;
+        }
+        for (int i = 0; i < inputFluidInventory.getTanks(); i++) {
+            IMultipleTankHandler.ITankEntry tank = inputFluidInventory.getTankAt(i);
+            if (tank.getFluidAmount() <= 0) {
+                continue;
+            }
+            // Fill matching existing slots first
+            for (int j = 0; j < FLUID_SLOTS; j++) {
+                if (fluid[j] != null && fluid[j].isFluidEqual(tank.getFluid())) {
+                    long amount = fluidBank.fill(tank.getFluidAmount(), j);
+                    tank.drain((int) amount, true);
+                    if (tank.getFluidAmount() == 0) {
                         break;
                     }
-                    else
-                        setActive(false);
                 }
-
             }
-            if(this.energyContainer.getInputVoltage() * this.energyContainer.getInputAmperage() >this.fluidBank.eut && this.energyContainer.getEnergyStored()>this.fluidBank.eut)
-            {
-                this.energyContainer.changeEnergy(-this.fluidBank.eut);
-                this.setWorkingEnabled(true);
-            }
-            if (isWorkingEnabled() && time++>20 ) {
-                if(inputFluidInventory.getTanks()>0){
-                    for (int i = 0; i < inputFluidInventory.getTanks(); i++) {
-                        if(inputFluidInventory.getTankAt(i).getFluidAmount()>0)
-                            for (int j = 0; j < 25; j++) {
-                                if(this.fluid[j]!=null && this.fluid[j].isFluidEqual(inputFluidInventory.getTankAt(i).getFluid()))
-                                {
-                                    long amount =  fluidBank.fill(inputFluidInventory.getTankAt(i).getFluidAmount(),j);
-                                    inputFluidInventory.getTankAt(i).drain((int)amount,true);
-                                    if(inputFluidInventory.getTankAt(i).getFluidAmount()==0)
-                                        break;
-                                }
-                            }
-                        for (int j = 0; j < 25; j++) {
-                            if(this.fluid[j]==null )
-                            {
-                                if(this.fluid[j]==null)  this.fluid[j] = inputFluidInventory.getTankAt(i).getFluid();
-                                long amount =  fluidBank.fill(inputFluidInventory.getTankAt(i).getFluidAmount(),j);
-                                inputFluidInventory.getTankAt(i).drain((int)amount,true);
-                                if(inputFluidInventory.getTankAt(i).getFluidAmount()==0)
-                                    break;
-                            }
-                        }
+            // Then fill empty slots
+            for (int j = 0; j < FLUID_SLOTS; j++) {
+                if (fluid[j] == null) {
+                    fluid[j] = tank.getFluid();
+                    long amount = fluidBank.fill(tank.getFluidAmount(), j);
+                    tank.drain((int) amount, true);
+                    if (tank.getFluidAmount() == 0) {
+                        break;
                     }
                 }
-                if(outputFluidInventory.getTanks()>0 && this.fluid[circuit]!=null &&this.outputflag==1)
-                {
-
-                    List<FluidStack> Outputs = new ArrayList<>();
-                    for (int i = 0; i < outputFluidInventory.getTanks(); i++) {
-                        if((this.fluid[circuit]!=null && this.fluid[circuit].isFluidEqual(outputFluidInventory.getTankAt(i).getFluid())) || outputFluidInventory.getTankAt(i).getFluid()==null)
-                        {
-                            long energyDebanked = fluidBank.drain(outputFluidInventory.getTankAt(i).getCapacity()-outputFluidInventory.getTankAt(i).getFluidAmount(),this.circuit);
-                            Outputs.add(new FluidStack(this.fluid[circuit].getFluid(), (int) energyDebanked));
-                        }
-                    }
-                    GTTransferUtils.addFluidsToFluidHandler(outputFluidInventory ,false, Outputs);
-                }
-                if(!fluidBank.hasFluid(this.circuit))
-                    fluid[circuit] = null;
-                time=0;
             }
         }
     }
-    private static final StructureContributionKey<ITfftData, List<ITfftData>> BATTERY_KEY =
+
+    private void exportFluids() {
+        if (outputFluidInventory.getTanks() <= 0 || fluid[circuit] == null || outputflag != 1) {
+            return;
+        }
+        List<FluidStack> outputs = new ArrayList<>();
+        for (int i = 0; i < outputFluidInventory.getTanks(); i++) {
+            IMultipleTankHandler.ITankEntry tank = outputFluidInventory.getTankAt(i);
+            boolean empty = tank.getFluid() == null;
+            boolean matching = fluid[circuit].isFluidEqual(tank.getFluid());
+            if (!empty && !matching) {
+                continue;
+            }
+            long drained = fluidBank.drain(tank.getCapacity() - tank.getFluidAmount(), circuit);
+            outputs.add(new FluidStack(fluid[circuit].getFluid(), (int) drained));
+        }
+        GTTransferUtils.addFluidsToFluidHandler(outputFluidInventory, false, outputs);
+    }
+
+    // ---------------------------------------------------------------------
+    // Structure
+    // ---------------------------------------------------------------------
+
+    private static final StructureContributionKey<ITFFTData, List<ITFFTData>> BATTERY_KEY =
             StructureContributionKey.orderedList("drtech:tfft_battery_cells");
 
-    private static final IStructureElement BATTERY_ELEMENT = new BatteryContributionElement<>(
+    private static final IStructureElement<?> BATTERY_ELEMENT = new BatteryContributionElement<Object>(
             "drtech:tfft_battery_cells",
             state -> {
                 if (!Datas.TFFT_CASINGS.containsKey(state)) return null;
-                ITfftData data = Datas.TFFT_CASINGS.get(state);
+                ITFFTData data = Datas.TFFT_CASINGS.get(state);
                 if (data.getTier() == -1 || data.getCapacity() <= 0) return null;
                 return data;
             },
             () -> Datas.TFFT_CASINGS.entrySet().stream()
-                    .sorted(java.util.Comparator.comparingInt(e -> e.getValue().getTier()))
+                    .sorted(Comparator.comparingInt(e -> e.getValue().getTier()))
                     .map(e -> new BlockInfo(e.getKey(), null))
                     .toArray(BlockInfo[]::new));
 
     @NotNull
     private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:tfft_tank",
-                    MetatileEntityTwentyFiveFluidTank::buildTemplate);
+            StructureDefinition.getOrBuild("drtech:tfft_tank", MetatileEntityTwentyFiveFluidTank::buildTemplate);
 
     @Override
-    protected StructureDefinition<?> createStructureDefinition() {
+    protected @NotNull StructureDefinition<?> createStructureDefinition() {
         return STRUCTURE_DEFINITION;
     }
 
     private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, DOWN, FRONT)
                 .piece("start")
-                    .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
+                .aisle("XXXXX", "XXXXX", "XXSXX", "XXXXX", "XXXXX")
                 .repeatablePiece("body", 3, 14)
-                    .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
+                .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
                 .piece("end")
-                    .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
+                .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
                 .self('S', MetatileEntityTwentyFiveFluidTank.class)
                 .where('X', Elements.chain(
                         Elements.counted(0, 4096, Elements.block(getCasingState())),
@@ -307,8 +377,8 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                 .where('B', Elements.withTooltips(BATTERY_ELEMENT,
                         "gregtech.multiblock.pattern.error.batteries"))
                 .buildStructureDefinition();
-
     }
+
     protected static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.TFFT_CASING);
     }
@@ -316,55 +386,64 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     protected static IBlockState getGlassState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.LAMINATED_GLASS);
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.TFFT_TANK_CASING;
     }
+
     @SideOnly(Side.CLIENT)
     @NotNull
     @Override
     protected ICubeRenderer getFrontOverlay() {
         return Textures.TFFT_OVERLAY;
     }
+
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
-                               boolean advanced) {
+    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
         tooltip.add(TooltipHelper.RAINBOW_SLOW + I18n.format("超超超超级量子缸！", new Object[0]));
         tooltip.add(I18n.format("能存储25种流体的超级储罐，容量由多方块内的流体单元决定"));
         tooltip.add(I18n.format("在UI中通过按钮进行流体操作"));
     }
+
+    // ---------------------------------------------------------------------
+    // Display
+    // ---------------------------------------------------------------------
+
     @Override
     protected void configureDisplayText(MultiblockUIBuilder builder) {
         super.configureDisplayText(builder);
-        builder.setWorkingStatus(true, isActive() && isWorkingEnabled()) // transform into two-state system for display
+        builder.setWorkingStatus(true, isActive() && isWorkingEnabled())
                 .addCustom((keyManager, syncer) -> {
                     if (!isStructureFormed()) {
                         return;
                     }
-                    boolean hasBank = syncer.syncBoolean(() -> this.fluidBank != null);
-                    int circuit = syncer.syncInt(() -> this.circuit);
-                    int outputflag = syncer.syncInt(() -> this.outputflag);
-                    int eut = syncer.syncInt(() -> this.fluidBank == null ? 0 : this.fluidBank.eut);
-                    String capacityText = syncer.<String>syncObject(() -> this.fluidBank == null ? "0 L"
-                            : TextFormattingUtil.formatNumbers(this.fluidBank.getCapacity(circuit)) + " L",
+                    boolean hasBank = syncer.syncBoolean(() -> fluidBank != null);
+                    int syncedCircuit = syncer.syncInt(() -> circuit);
+                    int output = syncer.syncInt(() -> outputflag);
+                    int eut = syncer.syncInt(() -> fluidBank == null ? 0 : fluidBank.eut);
+                    String capacityText = syncer.<String>syncObject(
+                            () -> fluidBank == null ? "0 L"
+                                    : TextFormattingUtil.formatNumbers(fluidBank.getCapacity(syncedCircuit)) + " L",
                             ByteBufAdapters.STRING);
-                    int[] slotIndex = new int[5];
-                    String[] slotFluid = new String[5];
-                    String[] slotStored = new String[5];
-                    for (int j = 0; j < 5; j++) {
-                        final int idx = circuit - 2 + j;
+
+                    int[] slotIndex = new int[DISPLAY_SLOTS];
+                    String[] slotFluid = new String[DISPLAY_SLOTS];
+                    String[] slotStored = new String[DISPLAY_SLOTS];
+                    for (int j = 0; j < DISPLAY_SLOTS; j++) {
+                        final int idx = syncedCircuit - 2 + j;
                         slotIndex[j] = idx;
                         slotFluid[j] = syncer.<String>syncObject(() -> {
-                            if (idx < 0 || idx >= 25 || this.fluid == null || this.fluid[idx] == null) {
+                            if (idx < 0 || idx >= FLUID_SLOTS || fluid[idx] == null) {
                                 return "空";
                             }
-                            return this.fluid[idx].getLocalizedName();
+                            return fluid[idx].getLocalizedName();
                         }, ByteBufAdapters.STRING);
                         slotStored[j] = syncer.<String>syncObject(() -> {
-                            if (idx < 0 || idx >= 25 || this.fluidBank == null) {
+                            if (idx < 0 || idx >= FLUID_SLOTS || fluidBank == null) {
                                 return "";
                             }
-                            return TextFormattingUtil.formatNumbers(this.fluidBank.getStored(idx)) + " L";
+                            return TextFormattingUtil.formatNumbers(fluidBank.getStored(idx)) + " L";
                         }, ByteBufAdapters.STRING);
                     }
 
@@ -373,52 +452,59 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                             return;
                         }
                         richText.add(KeyUtil.lang(TextFormatting.GRAY,
-                                "gtqt.multiblock.power_substation.stored",
-                                KeyUtil.string(TextFormatting.GOLD, capacityText)))
+                                        "gtqt.multiblock.power_substation.stored",
+                                        KeyUtil.string(TextFormatting.GOLD, capacityText)))
                                 .newLine();
                         richText.add(KeyUtil.lang(TextFormatting.GRAY,
-                                "drtech.multiblock.power_substation.eut",
-                                KeyUtil.string(TextFormatting.AQUA, String.valueOf(eut))))
+                                        "drtech.multiblock.power_substation.eut",
+                                        KeyUtil.string(TextFormatting.AQUA, String.valueOf(eut))))
                                 .newLine();
                         richText.add(KeyUtil.lang(TextFormatting.GRAY,
-                                "drtech.multiblock.power_substation.output",
-                                KeyUtil.string(TextFormatting.WHITE, outputflag == 0 ? "禁用" : "启用")))
+                                        "drtech.multiblock.power_substation.output",
+                                        KeyUtil.string(TextFormatting.WHITE, output == 0 ? "禁用" : "启用")))
                                 .newLine();
                         richText.add(IKey.str(TextFormatting.GOLD + "======================")).newLine();
-                        for (int j = 0; j < 5; j++) {
+                        for (int j = 0; j < DISPLAY_SLOTS; j++) {
                             int idx = slotIndex[j];
-                            if (idx < 0 || idx >= 25) {
+                            if (idx < 0 || idx >= FLUID_SLOTS) {
                                 continue;
                             }
-                            TextFormatting color = idx == circuit ? TextFormatting.GOLD : TextFormatting.GRAY;
+                            TextFormatting color = idx == syncedCircuit ? TextFormatting.GOLD : TextFormatting.GRAY;
                             richText.add(KeyUtil.lang(color, "gtqt.multiblock.yot_tank.fluid_type",
-                                    KeyUtil.string(TextFormatting.WHITE, String.valueOf(idx)),
-                                    KeyUtil.string(TextFormatting.WHITE, slotFluid[j]),
-                                    KeyUtil.string(TextFormatting.WHITE, slotStored[j])))
+                                            KeyUtil.string(TextFormatting.WHITE, String.valueOf(idx)),
+                                            KeyUtil.string(TextFormatting.WHITE, slotFluid[j]),
+                                            KeyUtil.string(TextFormatting.WHITE, slotStored[j])))
                                     .newLine();
                         }
                         richText.add(IKey.str(TextFormatting.GOLD + "======================")).newLine();
                     });
                 });
     }
+
     @Override
     public TextureArea getProgressBarTexture(int index) {
         return index == 0 ? GuiTextures.PROGRESS_BAR_HPCA_COMPUTATION : GuiTextures.PROGRESS_BAR_FUSION_HEAT;
     }
+
     @Override
     public void addBarHoverText(List<ITextComponent> hoverList, int index) {
-        BigInteger energyStored = fluidBank.getStored(this.circuit);
-        BigInteger energyCapacity = fluidBank.getCapacity(this.circuit);
+        if (fluidBank == null) {
+            return;
+        }
+        BigInteger energyStored = fluidBank.getStored(circuit);
+        BigInteger energyCapacity = fluidBank.getCapacity(circuit);
         if (index == 0) {
-            ITextComponent cwutInfo = TextComponentUtil.stringWithColor(
-                    TextFormatting.AQUA,
-                    energyStored+ " / " + energyCapacity + "L");
+            ITextComponent info = TextComponentUtil.stringWithColor(
+                    TextFormatting.AQUA, energyStored + " / " + energyCapacity + "L");
             hoverList.add(TextComponentUtil.translationWithColor(
-                    TextFormatting.GRAY,
-                    "gtqt.multiblock.tfft.computation",
-                    cwutInfo));
+                    TextFormatting.GRAY, "gtqt.multiblock.tfft.computation", info));
         }
     }
+
+    // ---------------------------------------------------------------------
+    // GUI
+    // ---------------------------------------------------------------------
+
     @Override
     @Nonnull
     protected Widget getFlexButton(int x, int y, int width, int height) {
@@ -439,68 +525,72 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
     }
 
     private void incrementThreshold(Widget.ClickData clickData) {
-        this.circuit = MathHelper.clamp(circuit + 1, 0, 24);
+        circuit = MathHelper.clamp(circuit + 1, 0, FLUID_SLOTS - 1);
     }
 
     private void decrementThreshold(Widget.ClickData clickData) {
-        this.circuit = MathHelper.clamp(circuit - 1, 0, 24);
+        circuit = MathHelper.clamp(circuit - 1, 0, FLUID_SLOTS - 1);
     }
-    private void setoutputFlag(Widget.ClickData clickData)
-    {
-        if( this.outputflag==0)
-            this.outputflag=1;
-        else if (this.outputflag==1) {
-            this.outputflag=0;
-        }
+
+    private void setoutputFlag(Widget.ClickData clickData) {
+        outputflag = outputflag == 0 ? 1 : 0;
     }
-    private void clearFluid(Widget.ClickData clickData)
-    {
-        this.fluid[circuit] = null;
-        this.fluidBank.clearStore(circuit);
+
+    private void clearFluid(Widget.ClickData clickData) {
+        fluid[circuit] = null;
+        fluidBank.clearStore(circuit);
     }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), this.isActive(),
-                this.isWorkingEnabled());
+        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(),
+                isActive(), isWorkingEnabled());
     }
+
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
-        return new MetatileEntityTwentyFiveFluidTank(this.metaTileEntityId);
+        return new MetatileEntityTwentyFiveFluidTank(metaTileEntityId);
     }
+
+    // ---------------------------------------------------------------------
+    // Structure lifecycle
+    // ---------------------------------------------------------------------
+
     @Override
     public void invalidateStructure() {
         super.invalidateStructure();
         resetTileAbilities();
     }
+
     @Override
     protected void formStructure(@NotNull FormedStructureView formed) {
         super.formStructure(formed);
         initializeAbilities();
-        List<ITfftData> aggregate = formed.getAggregate(BATTERY_KEY);
-        List<ITfftData> parts = aggregate == null ? new ArrayList<>() : new ArrayList<>(aggregate);
+
+        List<ITFFTData> aggregate = formed.getAggregate(BATTERY_KEY);
+        List<ITFFTData> parts = aggregate == null ? new ArrayList<>() : new ArrayList<>(aggregate);
         if (parts.isEmpty()) {
             invalidateStructure();
             return;
         }
-        if (this.fluidBank == null) {
-            this.fluidBank = new TFFTTankFluidBank(parts);
-        } else {
-            this.fluidBank = fluidBank.rebuild(parts);
-        }
+
+        fluidBank = (fluidBank == null) ? new TFFTTankFluidBank(parts) : fluidBank.rebuild(parts);
     }
+
     private void initializeAbilities() {
-        this.inputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
-        this.outputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
-        this.itemImportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
-        this.energyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
+        inputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
+        outputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
+        itemImportInventory = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
+        energyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
     }
+
     private void resetTileAbilities() {
-        this.inputFluidInventory = new FluidTankList(true);
-        this.outputFluidInventory = new FluidTankList(true);
-        this.itemImportInventory =  new ItemHandlerList(Collections.emptyList());
-        this.energyContainer = new EnergyContainerList(Collections.emptyList());
+        inputFluidInventory = new FluidTankList(true);
+        outputFluidInventory = new FluidTankList(true);
+        itemImportInventory = new ItemHandlerList(Collections.emptyList());
+        energyContainer = new EnergyContainerList(Collections.emptyList());
     }
 
     @Override
@@ -508,8 +598,9 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         return 0;
     }
 
-
-
+    // ---------------------------------------------------------------------
+    // Fluid bank
+    // ---------------------------------------------------------------------
 
     public static class TFFTTankFluidBank {
 
@@ -517,104 +608,114 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
         private static final String NBT_STORED = "Stored";
         private static final String NBT_MAX = "Max";
         private static final String NBT_EUT = "Eut";
-        private final long[][] storage=new long[25][];
-        private final long[][] maximums=new long[25][];
-        private final BigInteger[] capacity = new BigInteger[25];
-        private int index[] = new int[25];
-        public  int eut = 0;
 
-        public TFFTTankFluidBank(List<ITfftData> batteries) {
-            for (int i = 0; i < 25; i++) {
-                storage[i] = new long[batteries.size()];
-                maximums[i] = new long[batteries.size()];
-                for (int j = 0; j < batteries.size(); j++) {
-                    maximums[i][j] = batteries.get(j).getCapacity()/25;
-                    eut+= batteries.get(j).getEut();
+        private final long[][] storage = new long[FLUID_SLOTS][];
+        private final long[][] maximums = new long[FLUID_SLOTS][];
+        private final BigInteger[] capacity = new BigInteger[FLUID_SLOTS];
+        private final int[] index = new int[FLUID_SLOTS];
+        public int eut = 0;
+
+        public TFFTTankFluidBank(List<ITFFTData> batteries) {
+            int size = batteries.size();
+            for (int i = 0; i < FLUID_SLOTS; i++) {
+                storage[i] = new long[size];
+                maximums[i] = new long[size];
+                for (int j = 0; j < size; j++) {
+                    maximums[i][j] = batteries.get(j).getCapacity() / FLUID_SLOTS;
                 }
                 capacity[i] = summarize(maximums[i]);
+            }
+            for (ITFFTData battery : batteries) {
+                eut += battery.getEut();
             }
         }
 
         public TFFTTankFluidBank(NBTTagCompound storageTag) {
-            for (int j = 0; j < 25; j++) {
-                int size = storageTag.getInteger(NBT_SIZE+j);
+            for (int j = 0; j < FLUID_SLOTS; j++) {
+                int size = storageTag.getInteger(NBT_SIZE + j);
                 storage[j] = new long[size];
                 maximums[j] = new long[size];
                 for (int i = 0; i < size; i++) {
-                    NBTTagCompound subtag = storageTag.getCompoundTag(j+String.valueOf(i));
-                    if (subtag.hasKey(NBT_STORED+j)) {
-                        storage[j][i] = subtag.getLong(NBT_STORED+j);
+                    NBTTagCompound subtag = storageTag.getCompoundTag(j + String.valueOf(i));
+                    if (subtag.hasKey(NBT_STORED + j)) {
+                        storage[j][i] = subtag.getLong(NBT_STORED + j);
                     }
-                    maximums[j][i] = subtag.getLong(NBT_MAX+j);
+                    maximums[j][i] = subtag.getLong(NBT_MAX + j);
                 }
-
                 capacity[j] = summarize(maximums[j]);
             }
-            this.eut = storageTag.getInteger(NBT_EUT);
+            eut = storageTag.getInteger(NBT_EUT);
         }
 
         private NBTTagCompound writeToNBT(NBTTagCompound compound) {
-            for (int j = 0; j < 25; j++) {
-                compound.setInteger(NBT_SIZE+j, storage[j].length);
+            for (int j = 0; j < FLUID_SLOTS; j++) {
+                compound.setInteger(NBT_SIZE + j, storage[j].length);
                 for (int i = 0; i < storage[j].length; i++) {
                     NBTTagCompound subtag = new NBTTagCompound();
                     if (storage[j][i] > 0) {
-                        subtag.setLong(NBT_STORED+j, storage[j][i]);
+                        subtag.setLong(NBT_STORED + j, storage[j][i]);
                     }
-                    subtag.setLong(NBT_MAX+j, maximums[j][i]);
-                    compound.setTag(j+String.valueOf(i), subtag);
+                    subtag.setLong(NBT_MAX + j, maximums[j][i]);
+                    compound.setTag(j + String.valueOf(i), subtag);
                 }
             }
-            compound.setInteger(NBT_EUT,this.eut);
+            compound.setInteger(NBT_EUT, eut);
             return compound;
         }
 
-        public TFFTTankFluidBank rebuild(@NotNull List<ITfftData> batteries) {
+        public TFFTTankFluidBank rebuild(@NotNull List<ITFFTData> batteries) {
             if (batteries.isEmpty()) {
                 throw new IllegalArgumentException("Cannot rebuild Power Substation power bank with no batteries!");
             }
             TFFTTankFluidBank newStorage = new TFFTTankFluidBank(batteries);
-            for (int i = 0; i < 25; i++) {
+            for (int i = 0; i < FLUID_SLOTS; i++) {
                 for (long stored : storage[i]) {
-                    newStorage.fill(stored,i);
+                    newStorage.fill(stored, i);
                 }
             }
-
             return newStorage;
         }
 
         /** @return Amount filled into storage */
-        public long fill(long amount,int circuit) {
-            if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
-            if (index[circuit] != storage[circuit].length - 1 && storage[circuit][index[circuit]] == maximums[circuit][index[circuit]]) {
-                index[circuit]++;
+        public long fill(long amount, int circuit) {
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative!");
             }
-            long maxFill = Math.min(maximums[index[circuit]][circuit] - storage[circuit][index[circuit]], amount);
-            if (maxFill == 0 && index[circuit] == storage[circuit].length - 1) {
+            int idx = index[circuit];
+            if (idx != storage[circuit].length - 1 && storage[circuit][idx] == maximums[circuit][idx]) {
+                idx++;
+                index[circuit] = idx;
+            }
+            long maxFill = Math.min(maximums[circuit][idx] - storage[circuit][idx], amount);
+            if (maxFill == 0 && idx == storage[circuit].length - 1) {
                 return 0;
             }
-            storage[circuit][index[circuit]] += maxFill;
+            storage[circuit][idx] += maxFill;
             amount -= maxFill;
-            if (amount > 0 && index[circuit] != storage[circuit].length - 1) {
-                return maxFill + fill(amount,circuit);
+            if (amount > 0 && idx != storage[circuit].length - 1) {
+                return maxFill + fill(amount, circuit);
             }
             return maxFill;
         }
 
-        public long drain(long amount,int circuit) {
-            if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
-            if (index[circuit] != 0 && storage[circuit][index[circuit]] == 0) {
-                index[circuit]--;
+        public long drain(long amount, int circuit) {
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative!");
             }
-            long maxDrain = Math.min(storage[circuit][index[circuit]], amount);
-            if (maxDrain == 0 && index[circuit] == 0) {
+            int idx = index[circuit];
+            if (idx != 0 && storage[circuit][idx] == 0) {
+                idx--;
+                index[circuit] = idx;
+            }
+            long maxDrain = Math.min(storage[circuit][idx], amount);
+            if (maxDrain == 0 && idx == 0) {
                 return 0;
             }
-            storage[circuit][index[circuit]] -= maxDrain;
+            storage[circuit][idx] -= maxDrain;
             amount -= maxDrain;
-            if (amount > 0 && index[circuit] != 0) {
-                index[circuit]--;
-                return maxDrain + drain(amount,circuit);
+            if (amount > 0 && idx != 0) {
+                index[circuit] = idx - 1;
+                return maxDrain + drain(amount, circuit);
             }
             return maxDrain;
         }
@@ -629,7 +730,9 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
 
         public boolean hasFluid(int circuit) {
             for (long l : storage[circuit]) {
-                if (l > 0) return true;
+                if (l > 0) {
+                    return true;
+                }
             }
             return false;
         }
@@ -649,11 +752,9 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
             }
             return retVal;
         }
-        public  void clearStore(int circuit)
-        {
-            for (int i = 0; i < storage.length; i++) {
-                storage[circuit][i]=0;
-            }
+
+        public void clearStore(int circuit) {
+            Arrays.fill(storage[circuit], 0L);
         }
     }
 }

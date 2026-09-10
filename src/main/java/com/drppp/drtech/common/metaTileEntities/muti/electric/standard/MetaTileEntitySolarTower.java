@@ -18,6 +18,7 @@ import gregtech.api.recipes.Recipe;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.KeyUtil;
 import gregtech.client.renderer.ICubeRenderer;
+import gregtech.common.blocks.BlockMetalCasing;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -81,8 +82,7 @@ public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
                 .self('S', MetaTileEntitySolarTower.class)
                 .any('#')
                 .where('T', Elements.chain(
-                        Elements.counted(210, 4096, Elements.block(
-                                BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING))),
+                        Elements.counted(210, 4096, Elements.block(getCasingState())),
                         Elements.hatch(MultiblockAbility.EXPORT_FLUIDS, 1, -1, 1),
                         Elements.hatch(MultiblockAbility.IMPORT_FLUIDS, 1, -1, 1),
                         Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH, 1, 1),
@@ -93,7 +93,9 @@ public class MetaTileEntitySolarTower extends NoEnergyMultiblockController {
                 .buildStructureDefinition();
 
     }
-
+    public static IBlockState getCasingState() {
+        return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.SOLAR_TOWER_CASING);
+    }
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.SALT_INHIBITION_CASING;

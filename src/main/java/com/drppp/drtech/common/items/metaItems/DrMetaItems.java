@@ -27,37 +27,50 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem HAND_PUMP;
     public static MetaItem<?>.MetaValueItem GRASS_KILLER;
     public static MetaItem<?>.MetaValueItem UPGRADE_NULL;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED1;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED2;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED3;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED4;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED5;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED6;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED7;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED8;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED8P;
-    public static MetaItem<?>.MetaValueItem UPGRADE_PRODUCTION;
-    public static MetaItem<?>.MetaValueItem UPGRADE_PLAIN;
-    public static MetaItem<?>.MetaValueItem UPGRADE_LIGHT;
-    public static MetaItem<?>.MetaValueItem UPGRADE_FLOWERING;
-    public static MetaItem<?>.MetaValueItem UPGRADE_WINTER_EMULATION;
-    public static MetaItem<?>.MetaValueItem UPGRADE_DRYER;
-    public static MetaItem<?>.MetaValueItem UPGRADE_AUTOMATION;
-    public static MetaItem<?>.MetaValueItem UPGRADE_HUMIDIFIER;
-    public static MetaItem<?>.MetaValueItem UPGRADE_HELL_EMULATION;
-    public static MetaItem<?>.MetaValueItem UPGRADE_POLLEN_SCRUBBER;
-    public static MetaItem<?>.MetaValueItem UPGRADE_DESERT_EMULATION;
-    public static MetaItem<?>.MetaValueItem UPGRADE_COOLER;
-    public static MetaItem<?>.MetaValueItem UPGRADE_LIFESPAN;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SEAL;
-    public static MetaItem<?>.MetaValueItem UPGRADE_GENETIC_STABILIZER;
-    public static MetaItem<?>.MetaValueItem UPGRADE_JUNGLE_EMULATION;
-    public static MetaItem<?>.MetaValueItem UPGRADE_TERRITORY;
-    public static MetaItem<?>.MetaValueItem UPGRADE_OCEAN_EMULATION;
-    public static MetaItem<?>.MetaValueItem UPGRADE_OPEN_SKY;
-    public static MetaItem<?>.MetaValueItem UPGRADE_HEATER;
-    public static MetaItem<?>.MetaValueItem UPGRADE_SIEVE;
-    public static MetaItem<?>.MetaValueItem UPGRADE_T;
+
+    // 工业蜂箱升级：声明顺序与 GT_ApiaryUpgrade 的枚举顺序一致。
+    // 行尾数字是物品元数据，它们并不连续（为兼容已有存档而固定），不要按声明顺序推断。
+
+    // 加速（互斥，只能装一件）
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED1;             // 29
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED2;             // 30
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED3;             // 31
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED4;             // 32
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED5;             // 33
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED6;             // 34
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED7;             // 35
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED8;             // 36
+    public static MetaItem<?>.MetaValueItem UPGRADE_SPEED8P;            // 37
+
+    // 产量
+    public static MetaItem<?>.MetaValueItem UPGRADE_PRODUCTION;         // 38
+
+    // 环境模拟
+    public static MetaItem<?>.MetaValueItem UPGRADE_PLAIN;              // 39 平原
+    public static MetaItem<?>.MetaValueItem UPGRADE_WINTER_EMULATION;   // 42 冰原
+    public static MetaItem<?>.MetaValueItem UPGRADE_HELL_EMULATION;     // 46 地狱
+    public static MetaItem<?>.MetaValueItem UPGRADE_DESERT_EMULATION;   // 48 沙漠
+    public static MetaItem<?>.MetaValueItem UPGRADE_JUNGLE_EMULATION;   // 53 丛林
+    public static MetaItem<?>.MetaValueItem UPGRADE_OCEAN_EMULATION;    // 55 海洋
+    public static MetaItem<?>.MetaValueItem UPGRADE_DRYER;              // 43 除湿
+    public static MetaItem<?>.MetaValueItem UPGRADE_HUMIDIFIER;         // 45 加湿
+    public static MetaItem<?>.MetaValueItem UPGRADE_COOLER;             // 49 降温
+    public static MetaItem<?>.MetaValueItem UPGRADE_HEATER;             // 57 升温
+
+    // 行为开关
+    public static MetaItem<?>.MetaValueItem UPGRADE_LIGHT;              // 40 内部光照
+    public static MetaItem<?>.MetaValueItem UPGRADE_T;                  // 59 内部黑暗
+    public static MetaItem<?>.MetaValueItem UPGRADE_OPEN_SKY;           // 56 露天模拟
+    public static MetaItem<?>.MetaValueItem UPGRADE_SEAL;               // 51 气密
+    public static MetaItem<?>.MetaValueItem UPGRADE_AUTOMATION;         // 44 自动回填
+
+    // 属性强化
+    public static MetaItem<?>.MetaValueItem UPGRADE_FLOWERING;          // 41
+    public static MetaItem<?>.MetaValueItem UPGRADE_POLLEN_SCRUBBER;    // 47
+    public static MetaItem<?>.MetaValueItem UPGRADE_LIFESPAN;           // 50
+    public static MetaItem<?>.MetaValueItem UPGRADE_GENETIC_STABILIZER; // 52
+    public static MetaItem<?>.MetaValueItem UPGRADE_TERRITORY;          // 54
+    public static MetaItem<?>.MetaValueItem UPGRADE_SIEVE;              // 58
     public static MetaItem<?>.MetaValueItem TOOL_BOX;
     public static MetaItem<?>.MetaValueItem MATRIX_GEMS;
     public static MetaItem<?>.MetaValueItem XJC;

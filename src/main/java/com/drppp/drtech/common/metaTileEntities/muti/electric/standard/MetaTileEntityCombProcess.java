@@ -34,7 +34,7 @@ public class MetaTileEntityCombProcess extends RecipeMapMultiblockController {
         this.recipeMapWorkable = new SelfRecipeLogic(this, true);
     }
 
-    private static IBlockState getCasingState() {
+    public static IBlockState getCasingState() {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN);
     }
 

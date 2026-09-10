@@ -73,7 +73,7 @@ public class MetaTileEntityIndustrialCablePress extends RecipeMapMultiblockContr
         return true;
     }
 
-    protected static IBlockState getCasingState() {
+    public static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.CABLE_PRESS_CASING);
     }
 

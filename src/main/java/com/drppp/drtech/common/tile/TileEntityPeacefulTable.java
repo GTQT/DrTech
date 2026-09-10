@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,44 +31,52 @@ public class TileEntityPeacefulTable extends TileEntity implements ITickable {
 
     private static final int WORK_INTERVAL = 200;
     private static final int LOOT_ROLLS = 3;
+    private static final String LOOT_TABLE_PREFIX = "entities/";
 
     private int tick = 0;
 
     @Override
     public void update() {
-        if (world == null || world.isRemote || world.getDifficulty() != EnumDifficulty.PEACEFUL || tick++ <= WORK_INTERVAL) {
+        if (world == null || world.isRemote || world.getDifficulty() != EnumDifficulty.PEACEFUL) {
+            return;
+        }
+        if (++tick <= WORK_INTERVAL) {
             return;
         }
         tick = 0;
 
-        TileEntity outputTile = world.getTileEntity(pos.offset(EnumFacing.UP));
-        if (outputTile == null || !outputTile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            return;
-        }
-
-        IItemHandler handler = outputTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        IItemHandler handler = getOutputHandler();
         if (handler == null) {
             return;
         }
 
-        List<ResourceLocation> lootTables = getCurrentDimensionMonsterLootTables();
+        Map<ResourceLocation, Integer> lootTables = collectMonsterLootTables();
         if (lootTables.isEmpty()) {
             return;
         }
 
         Random random = world.rand;
-        for (int i = 0; i < handler.getSlots(); i++) {
-            ItemStack stack = handler.getStackInSlot(i);
+        for (int slot = 0; slot < handler.getSlots(); slot++) {
+            ItemStack stack = handler.getStackInSlot(slot);
             if (!(stack.getItem() instanceof ItemSword)) {
                 continue;
             }
-
-            ResourceLocation lootTable = lootTables.get(random.nextInt(lootTables.size()));
-            collectDrops(lootTable, handler, stack, i, random);
+            ResourceLocation lootTable = pickWeighted(lootTables, random);
+            if (lootTable != null) {
+                collectDrops(lootTable, handler, stack, slot, random);
+            }
         }
     }
 
-    private List<ResourceLocation> getCurrentDimensionMonsterLootTables() {
+    @Nullable
+    private IItemHandler getOutputHandler() {
+        TileEntity outputTile = world.getTileEntity(pos.offset(EnumFacing.UP));
+        return outputTile == null
+                ? null
+                : outputTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+    }
+
+    private Map<ResourceLocation, Integer> collectMonsterLootTables() {
         Map<ResourceLocation, Integer> tables = new LinkedHashMap<>();
         for (Biome biome : world.getBiomeProvider().getBiomesToSpawnIn()) {
             for (Biome.SpawnListEntry spawnEntry : biome.getSpawnableList(EnumCreatureType.MONSTER)) {
@@ -78,21 +87,40 @@ public class TileEntityPeacefulTable extends TileEntity implements ITickable {
                 tables.merge(lootTable, Math.max(1, spawnEntry.itemWeight), Math::max);
             }
         }
-
-        List<ResourceLocation> weightedTables = new ArrayList<>();
-        for (Map.Entry<ResourceLocation, Integer> entry : tables.entrySet()) {
-            for (int i = 0; i < entry.getValue(); i++) {
-                weightedTables.add(entry.getKey());
-            }
-        }
-        return weightedTables;
+        return tables;
     }
 
+    /**
+     * Weighted random pick without materializing an expanded list.
+     * Avoids allocating a list sized by the sum of all spawn weights every tick.
+     */
+    @Nullable
+    private static ResourceLocation pickWeighted(Map<ResourceLocation, Integer> tables, Random random) {
+        int totalWeight = 0;
+        for (int weight : tables.values()) {
+            totalWeight += weight;
+        }
+        if (totalWeight <= 0) {
+            return null;
+        }
+
+        int roll = random.nextInt(totalWeight);
+        for (Map.Entry<ResourceLocation, Integer> entry : tables.entrySet()) {
+            roll -= entry.getValue();
+            if (roll < 0) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     private ResourceLocation getLootTableForSpawnEntry(Biome.SpawnListEntry spawnEntry) {
         if (spawnEntry == null || spawnEntry.entityClass == null) {
             return null;
         }
-        if (!EntityLiving.class.isAssignableFrom(spawnEntry.entityClass) || !IMob.class.isAssignableFrom(spawnEntry.entityClass)) {
+        if (!EntityLiving.class.isAssignableFrom(spawnEntry.entityClass)
+                || !IMob.class.isAssignableFrom(spawnEntry.entityClass)) {
             return null;
         }
 
@@ -102,10 +130,11 @@ public class TileEntityPeacefulTable extends TileEntity implements ITickable {
         }
 
         ResourceLocation entityId = entityEntry.getRegistryName();
-        return new ResourceLocation(entityId.getNamespace(), "entities/" + entityId.getPath());
+        return new ResourceLocation(entityId.getNamespace(), LOOT_TABLE_PREFIX + entityId.getPath());
     }
 
-    private void collectDrops(ResourceLocation lootTableLocation, IItemHandler handler, ItemStack sword, int slot, Random random) {
+    private void collectDrops(ResourceLocation lootTableLocation, IItemHandler handler,
+                              ItemStack sword, int slot, Random random) {
         if (!(world instanceof WorldServer)) {
             return;
         }
@@ -116,7 +145,9 @@ public class TileEntityPeacefulTable extends TileEntity implements ITickable {
 
         for (int i = 0; i < LOOT_ROLLS; i++) {
             allDrops.addAll(lootTable.generateLootForPools(random, lootContext));
-            damageSword(handler, sword, slot, random);
+            if (!damageSword(handler, sword, slot, random)) {
+                break;
+            }
         }
 
         if (!allDrops.isEmpty()) {
@@ -124,12 +155,20 @@ public class TileEntityPeacefulTable extends TileEntity implements ITickable {
         }
     }
 
-    private void damageSword(IItemHandler handler, ItemStack sword, int slot, Random random) {
-        if (random.nextBoolean()) {
-            sword.setItemDamage(sword.getItemDamage() + 1);
-            if (sword.getItemDamage() >= sword.getMaxDamage()) {
-                handler.extractItem(slot, 1, false);
-            }
+    /**
+     * Damage the sword by one point with 50% probability.
+     *
+     * @return true if the sword stack still occupies its slot, false if it was consumed.
+     */
+    private boolean damageSword(IItemHandler handler, ItemStack sword, int slot, Random random) {
+        if (!random.nextBoolean()) {
+            return true;
         }
+        sword.setItemDamage(sword.getItemDamage() + 1);
+        if (sword.getItemDamage() >= sword.getMaxDamage()) {
+            handler.extractItem(slot, 1, false);
+            return false;
+        }
+        return true;
     }
 }

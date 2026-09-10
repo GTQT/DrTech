@@ -28,17 +28,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePart implements IMultiblockAbilityPart<IFluidTank>{
+public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePart implements IMultiblockAbilityPart<IFluidTank> {
+
+    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+
     private MetaTileEntityYotTank yotTank;
     public YotTankHatch tankHatch;
+
     public MetaTileEntityYotHatch(ResourceLocation metaTileEntityId) {
         super(metaTileEntityId, GTValues.LV, false);
-
     }
 
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
-        return new MetaTileEntityYotHatch(this.metaTileEntityId);
+        return new MetaTileEntityYotHatch(metaTileEntityId);
     }
 
     @Override
@@ -54,34 +57,28 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
     @Override
     public void update() {
         super.update();
-        if(!getWorld().isRemote)
-        {
-            if(this.getController()==null)
-            {
-                this.yotTank=null;
-                if(this.tankHatch!=null)
-                    this.tankHatch.drain(this.tankHatch.getFluid(),true);
-            }
-            else
-            {
-                if(this.yotTank.getFluid()==null )
-                    this.tankHatch.drain(this.tankHatch.getFluid(),true);
-            }
-
+        if (getWorld().isRemote) {
+            return;
+        }
+        if (getController() == null) {
+            yotTank = null;
+        }
+        if (tankHatch != null && (getController() == null || yotTank == null || yotTank.getFluid() == null)) {
+            tankHatch.drain(tankHatch.getFluid(), true);
         }
     }
 
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        if (this.shouldRenderOverlay()) {
+        if (shouldRenderOverlay()) {
             Textures.ME_INPUT_BUS.renderSided(getFrontFacing(), renderState, translation, pipeline);
         }
     }
 
     public void setYotTank(MetaTileEntityYotTank yotTank) {
         this.yotTank = yotTank;
-        this.tankHatch = new YotTankHatch(Integer.MAX_VALUE,this.yotTank);
+        tankHatch = new YotTankHatch(Integer.MAX_VALUE, yotTank);
     }
 
     @Override
@@ -91,113 +88,104 @@ public class MetaTileEntityYotHatch extends MetaTileEntityMultiblockNotifiablePa
 
     @Override
     public void registerAbilities(@NotNull AbilityInstances abilityInstances) {
-        if(tankHatch!=null)
+        if (tankHatch != null) {
             abilityInstances.add(tankHatch);
+        }
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
-        if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.tankHatch);
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && tankHatch != null) {
+            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(tankHatch);
+        }
         return super.getCapability(capability, side);
     }
 
-    
+    private static class YotTankHatch extends FluidTank {
 
-
-    private class YotTankHatch extends FluidTank {
         private final MetaTileEntityYotTank yotTank;
-        public YotTankHatch(int capacity,MetaTileEntityYotTank yotTank) {
+
+        public YotTankHatch(int capacity, MetaTileEntityYotTank yotTank) {
             super(capacity);
             this.yotTank = yotTank;
-            if(this.yotTank!=null && this.yotTank.getFluid()!=null)
-            {
-                if(this.yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
-                    this.fluid = new FluidStack(this.yotTank.getFluid(),Integer.MAX_VALUE);
-                else
-                    this.fluid = new FluidStack(this.yotTank.getFluid(),this.yotTank.getFluidBank().getStored().intValue());
-            }
+            syncFluid();
         }
+
+        private void syncFluid() {
+            if (yotTank == null || yotTank.getFluid() == null) {
+                fluid = null;
+                return;
+            }
+            BigInteger stored = yotTank.getFluidBank().getStored();
+            fluid = new FluidStack(yotTank.getFluid(), stored.compareTo(MAX_INT) > 0 ? Integer.MAX_VALUE : stored.intValue());
+        }
+
         @Override
         public FluidStack drain(FluidStack resource, boolean doDrain) {
-            if(this.yotTank==null || this.fluid==null || !resource.isFluidEqual(this.fluid))
+            if (resource == null || yotTank == null || fluid == null || !resource.isFluidEqual(fluid)) {
                 return null;
-            if(this.yotTank.getFluid()==null)
-                return null;
-            if(this.yotTank.getFluidBank().getStored().longValue()<=0)
-                return null;
-            int drain = 0;
-            if(doDrain)
-            {
-                if(resource.amount>=0)
-                    drain = (int) this.yotTank.getFluidBank().drain(resource.amount);
-                else
-                    drain=0;
             }
-            else drain = super.drain(resource,false)==null?0:super.drain(resource,false).amount;
-            if(this.yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
-                this.fluid = new FluidStack(this.yotTank.getFluid(),Integer.MAX_VALUE);
-            else
-                this.fluid = new FluidStack(this.yotTank.getFluid(),this.yotTank.getFluidBank().getStored().intValue());
-            return  new FluidStack(this.yotTank.getFluid(),drain);
+            if (yotTank.getFluid() == null || yotTank.getFluidBank().getStored().signum() <= 0) {
+                return null;
+            }
+            int drain = 0;
+            if (doDrain) {
+                if (resource.amount >= 0) {
+                    drain = (int) yotTank.getFluidBank().drain(resource.amount);
+                }
+            } else {
+                FluidStack simulated = super.drain(resource, false);
+                drain = simulated == null ? 0 : simulated.amount;
+            }
+            FluidStack resultFluid = yotTank.getFluid();
+            syncFluid();
+            return resultFluid == null ? null : new FluidStack(resultFluid, drain);
         }
 
         @Override
         public FluidStack drain(int maxDrain, boolean doDrain) {
-            if(this.yotTank==null || maxDrain<=0)
+            if (yotTank == null || maxDrain <= 0 || yotTank.getFluid() == null || yotTank.getFluidBank().getStored().signum() <= 0) {
                 return null;
-            if(this.yotTank.getFluid()==null)
-                return null;
-            if(this.yotTank.getFluidBank().getStored().longValue()<=0)
-                return null;
-            if(doDrain)
-            {
-                this.yotTank.getFluidBank().drain(maxDrain);
-                if(this.yotTank.getFluidBank().getStored().intValue()==0)
-                    this.yotTank.setFluid(null);
             }
-            if(this.yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
-                this.fluid = new FluidStack(this.yotTank.getFluid(),Integer.MAX_VALUE);
-            else
-                this.fluid = new FluidStack(this.yotTank.getFluid(),this.yotTank.getFluidBank().getStored().intValue());
-            return super.drain(maxDrain, doDrain);
-        }
-
-        @Override
-        public boolean canFillFluidType(FluidStack fluid) {
-            return super.canFillFluidType(fluid);
+            FluidStack resultFluid = yotTank.getFluid();
+            int drain = 0;
+            if (doDrain) {
+                drain = (int) yotTank.getFluidBank().drain(maxDrain);
+                if (yotTank.getFluidBank().getStored().signum() == 0) {
+                    yotTank.setFluid(null);
+                }
+            } else {
+                FluidStack simulated = super.drain(maxDrain, false);
+                drain = simulated == null ? 0 : simulated.amount;
+            }
+            syncFluid();
+            return resultFluid == null ? null : new FluidStack(resultFluid, drain);
         }
 
         @Override
         public int fill(FluidStack resource, boolean doFill) {
-            if(this.yotTank==null)
+            if (yotTank == null || resource == null) {
                 return 0;
-            int fillamount =0;
-            if(this.yotTank.getFluid()==null)
-                this.yotTank.setFluid(resource);
-            if(doFill)
-            {
-                fillamount = (int) this.yotTank.getFluidBank().fill(resource.amount);
             }
-            else
-            {
-                fillamount = super.fill(resource,false);
-                if(this.fluid.amount==Integer.MAX_VALUE)
-                {
-                   var cap =  this.yotTank.getFluidBank().getCapacity();
-                   var store = this.yotTank.getFluidBank().getStored();
-                   if(cap.subtract(store).compareTo(BigInteger.valueOf(resource.amount))>0)
-                   {
-                       fillamount = resource.amount;
-                   }
+            if (yotTank.getFluid() == null) {
+                yotTank.setFluid(resource);
+                syncFluid();
+            }
+            int fillAmount;
+            if (doFill) {
+                fillAmount = (int) yotTank.getFluidBank().fill(resource.amount);
+            } else {
+                fillAmount = super.fill(resource, false);
+                if (fluid != null && fluid.amount == Integer.MAX_VALUE) {
+                    BigInteger capacity = yotTank.getFluidBank().getCapacity();
+                    BigInteger stored = yotTank.getFluidBank().getStored();
+                    if (capacity.subtract(stored).compareTo(BigInteger.valueOf(resource.amount)) > 0) {
+                        fillAmount = resource.amount;
+                    }
                 }
             }
-            if(this.yotTank.getFluidBank().getStored().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
-                this.fluid = new FluidStack(this.yotTank.getFluid(),Integer.MAX_VALUE);
-            else
-                this.fluid = new FluidStack(this.yotTank.getFluid(),this.yotTank.getFluidBank().getStored().intValue());
-            return fillamount;
+            syncFluid();
+            return fillAmount;
         }
-
     }
 }

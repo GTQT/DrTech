@@ -152,7 +152,8 @@ public class MetaTileentityConcreteBackfiller extends MetaTileEntityBaseWithCont
 
     }
 
-    public IBlockState getCasingState() {
+    @Override
+    public IBlockState getCasingBlock() {
         return getCasingState(level);
     }
 

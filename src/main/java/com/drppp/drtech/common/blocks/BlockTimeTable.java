@@ -12,6 +12,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
@@ -30,54 +31,21 @@ public class BlockTimeTable extends Block {
         return  new TileEntityTimeTable();
     }
     @Override
-    public boolean hasTileEntity(IBlockState state) {
+    public boolean hasTileEntity(@NotNull IBlockState state) {
         return true;
     }
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(@NotNull IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state) {
+    public boolean isFullCube(@NotNull IBlockState state) {
         return false;
     }
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
+    public @NotNull BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.TRANSLUCENT;
     }
-
-
-    /*
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if(!worldIn.isRemote)
-        {
-            hand = EnumHand.OFF_HAND;
-            TileEntityTimeTable tt = (TileEntityTimeTable) worldIn.getTileEntity(pos);
-            if(playerIn.getHeldItem(hand).getItem()== GTQTMetaItems.TIME_BOTTLE.getMetaItem() && playerIn.getHeldItem(hand).getMetadata()==GTQTMetaItems.TIME_BOTTLE.getMetaValue())
-            {
-                if(tt.inventory.getStackInSlot(0).isEmpty())
-                {
-                    tt.inventory.insertItem(0,playerIn.getHeldItem(hand),false);
-                    tt.markDirty();
-                    playerIn.setHeldItem(EnumHand.OFF_HAND, ItemStack.EMPTY);
-                    return true;
-                }
-            }else if(playerIn.isSneaking())
-            {
-                if(!tt.inventory.getStackInSlot(0).isEmpty())
-                {
-                    worldIn.spawnEntity(new EntityItem(worldIn,pos.getX()+0.5,pos.getY()+1,pos.getZ()+0.5,tt.inventory.getStackInSlot(0)));
-                    tt.markDirty();
-                    tt.inventory.extractItem(0,1,false);
-                }
-            }
-        }
-        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
-    }
-
-     */
-
 }

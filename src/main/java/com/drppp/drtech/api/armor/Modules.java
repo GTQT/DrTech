@@ -15,18 +15,6 @@ import java.rmi.AlreadyBoundException;
 
 public class Modules {
 
-    private static final Int2ObjectOpenHashMap<IModule> REGISTRY = new Int2ObjectOpenHashMap<>();
-    private static final Object2IntOpenHashMap<IModule> BACK_REGISTRY = new Object2IntOpenHashMap<>();
-    private static final Int2ObjectOpenHashMap<MaterialArmorModuleBuilder> ARMOR_MODULES = new Int2ObjectOpenHashMap<>();
-
-    public static Iterable<IModule> getRegisteredModules() {
-        return REGISTRY.values();
-    }
-
-    public static Int2ObjectMap<MaterialArmorModuleBuilder> getArmorModules() {
-        return Int2ObjectMaps.unmodifiable(ARMOR_MODULES);
-    }
-
     public static final IModule NIGHT_VISION = new NightVision();
     public static final IModule SOLAR_GEN_I = new SolarGen(GTValues.V[1], 1);
     public static final IModule SOLAR_GEN_II = new SolarGen(GTValues.V[2], 2);
@@ -39,13 +27,17 @@ public class Modules {
     public static final IModule AUTO_FEEDER = new AutoFeeder();
     public static final IModule OXYGEN_MASK = new OxygenMask();
     public static final IModule RECEIVER_MODULE = new ReceiverModule();
-    public static final IModule ANTI_GRAVITY   = new AntiGravity();
-    public static final IModule SPRINT_MODULE  = new SprintModule();
-    public static final IModule ENERGY_SHIELD  = new EnergyShield();
+    public static final IModule ANTI_GRAVITY = new AntiGravity();
+    public static final IModule SPRINT_MODULE = new SprintModule();
+    public static final IModule ENERGY_SHIELD = new EnergyShield();
     public static final IModule HEALING_MODULE = new HealingModule();
-    public static final IModule APIARIST_SHIELD  = new ApiaristShield();
+    public static final IModule APIARIST_SHIELD = new ApiaristShield();
     public static final IModule REVEALING_GOGGLES = new RevealingGoggles();
-    public static final IModule VIS_OPTIMIZER     = new VisOptimizer();
+    public static final IModule VIS_OPTIMIZER = new VisOptimizer();
+    private static final Int2ObjectOpenHashMap<IModule> REGISTRY = new Int2ObjectOpenHashMap<>();
+    private static final Object2IntOpenHashMap<IModule> BACK_REGISTRY = new Object2IntOpenHashMap<>();
+    private static final Int2ObjectOpenHashMap<MaterialArmorModuleBuilder> ARMOR_MODULES = new Int2ObjectOpenHashMap<>();
+
     static {
         registerModule(0, NIGHT_VISION);
         registerModule(1, SOLAR_GEN_I);
@@ -120,6 +112,14 @@ public class Modules {
                 .armor(15, 10)
                 .specialArmor(((entity, modularArmorPiece, moduleData, source, damage, slot) -> new AbsorbResult(0.5, 100)))
                 .registerModule();
+    }
+
+    public static Iterable<IModule> getRegisteredModules() {
+        return REGISTRY.values();
+    }
+
+    public static Int2ObjectMap<MaterialArmorModuleBuilder> getArmorModules() {
+        return Int2ObjectMaps.unmodifiable(ARMOR_MODULES);
     }
 
     public static void registerModule(int id, IModule module) {

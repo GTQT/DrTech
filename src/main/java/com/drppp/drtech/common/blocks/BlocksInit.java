@@ -2,19 +2,15 @@ package com.drppp.drtech.common.blocks;
 
 
 import com.drppp.drtech.Tags;
-import com.drppp.drtech.common.tile.*;
 import com.drppp.drtech.api.utils.Datas;
+import com.drppp.drtech.common.blocks.metaBlocks.*;
+import com.drppp.drtech.common.tile.*;
 import com.meowmel.cropQT.block.BlockCropStick;
 import com.meowmel.cropQT.tile.TileCropStick;
-import com.drppp.drtech.common.blocks.metaBlocks.*;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.lwjgl.util.vector.Vector3f;
-
-import java.util.Random;
 
 public class BlocksInit {
     public static final BlockGravitationalAnomaly BLOCK_GRAVITATIONAL_ANOMALY = new BlockGravitationalAnomaly();
@@ -25,7 +21,7 @@ public class BlocksInit {
     public static final BlockPeacefulTable BLOCK_PEACEFUL_TABLE = new BlockPeacefulTable();
     public static final BlockWasteDirt BLOCK_WASTE_DIRT = new BlockWasteDirt();
     public static final BlockStoragePail BLOCK_STORAGE_PAIL = new BlockStoragePail("compress", 1);
-    public static final MetaGlasses1 TRANSPARENT_CASING1 = new MetaGlasses1("glasses_casing1");
+    public static final MetaGlasses TRANSPARENT_CASING = new MetaGlasses("glasses_casing");
     public static final MetaCasing COMMON_CASING = new MetaCasing();
     public static final MetaCasing1 COMMON_CASING1 = new MetaCasing1();
     public static final BlockFusionReactorCasing FUSION_REACTOR_CASING = new BlockFusionReactorCasing();
@@ -51,8 +47,7 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityGoldenSea.class, new ResourceLocation(Tags.MODID, "gold_coin"));
         GameRegistry.registerTileEntity(TileEntityPeacefulTable.class, new ResourceLocation(Tags.MODID, "peaceful_table"));
         GameRegistry.registerTileEntity(TileEntityStoragePail.class, new ResourceLocation(Tags.MODID, "storage_pail"));
-        GameRegistry.registerTileEntity(TileEntitySapBag.class, new ResourceLocation(Tags.MODID, "sap_bag"));
-        event.getRegistry().register(TRANSPARENT_CASING1);
+        event.getRegistry().register(TRANSPARENT_CASING);
         event.getRegistry().register(COMMON_CASING);
         event.getRegistry().register(COMMON_CASING1);
         event.getRegistry().register(FUSION_REACTOR_CASING);
@@ -67,16 +62,5 @@ public class BlocksInit {
         event.getRegistry().register(CROP_STICK);
         GameRegistry.registerTileEntity(TileCropStick.class, Tags.MODID + ":crop_stick");
         Datas.init();
-    }
-
-    public static Vector3f randomSpherePoint(double x0, double y0, double z0, Vec3d radius, Random rand) {
-        double u = rand.nextDouble();
-        double v = rand.nextDouble();
-        double theta = 6.283185307179586 * u;
-        double phi = Math.acos(2.0 * v - 1.0);
-        double x = x0 + radius.x * Math.sin(phi) * Math.cos(theta);
-        double y = y0 + radius.y * Math.sin(phi) * Math.sin(theta);
-        double z = z0 + radius.z * Math.cos(phi);
-        return new Vector3f((float) x, (float) y, (float) z);
     }
 }

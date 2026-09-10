@@ -39,7 +39,7 @@ public class MetaTileEntityLargeExtruder extends RecipeMapMultiblockController {
         this.recipeMapWorkable = new SelfRecipeLogic(this, true);
     }
 
-    private static IBlockState getCasingState() {
+    public static IBlockState getCasingState() {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.TUNGSTENSTEEL_ROBUST);
     }
 

@@ -103,7 +103,7 @@ public class ItemsInit {
         event.getRegistry().register(ITEM_BLOCK_WASTE_DIRT);
         event.getRegistry().register(ITEM_BLOCK_ADVANCED_CAULDRON);
         event.getRegistry().register(ITEM_BLOCK_TIME_TABLE);
-        event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING1, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.TRANSPARENT_CASING, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.COMMON_CASING1, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING, VariantItemBlock::new));
@@ -142,7 +142,7 @@ public class ItemsInit {
 
     @SideOnly(Side.CLIENT)
     public static void registerItemModels() {
-        registerItemModel(BlocksInit.TRANSPARENT_CASING1);
+        registerItemModel(BlocksInit.TRANSPARENT_CASING);
         registerItemModel(BlocksInit.COMMON_CASING);
         registerItemModel(BlocksInit.COMMON_CASING1);
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING);

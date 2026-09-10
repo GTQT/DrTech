@@ -73,7 +73,7 @@ public class MetaTileEntityIndustrialRollerPress extends MultiMapMultiblockContr
         return true;
     }
 
-    protected static IBlockState getCasingState() {
+    public static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.METAL_PRESS_CASING);
     }
 

@@ -112,7 +112,11 @@ public class MetaItems1 extends StandardMetaItem {
                 .addComponents(new KillGrassBehavior())
                 .setCreativeTabs(DrTechMain.DrTechTab)
                 .setMaxStackSize(1);
+        // ---- 工业蜂箱升级：声明顺序与 GT_ApiaryUpgrade 的枚举顺序一致，每个升级的元数据见 addItem 的第一个参数 ----
+
         DrMetaItems.UPGRADE_NULL = this.addItem(28, "upgrade_null").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
+
+        // 加速（互斥，只能装一件）
         DrMetaItems.UPGRADE_SPEED1 = this.addItem(29, "upgrade_speed1").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.upgrade.info", "加速"));
@@ -177,6 +181,7 @@ public class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.product"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+1A-UV"));
                 }));
+        // 产量
         DrMetaItems.UPGRADE_PRODUCTION = this.addItem(38, "upgrade_production").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.upgrade.info", "产量"));
@@ -184,26 +189,13 @@ public class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.production.function"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+40%"));
                 }));
+        // 环境模拟
         DrMetaItems.UPGRADE_PLAIN = this.addItem(39, "upgrade_plain").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.upgrade.info", "平原环境"));
                     lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
                     lines.add(I18n.format("metaitem.upgrade.biomes", "平原"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+40%"));
-                }));
-        DrMetaItems.UPGRADE_LIGHT = this.addItem(40, "upgrade_light").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "内部光照"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.light"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
-                }));
-        DrMetaItems.UPGRADE_FLOWERING = this.addItem(41, "upgrade_flowering").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "授粉"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "8S"));
-                    lines.add(I18n.format("metaitem.upgrade.flowering"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+10%"));
                 }));
         DrMetaItems.UPGRADE_WINTER_EMULATION = this.addItem(42, "upgrade_winter_emulation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
@@ -212,39 +204,12 @@ public class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.biomes", "冰原"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+50%"));
                 }));
-        DrMetaItems.UPGRADE_DRYER = this.addItem(43, "upgrade_dryer").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "干燥"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "16"));
-                    lines.add(I18n.format("metaitem.upgrade.dry"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+2.5%"));
-                }));
-        DrMetaItems.UPGRADE_AUTOMATION = this.addItem(44, "upgrade_automation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "自动化"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+10%"));
-                }));
-        DrMetaItems.UPGRADE_HUMIDIFIER = this.addItem(45, "upgrade_humidifier").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "干燥"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "16"));
-                    lines.add(I18n.format("metaitem.upgrade.humidifier"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+2.5%"));
-                }));
         DrMetaItems.UPGRADE_HELL_EMULATION = this.addItem(46, "upgrade_hell_emulation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.upgrade.info", "地狱环境"));
                     lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
                     lines.add(I18n.format("metaitem.upgrade.biomes", "地狱"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+50%"));
-                }));
-        DrMetaItems.UPGRADE_POLLEN_SCRUBBER = this.addItem(47, "upgrade_pollen_scrubber").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "花粉洗涤"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.pollen_scrubber"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+30%"));
                 }));
         DrMetaItems.UPGRADE_DESERT_EMULATION = this.addItem(48, "upgrade_desert_emulation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
@@ -253,6 +218,34 @@ public class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.biomes", "沙漠"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+20%"));
                 }));
+        DrMetaItems.UPGRADE_JUNGLE_EMULATION = this.addItem(53, "upgrade_jungle_emulation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "丛林环境"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
+                    lines.add(I18n.format("metaitem.upgrade.biomes", "丛林"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+20%"));
+                }));
+        DrMetaItems.UPGRADE_OCEAN_EMULATION = this.addItem(55, "upgrade_ocean_emulation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "海洋环境"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
+                    lines.add(I18n.format("metaitem.upgrade.biomes", "海洋"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+20%"));
+                }));
+        DrMetaItems.UPGRADE_DRYER = this.addItem(43, "upgrade_dryer").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "干燥"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "16"));
+                    lines.add(I18n.format("metaitem.upgrade.dry"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+2.5%"));
+                }));
+        DrMetaItems.UPGRADE_HUMIDIFIER = this.addItem(45, "upgrade_humidifier").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "干燥"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "16"));
+                    lines.add(I18n.format("metaitem.upgrade.humidifier"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+2.5%"));
+                }));
         DrMetaItems.UPGRADE_COOLER = this.addItem(49, "upgrade_cooler").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.upgrade.info", "冷却器"));
@@ -260,11 +253,31 @@ public class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.cooler"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+2.5%"));
                 }));
-        DrMetaItems.UPGRADE_LIFESPAN = this.addItem(50, "upgrade_lifespan").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+        DrMetaItems.UPGRADE_HEATER = this.addItem(57, "upgrade_heater").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "寿命"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "4"));
-                    lines.add(I18n.format("metaitem.upgrade.lifespan"));
+                    lines.add(I18n.format("metaitem.upgrade.info", "加热器"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
+                    lines.add(I18n.format("metaitem.upgrade.heater"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+2.5%"));
+                }));
+        // 行为开关
+        DrMetaItems.UPGRADE_LIGHT = this.addItem(40, "upgrade_light").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "内部光照"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
+                    lines.add(I18n.format("metaitem.upgrade.light"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
+                }));
+        DrMetaItems.UPGRADE_T = this.addItem(59, "upgrade_t").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "黑夜环境"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
+                }));
+        DrMetaItems.UPGRADE_OPEN_SKY = this.addItem(56, "upgrade_open_sky").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "露天环境"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
                 }));
         DrMetaItems.UPGRADE_SEAL = this.addItem(51, "upgrade_seal").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
@@ -274,19 +287,40 @@ public class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.seal"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
                 }));
+        DrMetaItems.UPGRADE_AUTOMATION = this.addItem(44, "upgrade_automation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "自动化"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+10%"));
+                }));
+        // 属性强化
+        DrMetaItems.UPGRADE_FLOWERING = this.addItem(41, "upgrade_flowering").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "授粉"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "8S"));
+                    lines.add(I18n.format("metaitem.upgrade.flowering"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+10%"));
+                }));
+        DrMetaItems.UPGRADE_POLLEN_SCRUBBER = this.addItem(47, "upgrade_pollen_scrubber").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "花粉洗涤"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
+                    lines.add(I18n.format("metaitem.upgrade.pollen_scrubber"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+30%"));
+                }));
+        DrMetaItems.UPGRADE_LIFESPAN = this.addItem(50, "upgrade_lifespan").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
+                new TooltipBehavior((lines) -> {
+                    lines.add(I18n.format("metaitem.upgrade.info", "寿命"));
+                    lines.add(I18n.format("metaitem.upgrade.maxnum", "4"));
+                    lines.add(I18n.format("metaitem.upgrade.lifespan"));
+                    lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
+                }));
         DrMetaItems.UPGRADE_GENETIC_STABILIZER = this.addItem(52, "upgrade_genetic_stabilizer").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.upgrade.info", "基因稳定"));
                     lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
                     lines.add(I18n.format("metaitem.upgrade.genetic_stabilizer"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+150%"));
-                }));
-        DrMetaItems.UPGRADE_JUNGLE_EMULATION = this.addItem(53, "upgrade_jungle_emulation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "丛林环境"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.biomes", "丛林"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+20%"));
                 }));
         DrMetaItems.UPGRADE_TERRITORY = this.addItem(54, "upgrade_territory").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
@@ -295,38 +329,12 @@ public class MetaItems1 extends StandardMetaItem {
                     lines.add(I18n.format("metaitem.upgrade.territory"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
                 }));
-        DrMetaItems.UPGRADE_OCEAN_EMULATION = this.addItem(55, "upgrade_ocean_emulation").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "海洋环境"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.biomes", "海洋"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+20%"));
-                }));
-        DrMetaItems.UPGRADE_OPEN_SKY = this.addItem(56, "upgrade_open_sky").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "露天环境"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
-                }));
-        DrMetaItems.UPGRADE_HEATER = this.addItem(57, "upgrade_heater").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "加热器"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.heater"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+2.5%"));
-                }));
         DrMetaItems.UPGRADE_SIEVE = this.addItem(58, "upgrade_sieve").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
                 new TooltipBehavior((lines) -> {
                     lines.add(I18n.format("metaitem.upgrade.info", "筛网"));
                     lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
                     lines.add(I18n.format("metaitem.upgrade.sieve"));
                     lines.add(I18n.format("metaitem.upgrade.energy", "+25%"));
-                }));
-        DrMetaItems.UPGRADE_T = this.addItem(59, "upgrade_t").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64).addComponents(
-                new TooltipBehavior((lines) -> {
-                    lines.add(I18n.format("metaitem.upgrade.info", "黑夜环境"));
-                    lines.add(I18n.format("metaitem.upgrade.maxnum", "1"));
-                    lines.add(I18n.format("metaitem.upgrade.energy", "+5%"));
                 }));
         DrMetaItems.TOOL_BOX = this.addItem(60, "tool_box").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(1)
                 .addComponents(

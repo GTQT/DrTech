@@ -116,8 +116,7 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
                 .blocks('X', Blocks.FARMLAND)
                 .blocks('W', Blocks.WATER)
                 .where('A', Elements.chain(
-                        Elements.counted(0, 4096, Elements.block(
-                                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN))),
+                        Elements.counted(0, 4096, Elements.block(getCasingState())),
                         Elements.hatch(MultiblockAbility.MAINTENANCE_HATCH,
                                 gregtech.common.ConfigHolder.machines.enableMaintenance ? 1 : 0, 1),
                         Elements.hatch(MultiblockAbility.INPUT_ENERGY, 0, 2),
@@ -128,6 +127,10 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
                 .buildStructureDefinition();
     }
 
+    public static IBlockState getCasingState() {
+        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN);
+    }
+
     protected static IBlockState getGlassesState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
@@ -136,11 +139,6 @@ public class MetaTileentityCropsSimulateMachine extends MetaTileEntityBaseWithCo
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.CLEAN_STAINLESS_STEEL_CASING;
-    }
-
-    @Override
-    public boolean usesMui2() {
-        return true;
     }
 
     @Override

@@ -31,7 +31,7 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
         setHardness(5.0f);
         setResistance(10.0f);
         setSoundType(SoundType.METAL);
-        setHarvestLevel(ToolClasses.WRENCH, 3); // Diamond level, can be mined by a steel wrench or better
+        setHarvestLevel(ToolClasses.WRENCH, 3);
         setDefaultState(getState(BlockYotTankPartType.YOT_PART_TIER_T1));
         setCreativeTab(DrTechMain.DrTechTab);
     }
@@ -47,9 +47,9 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
                                @NotNull ITooltipFlag advanced) {
         super.addInformation(stack, world, tooltip, advanced);
 
-        BlockYotTankPartType batteryType = getState(stack);
-        if (batteryType.getCapacity().compareTo(BigInteger.ZERO)==1) {
-            tooltip.add(I18n.format("drtech.universal.tooltip.energy_storage_capacity", batteryType.getCapacity().toString().replaceAll("(\\d)(?=(\\d{3})+$)", "$1,")));
+        BlockYotTankPartType capType = getState(stack);
+        if (capType.getCapacity().compareTo(BigInteger.ZERO) == 1) {
+            tooltip.add(I18n.format("drtech.multiblock.yot_tank.fluid_capacity", capType.getCapacity().toString().replaceAll("(\\d)(?=(\\d{3})+$)", "$1,")));
         }
     }
 
@@ -70,11 +70,6 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
         private final int tier;
         private final BigInteger capacity;
 
-        BlockYotTankPartType() {
-            this.tier = -1;
-            this.capacity = new BigInteger("0");
-        }
-
         BlockYotTankPartType(int tier, String capacity) {
             this.tier = tier;
             this.capacity = new BigInteger(capacity);
@@ -90,7 +85,6 @@ public class BlockYotTankPart extends VariantBlock<BlockYotTankPart.BlockYotTank
             return capacity;
         }
 
-        // must be separately named because of reobf issue
         @NotNull
         @Override
         public String getStoreName() {

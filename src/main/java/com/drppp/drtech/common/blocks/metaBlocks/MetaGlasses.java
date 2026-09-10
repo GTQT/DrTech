@@ -29,9 +29,9 @@ public class MetaGlasses extends VariantActiveBlock<MetaGlasses.CasingType> {
         setResistance(5.0F);
         setSoundType(SoundType.GLASS);
         setHarvestLevel(ToolClasses.PICKAXE, 1);
-        setDefaultState(getState(CasingType.TI_BORON_SILICATE_GLASS_BLOCK));
+        setDefaultState(getState(CasingType.RECOMBINATION_GLASS_BLOCK));
         setCreativeTab(DrTechMain.DrTechTab);
-        this.useNeighborBrightness = true;
+        //this.useNeighborBrightness = true;
     }
     @Override
     public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
@@ -68,14 +68,7 @@ public class MetaGlasses extends VariantActiveBlock<MetaGlasses.CasingType> {
                 super.shouldSideBeRendered(state, world, pos, side);
     }
     public enum CasingType implements IStringSerializable {
-        TI_BORON_SILICATE_GLASS_BLOCK("ti_boron_silicate_glass_block", 4),
-        W_BORON_SILICATE_GLASS_BLOCK("w_boron_silicate_glass_block", 5),
-        CThY_BORON_SILICATE_GLASS_BLOCK("thy_boron_silicate_glass_block", 5),
-        CR_BORON_SILICATE_GLASS_BLOCK("cr_boron_silicate_glass_block", 6),
-        IR_BORON_SILICATE_GLASS_BLOCK("ir_boron_silicate_glass_block", 7),
-        OS_BORON_SILICATE_GLASS_BLOCK("os_boron_silicate_glass_block", 8),
-        NE_BORON_SILICATE_GLASS_BLOCK("ne_boron_silicate_glass_block", 9),
-        SNE_BORON_SILICATE_GLASS_BLOCK("sne_boron_silicate_glass_block", 10);
+        RECOMBINATION_GLASS_BLOCK("recombination_glass_block", 1);
 
 
         private final String name;
@@ -90,15 +83,6 @@ public class MetaGlasses extends VariantActiveBlock<MetaGlasses.CasingType> {
         @Nonnull
         public String getName() {
             return this.name;
-        }
-
-        public static CasingType getByTier(int tier) {
-            CasingType casingType = null;
-            for (CasingType type : values())
-                if (type.tier == tier) {
-                    casingType = type;
-                }
-            return casingType;
         }
     }
 }

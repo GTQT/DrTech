@@ -17,6 +17,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -25,9 +26,40 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TileEntityConnector extends TileEntity implements ITickable {
+
+    // ---------------------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------------------
+
+    private static final int MIN_TIER = 1;
+    private static final int MAX_TIER = 3;
+
     private static final int[] MAX_WIRE_LENGTH = {0, 32, 48, 64};
     private static final int[] WIRE_COLOR = {0, 0xB87333, 0xD7B35A, 0xC9C9C9};
+    private static final int[] GT_TIER_BY_TIER = {GTValues.LV, GTValues.LV, GTValues.MV, GTValues.HV};
+
     private static final long MAX_TRANSFER_AMPERAGE = 10;
+    private static final int VALIDATE_INTERVAL = 20;
+
+    private static final String NBT_CONNECTOR_TIER = "ConnectorTier";
+    private static final String NBT_MAX_ENERGY = "MaxEnergy";
+    private static final String NBT_STORED_ENERGY = "StoredEnergy";
+    private static final String NBT_SUCCESS = "Success";
+    private static final String NBT_SELF_POS = "selfPos";
+    private static final String NBT_NEXT_POS = "nextPos";
+    private static final String NBT_BEFORE_POS = "beforePos";
+    private static final String NBT_CONNECTIONS = "Connections";
+    private static final String NBT_TARGET = "Target";
+    private static final String NBT_WIRE_TIER = "WireTier";
+    private static final String NBT_LENGTH = "Length";
+    private static final String NBT_TARGET_SIDE = "TargetSide";
+    private static final String NBT_POS_X = "xx";
+    private static final String NBT_POS_Y = "yy";
+    private static final String NBT_POS_Z = "zz";
+
+    // ---------------------------------------------------------------------
+    // State
+    // ---------------------------------------------------------------------
 
     private final List<WireConnection> connections = new ArrayList<>();
     private int connectorTier = 1;
@@ -48,6 +80,10 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         this.MaxEnergy = getCapacityForTier(this.connectorTier);
     }
 
+    // ---------------------------------------------------------------------
+    // Tier utilities
+    // ---------------------------------------------------------------------
+
     public static int getMaxWireLength(int tier) {
         return MAX_WIRE_LENGTH[clampTier(tier)];
     }
@@ -57,8 +93,26 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     }
 
     public static long getCapacityForTier(int tier) {
-        return (long) Math.pow(4, 4 + 2 * clampTier(tier));
+        // 4^(4 + 2 * tier) == 2^(8 + 4 * tier)
+        return 1L << (8 + 4 * clampTier(tier));
     }
+
+    public int getConnectorTier() {
+        this.connectorTier = clampTier(this.connectorTier);
+        return this.connectorTier;
+    }
+
+    public boolean canConnectWire(int wireTier) {
+        return getConnectorTier() == clampTier(wireTier);
+    }
+
+    private int getGtTier() {
+        return GT_TIER_BY_TIER[getConnectorTier()];
+    }
+
+    // ---------------------------------------------------------------------
+    // Static connection API
+    // ---------------------------------------------------------------------
 
     public static boolean connect(WorldAccess worldAccess, BlockPos firstPos, BlockPos secondPos, int wireTier) {
         TileEntity first = worldAccess.getTileEntity(firstPos);
@@ -71,6 +125,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         TileEntityConnector secondConnector = (TileEntityConnector) second;
         int tier = clampTier(wireTier);
         int length = (int) Math.ceil(Math.sqrt(firstPos.distanceSq(secondPos)));
+
         if (!firstConnector.canConnectWire(tier) || !secondConnector.canConnectWire(tier)) {
             return false;
         }
@@ -96,26 +151,20 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     }
 
     public static ItemStack getWireStack(int tier) {
-        switch (clampTier(tier)) {
-            case 1:
-                return DrMetaItems.LOW_VOLTAGE_WIRE == null ? ItemStack.EMPTY : DrMetaItems.LOW_VOLTAGE_WIRE.getStackForm();
-            case 2:
-                return DrMetaItems.MEDIUM_VOLTAGE_WIRE == null ? ItemStack.EMPTY : DrMetaItems.MEDIUM_VOLTAGE_WIRE.getStackForm();
-            case 3:
-                return DrMetaItems.HIGH_VOLTAGE_WIRE == null ? ItemStack.EMPTY : DrMetaItems.HIGH_VOLTAGE_WIRE.getStackForm();
-            default:
-                return ItemStack.EMPTY;
-        }
+        return switch (clampTier(tier)) {
+            case 1 ->
+                    DrMetaItems.LOW_VOLTAGE_WIRE == null ? ItemStack.EMPTY : DrMetaItems.LOW_VOLTAGE_WIRE.getStackForm();
+            case 2 ->
+                    DrMetaItems.MEDIUM_VOLTAGE_WIRE == null ? ItemStack.EMPTY : DrMetaItems.MEDIUM_VOLTAGE_WIRE.getStackForm();
+            case 3 ->
+                    DrMetaItems.HIGH_VOLTAGE_WIRE == null ? ItemStack.EMPTY : DrMetaItems.HIGH_VOLTAGE_WIRE.getStackForm();
+            default -> ItemStack.EMPTY;
+        };
     }
 
-    public int getConnectorTier() {
-        this.connectorTier = clampTier(this.connectorTier);
-        return this.connectorTier;
-    }
-
-    public boolean canConnectWire(int wireTier) {
-        return getConnectorTier() == clampTier(wireTier);
-    }
+    // ---------------------------------------------------------------------
+    // Connection management
+    // ---------------------------------------------------------------------
 
     public boolean hasConnection(BlockPos target) {
         for (WireConnection connection : connections) {
@@ -131,46 +180,36 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     }
 
     public boolean addConnection(BlockPos target, int wireTier, int length) {
-        if (target == null || target.equals(pos) || hasConnection(target) || !canConnectWire(wireTier)) {
-            return false;
-        }
-        int tier = clampTier(wireTier);
-        if (length > getMaxWireLength(tier)) {
-            return false;
-        }
-
-        connections.add(new WireConnection(target.toImmutable(), tier, length, null));
-        updateLegacyFields();
-        markDirtyAndSync();
-        return true;
+        return addMachineConnection(target, wireTier, length, null);
     }
 
     public boolean addMachineConnection(BlockPos target, int wireTier, int length, @Nullable EnumFacing targetSide) {
-        if (target == null || target.equals(pos) || hasConnection(target) || !canConnectWire(wireTier)) {
+        if (!canAddConnection(target, wireTier, length)) {
             return false;
         }
-        int tier = clampTier(wireTier);
-        if (length > getMaxWireLength(tier)) {
-            return false;
-        }
-
-        connections.add(new WireConnection(target.toImmutable(), tier, length, targetSide));
+        connections.add(new WireConnection(target, wireTier, length, targetSide));
         updateLegacyFields();
         markDirtyAndSync();
         return true;
     }
 
-    public boolean removeConnection(BlockPos target) {
+    private boolean canAddConnection(BlockPos target, int wireTier, int length) {
+        if (target == null || target.equals(pos) || hasConnection(target) || !canConnectWire(wireTier)) {
+            return false;
+        }
+        return length <= getMaxWireLength(clampTier(wireTier));
+    }
+
+    public void removeConnection(BlockPos target) {
         Iterator<WireConnection> iterator = connections.iterator();
         while (iterator.hasNext()) {
             if (iterator.next().target.equals(target)) {
                 iterator.remove();
                 updateLegacyFields();
                 markDirtyAndSync();
-                return true;
+                return;
             }
         }
-        return false;
     }
 
     public void removeAllConnections(boolean dropItems) {
@@ -180,8 +219,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             return;
         }
 
-        List<WireConnection> copy = new ArrayList<>(connections);
-        for (WireConnection connection : copy) {
+        for (WireConnection connection : new ArrayList<>(connections)) {
             if (world.isBlockLoaded(connection.target)) {
                 TileEntity tileEntity = world.getTileEntity(connection.target);
                 if (tileEntity instanceof TileEntityConnector) {
@@ -191,7 +229,8 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             if (dropItems && !world.isRemote) {
                 ItemStack wireStack = getWireStack(connection.wireTier);
                 if (!wireStack.isEmpty()) {
-                    InventoryHelper.spawnItemStack(world, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, wireStack);
+                    InventoryHelper.spawnItemStack(world,
+                            pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, wireStack);
                 }
             }
         }
@@ -201,61 +240,74 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         markDirtyAndSync();
     }
 
+    // ---------------------------------------------------------------------
+    // NBT
+    // ---------------------------------------------------------------------
+
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(@NotNull NBTTagCompound compound) {
         super.readFromNBT(compound);
 
-        long savedMaxEnergy = compound.getLong("MaxEnergy");
-        this.connectorTier = compound.hasKey("ConnectorTier") ? clampTier(compound.getInteger("ConnectorTier")) : inferTier(savedMaxEnergy);
+        long savedMaxEnergy = compound.getLong(NBT_MAX_ENERGY);
+        this.connectorTier = compound.hasKey(NBT_CONNECTOR_TIER)
+                ? clampTier(compound.getInteger(NBT_CONNECTOR_TIER))
+                : inferTier(savedMaxEnergy);
         this.MaxEnergy = savedMaxEnergy > 0 ? savedMaxEnergy : getCapacityForTier(this.connectorTier);
-        this.StoredEnergy = clampEnergy(compound.getLong("StoredEnergy"), 0, this.MaxEnergy);
-        this.success = compound.getInteger("Success");
+        this.StoredEnergy = clampEnergy(compound.getLong(NBT_STORED_ENERGY), 0, this.MaxEnergy);
+        this.success = compound.getInteger(NBT_SUCCESS);
 
-        this.selfPos = readBlockPos(compound, "selfPos");
-        this.nextPos = readBlockPos(compound, "nextPos");
-        this.beforePos = readBlockPos(compound, "beforePos");
+        this.selfPos = readBlockPos(compound, NBT_SELF_POS);
+        this.nextPos = readBlockPos(compound, NBT_NEXT_POS);
+        this.beforePos = readBlockPos(compound, NBT_BEFORE_POS);
 
         this.connections.clear();
-        NBTTagList connectionList = compound.getTagList("Connections", Constants.NBT.TAG_COMPOUND);
+        NBTTagList connectionList = compound.getTagList(NBT_CONNECTIONS, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < connectionList.tagCount(); i++) {
             NBTTagCompound connectionTag = connectionList.getCompoundTagAt(i);
-            BlockPos target = readBlockPos(connectionTag, "Target");
-            int wireTier = clampTier(connectionTag.getInteger("WireTier"));
-            int length = connectionTag.getInteger("Length");
-            if (target != null && !target.equals(pos) && !hasConnection(target)) {
-                EnumFacing targetSide = connectionTag.hasKey("TargetSide") ? EnumFacing.byIndex(connectionTag.getInteger("TargetSide")) : null;
-                this.connections.add(new WireConnection(target, wireTier, length, targetSide));
+            BlockPos target = readBlockPos(connectionTag, NBT_TARGET);
+            if (target == null || target.equals(pos) || hasConnection(target)) {
+                continue;
             }
+            int wireTier = clampTier(connectionTag.getInteger(NBT_WIRE_TIER));
+            int length = connectionTag.getInteger(NBT_LENGTH);
+            EnumFacing targetSide = connectionTag.hasKey(NBT_TARGET_SIDE)
+                    ? EnumFacing.byIndex(connectionTag.getInteger(NBT_TARGET_SIDE))
+                    : null;
+            this.connections.add(new WireConnection(target, wireTier, length, targetSide));
         }
         updateLegacyFields();
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public @NotNull NBTTagCompound writeToNBT(@NotNull NBTTagCompound compound) {
         super.writeToNBT(compound);
-        compound.setInteger("ConnectorTier", getConnectorTier());
-        compound.setLong("MaxEnergy", MaxEnergy);
-        compound.setLong("StoredEnergy", StoredEnergy);
-        compound.setInteger("Success", success);
+        compound.setInteger(NBT_CONNECTOR_TIER, getConnectorTier());
+        compound.setLong(NBT_MAX_ENERGY, MaxEnergy);
+        compound.setLong(NBT_STORED_ENERGY, StoredEnergy);
+        compound.setInteger(NBT_SUCCESS, success);
 
-        writeBlockPos(compound, "selfPos", selfPos);
-        writeBlockPos(compound, "nextPos", nextPos);
-        writeBlockPos(compound, "beforePos", beforePos);
+        writeBlockPos(compound, NBT_SELF_POS, selfPos);
+        writeBlockPos(compound, NBT_NEXT_POS, nextPos);
+        writeBlockPos(compound, NBT_BEFORE_POS, beforePos);
 
         NBTTagList connectionList = new NBTTagList();
         for (WireConnection connection : connections) {
             NBTTagCompound connectionTag = new NBTTagCompound();
-            writeBlockPos(connectionTag, "Target", connection.target);
-            connectionTag.setInteger("WireTier", connection.wireTier);
-            connectionTag.setInteger("Length", connection.length);
+            writeBlockPos(connectionTag, NBT_TARGET, connection.target);
+            connectionTag.setInteger(NBT_WIRE_TIER, connection.wireTier);
+            connectionTag.setInteger(NBT_LENGTH, connection.length);
             if (connection.targetSide != null) {
-                connectionTag.setInteger("TargetSide", connection.targetSide.getIndex());
+                connectionTag.setInteger(NBT_TARGET_SIDE, connection.targetSide.getIndex());
             }
             connectionList.appendTag(connectionTag);
         }
-        compound.setTag("Connections", connectionList);
+        compound.setTag(NBT_CONNECTIONS, connectionList);
         return compound;
     }
+
+    // ---------------------------------------------------------------------
+    // Tick
+    // ---------------------------------------------------------------------
 
     @Override
     public void update() {
@@ -265,11 +317,15 @@ public class TileEntityConnector extends TileEntity implements ITickable {
 
         transferEnergyToConnections();
 
-        if (tick++ >= 20) {
+        if (++tick >= VALIDATE_INTERVAL) {
             tick = 0;
             validateConnections();
         }
     }
+
+    // ---------------------------------------------------------------------
+    // Client sync
+    // ---------------------------------------------------------------------
 
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
@@ -282,22 +338,30 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     }
 
     @Override
-    public NBTTagCompound getUpdateTag() {
+    public @NotNull NBTTagCompound getUpdateTag() {
         return writeToNBT(new NBTTagCompound());
     }
 
     @Override
-    public void handleUpdateTag(NBTTagCompound tag) {
+    public void handleUpdateTag(@NotNull NBTTagCompound tag) {
         readFromNBT(tag);
     }
 
     @Override
-    public AxisAlignedBB getRenderBoundingBox() {
+    public @NotNull AxisAlignedBB getRenderBoundingBox() {
         int range = getMaxWireLength(getConnectorTier()) + 1;
         return new AxisAlignedBB(
                 pos.getX() - range, pos.getY() - range, pos.getZ() - range,
                 pos.getX() + range + 1, pos.getY() + range + 1, pos.getZ() + range + 1);
     }
+
+    public boolean shouldRender() {
+        return !connections.isEmpty();
+    }
+
+    // ---------------------------------------------------------------------
+    // Energy API
+    // ---------------------------------------------------------------------
 
     public long acceptEnergyFromNetwork(EnumFacing side, long voltage, long amperage) {
         if (voltage <= 0 || amperage <= 0 || voltage > getInputVoltage()) {
@@ -305,8 +369,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         }
 
         long acceptedAmperage = Math.min(amperage, getInputAmperage());
-        long roomAmperage = (MaxEnergy - StoredEnergy) / voltage;
-        acceptedAmperage = Math.min(acceptedAmperage, roomAmperage);
+        acceptedAmperage = Math.min(acceptedAmperage, (MaxEnergy - StoredEnergy) / voltage);
         if (acceptedAmperage <= 0) {
             return 0;
         }
@@ -361,8 +424,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         if (amount <= 0) {
             return 0;
         }
-        long accepted = Math.min(amount, getTransferLimit());
-        accepted = Math.min(accepted, MaxEnergy - StoredEnergy);
+        long accepted = Math.min(Math.min(amount, getTransferLimit()), MaxEnergy - StoredEnergy);
         if (accepted > 0) {
             StoredEnergy += accepted;
             markDirty();
@@ -374,8 +436,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         if (amount <= 0) {
             return 0;
         }
-        long removed = Math.min(amount, getTransferLimit());
-        removed = Math.min(removed, StoredEnergy);
+        long removed = Math.min(Math.min(amount, getTransferLimit()), StoredEnergy);
         if (removed > 0) {
             StoredEnergy -= removed;
             markDirty();
@@ -383,9 +444,9 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         return removed;
     }
 
-    public boolean shouldRender() {
-        return !connections.isEmpty();
-    }
+    // ---------------------------------------------------------------------
+    // Energy transfer
+    // ---------------------------------------------------------------------
 
     private void transferEnergyToConnections() {
         if (connections.isEmpty()) {
@@ -410,8 +471,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             return 0;
         }
 
-        long accepted = Math.min(amount, getTransferLimit());
-        accepted = Math.min(accepted, MaxEnergy - StoredEnergy);
+        long accepted = Math.min(Math.min(amount, getTransferLimit()), MaxEnergy - StoredEnergy);
         if (accepted > 0) {
             StoredEnergy += accepted;
             markDirty();
@@ -420,9 +480,8 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     }
 
     private void transferEnergyToConnector(TileEntityConnector target) {
-        double ownRatio = getStorageRatio();
-        double targetRatio = target.getStorageRatio();
-        if (ownRatio <= targetRatio || StoredEnergy < getOutputVoltage()) {
+        // Only balance toward connectors with a lower storage ratio (energy spreading).
+        if (getStorageRatio() <= target.getStorageRatio() || StoredEnergy < getOutputVoltage()) {
             return;
         }
 
@@ -438,27 +497,27 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             return;
         }
 
-        IEnergyContainer targetSideContainer = getEnergyContainer(tileEntity, targetSide);
-        if (targetSideContainer != null) {
-            if (targetSideContainer.outputsEnergy(targetSide)) {
-                pullEnergyFromMachine(targetSideContainer, targetSide);
+        IEnergyContainer directContainer = getEnergyContainer(tileEntity, targetSide);
+        if (directContainer != null) {
+            if (directContainer.outputsEnergy(targetSide)) {
+                pullEnergyFromMachine(directContainer, targetSide);
                 return;
             }
-            if (targetSideContainer.inputsEnergy(targetSide)) {
-                pushEnergyToMachine(targetSideContainer, targetSide);
+            if (directContainer.inputsEnergy(targetSide)) {
+                pushEnergyToMachine(directContainer, targetSide);
                 return;
             }
         }
 
-        EnergyConnection inputConnection = findEnergyConnection(tileEntity, targetSide, true);
-        if (inputConnection != null) {
-            pushEnergyToMachine(inputConnection.energyContainer, inputConnection.side);
+        EnergyConnection input = findEnergyConnection(tileEntity, targetSide, true);
+        if (input != null) {
+            pushEnergyToMachine(input.energyContainer, input.side);
             return;
         }
 
-        EnergyConnection outputConnection = findEnergyConnection(tileEntity, targetSide, false);
-        if (outputConnection != null) {
-            pullEnergyFromMachine(outputConnection.energyContainer, outputConnection.side);
+        EnergyConnection output = findEnergyConnection(tileEntity, targetSide, false);
+        if (output != null) {
+            pullEnergyFromMachine(output.energyContainer, output.side);
         }
     }
 
@@ -466,7 +525,6 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         if (StoredEnergy < getOutputVoltage()) {
             return;
         }
-
         long voltage = getOutputVoltage();
         long availableAmperage = Math.min(getOutputAmperage(), StoredEnergy / voltage);
         long acceptedAmperage = energyContainer.acceptEnergyFromNetwork(targetSide, voltage, availableAmperage);
@@ -481,10 +539,9 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             return;
         }
 
-        long roomAmperage = (MaxEnergy - StoredEnergy) / voltage;
         long availableAmperage = Math.min(MAX_TRANSFER_AMPERAGE, energyContainer.getOutputAmperage());
         availableAmperage = Math.min(availableAmperage, energyContainer.getEnergyStored() / voltage);
-        availableAmperage = Math.min(availableAmperage, roomAmperage);
+        availableAmperage = Math.min(availableAmperage, (MaxEnergy - StoredEnergy) / voltage);
         if (availableAmperage <= 0) {
             return;
         }
@@ -497,11 +554,16 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         }
     }
 
+    // ---------------------------------------------------------------------
+    // Validation
+    // ---------------------------------------------------------------------
+
     private void validateConnections() {
         boolean changed = false;
         Iterator<WireConnection> iterator = connections.iterator();
         while (iterator.hasNext()) {
             WireConnection connection = iterator.next();
+
             if (connection.target.equals(pos) || connection.length > getMaxWireLength(connection.wireTier)) {
                 iterator.remove();
                 changed = true;
@@ -520,7 +582,9 @@ public class TileEntityConnector extends TileEntity implements ITickable {
                 continue;
             }
 
-            if (findEnergyConnection(tileEntity, connection.targetSide, true) == null && findEnergyConnection(tileEntity, connection.targetSide, false) == null) {
+            boolean hasInput = findEnergyConnection(tileEntity, connection.targetSide, true) != null;
+            boolean hasOutput = findEnergyConnection(tileEntity, connection.targetSide, false) != null;
+            if (!hasInput && !hasOutput) {
                 iterator.remove();
                 changed = true;
             }
@@ -532,17 +596,21 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         }
     }
 
+    // ---------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------
+
     private void updateLegacyFields() {
         this.selfPos = pos;
         if (connections.isEmpty()) {
             this.success = 0;
             this.nextPos = null;
             this.beforePos = null;
-        } else {
-            this.success = 1;
-            this.nextPos = connections.get(0).target;
-            this.beforePos = connections.get(0).target;
+            return;
         }
+        this.success = 1;
+        this.nextPos = connections.get(0).target;
+        this.beforePos = connections.get(0).target;
     }
 
     private void markDirtyAndSync() {
@@ -550,18 +618,6 @@ public class TileEntityConnector extends TileEntity implements ITickable {
         if (world != null && !world.isRemote) {
             IBlockState state = world.getBlockState(pos);
             world.notifyBlockUpdate(pos, state, state, 3);
-        }
-    }
-
-    private int getGtTier() {
-        switch (getConnectorTier()) {
-            case 2:
-                return GTValues.MV;
-            case 3:
-                return GTValues.HV;
-            case 1:
-            default:
-                return GTValues.LV;
         }
     }
 
@@ -575,14 +631,22 @@ public class TileEntityConnector extends TileEntity implements ITickable {
 
     @Nullable
     private static IEnergyContainer getEnergyContainer(@Nullable TileEntity tileEntity, @Nullable EnumFacing side) {
-        return tileEntity == null ? null : tileEntity.getCapability(GregtechCapabilities.CAPABILITY_ENERGY_CONTAINER, side);
+        return tileEntity == null
+                ? null
+                : tileEntity.getCapability(GregtechCapabilities.CAPABILITY_ENERGY_CONTAINER, side);
     }
 
     @Nullable
-    private static EnergyConnection findEnergyConnection(@Nullable TileEntity tileEntity, @Nullable EnumFacing preferredSide, boolean input) {
-        EnergyConnection preferredConnection = getUsableEnergyConnection(tileEntity, preferredSide, input);
-        if (preferredConnection != null) {
-            return preferredConnection;
+    private static EnergyConnection findEnergyConnection(@Nullable TileEntity tileEntity,
+                                                         @Nullable EnumFacing preferredSide,
+                                                         boolean input) {
+        if (tileEntity == null) {
+            return null;
+        }
+
+        EnergyConnection preferred = getUsableEnergyConnection(tileEntity, preferredSide, input);
+        if (preferred != null) {
+            return preferred;
         }
 
         for (EnumFacing side : EnumFacing.VALUES) {
@@ -595,19 +659,22 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             }
         }
 
-        return preferredSide == null ? null : getUsableEnergyConnection(tileEntity, null, input);
+        if (preferredSide == null) {
+            return null;
+        }
+        return getUsableEnergyConnection(tileEntity, null, input);
     }
 
     @Nullable
-    private static EnergyConnection getUsableEnergyConnection(@Nullable TileEntity tileEntity, @Nullable EnumFacing side, boolean input) {
+    private static EnergyConnection getUsableEnergyConnection(@Nullable TileEntity tileEntity,
+                                                              @Nullable EnumFacing side,
+                                                              boolean input) {
         IEnergyContainer energyContainer = getEnergyContainer(tileEntity, side);
         if (energyContainer == null) {
             return null;
         }
-        if (input ? energyContainer.inputsEnergy(side) : energyContainer.outputsEnergy(side)) {
-            return new EnergyConnection(energyContainer, side);
-        }
-        return null;
+        boolean usable = input ? energyContainer.inputsEnergy(side) : energyContainer.outputsEnergy(side);
+        return usable ? new EnergyConnection(energyContainer, side) : null;
     }
 
     private static int inferTier(long capacity) {
@@ -621,11 +688,11 @@ public class TileEntityConnector extends TileEntity implements ITickable {
     }
 
     private static int clampTier(int tier) {
-        if (tier < 1) {
-            return 1;
+        if (tier < MIN_TIER) {
+            return MIN_TIER;
         }
-        if (tier > 3) {
-            return 3;
+        if (tier > MAX_TIER) {
+            return MAX_TIER;
         }
         return tier;
     }
@@ -643,7 +710,7 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             return null;
         }
         NBTTagCompound posTag = compound.getCompoundTag(key);
-        return new BlockPos(posTag.getInteger("xx"), posTag.getInteger("yy"), posTag.getInteger("zz"));
+        return new BlockPos(posTag.getInteger(NBT_POS_X), posTag.getInteger(NBT_POS_Y), posTag.getInteger(NBT_POS_Z));
     }
 
     private static void writeBlockPos(NBTTagCompound compound, String key, @Nullable BlockPos blockPos) {
@@ -651,11 +718,15 @@ public class TileEntityConnector extends TileEntity implements ITickable {
             return;
         }
         NBTTagCompound posTag = new NBTTagCompound();
-        posTag.setInteger("xx", blockPos.getX());
-        posTag.setInteger("yy", blockPos.getY());
-        posTag.setInteger("zz", blockPos.getZ());
+        posTag.setInteger(NBT_POS_X, blockPos.getX());
+        posTag.setInteger(NBT_POS_Y, blockPos.getY());
+        posTag.setInteger(NBT_POS_Z, blockPos.getZ());
         compound.setTag(key, posTag);
     }
+
+    // ---------------------------------------------------------------------
+    // Inner types
+    // ---------------------------------------------------------------------
 
     public static class WireConnection {
         public final BlockPos target;

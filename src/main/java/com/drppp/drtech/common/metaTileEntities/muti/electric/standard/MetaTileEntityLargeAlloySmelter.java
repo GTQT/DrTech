@@ -112,7 +112,7 @@ public class MetaTileEntityLargeAlloySmelter extends RecipeMapMultiblockControll
         return shapeInfo;
     }
 
-    protected static IBlockState getCasingState() {
+    public static IBlockState getCasingState() {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.INVAR_HEATPROOF);
     }
 

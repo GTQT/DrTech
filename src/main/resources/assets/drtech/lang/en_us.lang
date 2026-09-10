@@ -115,14 +115,11 @@ tile.glasses_casing.ir_boron_silicate_glass_block.name=Iridium-Reinforced Borosi
 tile.glasses_casing.os_boron_silicate_glass_block.name=Osmium-Reinforced Borosilicate Glass Block
 tile.glasses_casing.ne_boron_silicate_glass_block.name=Neutron-Reinforced Borosilicate Glass Block
 tile.glasses_casing.sne_boron_silicate_glass_block.name=Cosmic Neutron-Reinforced Borosilicate Glass Block
-tile.glasses_casing1.uu_glass_block.name=Inhibitor Glass Block
-tile.glasses_casing1.copy_glass_block.name=Particle Inhibitor Glass Block
-tile.glasses_casing1.recombination_glass_block.name=Molecular Inhibitor Glass Block
+tile.glasses_casing.uu_glass_block.name=Inhibitor Glass Block
+tile.glasses_casing.copy_glass_block.name=Particle Inhibitor Glass Block
+tile.glasses_casing.recombination_glass_block.name=Molecular Inhibitor Glass Block
 tile.drtech.gravitational_anomaly.name=Gravitational Anomaly
 tile.my_laser_pipe_normal.name=Transparent Laser Tube
-tile.drtech.connector_1.name=Grade 1 Capacitor
-tile.drtech.connector_2.name=Grade 2 Capacitor
-tile.drtech.connector_3.name=Grade 3 Capacitor
 tile.drtech.golden_sea.name=Cornucopia
 tile.drtech.peaceful_table.name=Table of Peace
 tile.drtech.peaceful_table.tooltip.1=Works only while the world is set to Peaceful difficulty.
@@ -276,7 +273,7 @@ drtech.machine.logcreate.tip.2=闂?Saw = 1x  Circular Saw = 2x  Chainsaw = 4x
 drtech.machine.logcreate.tip.3=闂?Fixed operation time: 5 seconds
 drtech.machine.recombination.tip.1=闂?Parallel = 2 * voltage tier
 drtech.machine.recombination.tip.2=闂?Molecular transformation!
-drtech.universal.tooltip.energy_storage_capacity=闂佸綊妫跨粩顤宭uid buffer: 闂佸綊妫块幏?s L
+drtech.multiblock.yot_tank.fluid_capacity=§c流体缓存：§r%s L
 drtech.multiblock.yot_tank.fluid_type=Fluid type: %s
 gregtech.machine.yot_tank.tooltip1=闂?Ultra Super Super Quantum Tank!
 gregtech.machine.yot_tank.tooltip2=闂?Store any combination, runs without power!
@@ -2174,105 +2171,105 @@ drtech.mob_info.cond.player_kill=Requires player kill
 drtech.mob_info.cond.looting=Affected by looting
 drtech.mob_info.cond.burning=Dropped when on fire
 
-# ===== Modular Armor (merged from mechtech) =====
+# ===== Modular Armor =====
 metaitem.wireless_receiver.name=Wireless Receiver Cover
 
-mechtech.key.auto_feeder.mode_switch=Auto Feeder mode
+drtech.key.auto_feeder.mode_switch=Auto Feeder mode
 
 
-mechtech.auto_feeder.mode=Auto Feeder: %s
+drtech.auto_feeder.mode=Auto Feeder: %s
 
-mechtech.universal.tooltip.item_storage_accept=Accepts:
-mechtech.universal.tooltip.item_storage_reject=Rejects:
+drtech.universal.tooltip.item_storage_accept=Accepts:
+drtech.universal.tooltip.item_storage_reject=Rejects:
 
-mechtech.machine.armor_workbench.name=Armor Workbench
-mechtech.machine.armor_workbench.tooltip=Can be used to modify Modular Armor
+drtech.machine.armor_workbench.name=Armor Workbench
+drtech.machine.armor_workbench.tooltip=Can be used to modify Modular Armor
 
-mechtech.modular_workbench.error1=Module %s is required
-mechtech.modular_workbench.error2=Incompatible with %s
-mechtech.modular_workbench.error3=This is not a Module
-mechtech.modular_workbench.error4=Can't insert more of this module
-mechtech.modular_workbench.error5=Invalid armor piece
-
-
+drtech.modular_workbench.error1=Module %s is required
+drtech.modular_workbench.error2=Incompatible with %s
+drtech.modular_workbench.error3=This is not a Module
+drtech.modular_workbench.error4=Can't insert more of this module
+drtech.modular_workbench.error5=Invalid armor piece
 
 
 
-mechtech.modules.armor_plating.name=%s Armor Plating
-mechtech.modules.night_vision.name=Night Vision
-mechtech.modules.solar_gen.1.name=Solar Gen I
-mechtech.modules.solar_gen.2.name=Solar Gen II
-mechtech.modules.solar_gen.3.name=Solar Gen III
-mechtech.modules.jetpack.name=Thruster Jetpack
-mechtech.modules.advanced_jetpack.name=Advanced Thruster Jetpack
-mechtech.modules.shock_absorber.name=Shock Absorber
-mechtech.modules.insulator.name=Thick Insulator
-mechtech.modules.binoculars.name=Binoculars
-mechtech.modules.auto_feeder.name=Auto Feeder
-mechtech.modules.oxygen_mask.name=Oxygen Mask
-mechtech.modules.wireless_cover.name=Wireless Receiver
+
+
+drtech.modules.armor_plating.name=%s Armor Plating
+drtech.modules.night_vision.name=Night Vision
+drtech.modules.solar_gen.1.name=Solar Gen I
+drtech.modules.solar_gen.2.name=Solar Gen II
+drtech.modules.solar_gen.3.name=Solar Gen III
+drtech.modules.jetpack.name=Thruster Jetpack
+drtech.modules.advanced_jetpack.name=Advanced Thruster Jetpack
+drtech.modules.shock_absorber.name=Shock Absorber
+drtech.modules.insulator.name=Thick Insulator
+drtech.modules.binoculars.name=Binoculars
+drtech.modules.auto_feeder.name=Auto Feeder
+drtech.modules.oxygen_mask.name=Oxygen Mask
+drtech.modules.wireless_cover.name=Wireless Receiver
 metaitem.anti_gravity.name=反重力单元
-mechtech.anti_gravity.tooltip.1=创造飞行
-mechtech.anti_gravity.tooltip.2=耗电:%s EU/t
+drtech.anti_gravity.tooltip.1=创造飞行
+drtech.anti_gravity.tooltip.2=耗电:%s EU/t
 metaitem.sprint_module.name=助行推进器
 metaitem.energy_shield.name=能量护盾
 metaitem.healing_module.name=治愈器
 
 
 # --- Anti-Gravity Module ---
-mechtech.modules.anti_gravity.name=Anti-Gravity Module
-mechtech.anti_gravity.mode=Anti-Gravity: %s
+drtech.modules.anti_gravity.name=Anti-Gravity Module
+drtech.anti_gravity.mode=Anti-Gravity: %s
 item.metaitem.anti_gravity.name=Anti-Gravity Module
 
 # --- Sprint Module ---
-mechtech.modules.sprint_module.name=Sprint Module
-mechtech.sprint_module.mode=Sprint Boost: %s
+drtech.modules.sprint_module.name=Sprint Module
+drtech.sprint_module.mode=Sprint Boost: %s
 item.metaitem.sprint_module.name=Sprint Module
 
 # --- Energy Shield ---
-mechtech.modules.energy_shield.name=Energy Shield Unit
-mechtech.energy_shield.mode=Energy Shield: %s
-mechtech.energy_shield.tooltip.1=Converts EU to a damage-absorbing shield
-mechtech.energy_shield.tooltip.2=Cost: %d EU per damage point
-mechtech.energy_shield.tooltip.3=Max absorption: %d per hit
+drtech.modules.energy_shield.name=Energy Shield Unit
+drtech.energy_shield.mode=Energy Shield: %s
+drtech.energy_shield.tooltip.1=Converts EU to a damage-absorbing shield
+drtech.energy_shield.tooltip.2=Cost: %d EU per damage point
+drtech.energy_shield.tooltip.3=Max absorption: %d per hit
 item.metaitem.energy_shield.name=Energy Shield Unit
 
 # --- Healing Module ---
-mechtech.modules.healing_module.name=Healing Module
-mechtech.healing_module.active=Healing: Active
-mechtech.healing_module.tooltip.1=Grants Regeneration while worn
-mechtech.healing_module.tooltip.2=Cost: %d EU per second
-mechtech.healing_module.tooltip.3=Stack across armor pieces for higher levels
+drtech.modules.healing_module.name=Healing Module
+drtech.healing_module.active=Healing: Active
+drtech.healing_module.tooltip.1=Grants Regeneration while worn
+drtech.healing_module.tooltip.2=Cost: %d EU per second
+drtech.healing_module.tooltip.3=Stack across armor pieces for higher levels
 item.metaitem.healing_module.name=Healing Module
 
 # --- Apiarist Shield ---
-mechtech.modules.apiarist_shield.name=Apiarist Shield
-mechtech.apiarist_shield.tooltip.1=Protects against bee effects (Forestry)
-mechtech.apiarist_shield.tooltip.disabled=§7Requires Forestry§r
+drtech.modules.apiarist_shield.name=Apiarist Shield
+drtech.apiarist_shield.tooltip.1=Protects against bee effects (Forestry)
+drtech.apiarist_shield.tooltip.disabled=§7Requires Forestry§r
 metaitem.apiarist_shield.name=Apiarist Shield
 
 # --- Revealing Goggles ---
-mechtech.modules.revealing_goggles.name=Revealing Goggles
-mechtech.revealing_goggles.mode=Revealing: %s
-mechtech.revealing_goggles.tooltip.1=Grants Goggles of Revealing effect (Thaumcraft)
-mechtech.revealing_goggles.tooltip.2=Cost: %d EU/t
-mechtech.revealing_goggles.tooltip.disabled=§7Requires Thaumcraft§r
+drtech.modules.revealing_goggles.name=Revealing Goggles
+drtech.revealing_goggles.mode=Revealing: %s
+drtech.revealing_goggles.tooltip.1=Grants Goggles of Revealing effect (Thaumcraft)
+drtech.revealing_goggles.tooltip.2=Cost: %d EU/t
+drtech.revealing_goggles.tooltip.disabled=§7Requires Thaumcraft§r
 metaitem.revealing_goggles.name=Revealing Goggles
 
 # --- Vis Optimizer ---
-mechtech.modules.vis_optimizer.name=Vis Optimizer
-mechtech.vis_optimizer.tooltip.1=Reduces vis cost by %d%%
-mechtech.vis_optimizer.tooltip.2=Stack across armor pieces for higher discount
-mechtech.vis_optimizer.tooltip.disabled=§7Requires Thaumcraft§r
+drtech.modules.vis_optimizer.name=Vis Optimizer
+drtech.vis_optimizer.tooltip.1=Reduces vis cost by %d%%
+drtech.vis_optimizer.tooltip.2=Stack across armor pieces for higher discount
+drtech.vis_optimizer.tooltip.disabled=§7Requires Thaumcraft§r
 metaitem.vis_optimizer.name=Vis Optimizer
 
-mechtech.modules.armor_plating.tooltip.1=§rDurability: §a%d/%d
-mechtech.modules.armor_plating.tooltip.2=§rArmor: §a%d
-mechtech.modules.armor_plating.tooltip.3=§rToughness: §a%d
-mechtech.modules.armor_plating.tooltip.unsneak=§aHold Shift
-mechtech.modules.armor_plating.tooltip.sneak=Armor Platings can be used to strengthen the defense of a Modular Armor, but the efficiency gets worse the more platings you use in one armor piece.
-mechtech.modules.binoculars.zoom.enable=Zoom enabled
-mechtech.modules.binoculars.zoom.disable=Zoom disabled
+drtech.modules.armor_plating.tooltip.1=§rDurability: §a%d/%d
+drtech.modules.armor_plating.tooltip.2=§rArmor: §a%d
+drtech.modules.armor_plating.tooltip.3=§rToughness: §a%d
+drtech.modules.armor_plating.tooltip.unsneak=§aHold Shift
+drtech.modules.armor_plating.tooltip.sneak=Armor Platings can be used to strengthen the defense of a Modular Armor, but the efficiency gets worse the more platings you use in one armor piece.
+drtech.modules.binoculars.zoom.enable=Zoom enabled
+drtech.modules.binoculars.zoom.disable=Zoom disabled
 
 metaitem.modular_helmet.name=Modular Helmet
 metaitem.modular_chestplate.name=Modular Chestplate
@@ -2295,4 +2292,4 @@ metaitem.modular_armor.installed_modules=§bInstalled Modules: §7(%d/%d)
 metaitem.modular_armor.no_modules=§cNo Modules installed
 metaitem.modular_armor.max_fluid=§3Max fluid cell size: %s
 
-mechtech.modular_armor.usable=§3Can be used as a module in the Modular Armor
+drtech.modular_armor.usable=§3Can be used as a module in the Modular Armor

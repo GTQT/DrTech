@@ -113,8 +113,4 @@ public class TileEntityStoragePail extends TileEntityWithUI implements IGuiHolde
         }
         return super.getCapability(capability, facing);
     }
-
-    @Override
-    public void update() {
-    }
 }

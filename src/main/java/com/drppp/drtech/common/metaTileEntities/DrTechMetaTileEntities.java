@@ -157,6 +157,7 @@ public class DrTechMetaTileEntities {
         CROPS_SIMULATE = registerMetaTileEntity(getID(), new MetaTileentityCropsSimulateMachine(getDrId("crops_simulate_machine")));
         INDUSTRIAL_APIARY = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialApiary(getDrId("industrial_apiary"), Textures.INDUSTRIAL_APIARY));
 
+        /*
         if (DrtConfig.machine.EnableIndustrialMachines) {
             INDUSTRIAL_MIXER = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialMixer(getDrId("industrial_mixer")));
             INDUSTRIAL_ROLLER_PRESS = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialRollerPress(getDrId("industrial_roller_press")));
@@ -165,6 +166,8 @@ public class DrTechMetaTileEntities {
             INDUSTRIAL_CENTRIFUGE = registerMetaTileEntity(getID(), new MetaTileEntityIndustrialCentrifuge(getDrId("industrial_centrifuge")));
             LARGE_EXTRUDER = registerMetaTileEntity(getID(), new MetaTileEntityLargeExtruder(getDrId("large_extruder")));
         }
+
+         */
 
         DRONE_PROGRAMMER = registerMetaTileEntity(DRONE_PROGRAMMER_META_ID,
                 new MetaTileEntityDroneProgrammer(getDrId("drone_programmer")));

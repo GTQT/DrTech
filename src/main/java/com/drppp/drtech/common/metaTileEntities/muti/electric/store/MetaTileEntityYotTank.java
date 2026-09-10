@@ -4,7 +4,6 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Matrix4;
 
-import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.serialization.ByteBufAdapters;
 import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.blocks.metaBlocks.MetaCasing;
@@ -32,7 +31,6 @@ import gregtech.api.unification.material.Materials;
 import gregtech.api.util.BlockInfo;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.KeyUtil;
-import gregtech.api.util.TextComponentUtil;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.common.blocks.BlockGlassCasing;
@@ -44,7 +42,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -65,11 +62,29 @@ import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 
 public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements IControllable, IProgressBarMultiblock {
-    private static final String NBT_FLUID_BANK = "EnergyBank";
-    private boolean isActive, isWorkingEnabled = true;
-    // Match Context Headers
 
+    private static final String NBT_FLUID_BANK = "EnergyBank";
     private static final String NBT_FLUID = "Fluid";
+
+    private static final String NBT_KEY_ACTIVE = "isActive";
+    private static final String NBT_KEY_WORKING = "isWorkingEnabled";
+    private static final String NBT_KEY_OUTPUT_FLAG = "OutFlag";
+
+    private boolean isActive;
+    private boolean isWorkingEnabled = true;
+    private int outputflag = 0;
+    private int time = 0;
+
+    private FluidStack fluid;
+    public IMultipleTankHandler inputFluidInventory;
+    public IMultipleTankHandler outputFluidInventory;
+    private YotTankFluidBank fluidBank;
+
+    protected final ArrayList<MetaTileEntityYotHatch> mYottaHatch = new ArrayList<>();
+
+    public MetaTileEntityYotTank(ResourceLocation metaTileEntityId) {
+        super(metaTileEntityId);
+    }
 
     public FluidStack getFluid() {
         return fluid;
@@ -79,29 +94,24 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         this.fluid = fluid;
     }
 
-    private  FluidStack fluid;
-    public IMultipleTankHandler inputFluidInventory;
-    public IMultipleTankHandler outputFluidInventory;
-    private YotTankFluidBank fluidBank;
-    private int outputflag = 0;
-
     public YotTankFluidBank getFluidBank() {
         return fluidBank;
     }
-    protected final ArrayList<MetaTileEntityYotHatch> mYottaHatch = new ArrayList<>();
-    int time=0;
-    public MetaTileEntityYotTank(ResourceLocation metaTileEntityId) {
-        super(metaTileEntityId);
-    }
+
+    // ---------------------------------------------------------------------
+    // Working / active state
+    // ---------------------------------------------------------------------
 
     @Override
     public boolean isWorkingEnabled() {
-        return this.isWorkingEnabled;
+        return isWorkingEnabled;
     }
+
     @Override
     public boolean usesMui2() {
         return false;
     }
+
     @Override
     public void setWorkingEnabled(boolean b) {
         this.isWorkingEnabled = b;
@@ -111,21 +121,28 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             writeCustomData(GregtechDataCodes.WORKING_ENABLED, buf -> buf.writeBoolean(isWorkingEnabled));
         }
     }
+
     @Override
     public boolean isActive() {
-        return super.isActive() && this.isActive;
+        return super.isActive() && isActive;
     }
 
     public void setActive(boolean active) {
-        if (this.isActive != active) {
-            this.isActive = active;
-            markDirty();
-            World world = getWorld();
-            if (world != null && !world.isRemote) {
-                writeCustomData(GregtechDataCodes.WORKABLE_ACTIVE, buf -> buf.writeBoolean(active));
-            }
+        if (this.isActive == active) {
+            return;
+        }
+        this.isActive = active;
+        markDirty();
+        World world = getWorld();
+        if (world != null && !world.isRemote) {
+            writeCustomData(GregtechDataCodes.WORKABLE_ACTIVE, buf -> buf.writeBoolean(active));
         }
     }
+
+    // ---------------------------------------------------------------------
+    // Sync
+    // ---------------------------------------------------------------------
+
     @Override
     public void writeInitialSyncData(PacketBuffer buf) {
         super.writeInitialSyncData(buf);
@@ -151,40 +168,44 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             scheduleRenderUpdate();
         }
     }
+
+    // ---------------------------------------------------------------------
+    // NBT
+    // ---------------------------------------------------------------------
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
-        data.setBoolean("isActive", isActive);
-        data.setBoolean("isWorkingEnabled", isWorkingEnabled);
-        data.setInteger("OutFlag",this.outputflag);
-       if(fluid!=null)
-       {
-           NBTTagCompound fluidNBT = new NBTTagCompound();
-           fluid.writeToNBT(fluidNBT);
-           data.setTag(NBT_FLUID,fluidNBT);
-           if (fluidBank != null) {
-               data.setTag(NBT_FLUID_BANK, fluidBank.writeToNBT(new NBTTagCompound()));
-           }
-       }
+        data.setBoolean(NBT_KEY_ACTIVE, isActive);
+        data.setBoolean(NBT_KEY_WORKING, isWorkingEnabled);
+        data.setInteger(NBT_KEY_OUTPUT_FLAG, outputflag);
+        if (fluid == null) {
+            return data;
+        }
+        NBTTagCompound fluidNBT = new NBTTagCompound();
+        fluid.writeToNBT(fluidNBT);
+        data.setTag(NBT_FLUID, fluidNBT);
+        if (fluidBank != null) {
+            data.setTag(NBT_FLUID_BANK, fluidBank.writeToNBT(new NBTTagCompound()));
+        }
         return data;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
-        isActive = data.getBoolean("isActive");
-        isWorkingEnabled = data.getBoolean("isWorkingEnabled");
-        this.outputflag = data.getInteger("OutFlag");
-        if(data.hasKey(NBT_FLUID))
-        {
-            NBTTagCompound fluidNBT= (NBTTagCompound) data.getTag(NBT_FLUID);
-            fluid = FluidStack.loadFluidStackFromNBT(fluidNBT);
-            if (data.hasKey(NBT_FLUID_BANK)) {
-                fluidBank = new YotTankFluidBank(data.getCompoundTag(NBT_FLUID_BANK));
-
-            }
+        isActive = data.getBoolean(NBT_KEY_ACTIVE);
+        isWorkingEnabled = data.getBoolean(NBT_KEY_WORKING);
+        outputflag = data.getInteger(NBT_KEY_OUTPUT_FLAG);
+        if (!data.hasKey(NBT_FLUID)) {
+            return;
+        }
+        fluid = FluidStack.loadFluidStackFromNBT((NBTTagCompound) data.getTag(NBT_FLUID));
+        if (data.hasKey(NBT_FLUID_BANK)) {
+            fluidBank = new YotTankFluidBank(data.getCompoundTag(NBT_FLUID_BANK));
         }
     }
+
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
         if (capability == GregtechTileCapabilities.CAPABILITY_CONTROLLABLE) {
@@ -192,43 +213,73 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         }
         return super.getCapability(capability, side);
     }
+
+    // ---------------------------------------------------------------------
+    // Tick logic
+    // ---------------------------------------------------------------------
+
     @Override
     protected void updateFormedValid() {
-        if (!this.getWorld().isRemote ) {
-            if (getOffsetTimer() % 20 == 0) {
-                // active here is just used for rendering
-                setActive(fluidBank.hasFluid());
-            }
-            time++;
-            if (isWorkingEnabled() && time>20) {
-                if(inputFluidInventory.getTanks()>0){
-                    for (int i = 0; i < inputFluidInventory.getTanks(); i++) {
-                        if(this.fluid==null || this.fluid.isFluidEqual(inputFluidInventory.getTankAt(i).getFluid()))
-                        {
-                            if(this.fluid==null)  this.fluid = inputFluidInventory.getTankAt(i).getFluid();
-                            long amount =  fluidBank.fill(inputFluidInventory.getTankAt(i).getFluidAmount());
-                            inputFluidInventory.getTankAt(i).drain((int)amount,true);
-                        }
-                    }
-                }
-                if(outputFluidInventory.getTanks()>0 && this.fluid!=null && this.outputflag==1)
-                {
+        if (getWorld().isRemote) {
+            return;
+        }
 
-                    List<FluidStack> Outputs = new ArrayList<>();
-                    for (int i = 0; i < outputFluidInventory.getTanks(); i++) {
-                        if(outputFluidInventory.getTankAt(i).getFluid()!=null && !outputFluidInventory.getTankAt(i).getFluid().isFluidEqual(this.fluid))
-                            continue;
-                        long energyDebanked = fluidBank.drain(outputFluidInventory.getTankAt(i).getCapacity()-outputFluidInventory.getTankAt(i).getFluidAmount());
-                        Outputs.add(new FluidStack(this.fluid.getFluid(), (int) energyDebanked));
-                    }
-                    GTTransferUtils.addFluidsToFluidHandler(outputFluidInventory ,false, Outputs);
-                }
-                if(!fluidBank.hasFluid())
-                    fluid = null;
-                time=0;
+        if (getOffsetTimer() % 20 == 0) {
+            // active here is just used for rendering
+            setActive(fluidBank.hasFluid());
+        }
+
+        time++;
+        if (!isWorkingEnabled() || time <= 20) {
+            return;
+        }
+
+        importFluids();
+        exportFluids();
+
+        if (!fluidBank.hasFluid()) {
+            fluid = null;
+        }
+        time = 0;
+    }
+
+    private void importFluids() {
+        if (inputFluidInventory.getTanks() <= 0) {
+            return;
+        }
+        for (int i = 0; i < inputFluidInventory.getTanks(); i++) {
+            IMultipleTankHandler.ITankEntry tank = inputFluidInventory.getTankAt(i);
+            if (fluid != null && !fluid.isFluidEqual(tank.getFluid())) {
+                continue;
             }
+            if (fluid == null) {
+                fluid = tank.getFluid();
+            }
+            long amount = fluidBank.fill(tank.getFluidAmount());
+            tank.drain((int) amount, true);
         }
     }
+
+    private void exportFluids() {
+        if (outputFluidInventory.getTanks() <= 0 || fluid == null || outputflag != 1) {
+            return;
+        }
+        List<FluidStack> outputs = new ArrayList<>();
+        for (int i = 0; i < outputFluidInventory.getTanks(); i++) {
+            IMultipleTankHandler.ITankEntry tank = outputFluidInventory.getTankAt(i);
+            if (tank.getFluid() != null && !tank.getFluid().isFluidEqual(fluid)) {
+                continue;
+            }
+            long drained = fluidBank.drain(tank.getCapacity() - tank.getFluidAmount());
+            outputs.add(new FluidStack(fluid.getFluid(), (int) drained));
+        }
+        GTTransferUtils.addFluidsToFluidHandler(outputFluidInventory, false, outputs);
+    }
+
+    // ---------------------------------------------------------------------
+    // GUI
+    // ---------------------------------------------------------------------
+
     @Override
     @Nonnull
     protected Widget getFlexButton(int x, int y, int width, int height) {
@@ -241,23 +292,24 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 .setTooltipText("gtqtcore.multiblock.tfft.isoutput"));
         return group;
     }
-    private void setoutputFlag(Widget.ClickData clickData)
-    {
-        if( this.outputflag==0)
-            this.outputflag=1;
-        else if (this.outputflag==1) {
-            this.outputflag=0;
-        }
+
+    private void setoutputFlag(Widget.ClickData clickData) {
+        outputflag = outputflag == 0 ? 1 : 0;
     }
-    private void clearFluid(Widget.ClickData clickData)
-    {
-        this.fluid = null;
-        this.fluidBank.clearStore();
+
+    private void clearFluid(Widget.ClickData clickData) {
+        fluid = null;
+        fluidBank.clearStore();
     }
+
+    // ---------------------------------------------------------------------
+    // Structure
+    // ---------------------------------------------------------------------
+
     private static final StructureContributionKey<IStoreData, List<IStoreData>> BATTERY_KEY =
             StructureContributionKey.orderedList("drtech:yot_storage_cells");
 
-    private static final IStructureElement BATTERY_ELEMENT = new BatteryContributionElement<>(
+    private static final IStructureElement<?> BATTERY_ELEMENT = new BatteryContributionElement<Object> (
             "drtech:yot_storage_cells",
             state -> {
                 if (!Datas.YOT_CASINGS.containsKey(state)) return null;
@@ -266,14 +318,13 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                 return data;
             },
             () -> Datas.YOT_CASINGS.entrySet().stream()
-                    .sorted(java.util.Comparator.comparingInt(e -> e.getValue().getTier()))
+                    .sorted(Comparator.comparingInt(e -> e.getValue().getTier()))
                     .map(e -> new BlockInfo(e.getKey(), null))
                     .toArray(BlockInfo[]::new));
 
     @NotNull
     private static final StructureDefinition<?> STRUCTURE_DEFINITION =
-            StructureDefinition.getOrBuild("drtech:yot_tank",
-                    MetaTileEntityYotTank::buildTemplate);
+            StructureDefinition.getOrBuild("drtech:yot_tank", MetaTileEntityYotTank::buildTemplate);
 
     @Override
     protected StructureDefinition<?> createStructureDefinition() {
@@ -283,13 +334,13 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     private static StructureDefinition<?> buildTemplate() {
         return DeclarativePatternBuilder.start(RIGHT, FRONT, UP)
                 .piece("start")
-                    .aisle("#####", "#XXX#", "#XXX#", "#XXX#", "#####")
-                    .aisle("XXSXX", "XCCCX", "XCCCX", "XCCCX", "XXXXX")
+                .aisle("#####", "#XXX#", "#XXX#", "#XXX#", "#####")
+                .aisle("XXSXX", "XCCCX", "XCCCX", "XCCCX", "XXXXX")
                 .repeatablePiece("body", 1, 14)
-                    .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
+                .aisle("GGGGG", "GBBBG", "GBBBG", "GBBBG", "GGGGG")
                 .piece("end")
-                    .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
-                    .aisle("LLLLL", "L###L", "L###L", "L###L", "LLLLL")
+                .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX", "XXXXX")
+                .aisle("LLLLL", "L###L", "L###L", "L###L", "LLLLL")
                 .self('S', MetaTileEntityYotTank.class)
                 .any('#')
                 .blocks('C', getCasingState())
@@ -303,11 +354,10 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                         Elements.hatch(DrtechCapabilities.YOT_HATCH, 0, 1)))
                 .blocks('G', getGlassState())
                 .frames('L', Materials.Steel)
-                .where('B', Elements.withTooltips(BATTERY_ELEMENT,
-                        "gregtech.multiblock.pattern.error.batteries"))
+                .where('B', Elements.withTooltips(BATTERY_ELEMENT, "gregtech.multiblock.pattern.error.batteries"))
                 .buildStructureDefinition();
-
     }
+
     protected static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(MetaCasing.MetalCasingType.YOT_TANK_CASING);
     }
@@ -315,20 +365,26 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     protected static IBlockState getGlassState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.FUSION_GLASS);
     }
+
     @Override
     public ICubeRenderer getBaseTexture(IMultiblockPart iMultiblockPart) {
         return Textures.YOT_TANK_CASING;
     }
+
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip,
-                               boolean advanced) {
+    public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
         tooltip.add(I18n.format("gregtech.machine.yot_tank.tooltip1"));
         tooltip.add(I18n.format("gregtech.machine.yot_tank.tooltip2"));
     }
+
+    // ---------------------------------------------------------------------
+    // Display
+    // ---------------------------------------------------------------------
+
     @Override
     protected void configureDisplayText(MultiblockUIBuilder builder) {
         super.configureDisplayText(builder);
-        builder.setWorkingStatus(true, isActive() && isWorkingEnabled()) // transform into two-state system for display
+        builder.setWorkingStatus(true, isActive() && isWorkingEnabled())
                 .setWorkingStatusKeys(
                         "gregtech.multiblock.idling",
                         "gregtech.multiblock.idling",
@@ -337,37 +393,35 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
                     if (!isStructureFormed()) {
                         return;
                     }
-                    boolean hasBank = syncer.syncBoolean(() -> this.fluidBank != null);
-                    String storedText = syncer.<String>syncObject(() -> this.fluidBank == null ? "0 L"
-                            : TextFormattingUtil.formatNumbers(this.fluidBank.getStored()) + " L",
+                    boolean hasBank = syncer.syncBoolean(() -> fluidBank != null);
+                    String storedText = syncer.<String>syncObject(
+                            () -> fluidBank == null ? "0 L" : TextFormattingUtil.formatNumbers(fluidBank.getStored()) + " L",
                             ByteBufAdapters.STRING);
-                    String capacityText = syncer.<String>syncObject(() -> this.fluidBank == null ? "0 L"
-                            : TextFormattingUtil.formatNumbers(this.fluidBank.getCapacity()) + " L",
+                    String capacityText = syncer.<String>syncObject(
+                            () -> fluidBank == null ? "0 L" : TextFormattingUtil.formatNumbers(fluidBank.getCapacity()) + " L",
                             ByteBufAdapters.STRING);
-                    String fluidName = syncer.<String>syncObject(() -> this.fluid == null
-                            ? "空" : this.fluid.getLocalizedName(), ByteBufAdapters.STRING);
-                    int outputflag = syncer.syncInt(() -> this.outputflag);
+                    String fluidName = syncer.<String>syncObject(
+                            () -> fluid == null ? "空" : fluid.getLocalizedName(),
+                            ByteBufAdapters.STRING);
+                    int output = syncer.syncInt(() -> outputflag);
 
                     keyManager.add(richText -> {
                         if (!hasBank) {
                             return;
                         }
-                        // Stored line
                         richText.add(KeyUtil.lang(TextFormatting.GRAY,
-                                "gregtech.multiblock.power_substation.stored",
-                                KeyUtil.string(TextFormatting.GOLD, storedText)))
+                                        "gregtech.multiblock.power_substation.stored",
+                                        KeyUtil.string(TextFormatting.GOLD, storedText)))
                                 .newLine();
-                        // Capacity line
                         richText.add(KeyUtil.lang(TextFormatting.GRAY,
-                                "gregtech.multiblock.power_substation.capacity",
-                                KeyUtil.string(TextFormatting.GOLD, capacityText)))
+                                        "gregtech.multiblock.power_substation.capacity",
+                                        KeyUtil.string(TextFormatting.GOLD, capacityText)))
                                 .newLine();
                         richText.add(KeyUtil.lang(TextFormatting.GOLD, "drtech.multiblock.yot_tank.fluid_type",
-                                KeyUtil.string(TextFormatting.WHITE, fluidName)))
+                                        KeyUtil.string(TextFormatting.WHITE, fluidName)))
                                 .newLine();
-                        richText.add(KeyUtil.lang(TextFormatting.GRAY,
-                                "drtech.multiblock.power_substation.output",
-                                KeyUtil.string(TextFormatting.WHITE, outputflag == 0 ? "禁用" : "启用")))
+                        richText.add(KeyUtil.lang(TextFormatting.GRAY, "drtech.multiblock.power_substation.output",
+                                        KeyUtil.string(TextFormatting.WHITE, output == 0 ? "禁用" : "启用")))
                                 .newLine();
                     });
                 })
@@ -378,47 +432,56 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
     @Override
     public void renderMetaTileEntity(CCRenderState renderState, Matrix4 translation, IVertexOperation[] pipeline) {
         super.renderMetaTileEntity(renderState, translation, pipeline);
-        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(), this.isActive(),
-                this.isWorkingEnabled());
+        getFrontOverlay().renderOrientedState(renderState, translation, pipeline, getFrontFacing(),
+                isActive(), isWorkingEnabled());
     }
+
     @Override
     public MetaTileEntity createMetaTileEntity(IGregTechTileEntity iGregTechTileEntity) {
-        return new MetaTileEntityYotTank(this.metaTileEntityId);
+        return new MetaTileEntityYotTank(metaTileEntityId);
     }
+
+    // ---------------------------------------------------------------------
+    // Structure lifecycle
+    // ---------------------------------------------------------------------
+
     @Override
     public void invalidateStructure() {
         super.invalidateStructure();
         resetTileAbilities();
     }
+
     @Override
     protected void formStructure(@NotNull FormedStructureView formed) {
         super.formStructure(formed);
         initializeAbilities();
+
         List<IStoreData> aggregate = formed.getAggregate(BATTERY_KEY);
         List<IStoreData> parts = aggregate == null ? new ArrayList<>() : new ArrayList<>(aggregate);
+
         // 关联结构内的 Yot 仓口（旧机制经 matchContext "Multi" 集合并入，现改由成型部件列表获得）
         for (IMultiblockPart part : formed.getParts()) {
             if (part instanceof MetaTileEntityYotHatch) {
                 ((MetaTileEntityYotHatch) part).setYotTank(this);
             }
         }
+
         if (parts.isEmpty()) {
             invalidateStructure();
             return;
         }
-        if (this.fluidBank == null) {
-            this.fluidBank = new YotTankFluidBank(parts);
-        } else {
-            this.fluidBank = fluidBank.rebuild(parts);
-        }
+
+        fluidBank = (fluidBank == null) ? new YotTankFluidBank(parts) : fluidBank.rebuild(parts);
     }
+
     private void initializeAbilities() {
-        this.inputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
-        this.outputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
+        inputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
+        outputFluidInventory = new FluidTankList(true, getAbilities(MultiblockAbility.EXPORT_FLUIDS));
     }
+
     private void resetTileAbilities() {
-        this.inputFluidInventory = new FluidTankList(true);
-        this.outputFluidInventory = new FluidTankList(true);
+        inputFluidInventory = new FluidTankList(true);
+        outputFluidInventory = new FluidTankList(true);
     }
 
     @Override
@@ -426,26 +489,27 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         return 0;
     }
 
-
-
+    // ---------------------------------------------------------------------
+    // Fluid bank
+    // ---------------------------------------------------------------------
 
     public static class YotTankFluidBank {
 
         private static final String NBT_SIZE = "Size";
         private static final String NBT_STORED = "Stored";
         private static final String NBT_MAX = "Max";
+
         private final BigInteger[] storage;
         private final BigInteger[] maximums;
         private final BigInteger capacity;
         private int index;
 
         public YotTankFluidBank(List<IStoreData> batteries) {
-            storage = new BigInteger[batteries.size()];
-            for (int i = 0; i < batteries.size(); i++) {
+            int size = batteries.size();
+            storage = new BigInteger[size];
+            maximums = new BigInteger[size];
+            for (int i = 0; i < size; i++) {
                 storage[i] = BigInteger.ZERO;
-            }
-            maximums = new BigInteger[batteries.size()];
-            for (int i = 0; i < batteries.size(); i++) {
                 maximums[i] = batteries.get(i).getCapacity();
             }
             capacity = summarize(maximums);
@@ -454,26 +518,24 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         public YotTankFluidBank(NBTTagCompound storageTag) {
             int size = storageTag.getInteger(NBT_SIZE);
             storage = new BigInteger[size];
-            for (int i = 0; i < size; i++) {
-                storage[i] = BigInteger.ZERO;
-            }
             maximums = new BigInteger[size];
             for (int i = 0; i < size; i++) {
+                storage[i] = BigInteger.ZERO;
                 NBTTagCompound subtag = storageTag.getCompoundTag(String.valueOf(i));
                 if (subtag.hasKey(NBT_STORED)) {
                     storage[i] = new BigInteger(subtag.getString(NBT_STORED));
                 }
                 maximums[i] = new BigInteger(subtag.getString(NBT_MAX));
             }
-
             capacity = summarize(maximums);
         }
 
+        // Persist bank state
         private NBTTagCompound writeToNBT(NBTTagCompound compound) {
             compound.setInteger(NBT_SIZE, storage.length);
             for (int i = 0; i < storage.length; i++) {
                 NBTTagCompound subtag = new NBTTagCompound();
-                if (storage[i].compareTo(BigInteger.ZERO)==1) {
+                if (storage[i].signum() > 0) {
                     subtag.setString(NBT_STORED, storage[i].toString());
                 }
                 subtag.setString(NBT_MAX, maximums[i].toString());
@@ -481,6 +543,7 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             }
             return compound;
         }
+
         /**
          * Rebuild the power storage with a new list of batteries.
          * Will use existing stored power and try to map it onto new batteries.
@@ -499,12 +562,15 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
 
         /** @return Amount filled into storage */
         public long fill(long amount) {
-            if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
-            if (index != storage.length - 1 && storage[index].compareTo(maximums[index])==0) {
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative!");
+            }
+            if (index != storage.length - 1 && storage[index].compareTo(maximums[index]) == 0) {
                 index++;
             }
-            BigInteger maxFill = DrtechUtils.getBigIntegerMin(maximums[index].subtract(storage[index]), new BigInteger(String.valueOf(amount)));
-            if (maxFill.compareTo(BigInteger.ZERO)==0 && index == storage.length - 1) {
+            BigInteger maxFill = DrtechUtils.getBigIntegerMin(
+                    maximums[index].subtract(storage[index]), BigInteger.valueOf(amount));
+            if (maxFill.signum() == 0 && index == storage.length - 1) {
                 return 0;
             }
             storage[index] = storage[index].add(maxFill);
@@ -514,35 +580,41 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
             }
             return maxFill.longValue();
         }
+
         public BigInteger fill(BigInteger amount) {
-            if (amount.compareTo(BigInteger.ZERO) ==-1) throw new IllegalArgumentException("Amount cannot be negative!");
-            if (index != storage.length - 1 && storage[index].compareTo(maximums[index])==0) {
+            if (amount.signum() < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative!");
+            }
+            if (index != storage.length - 1 && storage[index].compareTo(maximums[index]) == 0) {
                 index++;
             }
-            BigInteger maxFill = DrtechUtils.getBigIntegerMin(maximums[index].subtract(storage[index]), new BigInteger(String.valueOf(amount)));
-            if (maxFill.compareTo(BigInteger.ZERO)==0 && index == storage.length - 1) {
+            BigInteger maxFill = DrtechUtils.getBigIntegerMin(maximums[index].subtract(storage[index]), amount);
+            if (maxFill.signum() == 0 && index == storage.length - 1) {
                 return BigInteger.ZERO;
             }
             storage[index] = storage[index].add(maxFill);
             amount = amount.subtract(maxFill);
-            if (amount.compareTo(BigInteger.ZERO)==1 && index != storage.length - 1) {
+            if (amount.signum() > 0 && index != storage.length - 1) {
                 return maxFill.add(fill(amount));
             }
             return maxFill;
         }
+
         /** @return Amount drained from storage */
         public long drain(long amount) {
-            if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative!");
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative!");
+            }
 
             // ensure index
-            if (index != 0 && storage[index].compareTo(BigInteger.ZERO) == 0) {
+            if (index != 0 && storage[index].signum() == 0) {
                 index--;
             }
 
-            BigInteger maxDrain = DrtechUtils.getBigIntegerMin(storage[index], new BigInteger(String.valueOf(amount)));
+            BigInteger maxDrain = DrtechUtils.getBigIntegerMin(storage[index], BigInteger.valueOf(amount));
 
             // storage is completely empty
-            if (maxDrain.compareTo(BigInteger.ZERO) == 0 && index == 0) {
+            if (maxDrain.signum() == 0 && index == 0) {
                 return 0;
             }
 
@@ -571,7 +643,9 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
 
         public boolean hasFluid() {
             for (BigInteger l : storage) {
-                if (l.compareTo(BigInteger.ZERO)==1) return true;
+                if (l.signum() > 0) {
+                    return true;
+                }
             }
             return false;
         }
@@ -579,16 +653,15 @@ public class MetaTileEntityYotTank extends MultiblockWithDisplayBase implements 
         private static BigInteger summarize(BigInteger[] values) {
             BigInteger retVal = BigInteger.ZERO;
             for (BigInteger value : values) {
-                if(value!=null)
+                if (value != null) {
                     retVal = retVal.add(value);
+                }
             }
             return retVal;
         }
-        public  void clearStore()
-        {
-            for (int i = 0; i < storage.length; i++) {
-                storage[i] = BigInteger.ZERO;
-            }
+
+        public void clearStore() {
+            Arrays.fill(storage, BigInteger.ZERO);
         }
     }
 }

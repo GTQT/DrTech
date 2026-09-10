@@ -76,7 +76,7 @@ public class MetaTileEntityIndustrialMixer extends RecipeMapMultiblockController
         return true;
     }
 
-    protected static IBlockState getCasingState() {
+    public static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING1.getState(MetaCasing1.MetalCasingType.JIAO_BAN_CASING);
     }
 
