@@ -36,7 +36,7 @@ public class MetaTileEntityDronePad extends RecipeMapMultiblockController {
         super(metaTileEntityId, DRONE_PAD);
     }
 
-    private static IBlockState getCasingState() {
+    public static IBlockState getCasingState() {
         return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STEEL_SOLID);
     }
 

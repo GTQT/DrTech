@@ -1,8 +1,12 @@
 package com.meowmel.cropQT.api;
 
 import com.drppp.drtech.common.items.ItemsInit;
+import com.meowmel.cropQT.api.mutation.MutationPools;
+import com.meowmel.cropQT.api.registries.HydrationRegistry;
 import com.meowmel.cropQT.block.BlockCropStick;
 import com.meowmel.cropQT.event.CropTickHandler;
+import com.meowmel.cropQT.fluid.FluidEnrichedFertilizer;
+import com.meowmel.cropQT.fluid.FluidFertilizer;
 import net.minecraftforge.common.MinecraftForge;
 
 /**
@@ -27,8 +31,15 @@ public class CropInitHandler {
     }
     public static void init()
     {
+        // 土壤组要先登记：CropType.Builder 的默认土壤引用了 SoilTypes.farmland，
+        // 而 SoilRegistry 的反查依赖登记顺序
+        SoilTypes.ensureRegistered();
+        HydrationRegistry.registerDefaults();
+        FluidFertilizer.register();
+        FluidEnrichedFertilizer.register();
         CropRegistry.ensureRegistered();
         CrossBreedingRegistry.registerDefaults();
+        MutationPools.registerDefaults();
         BlockCropStick.initVanillaSeedMap();
     }
     public static void clienInit()

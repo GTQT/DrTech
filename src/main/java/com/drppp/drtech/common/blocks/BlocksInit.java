@@ -6,6 +6,8 @@ import com.drppp.drtech.api.utils.Datas;
 import com.drppp.drtech.common.blocks.metaBlocks.*;
 import com.drppp.drtech.common.tile.*;
 import com.meowmel.cropQT.block.BlockCropStick;
+import com.meowmel.cropQT.block.BlockIndustrialFarmUnit;
+import com.meowmel.cropQT.block.BlockSeedBed;
 import com.meowmel.cropQT.tile.TileCropStick;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -31,6 +33,10 @@ public class BlocksInit {
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
     public static final BlockTimeTable BLOCK_TIME_TABLE = new BlockTimeTable();
+
+    // 工业农场的两个组件方块（作物系统）
+    public static final BlockSeedBed SEED_BED = new BlockSeedBed();
+    public static final BlockIndustrialFarmUnit INDUSTRIAL_FARM_UNIT = new BlockIndustrialFarmUnit();
     public static BlockCropStick CROP_STICK = new BlockCropStick();
 
     public static void init(RegistryEvent.Register<Block> event) {
@@ -60,6 +66,8 @@ public class BlocksInit {
         event.getRegistry().register(BLOCK_TIME_TABLE);
         GameRegistry.registerTileEntity(TileEntityTimeTable.class, new ResourceLocation(Tags.MODID, "time_table"));
         event.getRegistry().register(CROP_STICK);
+        event.getRegistry().register(SEED_BED);
+        event.getRegistry().register(INDUSTRIAL_FARM_UNIT);
         GameRegistry.registerTileEntity(TileCropStick.class, Tags.MODID + ":crop_stick");
         Datas.init();
     }

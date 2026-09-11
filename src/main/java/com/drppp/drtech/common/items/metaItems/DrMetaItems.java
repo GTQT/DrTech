@@ -1,6 +1,7 @@
 package com.drppp.drtech.common.items.metaItems;
 
 import com.meowmel.cropQT.item.MetaCrops;
+import com.meowmel.cropQT.item.MetaItemCropTools;
 import gregtech.api.items.metaitem.MetaItem;
 
 public final class DrMetaItems {
@@ -210,5 +211,8 @@ public final class DrMetaItems {
 
         MetaItemLootTable metaItemLootTable = new MetaItemLootTable();
         metaItemLootTable.setRegistryName("loot_table");
+
+        MetaItemCropTools cropTools = new MetaItemCropTools();
+        cropTools.setRegistryName("crop_tools");
     }
 }

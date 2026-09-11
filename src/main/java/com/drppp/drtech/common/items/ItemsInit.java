@@ -30,6 +30,7 @@ import com.drppp.drtech.common.glider.ItemHangGlider;
 import com.drppp.drtech.common.glider.ItemHangGliderPart;
 import com.meowmel.cropQT.item.ItemCropAnalyzer;
 import com.meowmel.cropQT.item.ItemCropSeed;
+import com.meowmel.cropQT.item.ItemEnvironmentalModule;
 import com.meowmel.cropQT.item.ItemWeedingShears;
 import gregtech.api.block.VariantItemBlock;
 import net.minecraft.block.Block;
@@ -63,6 +64,7 @@ public class ItemsInit {
     public static ItemCropSeed CROP_SEED = new ItemCropSeed();
     public static ItemCropAnalyzer CROP_ANALYZER = new ItemCropAnalyzer();
     public static ItemWeedingShears ITEM_WEEDING_SHEARS = new ItemWeedingShears();
+    public static ItemEnvironmentalModule ENVIRONMENTAL_MODULE = new ItemEnvironmentalModule();
     public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
     public static final ItemSimpleDrTech WING_FAIRY_DUST = new ItemSimpleDrTech("fairy_dust");
@@ -114,6 +116,7 @@ public class ItemsInit {
         event.getRegistry().register(CROP_SEED);
         event.getRegistry().register(CROP_ANALYZER);
         event.getRegistry().register(ITEM_WEEDING_SHEARS);
+        event.getRegistry().register(ENVIRONMENTAL_MODULE);
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(WING_FAIRY_DUST);
@@ -138,6 +141,9 @@ public class ItemsInit {
         event.getRegistry().register(DRONE_PROGRAM_CARD);
         event.getRegistry().register(DRONE_UPGRADE_MODULE);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
+        // 工业农场的两个组件方块走 VariantItemBlock，才能按 meta 出不同子物品
+        event.getRegistry().register(createItemBlock(BlocksInit.SEED_BED, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.INDUSTRIAL_FARM_UNIT, VariantItemBlock::new));
     }
 
     @SideOnly(Side.CLIENT)
@@ -150,6 +156,8 @@ public class ItemsInit {
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING3);
         registerItemModel(BlocksInit.YOT_TANK);
         registerItemModel(BlocksInit.TFFT_TANK);
+        registerItemModel(BlocksInit.SEED_BED);
+        registerItemModel(BlocksInit.INDUSTRIAL_FARM_UNIT);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
         ModelLoader.setCustomMeshDefinition(CROP_SEED, new ItemCropSeed.SeedMeshDefinition());
         // 种子袋变体模型(含默认 + 8个自定义，硬编码避免依赖CropRegistry时序)

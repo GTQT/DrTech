@@ -1,0 +1,35 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "environmental_enhancement": {
+        "textures": {
+          "all": "drtech:blocks/industrial_farm_unit_environmental_enhancement"
+        }
+      },
+      "growth_acceleration": {
+        "textures": {
+          "all": "drtech:blocks/industrial_farm_unit_growth_acceleration"
+        }
+      },
+      "fertilizer": {
+        "textures": {
+          "all": "drtech:blocks/industrial_farm_unit_fertilizer"
+        }
+      },
+      "advanced_harvesting": {
+        "textures": {
+          "all": "drtech:blocks/industrial_farm_unit_advanced_harvesting"
+        }
+      },
+      "overclocked_growth_acceleration": {
+        "textures": {
+          "all": "drtech:blocks/industrial_farm_unit_overclocked_growth_acceleration"
+        }
+      }
+    }
+  }
+}

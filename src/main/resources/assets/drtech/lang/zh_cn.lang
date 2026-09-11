@@ -1211,6 +1211,29 @@ tile.drtech.crop_stick.name=作物架
 item.drtech.crop_seed.name=种子袋
 item.drtech.crop_analyzer.name=作物分析器
 item.drtech.weeding_shears.name=除草剪
+# --- 作物系统：工具（meta item） ---
+metaitem.fertilizer_applicator.name=施肥器
+metaitem.watering_can.name=浇水壶
+
+# --- 作物系统：土壤组 ---
+cropqt.soil.farmland=耕地
+cropqt.soil.dirt_grass=泥土
+cropqt.soil.stone=石头
+cropqt.soil.sand=沙子
+cropqt.soil.mushroom=菌丝
+cropqt.soil.netherrack=下界岩
+cropqt.soil.end=末地石
+cropqt.soil.gravel=沙砾
+cropqt.soil.soul_sand=灵魂沙
+cropqt.soil.brick=砖块
+cropqt.soil.water=水体
+
+# --- 作物系统：液体肥料 ---
+fluid.drtech.fertilizer=液体肥料
+fluid.fertilizer=液体肥料
+fluid.drtech.enriched_fertilizer=浓缩液体肥料
+fluid.enriched_fertilizer=浓缩液体肥料
+
 item.drtech.xp_berry.name=经验莓
 item.drtech.soar_xp_berry.name=飞升莓
 
@@ -1847,15 +1870,14 @@ metaitem.uua_berry.name=UUA浆果
 metaitem.uum_berry.name=UUM浆果
 
 drtech.machine.crops.tooltip.1=§7螺丝刀右击切换工作阶段：§e输入模式 §7→ §a运行模式 §7→ §c输出模式
-drtech.machine.crops.tooltip.2=§7潜行螺丝刀右击切换核心模式：§e普通作物模式 §7/ §b作物架模式
-drtech.machine.crops.tooltip.3=§7输入模式会从输入总线部署作物；输出模式会将已部署作物和支撑物退回输出总线
+drtech.machine.crops.tooltip.2=§7本机只处理§e原版作物§7（IC2 风格作物种子）；CropQT 的作物请使用§b工业农场§7多方块
+drtech.machine.crops.tooltip.3=§7输入模式会从输入总线部署作物；输出模式会将已部署作物退回输出总线
 drtech.machine.crops.tooltip.4=§7运行阶段每株每轮消耗§b1000L 水§7，并消耗当前输入电压的§e1A§7电流；双能源仓为§e4A
-drtech.machine.crops.tooltip.5=§7支持§e多种不同作物§7同时输入；普通模式可混放普通种子，作物架模式可混放多个种子袋
-drtech.machine.crops.tooltip.6=§7§a肥料增强§7使用 GT 肥料：普通模式每株最多§e2§7份（每份§a+200%§7），作物架模式每株最多§e40§7份（每份§a+10%§7）
-drtech.machine.crops.tooltip.7=§7作物架模式需要§e种子袋 + 作物架§7；若有依托方块要求，其数量需与作物数一致
-drtech.machine.crops.tooltip.8=§7存在多种依托方块产出时，按本次读取到的第一种依托方块决定输出；界面与 TOP 会预览即将产出的物品
+drtech.machine.crops.tooltip.5=§7支持§e多种不同作物§7同时输入，各自独立结算产出
+drtech.machine.crops.tooltip.6=§7§a肥料增强§7使用 GT 肥料：每株每轮最多§e2§7份，每份§a+200%§7产出轮数
+drtech.machine.crops.tooltip.7=§7容量随输入电压档位提升；EV 起可用，之后每升一档容量翻倍
+drtech.machine.crops.tooltip.8=§7界面与 TOP 会预览即将产出的物品
 drtech.machine.crops.display.phase=阶段:
-drtech.machine.crops.display.core=模式:
 drtech.machine.crops.display.capacity=容量:
 drtech.machine.crops.display.deployed=已部署:
 drtech.machine.crops.display.varieties=种类:
@@ -2290,3 +2312,120 @@ metaitem.modular_armor.no_modules=§c未安装模块
 metaitem.modular_armor.max_fluid=§3最大流体单元容量：%s
 
 drtech.modular_armor.usable=§3可用作模块化护甲的模块
+
+# --- Crops: machines ---
+drtech.machine.seed_generator.lv.name=基础种子生成器
+drtech.machine.seed_generator.mv.name=进阶种子生成器
+drtech.machine.seed_generator.hv.name=进阶种子生成器 II
+drtech.machine.seed_generator.ev.name=进阶种子生成器 III
+drtech.machine.seed_generator.iv.name=精英种子生成器
+
+# --- Crops: machines ---
+drtech.machine.crop_manager.lv.name=基础作物管理器
+drtech.machine.crop_manager.mv.name=进阶作物管理器
+drtech.machine.crop_manager.hv.name=进阶作物管理器 II
+drtech.machine.crop_manager.ev.name=进阶作物管理器 III
+drtech.machine.crop_manager.iv.name=精英作物管理器
+drtech.machine.crop_breeder.lv.name=基础作物育种机
+drtech.machine.crop_breeder.mv.name=进阶作物育种机
+drtech.machine.crop_breeder.hv.name=进阶作物育种机 II
+drtech.machine.crop_breeder.ev.name=进阶作物育种机 III
+drtech.machine.crop_breeder.iv.name=精英作物育种机
+drtech.machine.gene_extractor.ev.name=进阶基因提取器
+drtech.machine.gene_extractor.iv.name=精英基因提取器
+drtech.machine.crop_synthesizer.ev.name=进阶作物合成器
+drtech.machine.crop_synthesizer.iv.name=精英作物合成器
+drtech.machine.industrial_farm.name=工业农场
+
+# --- Crops: machine tutorials ---
+drtech.machine.seed_generator.tooltip.1=用途§8：把一份§e已分析§8的种子袋原样复制一份
+drtech.machine.seed_generator.tooltip.2=输入§8 种子袋（必须先分析）　§7输出§8 同样的种子袋
+drtech.machine.seed_generator.tooltip.3=消耗§b液体肥料§8：肥料越浓，每次用掉的 mB 越少
+drtech.machine.seed_generator.tooltip.4=耗时随电压档位递减，最低 §e20 tick
+drtech.machine.seed_generator.tooltip.5=未分析的种子不给复制§8——先用作物分析仪过一遍
+drtech.machine.seed_generator.tooltip.6=作物链的顺序§8：分析 → §e扩繁§8 → 育种 → 提取 / 合成
+
+drtech.machine.crop_manager.tooltip.1=用途§8：以机器为中心，自动照料一大片作物架
+drtech.machine.crop_manager.tooltip.2=范围§8：水平半径 §e3 + 2×档位§8（LV 为 5、IV 为 13），上下各 §e2§8 格
+drtech.machine.crop_manager.tooltip.3=每个周期扫一遍§8：收获成熟作物、给缺水的补水、给缺肥的补肥
+drtech.machine.crop_manager.tooltip.4=三件事各有开关§8，§c默认只开收获§8——浇水和施肥要你主动打开
+drtech.machine.crop_manager.tooltip.5=机器自带水罐与液肥罐，接管道补；液肥越浓，一桶顶得越久
+drtech.machine.crop_manager.tooltip.6=本机只认液体肥料§8，固体肥料请用施肥器手动施
+drtech.machine.crop_manager.tooltip.7=收获加成随档位提高，IV 档 §e+25%
+
+drtech.machine.crop_breeder.tooltip.1=用途§8：把 §e2~4§8 颗已分析的亲本种子杂交成一颗新种子
+drtech.machine.crop_breeder.tooltip.2=走的是和作物架同一张§e变异表§8——田里试出来的组合，机器上照样成立
+drtech.machine.crop_breeder.tooltip.3=输入槽§8：LV ~ MV 给 3 个，HV 起给 §e6§8 个
+drtech.machine.crop_breeder.tooltip.4=成功率 §e40 + (档位 - LV) × 10§8 %，封顶 100%
+drtech.machine.crop_breeder.tooltip.5=失败照样扣亲本与液肥§8——育种是有成本的事
+drtech.machine.crop_breeder.tooltip.6=哪些组合能出什么，看 §eJEI 的杂交页
+drtech.machine.crop_breeder.tooltip.7=子代属性取各亲本属性的平均值
+
+drtech.machine.gene_extractor.tooltip.1=用途§8：把一颗已分析的种子拆成 §e4 个基因球之一
+drtech.machine.gene_extractor.tooltip.2=一次只抽一样§8：物种 / 生长 / 产量 / 抗性，用界面按钮切换
+drtech.machine.gene_extractor.tooltip.3=§物种要 §e5 分钟§8，抽单项属性减半
+drtech.machine.gene_extractor.tooltip.4=基因球会被消耗§8——这一点和合成器相反
+drtech.machine.gene_extractor.tooltip.5=本机按 §e3 安培§8取电，比同档别的机器费电
+drtech.machine.gene_extractor.tooltip.6=拿到球之后，用合成器把四颗拼回一颗完整种子
+
+drtech.machine.crop_synthesizer.tooltip.1=用途§8：§e4 个基因球 + UUM§8 → 一颗分析好的完整种子
+drtech.machine.crop_synthesizer.tooltip.2=基因球不消耗§8——它是可反复使用的模板，只有 UUM 被吃掉
+drtech.machine.crop_synthesizer.tooltip.3=UUM 用量§8：作物 tier 决定底量，三围决定增量
+drtech.machine.crop_synthesizer.tooltip.4=耗时随 tier 增长（约 5 ~ 10 分钟），本机按 §e3 安培§8取电
+drtech.machine.crop_synthesizer.tooltip.5=和提取器配对§8：提取器负责拆、合成器负责拼
+drtech.machine.crop_synthesizer.tooltip.6=四颗球攒齐之后，每次合成就只花 UUM
+
+# --- Crops: farm components ---
+tile.drtech.seed_bed.seed_bed.name=种子床
+tile.drtech.industrial_farm_unit.environmental_enhancement.name=环境强化单元
+tile.drtech.industrial_farm_unit.growth_acceleration.name=生长加速单元
+tile.drtech.industrial_farm_unit.fertilizer.name=肥料单元
+tile.drtech.industrial_farm_unit.advanced_harvesting.name=高级收割单元
+tile.drtech.industrial_farm_unit.overclocked_growth_acceleration.name=超频生长加速单元
+
+# --- Crops: environmental modules ---
+item.drtech.environmental_module.blank.name=空白环境模块
+item.drtech.environmental_module.hot.name=环境模块：炎热
+item.drtech.environmental_module.cold.name=环境模块：寒冷
+item.drtech.environmental_module.sparse.name=环境模块：稀疏
+item.drtech.environmental_module.dense.name=环境模块：茂密
+item.drtech.environmental_module.wet.name=环境模块：潮湿
+item.drtech.environmental_module.dry.name=环境模块：干燥
+item.drtech.environmental_module.savanna.name=环境模块：热带草原
+item.drtech.environmental_module.coniferous.name=环境模块：针叶
+item.drtech.environmental_module.jungle.name=环境模块：丛林
+item.drtech.environmental_module.spooky.name=环境模块：阴森
+item.drtech.environmental_module.dead.name=环境模块：死寂
+item.drtech.environmental_module.lush.name=环境模块：繁茂
+item.drtech.environmental_module.nether.name=环境模块：下界
+item.drtech.environmental_module.end.name=环境模块：末地
+item.drtech.environmental_module.mushroom.name=环境模块：蘑菇
+item.drtech.environmental_module.magical.name=环境模块：魔法
+item.drtech.environmental_module.ocean.name=环境模块：海洋
+item.drtech.environmental_module.river.name=环境模块：河流
+item.drtech.environmental_module.mesa.name=环境模块：台地
+item.drtech.environmental_module.forest.name=环境模块：森林
+item.drtech.environmental_module.plains.name=环境模块：平原
+item.drtech.environmental_module.mountain.name=环境模块：山地
+item.drtech.environmental_module.hills.name=环境模块：丘陵
+item.drtech.environmental_module.swamp.name=环境模块：沼泽
+item.drtech.environmental_module.sandy.name=环境模块：沙地
+item.drtech.environmental_module.snowy.name=环境模块：雪原
+item.drtech.environmental_module.wasteland.name=环境模块：荒地
+item.drtech.environmental_module.beach.name=环境模块：沙滩
+
+# --- Crops: industrial farm GUI ---
+cropqt.farm.display.tier=§7等级：§b%s§7   段数：§b%d
+cropqt.farm.display.slice_overflow=§c段数超限：%d / %d，请提高输入电压
+cropqt.farm.mode.input=输入模式
+cropqt.farm.mode.farm=生产模式
+cropqt.farm.mode.output=输出模式
+
+# --- Crops: gene orb modes ---
+cropqt.gene.mode.species=物种
+cropqt.gene.mode.growth=生长
+cropqt.gene.mode.gain=产量
+cropqt.gene.mode.resistance=抗性
+
+# 机器用法不在这里——那 5 台不走 RecipeMap，JEI 摆不出有意义的页，
+# 教程写在机器物品自己的 tooltip 里（见上面的 drtech.machine.*.tooltip.*）

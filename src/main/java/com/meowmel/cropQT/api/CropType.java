@@ -4,11 +4,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.BiomeDictionary;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 /**
  * 定义一种作物类型的所有属性
+ *
+ * <p>「种在哪」由两个独立字段决定，别搞混：
+ * <ul>
+ *     <li>{@link #soilTypes} —— 土壤，作物架<b>直接踩着的那一格</b>（y-1）。决定能不能种、保水保肥上限。</li>
+ *     <li>{@link #subSoilRequirement} —— 底土，再往下一格（y-2）。决定矿物来源，可为 {@code null}。</li>
+ * </ul>
  */
 
 public class CropType {
@@ -24,7 +32,6 @@ public class CropType {
     private final List<ItemStack> drops;           // 固定掉落(可后续追加)
     private final List<ChanceDrop> chanceDrops;    // 概率掉落(可后续追加)
     private final String lootTable;
-    private final String[] requiredBlocks;
     private final float lightRequirement;
     private final float waterRequirement;
     private final CropRenderType renderType;
@@ -35,6 +42,21 @@ public class CropType {
     private final float waterRequirementMax;  // RANGE模式的上限
     private final Map<String, List<ItemStack>> blockDrops;        // 方块ID → 特定掉落
     private final Map<String, List<ChanceDrop>> blockChanceDrops; // 方块ID → 特定概率掉落
+
+    // ==================== 种植条件 ====================
+
+    /** 允许的土壤组。默认 {@link SoilTypes#farmland}。 */
+    private final ISoilList soilTypes;
+    /** 底土要求；{@code null} 表示不挑底土。 */
+    private final SubSoilRequirement subSoilRequirement;
+    /** 偏好的生物群系标签，影响环境分。空集表示不挑。 */
+    private final Set<BiomeDictionary.Type> likedBiomes;
+    /** 完整生长一轮的时长（tick）。{@code <= 0} 表示按 tier 推导。 */
+    private final int growthDuration;
+    /** 参与杂交所需的最低生长进度（0~1）；{@code < 0} 表示禁止杂交。 */
+    private final float crossingThreshold;
+    /** 作为亲本被其它作物杂交所需的最低生长进度（0~1）；{@code < 0} 表示禁止。 */
+    private final float breedingThreshold;
 
     private CropType(Builder builder) {
         this.id = builder.id;
@@ -49,7 +71,6 @@ public class CropType {
         this.drops = new ArrayList<>(builder.drops);          // 可变副本
         this.chanceDrops = new ArrayList<>(builder.chanceDrops); // 可变副本
         this.lootTable = builder.lootTable;
-        this.requiredBlocks = builder.requiredBlocks;
         this.lightRequirement = builder.lightRequirement;
         this.waterRequirement = builder.waterRequirement;
         this.renderType = builder.renderType;
@@ -60,6 +81,12 @@ public class CropType {
         this.waterRequirementMax = builder.waterRequirementMax;
         this.blockDrops = new HashMap<>(builder.blockDrops);
         this.blockChanceDrops = new HashMap<>(builder.blockChanceDrops);
+        this.soilTypes = builder.soilTypes;
+        this.subSoilRequirement = builder.subSoilRequirement;
+        this.likedBiomes = Collections.unmodifiableSet(new HashSet<>(builder.likedBiomes));
+        this.growthDuration = builder.growthDuration;
+        this.crossingThreshold = builder.crossingThreshold;
+        this.breedingThreshold = builder.breedingThreshold;
     }
 
     // ==================== 后续追加掉落物(init阶段使用) ====================
@@ -191,7 +218,6 @@ public class CropType {
     public List<ItemStack> getDrops() { return drops; }
     public List<ChanceDrop> getChanceDrops() { return chanceDrops; }
     public String getLootTable() { return lootTable; }
-    public String[] getRequiredBlocks() { return requiredBlocks; }
     public float getLightRequirement() { return lightRequirement; }
     public float getWaterRequirement() { return waterRequirement; }
     public CropRenderType getRenderType() { return renderType; }
@@ -203,18 +229,52 @@ public class CropType {
     public Map<String, List<ItemStack>> getBlockDrops() { return blockDrops; }
     public Map<String, List<ChanceDrop>> getBlockChanceDrops() { return blockChanceDrops; }
 
-    public boolean canGrowAt(float light, float humidity, List<String> blocksBelowIds) {
+    // ==================== 种植条件 ====================
+
+    /**
+     * 允许的土壤组。
+     *
+     * <p>返回 {@code null} 表示<b>不限土壤</b>——这是默认值，也是迁移期的安全默认：
+     * 一个作物没显式声明土壤就不该被限制，否则老存档里的农场会突然种不下去。
+     */
+    @Nullable
+    public ISoilList getSoilTypes() { return soilTypes; }
+
+    /** 底土要求；没有则返回 {@code null}。 */
+    public SubSoilRequirement getSubSoilRequirement() { return subSoilRequirement; }
+
+    /** 是否要求特定底土。 */
+    public boolean hasSubSoilRequirement() { return subSoilRequirement != null; }
+
+    /** 偏好的生物群系标签，只读。 */
+    public Set<BiomeDictionary.Type> getLikedBiomes() { return likedBiomes; }
+
+    /**
+     * 完整生长一轮的时长（tick）。
+     *
+     * <p>没显式设定时按 {@code 600 * tier} 推导——机器（育种机 / 工业农场）用它算周期，
+     * 世界里的作物架走的是 {@link #getStageRequirement()} 那套逐阶段进度。
+     */
+    public int getGrowthDuration() {
+        return growthDuration > 0 ? growthDuration : 600 * tier;
+    }
+
+    /** 参与杂交所需的最低生长进度（0~1）；返回负数表示该作物不能主动杂交。 */
+    public float getCrossingThreshold() { return crossingThreshold; }
+
+    /** 作为亲本被杂交所需的最低生长进度（0~1）；返回负数表示不能被杂交。 */
+    public float getBreedingThreshold() { return breedingThreshold; }
+
+    /**
+     * 光照与湿度是否达标。
+     *
+     * <p><b>底土要求不在这里判</b>——底土要看真实方块，需要 {@link World} 与坐标，
+     * 见 {@link SubSoilRequirement#isMet} 与 {@code TileCropStick} 的生长逻辑。
+     * 本方法只需要光照与湿度两个标量。
+     */
+    public boolean canGrowAt(float light, float humidity) {
         if (!checkValue(light, lightRequirement, lightRequirementMax, lightCompare)) return false;
-        if (!checkValue(humidity, waterRequirement, waterRequirementMax, humidityCompare)) return false;
-        if (requiredBlocks != null && requiredBlocks.length > 0) {
-            for (String req : requiredBlocks) {
-                for (String actual : blocksBelowIds) {
-                    if (actual.equals(req)) return true;
-                }
-            }
-            return false;
-        }
-        return true;
+        return checkValue(humidity, waterRequirement, waterRequirementMax, humidityCompare);
     }
 
     private static boolean checkValue(float actual, float min, float max, CompareMode mode) {
@@ -250,7 +310,6 @@ public class CropType {
         private List<ItemStack> drops = new ArrayList<>();
         private List<ChanceDrop> chanceDrops = new ArrayList<>();
         private String lootTable = null;
-        private String[] requiredBlocks = new String[0];
         private float lightRequirement = 9;
         private float waterRequirement = 0;
         private CropRenderType renderType = CropRenderType.CROSS;
@@ -264,6 +323,13 @@ public class CropType {
         private String texturePath = null;    // 自定义贴图目录
         private String seedTexture = null;   // 自定义种子袋贴图分组键
         private int seedColor = 0xFFFFFF;    // 种子袋染色RGB
+
+        private ISoilList soilTypes = null;   // null = 不限土壤
+        private SubSoilRequirement subSoilRequirement = null;
+        private Set<BiomeDictionary.Type> likedBiomes = new HashSet<>();
+        private int growthDuration = -1;         // <=0 表示按 tier 推导
+        private float crossingThreshold = 0.8f;
+        private float breedingThreshold = 0.8f;
 
         public Builder(String id) { this.id = id; this.displayName = id; }
 
@@ -319,21 +385,6 @@ public class CropType {
         }
         /** 从战利品表获取掉落 */
         public Builder lootTable(String table) { this.lootTable = table; return this; }
-        public Builder requiredBlocks(String... b) { this.requiredBlocks = b; return this; }
-        /** 接受Block实例(自动取defaultState，带meta)。仅在init阶段后可用 */
-        public Builder requiredBlocks(Block... blocks) {
-            IBlockState[] states = new IBlockState[blocks.length];
-            for (int i = 0; i < blocks.length; i++) states[i] = blocks[i].getDefaultState();
-            return requiredBlocks(states);
-        }
-        /** 接受IBlockState实例，自动转为带meta的注册名(如 gregtech:compressed_1:9)。仅在init阶段后可用 */
-        public Builder requiredBlocks(IBlockState... states) {
-            this.requiredBlocks = new String[states.length];
-            for (int i = 0; i < states.length; i++) {
-                this.requiredBlocks[i] = blockStateToId(states[i]);
-            }
-            return this;
-        }
 
         private static String blockStateToId(IBlockState state) {
             Block block = state.getBlock();
@@ -353,6 +404,38 @@ public class CropType {
         public Builder seedColor(int rgb) { this.seedColor = rgb; return this; }
         /** 设为false则不允许通过杂交产出此作物 */
         public Builder canBeBreedResult(boolean v) { this.canBeBreedResult = v; return this; }
+
+        // ==================== 种植条件 ====================
+
+        /**
+         * 允许的土壤组（作物架直接踩着的那一格）。
+         * 不设表示不限土壤。
+         */
+        public Builder soil(ISoilList soil) { this.soilTypes = soil; return this; }
+
+        /**
+         * 底土要求（再往下一格）。
+         * 例：{@code .subSoil(SubSoilRequirements.copper)} 要求下方第二格是铜。
+         */
+        public Builder subSoil(SubSoilRequirement requirement) { this.subSoilRequirement = requirement; return this; }
+
+        /** 追加一个偏好的生物群系标签。 */
+        public Builder likedBiome(BiomeDictionary.Type type) { this.likedBiomes.add(type); return this; }
+
+        /** 批量设置偏好的生物群系标签。 */
+        public Builder likedBiomes(BiomeDictionary.Type... types) {
+            this.likedBiomes.addAll(Arrays.asList(types));
+            return this;
+        }
+
+        /** 完整生长一轮的时长（tick）。不设则按 {@code 600 * tier} 推导。 */
+        public Builder growthDuration(int ticks) { this.growthDuration = ticks; return this; }
+
+        /** 参与杂交所需的最低生长进度（0~1）；传负数表示禁止主动杂交。 */
+        public Builder crossingThreshold(float v) { this.crossingThreshold = v; return this; }
+
+        /** 作为亲本被杂交所需的最低生长进度（0~1）；传负数表示不能被杂交。 */
+        public Builder breedingThreshold(float v) { this.breedingThreshold = v; return this; }
         /** 光照小于等于某值 (蘑菇/暗处作物) */
         public Builder lightRequirementLess(float max) {
             this.lightRequirement = max;

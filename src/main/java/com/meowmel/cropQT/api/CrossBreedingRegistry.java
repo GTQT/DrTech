@@ -1,34 +1,22 @@
 package com.meowmel.cropQT.api;
 
-import java.util.*;
+import com.meowmel.cropQT.api.mutation.MutationRegistry;
 
 /**
- * 杂交配方注册表
+ * 旧杂交配方表。
+ *
+ * <p>现在只是 {@link MutationRegistry} 的一层门面：原来那些
+ * {@code register(父本A, 父本B, 产物, 权重)} 调用原样保留，实际登记进去的是
+ * {@link com.meowmel.cropQT.api.mutation.CropMutation}。
+ *
+ * <p>保留这个类，是因为这张约 100 条的配方表读起来仍然最直观——一条一行。
+ * 新配方（含 3 / 4 父本）直接写 {@link MutationRegistry#register} 即可。
  */
-
 public class CrossBreedingRegistry {
 
-    private static final List<CrossRecipe> RECIPES = new ArrayList<>();
-
+    /** 登记一条两父本配方。 */
     public static void register(String parent1, String parent2, String result, int weight) {
-        RECIPES.add(new CrossRecipe(parent1, parent2, result, weight));
-    }
-
-    public static List<CrossRecipe> getAllRecipes() {
-        return Collections.unmodifiableList(RECIPES);
-    }
-
-    /**
-     * 获取两个亲本能产出的所有杂交产物及权重
-     */
-    public static Map<String, Integer> getProducts(String a, String b) {
-        Map<String, Integer> products = new HashMap<>();
-        for (CrossRecipe recipe : RECIPES) {
-            if (recipe.matches(a, b)) {
-                products.merge(recipe.result, recipe.weight, Integer::sum);
-            }
-        }
-        return products;
+        MutationRegistry.register(result, weight, parent1, parent2);
     }
 
     public static void registerDefaults() {
@@ -181,19 +169,5 @@ public class CrossBreedingRegistry {
         register("aurelia", "green_diamond", "money_grass", 2);
         register("nuclear_grass", "dahlia", "mech_brain", 1);
         // heartfruit: canBeBreedResult=false, 不会出现在杂交产物中
-    }
-
-    public static class CrossRecipe {
-        public final String parent1, parent2, result;
-        public final int weight;
-
-        public CrossRecipe(String p1, String p2, String r, int w) {
-            parent1 = p1; parent2 = p2; result = r; weight = w;
-        }
-
-        public boolean matches(String a, String b) {
-            return (parent1.equals(a) && parent2.equals(b)) ||
-                    (parent1.equals(b) && parent2.equals(a));
-        }
     }
 }

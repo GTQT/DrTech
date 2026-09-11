@@ -3,6 +3,7 @@ package com.meowmel.cropQT.block;
 import com.drppp.drtech.Tags;
 import com.meowmel.cropQT.tile.TileCropStick;
 import com.meowmel.cropQT.api.CropRegistry;
+import com.meowmel.cropQT.api.SoilRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.item.ItemCropSeed;
@@ -134,11 +135,30 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
             player.sendMessage(new TextComponentString(TextFormatting.RED + "未知的作物类型!"));
             return false;
         }
-        tile.plantCrop(cropId, stats);
+        if (!tile.plantCrop(cropId, stats)) {
+            player.sendMessage(new TextComponentString(
+                    TextFormatting.RED + "土壤不合作物要求，种不下去!（需要 "
+                            + describeSoil(tile, cropId) + "）"));
+            return false;
+        }
         if (!player.isCreative()) item.shrink(1);
         CropType type = CropRegistry.get(cropId);
         player.sendMessage(new TextComponentString(TextFormatting.GREEN + "种植了 " + (type != null ? type.getDisplayName() : cropId)));
         return true;
+    }
+
+    /** 给玩家看的「这株作物要什么土壤」。取不到需求时退回一句笼统提示。 */
+    private String describeSoil(TileCropStick tile, String cropId) {
+        CropType type = CropRegistry.get(cropId);
+        if (type == null || type.getSoilTypes() == null) {
+            return "不挑土壤";
+        }
+        String name = type.getSoilTypes().getName();
+        net.minecraft.util.text.ITextComponent localized =
+                new net.minecraft.util.text.TextComponentTranslation("cropqt.soil." + name);
+        String text = localized.getUnformattedText();
+        // 没配 lang key 时 getUnformattedText 会把 key 原样返回，退到内部名
+        return text.startsWith("cropqt.soil.") ? name : text;
     }
 
     /**
@@ -175,9 +195,14 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         List<ItemStack> d = new ArrayList<>(); d.add(new ItemStack(this)); return d;
     }
 
+    /**
+     * 能不能架在这里：只要脚下那块是<b>已登记的土壤</b>就行。
+     *
+     * <p>规则照 CropsNH——不写死方块列表。这样 {@link com.meowmel.cropQT.api.SoilTypes}
+     * 里加了新土壤，作物架就自动能架上去，不需要回来改这里。
+     */
     @Override public boolean canPlaceBlockAt(World w, BlockPos p) {
-        Block b = w.getBlockState(p.down()).getBlock();
-        return b == Blocks.FARMLAND || b == Blocks.DIRT || b == Blocks.GRASS || b == Blocks.SOUL_SAND;
+        return SoilRegistry.getSoilFor(w.getBlockState(p.down())) != null;
     }
 
     @Override public void neighborChanged(IBlockState s, World w, BlockPos p, Block b, BlockPos f) {

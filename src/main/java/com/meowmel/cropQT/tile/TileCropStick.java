@@ -2,6 +2,9 @@ package com.meowmel.cropQT.tile;
 
 
 import com.meowmel.cropQT.api.*;
+import com.meowmel.cropQT.api.mutation.CropMutation;
+import com.meowmel.cropQT.api.mutation.MutationRegistry;
+import com.meowmel.cropQT.handler.CropConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -22,6 +25,14 @@ public class TileCropStick extends TileEntity implements ITickable {
 
     public static final int GROWTH_CYCLE = 256;
 
+    /**
+     * 底土不满足时的生长惩罚除数。
+     *
+     * <p>是<b>软惩罚</b>而不是硬门槛：放错底土的作物照样能长，只是慢到玩家自然会去修。
+     * 这样不会让已建好的农场突然死掉。
+     */
+    public static final int SUB_SOIL_PENALTY = 50;
+
     private String cropId = "";
     private CropStats stats = new CropStats();
     private int growthStage = 0;
@@ -30,6 +41,15 @@ public class TileCropStick extends TileEntity implements ITickable {
     private int tickCounter = 0;
     private boolean isWeed = false;
     private boolean pendingSync = false;
+
+    /**
+     * 当前储水量。上限由脚下的土壤组决定（见 {@link #getMaxWater()}）。
+     *
+     * <p>水位只提供<b>正向加成</b>（最多 +30%），断水不会让作物停摆。
+     */
+    private int waterStorage = 0;
+    /** 当前储肥量。加成上限 +50%。 */
+    private int fertilizerStorage = 0;
 
     @Override
     public void update() {
@@ -54,15 +74,32 @@ public class TileCropStick extends TileEntity implements ITickable {
         CropType type = getCropType();
         if (type == null || growthStage >= type.getMaxGrowthStage()) return;
 
+        // 配置把生长关掉时，连水肥都不该扣——否则玩家会白养一堆地
+        double growthMultiplier = CropConfig.getGrowthMultiplier();
+        if (growthMultiplier <= 0.0d) return;
+
         float light = EnvironmentCalculator.calcLight(world, pos);
         float humidity = EnvironmentCalculator.calcHumidity(world, pos);
-        List<String> blocksBelowIds = EnvironmentCalculator.getBlocksBelowIds(world, pos);
-        if (!type.canGrowAt(light * 15, humidity, blocksBelowIds)) return;
+        if (!type.canGrowAt(light * 15, humidity)) return;
 
-        float envScore = EnvironmentCalculator.calcEnvironmentScore(world, pos);
+        // 先扣这一轮的水肥，再按剩余储量算加成——这样储量见底的那一轮加成立刻掉下来
+        consumeStorages(type);
+
+        float envScore = EnvironmentCalculator.calcEnvironmentScore(
+                world, pos, getWaterRatio(), getFertilizerRatio());
         int baseIncr = stats.rollGrowthIncrement(world.rand);
         float envMult = 0.3f + envScore * 1.2f;
         int increment = Math.max(1, Math.round(baseIncr * envMult));
+
+        // 底土不满足 = 软惩罚：照样长，但慢到玩家自然会去补底土
+        if (!isSubSoilSatisfied()) {
+            increment = Math.max(1, increment / SUB_SOIL_PENALTY);
+        }
+
+        // 配置倍率放在最后——底土惩罚是"这块地不行"，配置是"这个存档想快一点"，两回事
+        if (growthMultiplier != 1.0d) {
+            increment = Math.max(1, (int) Math.round(increment * growthMultiplier));
+        }
 
         growthProgress += increment;
         if (growthProgress >= type.getStageRequirement()) {
@@ -121,19 +158,25 @@ public class TileCropStick extends TileEntity implements ITickable {
         markDirtyAndScheduleSync();
     }
 
-    // ==================== 杂交(新逻辑) ====================
+    // ==================== 杂交 ====================
+
+    /** 自交分支的出现概率（百分比）。照 CropsNH，一半一半。 */
+    private static final int SELF_CROSS_CHANCE = 50;
 
     /**
-     * 新杂交逻辑:
-     * 1. 收集所有参与杂交的作物
-     * 2. 将所有参与者两两组合查询杂交产物表, 同种产物权重相加
-     * 3. 每个参与者杂交出自身的权重固定500
-     * 4. 加杂草权重50
-     * 5. 按权重随机, 结果受Tier限制和canBeBreedResult检查
+     * 杂交一轮。流程照 CropsNH：
+     * <ol>
+     *     <li>收集四邻成熟非杂草作物，各自掷骰决定是否参与</li>
+     *     <li>一半概率走<b>自交</b>：随机挑一株参与者原样产出，属性重掷</li>
+     *     <li>否则查确定性配方，命中就按权重挑一个</li>
+     *     <li>没命中就查变异池，命中的池里随机挑一个、再随机挑成员</li>
+     *     <li>产物还要过 tier 上限与 {@code canBeBreedResult} 两道闸</li>
+     * </ol>
      */
     private void tickCrossBreeding() {
-        List<TileCropStick> allMature = new ArrayList<>();
         BlockPos[] neighbors = {pos.north(), pos.south(), pos.east(), pos.west()};
+
+        List<TileCropStick> allMature = new ArrayList<>();
         for (BlockPos nPos : neighbors) {
             TileEntity te = world.getTileEntity(nPos);
             if (te instanceof TileCropStick) {
@@ -143,65 +186,23 @@ public class TileCropStick extends TileEntity implements ITickable {
         }
         if (allMature.size() < 2) return;
 
+        double chanceMultiplier = CropConfig.getCrossBreedChanceMultiplier();
         List<TileCropStick> participants = new ArrayList<>();
         for (TileCropStick n : allMature) {
-            if (world.rand.nextInt(100) < n.stats.getCrossBreedChance()) participants.add(n);
+            int chance = (int) Math.round(n.stats.getCrossBreedChance() * chanceMultiplier);
+            if (world.rand.nextInt(100) < Math.min(100, chance)) participants.add(n);
         }
         if (participants.size() < 2) return;
 
-        // 构建产物权重表
-        Map<String, Integer> weightTable = new LinkedHashMap<>();
-
-        // 1. 每个参与者杂交出自身: 权重500
-        Set<String> parentIds = new HashSet<>();
+        List<String> parentIds = new ArrayList<>(participants.size());
         for (TileCropStick p : participants) {
             parentIds.add(p.cropId);
-            weightTable.merge(p.cropId, 500, Integer::sum);
         }
 
-        // 2. 所有参与者两两组合查询杂交配方, 产物权重相加
-        for (int i = 0; i < participants.size(); i++) {
-            for (int j = i + 1; j < participants.size(); j++) {
-                Map<String, Integer> products = CrossBreedingRegistry.getProducts(
-                        participants.get(i).cropId, participants.get(j).cropId);
-                for (Map.Entry<String, Integer> e : products.entrySet()) {
-                    weightTable.merge(e.getKey(), e.getValue(), Integer::sum);
-                }
-            }
-        }
-
-        // 3. 杂草权重
-        weightTable.merge("weed", 50, Integer::sum);
-
-        // Tier限制
-        int maxParentTier = participants.stream()
-                .map(t -> CropRegistry.get(t.cropId))
-                .filter(Objects::nonNull)
-                .mapToInt(CropType::getTier)
-                .max().orElse(1);
-
-        // 移除不合格的产物
-        weightTable.entrySet().removeIf(e -> {
-            CropType ct = CropRegistry.get(e.getKey());
-            if (ct == null) return true;
-            if (ct.getTier() > maxParentTier + 1) return true;
-            if (!ct.canBeBreedResult() && !parentIds.contains(e.getKey())) return true;
-            return false;
-        });
-
-        if (weightTable.isEmpty()) return;
-
-        // 按权重随机选择
-        int total = weightTable.values().stream().mapToInt(Integer::intValue).sum();
-        int roll = world.rand.nextInt(total);
-        String result = null;
-        for (Map.Entry<String, Integer> e : weightTable.entrySet()) {
-            roll -= e.getValue();
-            if (roll < 0) { result = e.getKey(); break; }
-        }
+        String result = pickBreedingResult(parentIds);
         if (result == null) return;
 
-        // 子代属性
+        // 子代属性取四邻所有作物的平均（不只参与者）
         List<CropStats> allStats = new ArrayList<>();
         for (BlockPos nPos : neighbors) {
             TileEntity te = world.getTileEntity(nPos);
@@ -219,6 +220,56 @@ public class TileCropStick extends TileEntity implements ITickable {
         markDirtyAndScheduleSync();
     }
 
+    /**
+     * 掷出这一轮的杂交产物。
+     *
+     * @param parentIds 参与者的作物 id，可含重复（两株同种作物会各占一项）
+     * @return 作物 id；没有合法产物时返回 {@code null}
+     */
+    @Nullable
+    private String pickBreedingResult(List<String> parentIds) {
+        if (world.rand.nextInt(100) < SELF_CROSS_CHANCE) {
+            String self = parentIds.get(world.rand.nextInt(parentIds.size()));
+            return isBreedResultAllowed(self, parentIds) ? self : null;
+        }
+
+        CropMutation mutation = MutationRegistry.pickDeterministic(parentIds, world.rand);
+        if (mutation != null) {
+            String result = mutation.getResult();
+            return isBreedResultAllowed(result, parentIds) ? result : null;
+        }
+
+        String pooled = MutationRegistry.pickFromPools(parentIds, world.rand);
+        if (pooled == null) {
+            return null;
+        }
+        return isBreedResultAllowed(pooled, parentIds) ? pooled : null;
+    }
+
+    /**
+     * 产物能不能落在这一格上。
+     *
+     * <p>两道闸：tier 不超过最高父本 +1；以及要么允许作为杂交产物
+     * （{@code canBeBreedResult}），要么本来就在参与者里（自交不受这条限制）。
+     */
+    private boolean isBreedResultAllowed(String cropId, List<String> parentIds) {
+        CropType result = CropRegistry.get(cropId);
+        if (result == null) {
+            return false;
+        }
+        if (!result.canBeBreedResult() && !parentIds.contains(cropId)) {
+            return false;
+        }
+        int maxParentTier = 1;
+        for (String parentId : parentIds) {
+            CropType parent = CropRegistry.get(parentId);
+            if (parent != null) {
+                maxParentTier = Math.max(maxParentTier, parent.getTier());
+            }
+        }
+        return result.getTier() <= maxParentTier + 1;
+    }
+
     // ==================== 收获(含概率掉落+战利品表) ====================
 
     /**
@@ -230,8 +281,8 @@ public class TileCropStick extends TileEntity implements ITickable {
 
         List<ItemStack> drops = new ArrayList<>();
 
-        // 获取下方方块ID列表
-        List<String> blocksBelowIds = EnvironmentCalculator.getBlocksBelowIds(world, pos);
+        // 土壤 + 底土的方块 ID：按方块区分的掉落表不区分是哪一格
+        List<String> blocksBelowIds = EnvironmentCalculator.getSoilAndSubSoilIds(world, pos);
 
         // 固定+概率掉落(根据方块决定)
         drops.addAll(type.rollDrops(world.rand, stats.getYieldBonus(world.rand), blocksBelowIds));
@@ -252,11 +303,23 @@ public class TileCropStick extends TileEntity implements ITickable {
 
     // ==================== 外部接口 ====================
 
-    public void plantCrop(String cropId, CropStats stats) {
+    /**
+     * 种下一株作物。
+     *
+     * <p>土壤不符合作物要求时<b>拒绝种植</b>——这是硬门槛，与底土的软惩罚相对。
+     *
+     * @return 是否种成功；调用方据此给玩家提示
+     */
+    public boolean plantCrop(String cropId, CropStats stats) {
+        CropType type = CropRegistry.get(cropId);
+        if (type == null || !isSoilValid(type)) {
+            return false;
+        }
         this.cropId = cropId; this.stats = stats;
         this.growthStage = 0; this.growthProgress = 0;
         this.isWeed = false; this.doubleCropStick = false;
         immediateSync();
+        return true;
     }
 
     public boolean harvest() {
@@ -269,6 +332,126 @@ public class TileCropStick extends TileEntity implements ITickable {
         this.cropId = ""; this.stats = new CropStats();
         this.growthStage = 0; this.growthProgress = 0; this.isWeed = false;
         immediateSync();
+    }
+
+    // ==================== 水 / 肥储量 ====================
+
+    /** 扣掉一个生长周期的水与肥。脚下不是已登记土壤时（理论上不会）不扣。 */
+    private void consumeStorages(CropType type) {
+        ISoilList soil = getSoilType();
+        if (soil == null) {
+            return;
+        }
+        int tier = type.getTier();
+        waterStorage = Math.max(0, waterStorage - soil.getWaterUsage(tier));
+        fertilizerStorage = Math.max(0, fertilizerStorage - soil.getFertilizerUsage(tier));
+    }
+
+    /** 储水上限，来自脚下的土壤组；不是土壤时返回 0。 */
+    public int getMaxWater() {
+        ISoilList soil = getSoilType();
+        return soil == null ? 0 : soil.getWaterCapacity();
+    }
+
+    /** 储肥上限，同上。 */
+    public int getMaxFertilizer() {
+        ISoilList soil = getSoilType();
+        return soil == null ? 0 : soil.getFertilizerCapacity();
+    }
+
+    public int getWaterStorage() { return waterStorage; }
+
+    public int getFertilizerStorage() { return fertilizerStorage; }
+
+    /** 水位 0~1，用于加成计算与界面显示。 */
+    public float getWaterRatio() {
+        int max = getMaxWater();
+        return max <= 0 ? 0f : Math.min(1f, waterStorage / (float) max);
+    }
+
+    /** 肥位 0~1。 */
+    public float getFertilizerRatio() {
+        int max = getMaxFertilizer();
+        return max <= 0 ? 0f : Math.min(1f, fertilizerStorage / (float) max);
+    }
+
+    /** 补水。 @return 实际补进去的量，满了或补不进时为 0 */
+    public int addWater(int amount) {
+        return addToStorage(amount, true);
+    }
+
+    /** 补肥。 @return 实际补进去的量 */
+    public int addFertilizer(int amount) {
+        return addToStorage(amount, false);
+    }
+
+    private int addToStorage(int amount, boolean water) {
+        if (amount <= 0) {
+            return 0;
+        }
+        int max = water ? getMaxWater() : getMaxFertilizer();
+        int current = water ? waterStorage : fertilizerStorage;
+        int added = Math.min(amount, max - current);
+        if (added <= 0) {
+            return 0;
+        }
+        if (water) {
+            waterStorage += added;
+        } else {
+            fertilizerStorage += added;
+        }
+        markDirtyAndScheduleSync();
+        return added;
+    }
+
+    // ==================== 种植条件查询 ====================
+
+    /**
+     * 脚下的土壤是否符合作物的要求。
+     *
+     * <p>作物没声明土壤组（{@code null}）表示不限土壤，恒为 {@code true}。
+     */
+    public boolean isSoilValid(@Nullable CropType type) {
+        if (type == null) {
+            return true;
+        }
+        ISoilList required = type.getSoilTypes();
+        return required == null || required.contains(EnvironmentCalculator.soilState(world, pos));
+    }
+
+    /**
+     * 当前底土是否满足要求。
+     *
+     * <p>没有底土要求的作物恒为 {@code true}。
+     */
+    public boolean isSubSoilSatisfied() {
+        CropType type = getCropType();
+        if (type == null || !type.hasSubSoilRequirement()) return true;
+        return type.getSubSoilRequirement().isMet(world, pos);
+    }
+
+    /** 脚下土壤所属的组；不是任何已登记土壤时返回 {@code null}。 */
+    @Nullable
+    public ISoilList getSoilType() {
+        return SoilRegistry.getSoilFor(EnvironmentCalculator.soilState(world, pos));
+    }
+
+    /**
+     * 当前不满足的生长条件，供分析仪 / TOP / tooltip 展示。
+     *
+     * <p>只列「种下去之后还能改」的条件——底土。土壤不在其中：它是种植时的硬门槛，
+     * 一旦种下就改不了了，列出来只会让玩家以为还有救。
+     */
+    public List<GrowthRequirement> getUnmetRequirements() {
+        CropType type = getCropType();
+        if (type == null) {
+            return Collections.emptyList();
+        }
+        SubSoilRequirement subSoil = type.getSubSoilRequirement();
+        if (subSoil == null || subSoil.isMet(world, pos)) {
+            return Collections.emptyList();
+        }
+        return Collections.singletonList(subSoil);
     }
 
     public void setDoubleCropStick(boolean v) { this.doubleCropStick = v; immediateSync(); }
@@ -291,6 +474,8 @@ public class TileCropStick extends TileEntity implements ITickable {
         n.setInteger("growthStage", growthStage); n.setInteger("growthProgress", growthProgress);
         n.setBoolean("doubleCropStick", doubleCropStick); n.setBoolean("isWeed", isWeed);
         n.setInteger("tickCounter", tickCounter); n.setBoolean("pendingSync", pendingSync);
+        n.setInteger("waterStorage", waterStorage);
+        n.setInteger("fertilizerStorage", fertilizerStorage);
         if (stats != null) stats.writeToNBT(n); return n;
     }
 
@@ -300,6 +485,8 @@ public class TileCropStick extends TileEntity implements ITickable {
         growthProgress = n.getInteger("growthProgress"); doubleCropStick = n.getBoolean("doubleCropStick");
         isWeed = n.getBoolean("isWeed"); tickCounter = n.getInteger("tickCounter");
         pendingSync = n.getBoolean("pendingSync"); stats = CropStats.readFromNBT(n);
+        waterStorage = n.getInteger("waterStorage");
+        fertilizerStorage = n.getInteger("fertilizerStorage");
     }
 
     @Override public SPacketUpdateTileEntity getUpdatePacket() { return new SPacketUpdateTileEntity(pos, 1, getUpdateTag()); }

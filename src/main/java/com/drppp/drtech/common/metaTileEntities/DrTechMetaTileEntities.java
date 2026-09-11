@@ -21,6 +21,13 @@ import com.drppp.drtech.common.metaTileEntities.muti.mutipart.MetaTileEntityYotH
 import com.drppp.drtech.common.metaTileEntities.single.EnergySink;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityArmorWorkbench;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityIndustrialApiary;
+import com.meowmel.cropQT.machine.MetaTileEntityCropBreeder;
+import com.meowmel.cropQT.machine.MetaTileEntityCropGeneExtractor;
+import com.meowmel.cropQT.machine.MetaTileEntityCropMachine;
+import com.meowmel.cropQT.machine.MetaTileEntityCropManager;
+import com.meowmel.cropQT.machine.MetaTileEntityCropSynthesizer;
+import com.meowmel.cropQT.machine.MetaTileEntityIndustrialFarm;
+import com.meowmel.cropQT.machine.MetaTileEntitySeedGenerator;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityLaserPipeBending;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityLightsaberAssembler;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityUniversalCollector;
@@ -30,6 +37,8 @@ import gregtech.api.metatileentity.SimpleMachineMetaTileEntity;
 import gregtech.api.util.GTUtility;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.IntFunction;
 
 import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntity;
 import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntities;
@@ -79,6 +88,15 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntityArmorWorkbench ARMOR_WORKBENCH;
     public static EnergySink ENERGY_SINK;
     public static MetaTileEntityIndustrialApiary INDUSTRIAL_APIARY;
+
+    /** 五台作物机器，按声明的档位排列。 */
+    public static MetaTileEntitySeedGenerator[] CROP_SEED_GENERATOR;
+    public static MetaTileEntityCropManager[] CROP_MANAGER;
+    public static MetaTileEntityCropBreeder[] CROP_BREEDER;
+    public static MetaTileEntityCropGeneExtractor[] CROP_GENE_EXTRACTOR;
+    public static MetaTileEntityCropSynthesizer[] CROP_SYNTHESIZER;
+    /** 工业农场：单控制器，等级由输入电压决定。 */
+    public static MetaTileEntityIndustrialFarm INDUSTRIAL_FARM;
     public static MetaTileEntityDroneProgrammer DRONE_PROGRAMMER;
     public static MetaTileEntityDroneDock DRONE_DOCK;
     public static MetaTileEntityDroneDock DRONE_DOCK_EV;
@@ -191,6 +209,63 @@ public class DrTechMetaTileEntities {
         // 模块化装甲（原 mechtech）
         ARMOR_WORKBENCH = registerMetaTileEntity(getID(), new MetaTileEntityArmorWorkbench(getDrId("armor_workbench")));
         ENERGY_SINK = registerMetaTileEntity(getID(), new EnergySink(getDrId("energy_sink")));
+
+        registerCropMachines();
+    }
+
+    /**
+     * 作物系统的单方块机器。
+     *
+     * <p>ID 段：200 起，每台占 10 个号（只用到前几个电压档）。
+     * 名称走 {@code drtech.machine.<path>.name}，路径形如 {@code seed_generator.lv}。
+     */
+    private static void registerCropMachines() {
+        CROP_SEED_GENERATOR = registerTieredCropMachine(200, "seed_generator",
+                MetaTileEntitySeedGenerator::new, CROP_TIERS_LV_TO_IV, MetaTileEntitySeedGenerator[]::new);
+        CROP_MANAGER = registerTieredCropMachine(210, "crop_manager",
+                MetaTileEntityCropManager::new, CROP_TIERS_LV_TO_IV, MetaTileEntityCropManager[]::new);
+        CROP_BREEDER = registerTieredCropMachine(220, "crop_breeder",
+                MetaTileEntityCropBreeder::new, CROP_TIERS_LV_TO_IV, MetaTileEntityCropBreeder[]::new);
+        CROP_GENE_EXTRACTOR = registerTieredCropMachine(230, "gene_extractor",
+                MetaTileEntityCropGeneExtractor::new, CROP_TIERS_EV_TO_IV, MetaTileEntityCropGeneExtractor[]::new);
+        CROP_SYNTHESIZER = registerTieredCropMachine(240, "crop_synthesizer",
+                MetaTileEntityCropSynthesizer::new, CROP_TIERS_EV_TO_IV, MetaTileEntityCropSynthesizer[]::new);
+        INDUSTRIAL_FARM = registerMetaTileEntity(250,
+                new MetaTileEntityIndustrialFarm(getDrId("industrial_farm")));
+    }
+
+    /** 常用机器主用的电压档：LV / MV / HV / EV / IV。 */
+    private static final int[] CROP_TIERS_LV_TO_IV = { GTValues.LV, GTValues.MV, GTValues.HV, GTValues.EV, GTValues.IV };
+
+    /** 提取器 / 合成器只做 EV 与 IV 两档——它们是后期机器。 */
+    private static final int[] CROP_TIERS_EV_TO_IV = { GTValues.EV, GTValues.IV };
+
+    /**
+     * 按电压档批量注册一台作物机器。
+     *
+     * <p>数组由调用方通过 {@code arrayFactory} 提供——泛型擦除下没法在方法里
+     * {@code new T[n]}，硬转会在运行时抛 ClassCastException。
+     *
+     * @param startId      首个 MTE id，之后的档位依次 +1
+     * @param name         机器名（会成为 {@code <name>.<电压名>} 的路径前缀）
+     * @param arrayFactory 通常直接传 {@code MetaTileEntityXxx[]::new}
+     */
+    private static <T extends MetaTileEntityCropMachine> T[] registerTieredCropMachine(
+            int startId, String name, CropMachineFactory<T> factory, int[] tiers,
+            IntFunction<T[]> arrayFactory) {
+        T[] machines = arrayFactory.apply(tiers.length);
+        for (int i = 0; i < tiers.length; i++) {
+            int tier = tiers[i];
+            machines[i] = registerMetaTileEntity(startId + i,
+                    factory.create(getDrId(name + "." + GTValues.VN[tier].toLowerCase()), tier));
+        }
+        return machines;
+    }
+
+    /** 机器工厂：{@code (ResourceLocation, tier) -> MetaTileEntity}。 */
+    @FunctionalInterface
+    private interface CropMachineFactory<T extends MetaTileEntityCropMachine> {
+        T create(ResourceLocation id, int tier);
     }
 
 

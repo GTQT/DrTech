@@ -4,6 +4,7 @@ import com.drppp.drtech.Tags;
 import com.meowmel.cropQT.tile.TileCropStick;
 import com.meowmel.cropQT.api.CropRenderType;
 import com.meowmel.cropQT.api.CropType;
+import com.meowmel.cropQT.handler.CropConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -81,10 +82,13 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
         BufferBuilder buf = tess.getBuffer();
         buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 
-        CropRenderType renderType = type.getRenderType();
+        // 形状可以被配置全局覆盖——出问题时不用逐个改作物定义
+        CropRenderType renderType = CropConfig.resolveRenderTypeOrDefault(type.getRenderType());
 
         if (renderType == CropRenderType.HASH) {
             drawHash(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
+        } else if (renderType == CropRenderType.FLOWER) {
+            drawFlower(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
         } else {
             drawCross(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
         }
@@ -139,6 +143,35 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
         // 东面 (沿Z轴, x=outer) 正反
         quadFlat(buf, outer, 0, 0, outer, h, 1, u0, u1, v0, v1, sky, block, 'x');
         quadFlat(buf, outer, 0, 1, outer, h, 0, u0, u1, v0, v1, sky, block, 'x');
+    }
+
+    /**
+     * FLOWER模式 - 四个面沿方块中线排成 # 字，向四边各外扩 2/16。
+     *
+     * <p>和 HASH 的区别在位置与尺寸：HASH 的面贴在离边 1/4 处、宽刚好 1 格；
+     * FLOWER 的面在 1/4 与 3/4 处，并且两端各出界 2/16，让花比作物架宽一圈。
+     * 布局取自源端的 FlowerPlantRenderer。
+     */
+    private void drawFlower(BufferBuilder buf, float h,
+                            float u0, float u1, float v0, float v1,
+                            int sky, int block) {
+        // 面沿轴展开时两端各出界 2/16
+        float out = -0.125f;
+        float far = 1.125f;
+        float near = 0.25f;
+        float away = 0.75f;
+
+        // 南北两个面 (沿X轴展开, Z 固定在 1/4 与 3/4)
+        quadFlat(buf, out, 0, near, far, h, near, u0, u1, v0, v1, sky, block, 'z');
+        quadFlat(buf, far, 0, near, out, h, near, u0, u1, v0, v1, sky, block, 'z');
+        quadFlat(buf, out, 0, away, far, h, away, u0, u1, v0, v1, sky, block, 'z');
+        quadFlat(buf, far, 0, away, out, h, away, u0, u1, v0, v1, sky, block, 'z');
+
+        // 东西两个面 (沿Z轴展开, X 固定在 1/4 与 3/4)
+        quadFlat(buf, near, 0, out, near, h, far, u0, u1, v0, v1, sky, block, 'x');
+        quadFlat(buf, near, 0, far, near, h, out, u0, u1, v0, v1, sky, block, 'x');
+        quadFlat(buf, away, 0, out, away, h, far, u0, u1, v0, v1, sky, block, 'x');
+        quadFlat(buf, away, 0, far, away, h, out, u0, u1, v0, v1, sky, block, 'x');
     }
 
     /**

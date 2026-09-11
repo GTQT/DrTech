@@ -8,8 +8,12 @@ package com.meowmel.cropQT.api;
  *
  * HASH   - 井字架状 (四个面沿方块四边排列, 类似原版甘蔗/地狱疣)
  *          适合: 高大/稀疏/茎状的作物
+ *
+ * FLOWER - 花坛状 (四个面沿方块中线排成 # 字, 且向四边各外扩 2/16)
+ *          适合: 花类, 让花朵看起来比作物架宽一圈
  */
 public enum CropRenderType {
     CROSS,
-    HASH
+    HASH,
+    FLOWER
 }
