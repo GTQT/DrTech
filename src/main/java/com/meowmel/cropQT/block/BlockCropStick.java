@@ -30,6 +30,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -100,6 +101,15 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         TileCropStick tile = (TileCropStick) te;
         ItemStack held = player.getHeldItem(hand);
 
+        // 除草：只认矿辞，不认具体物品——GT 的电动剪刀、各种 mod 的剪刀都在 toolShears 里
+        if (isWeedingTool(held) && tile.isWeedPlant()) {
+            tile.destroyCrop();
+            if (!player.isCreative()) {
+                held.damageItem(1, player);
+            }
+            player.sendMessage(new TextComponentString(TextFormatting.GREEN + "杂草已清除!"));
+            return true;
+        }
         if (!held.isEmpty() && held.getItem() instanceof ItemCropSeed) {
             String id = ItemCropSeed.getCropId(held);
             return tryPlant(tile, player, held, id, ItemCropSeed.getCropStats(held));
@@ -118,6 +128,28 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         }
         if (held.isEmpty()) {
             if (tile.hasCrop() && tile.isMature()) return doHarvest(world, pos, tile, player);
+        }
+        return false;
+    }
+
+    /**
+     * 手上的东西能不能用来除草。
+     *
+     * <p>只看矿辞 {@code toolShears}，不看具体物品 —— 这样 GT 的电动剪刀、
+     * 各种 mod 的剪刀、以及别的模组往这个矿辞里登记的东西都能用，不用为每种工具写一遍。
+     */
+    public static boolean isWeedingTool(@Nullable ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        int shearId = OreDictionary.getOreID("toolShears");
+        if (shearId < 0) {
+            return false;
+        }
+        for (int id : OreDictionary.getOreIDs(stack)) {
+            if (id == shearId) {
+                return true;
+            }
         }
         return false;
     }

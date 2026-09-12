@@ -1,7 +1,7 @@
 package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.AbstractModule;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.network.ArmorNetworkHandler;
 import com.drppp.drtech.network.packets.CModularArmorSwitchModuleMode;
 import gregtech.api.capability.GregtechCapabilities;
@@ -151,6 +151,6 @@ public class SprintModule extends AbstractModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.SPRINT_MODULE;
+        return DrMetaItems.SPRINT_MODULE;
     }
 }

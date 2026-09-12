@@ -239,3 +239,62 @@ M1–M8 的成果继续用，只是数据源从手写表换成生成器：
 - 确定性杂交（`MutationRegistry` / `MutationPool`）
 - 5 台机器 + 工业农场
 - `CropType` / `CropStats` / `TileCropStick` / `CropStickTESR` 的运行时逻辑
+
+---
+
+## 10. 实现记录（2026-09-11 完成）
+
+### 落地情况
+
+| 步骤 | 结果 |
+|---|---|
+| M9-1 作物材质资源 | ✅ 9 类 × 2 层 = 18 张灰度图（从 40 张产物图里每类挑一张代表转换）；10 个模型（`flower` 与种子共用） |
+| M9-2 修 `grain` 贴图名 | ✅ `grains{1,2}.png` → `grain{1,2}.png` |
+| M9-3 前缀与 flag | ✅ 由 `CropMaterialType` 枚举统一持有，删掉 `CropQTFlags` / `CropQTOrePrefix` |
+| M9-4 `CropProperty` | ✅ 新增，含 tier / 土壤 / 阶段 / 渲染图 / 种子材质 / 显式底土 |
+| M9-5 补 flag | ✅ `PostMaterialEvent` 里 `CropMaterialScanner.applyFlags()` |
+| M9-6 生成作物 | ✅ 20 种材料 → 20 株作物，跳过 0 |
+| M9-7 种子 | ✅ `SeedMeshDefinition` 走 `seedIcon`；显示名「种子袋」→「种子」；删除 8 个中间模型 |
+| M9-8 退役产物 | ✅ `MetaCrops` 删除；40 个产物 metaitem 与模型删除（**原图 40 张保留**，见下） |
+| M9-9 删旧作物 | ✅ 137 株 → 20 株生成 + 18 株手写原版表 |
+| M9-10 验证 | ✅ 服务端 `Done (7.567s)`，无 cropqt 报错 |
+
+### 实现中的偏差与发现
+
+| # | 事项 | 说明 |
+|---|---|---|
+| 1 | **扫描必须分两趟** | `OreDictUnifier.get(前缀, 材料)` 读的是 `OreDictUnifier.init()` 建的索引，而那个在 **`freezeRegistries()` 之后**才跑。所以 `PostMaterialEvent` 只能补 flag（晚了会抛「registry is frozen」），建作物必须推到 FML init。第一版一趟做完，20 株全被跳过（产物物品取不出来） |
+| 2 | `essence` 名字被占 | GT 已声明 `MaterialIconType.essence`（无人使用、无贴图），所以我们这类的叫 `magic_essence` |
+| 3 | `flower` 两组共用 | 种子组和作物组都要一个 `flower`，而 `MaterialIconType` 重名会抛异常。共用同一个类型对象，零改名零新增资源 |
+| 4 | **生长渲染图必须显式指定** | TESR 按作物 id 找 `textures/blocks/crop/<id>/`。新 id 是 `iron_leaf`，目录却叫 `ferrofern`（源端命名）→ 20 株全渲染成缺失贴图。已在声明表里逐条补上目录名 |
+| 5 | `CrossBreedingRegistry` 删除 | 117 条杂交配方全部引用已删的作物 id，留着只会让人以为能用 |
+| 6 | `MutationPools` 重写 | 成员换成新 id；JEI 页会跳过认不出的成员，所以看到的就是实际有效的 |
+
+### 已知的遗留
+
+| 项 | 说明 |
+|---|---|
+| **只声明了 20 种材料** | 这是初始清单，不是全部。要加作物就在 `CropMaterials.declare()` 里加一行 —— 参数格式照抄现有条目 |
+| **40 张源图保留** | `assets/drtech/textures/items/metaitems/crops/*.png` 已无代码引用，但它们是我生成灰度材质时的**唯一彩色原图**，删了就没法再生成。要清掉请说一声 |
+| **孤儿物品** | `ItemXpBerry` / `ItemSoarXpBerry` 原来是 `xp_berry` 作物的产物，那株作物已删，现在没有获取途径 |
+| **未在游戏里看过** | 种子图标染色、作物材质染色、JEI 三个页签、TESR 渲染 —— 都只验证了「不报错」，没验证「好看」 |
+
+### 上线后修的第一批问题（2026-09-12）
+
+客户端实测暴露出来的，日志逐条对得上：
+
+| # | 问题 | 根因 | 修法 |
+|---|---|---|---|
+| 1 | **20 株材料作物的种子形状全一样** | `CropMaterials` 里写了 `DEFAULT_SEED = oreberry` 给所有声明共用 | 形状改由**外型**决定（`CropMaterialType.getDefaultSeedIcon()`）：叶/根→`vanilla`、浆果→`oreberry`、花→`flower`、秆与纤维→`grain`、疣与菌→`spore`、枝→`bonsai`、花苞→`botania`、精华→`magic`。八种正好分完。材料仍可在属性里覆盖 |
+| 2 | **18 株原版作物还是种子袋** | 当初按「行为不变」处理，没给 `seedIcon` | 逐株补上形状 + 颜色（材质底图是灰度的，不染色出来是灰的） |
+| 3 | **`uranium_238_leaf` 显示成生 key** | GT 的材料名是 `uranium_238`（带下划线），我 lang 里写的是 `uranium238_leaf` | 改 lang key。**教训**：作物 id 由 `material.getName()` 拼出来，别凭材料常量名猜 |
+| 4 | **`environmental_module` 是紫黑块** | M7 漏了 item 模型注册 | 补一张灰度电路卡 + 模型 + 按 meta 染色的颜色处理器（29 个 meta 共用一张图） |
+
+> 诊断方式：往 `SeedMeshDefinition` 里塞了条临时日志，把 `cropId → 查表结果 → 用的模型`
+> 打出来。一次客户端启动就定位完了 —— 比在 Forge 的模型加载链里刨源码快得多。
+> 日志已撤。
+
+**顺带确认的一个隐患**（未修，不影响当前功能）：作物注册（FML init）比模型注册
+（`ModelRegistryEvent`）晚约 19 秒，所以烘焙期 `CropRegistry` 是空的。
+种子模型是运行期动态查的所以没事，但「烘焙期看到的世界和运行期不一样」这类问题
+迟早会咬人，值得单独理一次。

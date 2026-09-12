@@ -199,7 +199,7 @@ public class MetaTileEntityCropGeneExtractor extends MetaTileEntityCropMachine {
                         .pos(40, 24)
                         .background(GTGuiTextures.SLOT, GTGuiTextures.IN_SLOT_OVERLAY)
                         .slot(SyncHandlers.itemSlot(importItems, SLOT_INPUT)
-                                .singletonSlotGroup().accessibility(true, false)))
+                                .singletonSlotGroup().accessibility(true, true)))
                 .child(new ProgressWidget()
                         .value(progress)
                         .texture(GTGuiTextures.PROGRESS_BAR_ARROW, -1)

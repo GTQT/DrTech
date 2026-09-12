@@ -4,7 +4,7 @@ import com.drppp.drtech.api.armor.AbsorbResult;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.ISpecialArmorModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.network.ArmorNetworkHandler;
 import com.drppp.drtech.network.packets.CModularArmorSwitchModuleMode;
 import gregtech.api.capability.GregtechCapabilities;
@@ -133,6 +133,6 @@ public class EnergyShield extends AbstractModule implements ISpecialArmorModule 
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.ENERGY_SHIELD;
+        return DrMetaItems.ENERGY_SHIELD;
     }
 }

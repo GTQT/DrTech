@@ -2,7 +2,7 @@ package com.drppp.drtech.loaders.recipes;
 
 import com.drppp.drtech.api.armor.MaterialArmorModuleBuilder;
 import com.drppp.drtech.api.armor.Modules;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
 import gregtech.api.recipes.ModHandler;
 import gregtech.api.recipes.RecipeMaps;
@@ -41,7 +41,7 @@ public class Recipes {
                 .input(MetaItems.CARBON_MESH, 3)
                 .input(OrePrefix.plate, Materials.BlackBronze)
                 .input(circuit, MarkerMaterials.Tier.MV)
-                .output(MTMetaItems.MODULAR_HELMET)
+                .output(DrMetaItems.MODULAR_HELMET)
                 .EUt(400)
                 .duration(300)
                 .buildAndRegister();
@@ -51,7 +51,7 @@ public class Recipes {
                 .input(MetaItems.CARBON_MESH, 6)
                 .input(OrePrefix.plate, Materials.Tungsten)
                 .input(circuit, MarkerMaterials.Tier.HV)
-                .output(MTMetaItems.MODULAR_CHESTPLATE)
+                .output(DrMetaItems.MODULAR_CHESTPLATE)
                 .EUt(400)
                 .duration(400)
                 .buildAndRegister();
@@ -61,7 +61,7 @@ public class Recipes {
                 .input(MetaItems.CARBON_MESH, 5)
                 .input(OrePrefix.plate, Materials.NiobiumNitride)
                 .input(circuit, MarkerMaterials.Tier.MV)
-                .output(MTMetaItems.MODULAR_LEGGINGS)
+                .output(DrMetaItems.MODULAR_LEGGINGS)
                 .EUt(400)
                 .duration(350)
                 .buildAndRegister();
@@ -71,7 +71,7 @@ public class Recipes {
                 .input(MetaItems.CARBON_MESH, 2)
                 .input(OrePrefix.plate, Materials.Nichrome)
                 .input(circuit, MarkerMaterials.Tier.MV)
-                .output(MTMetaItems.MODULAR_BOOTS)
+                .output(DrMetaItems.MODULAR_BOOTS)
                 .EUt(400)
                 .duration(250)
                 .buildAndRegister();
@@ -112,7 +112,7 @@ public class Recipes {
                 .input(plate, Osmium)
                 .input(cableGtSingle, NiobiumNitride)
                 .circuitMeta(3)
-                .output(MTMetaItems.WIRELESS_RECEIVER)
+                .output(DrMetaItems.WIRELESS_RECEIVER)
                 .duration(200)
                 .EUt(2048)
                 .buildAndRegister();
@@ -122,7 +122,7 @@ public class Recipes {
                 .input(plate, Tin, 3)
                 .input(stick, Steel)
                 .circuitMeta(3)
-                .output(MTMetaItems.AUTO_FEEDER)
+                .output(DrMetaItems.AUTO_FEEDER)
                 .duration(140)
                 .EUt(96)
                 .buildAndRegister();
@@ -133,7 +133,7 @@ public class Recipes {
                 .input(lens, Glass, 2)
                 .input(MetaItems.DUCT_TAPE, 2)
                 .circuitMeta(3)
-                .output(MTMetaItems.BINOCULARS)
+                .output(DrMetaItems.BINOCULARS)
                 .duration(150)
                 .EUt(32)
                 .buildAndRegister();
@@ -142,7 +142,7 @@ public class Recipes {
                 .input(plate, Steel, 2)
                 .input(springSmall, Tungsten, 3)
                 .circuitMeta(3)
-                .output(MTMetaItems.SHOCK_ABSORBER)
+                .output(DrMetaItems.SHOCK_ABSORBER)
                 .duration(120)
                 .EUt(480)
                 .buildAndRegister();
@@ -151,7 +151,7 @@ public class Recipes {
                 .input(foil, Polycaprolactam, 64)
                 .input(MetaItems.DUCT_TAPE, 8)
                 .circuitMeta(3)
-                .output(MTMetaItems.THICK_INSULATOR)
+                .output(DrMetaItems.THICK_INSULATOR)
                 .duration(100)
                 .EUt(48)
                 .buildAndRegister();
@@ -161,7 +161,7 @@ public class Recipes {
                 .input(MetaItems.DUCT_TAPE, 8)
                 .input(craftingLens, Glass, 4)
                 .circuitMeta(3)
-                .output(MTMetaItems.OXYGEN_MASK)
+                .output(DrMetaItems.OXYGEN_MASK)
                 .duration(180)
                 .EUt(480)
                 .buildAndRegister();

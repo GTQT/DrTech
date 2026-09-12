@@ -3,7 +3,7 @@ package com.drppp.drtech.api.armor.modules;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
 import gregtech.api.items.metaitem.MetaItem;
@@ -164,6 +164,6 @@ public class HealingModule extends AbstractModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.HEALING_MODULE;
+        return DrMetaItems.HEALING_MODULE;
     }
 }

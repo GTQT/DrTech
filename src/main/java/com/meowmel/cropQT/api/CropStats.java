@@ -9,10 +9,11 @@ import java.util.Random;
  * 范围1-31
  *
  * <p>附带一个 {@code analyzed} 标志：未分析的种子看不到具体属性，也不能进种子生成机。
- * 用分析仪右键种子袋即可分析，见 {@code ItemCropAnalyzer}。
+ * 用作物分析仪分析种子即可解开，也可以丢进格雷扫描仪，见
+ * {@code CropAnalyzerBehavior} 与 {@code CropScannerLogic}。
  *
  * <p>它放在这里而不是单独一个类，是因为它和三维属性共用同一份 NBT——
- * 种子袋的 NBT 里就是 {@code cropId} + 这几个属性键。
+ * 种子的 NBT 里就是 {@code cropId} + 这几个属性键。
  */
 public class CropStats {
     public static final int MIN_STAT = 1;

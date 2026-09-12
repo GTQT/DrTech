@@ -25,7 +25,7 @@ import com.drppp.drtech.common.blocks.BlocksInit;
 import com.drppp.drtech.common.CommonProxy;
 import com.drppp.drtech.common.items.DrtToolItems;
 import com.drppp.drtech.common.items.ItemsInit;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.common.metaTileEntities.DrTechMetaTileEntities;
 import com.drppp.drtech.common.DrtechMetaEntities;
@@ -46,6 +46,7 @@ import com.drppp.drtech.intergations.opencomputers.OpenComputersPairingCommand;
 import com.drppp.drtech.intergations.opencomputers.OpenComputersPairingCleanupHandler;
 import com.meowmel.cropQT.api.CropInitHandler;
 import com.meowmel.cropQT.client.CropStickTESR;
+import com.meowmel.cropQT.client.CropTextureStitcher;
 import com.meowmel.cropQT.gtfo.TileCropFarmerMode;
 import com.meowmel.cropQT.tile.TileCropStick;
 import com.drppp.drtech.loaders.recipes.CraftingRecipes;
@@ -124,9 +125,8 @@ public class DrTechMain {
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
         DrTechTab = new DrTechCreativeTabs("drtech");
+        // 所有 MetaItem 物品的构造入口（含模块化装甲）——原本分散在 DrMetaItems / MTMetaItems 两处
         DrMetaItems.MetaItemsInit();
-        // 模块化装甲（原 mechtech）
-        MTMetaItems.init();
         ArmorNetworkHandler.init();
         DrtechCapInit.init();
         HookCapability.init();
@@ -194,6 +194,8 @@ public class DrTechMain {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMSMaster.class, new TESRMSMaster());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityGOLMaster.class, new TESRGOLMaster());
         TextureUtils.addIconRegister(Textures::register);
+        // 作物贴图没有被任何模型引用，得手动登记进图集，否则图集里没有它们（详见类注释）
+        MinecraftForge.EVENT_BUS.register(CropTextureStitcher.class);
     }
 
     @SubscribeEvent

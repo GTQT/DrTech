@@ -3,7 +3,7 @@ package com.drppp.drtech.api.armor.modules;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -18,7 +18,7 @@ import java.util.List;
  * Slot: All armor slots
  *
  * Discount per module: 5%, max 20% across all 4 slots.
- * The actual IVisDiscountGear interface is on MTArmorItem,
+ * The actual IVisDiscountGear interface is on DrArmorItem,
  * which delegates to getDiscount().
  */
 public class VisOptimizer extends AbstractModule {
@@ -43,7 +43,7 @@ public class VisOptimizer extends AbstractModule {
     }
 
     /**
-     * Called by MTArmorItem's IVisDiscountGear.getVisDiscount() delegation.
+     * Called by DrArmorItem's IVisDiscountGear.getVisDiscount() delegation.
      */
     public static int getDiscount(ItemStack armorPiece) {
         if (!Loader.isModLoaded("thaumcraft")) {
@@ -71,6 +71,6 @@ public class VisOptimizer extends AbstractModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.VIS_OPTIMIZER;
+        return DrMetaItems.VIS_OPTIMIZER;
     }
 }

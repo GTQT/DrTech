@@ -2,11 +2,12 @@ package com.meowmel.cropQT.api;
 
 import com.drppp.drtech.common.items.ItemsInit;
 import com.meowmel.cropQT.api.mutation.MutationPools;
+import com.meowmel.cropQT.api.unification.material.CropMaterialScanner;
 import com.meowmel.cropQT.api.registries.HydrationRegistry;
 import com.meowmel.cropQT.block.BlockCropStick;
 import com.meowmel.cropQT.event.CropTickHandler;
-import com.meowmel.cropQT.fluid.FluidEnrichedFertilizer;
-import com.meowmel.cropQT.fluid.FluidFertilizer;
+import com.meowmel.cropQT.integration.CropScannerLogic;
+import com.meowmel.cropQT.api.registries.FertilizerRegistry;
 import net.minecraftforge.common.MinecraftForge;
 
 /**
@@ -35,12 +36,15 @@ public class CropInitHandler {
         // 而 SoilRegistry 的反查依赖登记顺序
         SoilTypes.ensureRegistered();
         HydrationRegistry.registerDefaults();
-        FluidFertilizer.register();
-        FluidEnrichedFertilizer.register();
+        FertilizerRegistry.registerDefaults();
+        // 材料驱动的作物先登记（产物物品是 OreDictUnifier 取的，那时已经建好了索引），
+        // 再补手写的原版作物
+        CropMaterialScanner.registerCrops();
         CropRegistry.ensureRegistered();
-        CrossBreedingRegistry.registerDefaults();
         MutationPools.registerDefaults();
         BlockCropStick.initVanillaSeedMap();
+        // 让 GT 的扫描仪能分析种子（走 GT 的 registerCustomScannerLogic，不是 mixin）
+        gregtech.api.recipes.machines.RecipeMapScanner.registerCustomScannerLogic(new CropScannerLogic());
     }
     public static void clienInit()
     {

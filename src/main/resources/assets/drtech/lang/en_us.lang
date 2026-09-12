@@ -50,12 +50,15 @@ item.advanced_rocket.name=Advanced Rocket
 tile.drtech.water_mill.name=Primitive Water Mill
 tile.drtech.wood_axle.name=Drive Shaft
 tile.drtech.crop_stick.name=Crop Stick
-item.drtech.crop_seed.name=Seed Bag
-item.drtech.crop_analyzer.name=Crop Analyzer
-item.drtech.weeding_shears.name=Weeding Shears
+item.drtech.crop_seed.name=Seed
 # --- Crops: tools (meta items) ---
 metaitem.fertilizer_applicator.name=Fertilizer Applicator
 metaitem.watering_can.name=Watering Can
+metaitem.crop_analyzer.name=Crop Analyzer
+metaitem.crop_analyzer.tooltip.1=§7Sneak + right-click: open the analyzer
+metaitem.crop_analyzer.tooltip.2=§7Put an unanalyzed seed in the input slot to analyze it
+metaitem.crop_analyzer.tooltip.3=§7Right-click a crop stick: report its soil, water and environment
+metaitem.crop_analyzer.tooltip.4=§8Only analyzed seeds can be cloned, bred or extracted
 
 # --- Crops: soil groups ---
 cropqt.soil.farmland=Farmland
@@ -71,10 +74,8 @@ cropqt.soil.brick=Brick
 cropqt.soil.water=Water
 
 # --- Crops: liquid fertilizer ---
-fluid.drtech.fertilizer=Liquid Fertilizer
-fluid.fertilizer=Liquid Fertilizer
-fluid.drtech.enriched_fertilizer=Enriched Liquid Fertilizer
-fluid.enriched_fertilizer=Enriched Liquid Fertilizer
+drtech.material.fertilizer=Liquid Fertilizer
+drtech.material.enriched_fertilizer=Enriched Liquid Fertilizer
 
 item.drtech.xp_berry.name=Xp Berry
 item.drtech.soar_xp_berry.name=Soar Xp Berry
@@ -387,21 +388,35 @@ drtech.gui.industrial_apiary.tooltip.2.enabled=Enable processing
 behavior.matrix_gems.info=Stored data: %s
 drtech.multiblock.crops.seed=闂佸綊妫跨换婕噀ed info: %s
 #Fluids
-gregtech.material.cold_sun_salt=Cold Solar Salt
-gregtech.material.hot_sun_salt=Hot Solar Salt
-gregtech.material.chorus=Chorus Fruit
-gregtech.material.demulsifier=Demulsifier
-gregtech.material.high_energy_demulsifier=High-Energy Demulsifier
-gregtech.material.high_energy_chorus_solution=High-Energy Chorus Solution
-gregtech.material.ender_precipitate=Ender Precipitate
-gregtech.material.ender_extractant=Ender Extractant
-gregtech.material.extracted_chorus_solvent=Extracted Chorus Solvent
-gregtech.material.chorus_waste=Chorus Waste
-gregtech.material.ender_energy_factor=Ender Energy Factor
-gregtech.material.high_energy_diesel=High-Energy Diesel
-gregtech.material.high_energy_gasoline=High-Energy Gasoline
+drtech.material.cold_sun_salt=Cold Solar Salt
+drtech.material.hot_sun_salt=Hot Solar Salt
+drtech.material.chorus=Chorus Fruit
+drtech.material.demulsifier=Demulsifier
+drtech.material.high_energy_demulsifier=High-Energy Demulsifier
+drtech.material.high_energy_chorus_solution=High-Energy Chorus Solution
+drtech.material.ender_precipitate=Ender Precipitate
+drtech.material.ender_extractant=Ender Extractant
+drtech.material.extracted_chorus_solvent=Extracted Chorus Solvent
+drtech.material.chorus_waste=Chorus Waste
+drtech.material.ender_energy_factor=Ender Energy Factor
+drtech.material.high_energy_diesel=High-Energy Diesel
+drtech.material.high_energy_gasoline=High-Energy Gasoline
+drtech.material.fertilizer=Liquid Fertilizer
+drtech.material.enriched_fertilizer=Enriched Liquid Fertilizer
 item.gregtech.material.chorus.dust=Crushed Chorus Fruit
 item.gregtech.material.ender_precipitate.dust=Ender Precipitate
+
+# Crop produce prefix names. Key is item.material.oreprefix.<name>; %s is the material.
+item.material.oreprefix.leaf=%s Leaf
+item.material.oreprefix.fiber=%s Fiber
+item.material.oreprefix.twig=%s Twig
+item.material.oreprefix.flower=%s Flower
+item.material.oreprefix.berry=%s Berry
+item.material.oreprefix.stem=%s Stem
+item.material.oreprefix.wart=%s Wart
+item.material.oreprefix.root=%s Root
+item.material.oreprefix.blossom=%s Blossom
+item.material.oreprefix.magic_essence=%s Essence
 
 
 #Collector
@@ -2341,42 +2356,42 @@ drtech.machine.crop_synthesizer.iv.name=Elite Crop Synthesizer
 drtech.machine.industrial_farm.name=Industrial Farm
 
 # --- Crops: machine tutorials ---
-drtech.machine.seed_generator.tooltip.1=§7Use§8: copies an §eanalyzed§8 seed bag as-is
-drtech.machine.seed_generator.tooltip.2=§7In§8 seed bag (must be analyzed)   §7Out§8 an identical seed bag
-drtech.machine.seed_generator.tooltip.3=§7Consumes §bliquid fertilizer§8; the richer the fertilizer, the fewer mB per copy
-drtech.machine.seed_generator.tooltip.4=§7Duration halves per voltage tier, down to §e20 ticks
-drtech.machine.seed_generator.tooltip.5=§cUnanalyzed seeds cannot be copied§8 - run them through the Crop Analyzer first
-drtech.machine.seed_generator.tooltip.6=§7The chain runs§8: analyze -> §emultiply§8 -> breed -> extract / synthesize
+drtech.machine.seed_generator.tooltip.1=本机用于把一份已分析的种子袋原样复制一份
+drtech.machine.seed_generator.tooltip.2=输入种子袋（必须先分析），输出同样的种子袋
+drtech.machine.seed_generator.tooltip.3=消耗液体肥料，肥料越浓，每次用掉的 mB 越少
+drtech.machine.seed_generator.tooltip.4=耗时随电压档位递减，最低 20 tick
+drtech.machine.seed_generator.tooltip.5=未分析的种子不给复制——先用作物分析仪过一遍
+drtech.machine.seed_generator.tooltip.6=作物链的顺序为分析 → 扩繁 → 育种 → 提取 / 合成
 
-drtech.machine.crop_manager.tooltip.1=§7Use§8: automatically tends a large area of crop sticks around the machine
-drtech.machine.crop_manager.tooltip.2=§7Range§8: horizontal radius §e3 + 2x tier§8 (5 at LV, 13 at IV), §e2§8 blocks up and down
-drtech.machine.crop_manager.tooltip.3=§7Each cycle it sweeps the area§8: harvests ripe crops, waters the dry, fertilizes the hungry
-drtech.machine.crop_manager.tooltip.4=§7The three actions have separate switches§8, §charvest only by default§8 - watering and fertilizing must be turned on
-drtech.machine.crop_manager.tooltip.5=§7Carries its own water and liquid fertilizer tanks; pipe them in. Richer fertilizer lasts longer per bucket
-drtech.machine.crop_manager.tooltip.6=§cThis machine only accepts liquid fertilizer§8 - apply solid fertilizer by hand with the applicator
-drtech.machine.crop_manager.tooltip.7=§7Harvest bonus scales with tier, §e+25%§8 at IV
+drtech.machine.crop_manager.tooltip.1=本机以自身为中心，自动照料一大片作物架
+drtech.machine.crop_manager.tooltip.2=本机作用范围为水平半径 3 + 2×档位（LV 为 5、IV 为 13），上下各 2 格
+drtech.machine.crop_manager.tooltip.3=每个周期扫一遍，收获成熟作物、给缺水的补水、给缺肥的补肥
+drtech.machine.crop_manager.tooltip.4=三件事各有开关，默认只开收获——浇水和施肥要你主动打开
+drtech.machine.crop_manager.tooltip.5=机器自带水罐与液肥罐，接管道补；液肥越浓，一桶顶得越久
+drtech.machine.crop_manager.tooltip.6=本机只认液体肥料，固体肥料请用施肥器手动施
+drtech.machine.crop_manager.tooltip.7=收获加成随档位提高，IV 档 +25%%
 
-drtech.machine.crop_breeder.tooltip.1=§7Use§8: cross-breeds §e2 to 4§8 analyzed parent seeds into one new seed
-drtech.machine.crop_breeder.tooltip.2=§7Uses the same §emutation table§8 as crop sticks§8 - a combination found in the field works here too
-drtech.machine.crop_breeder.tooltip.3=§7Input slots§8: 3 at LV ~ MV, §e6§8 from HV up
-drtech.machine.crop_breeder.tooltip.4=§7Success rate §e40 + (tier - LV) x 10§8 %, capped at 100%
-drtech.machine.crop_breeder.tooltip.5=§cFailure still consumes parents and fertilizer§8 - breeding costs something
-drtech.machine.crop_breeder.tooltip.6=§7See the §eJEI cross-breeding page§8 for which combinations produce what
-drtech.machine.crop_breeder.tooltip.7=§7The offspring's stats are the average of its parents
+drtech.machine.crop_breeder.tooltip.1=本机把 2~4 颗已分析的亲本种子杂交成一颗新种子
+drtech.machine.crop_breeder.tooltip.2=走的是和作物架同一张变异表——田里试出来的组合，机器上照样成立
+drtech.machine.crop_breeder.tooltip.3=输入槽在 LV ~ MV 给 3 个，HV 起给 6 个
+drtech.machine.crop_breeder.tooltip.4=成功率为 40 + (档位 - LV) × 10 %%，封顶 100%%
+drtech.machine.crop_breeder.tooltip.5=失败照样扣亲本与液肥——育种是有成本的事
+drtech.machine.crop_breeder.tooltip.6=哪些组合能出什么，看 JEI 的杂交页
+drtech.machine.crop_breeder.tooltip.7=子代属性取各亲本属性的平均值
 
-drtech.machine.gene_extractor.tooltip.1=§7Use§8: splits an analyzed seed into §eone of the 4 gene orbs§8
-drtech.machine.gene_extractor.tooltip.2=§7One trait at a time§8: species / growth / yield / resistance, switched by the GUI button
-drtech.machine.gene_extractor.tooltip.3=§7Species takes §e5 minutes§8, a single stat takes half
-drtech.machine.gene_extractor.tooltip.4=§cThe gene orb is consumed§8 - the opposite of the synthesizer
-drtech.machine.gene_extractor.tooltip.5=§7Draws §e3 amps§8, hungrier than other machines of its tier
-drtech.machine.gene_extractor.tooltip.6=§7Use the synthesizer to assemble the four orbs back into a full seed
+drtech.machine.gene_extractor.tooltip.1=本机把一颗已分析的种子拆成 4 个基因球之一
+drtech.machine.gene_extractor.tooltip.2=一次只抽一样，可选物种 / 生长 / 产量 / 抗性，用界面按钮切换
+drtech.machine.gene_extractor.tooltip.3=物种要 5 分钟，抽单项属性减半
+drtech.machine.gene_extractor.tooltip.4=基因球会被消耗——这一点和合成器相反
+drtech.machine.gene_extractor.tooltip.5=本机按 3 安培取电，比同档别的机器费电
+drtech.machine.gene_extractor.tooltip.6=拿到球之后，用合成器把四颗拼回一颗完整种子
 
-drtech.machine.crop_synthesizer.tooltip.1=§7Use§8: §e4 gene orbs + UUM§8 -> one fully analyzed seed
-drtech.machine.crop_synthesizer.tooltip.2=§aGene orbs are not consumed§8 - they are reusable templates; only UUM is spent
-drtech.machine.crop_synthesizer.tooltip.3=§7UUM cost§8: crop tier sets the base, the three stats set the extra
-drtech.machine.crop_synthesizer.tooltip.4=§7Duration grows with tier (about 5 ~ 10 minutes); draws §e3 amps
-drtech.machine.crop_synthesizer.tooltip.5=§7Pairs with the extractor§8: the extractor takes seeds apart, the synthesizer puts them back
-drtech.machine.crop_synthesizer.tooltip.6=§7Once you have all four orbs, each synthesis only costs UUM
+drtech.machine.crop_synthesizer.tooltip.1=本机用 4 个基因球 + UUM 合成一颗分析好的完整种子
+drtech.machine.crop_synthesizer.tooltip.2=基因球不消耗——它是可反复使用的模板，只有 UUM 被吃掉
+drtech.machine.crop_synthesizer.tooltip.3=UUM 用量由作物 tier 决定底量，三围决定增量
+drtech.machine.crop_synthesizer.tooltip.4=耗时随 tier 增长（约 5 ~ 10 分钟），本机按 3 安培取电
+drtech.machine.crop_synthesizer.tooltip.5=和提取器配对，提取器负责拆、合成器负责拼
+drtech.machine.crop_synthesizer.tooltip.6=四颗球攒齐之后，每次合成就只花 UUM
 
 # --- Crops: farm components ---
 tile.drtech.seed_bed.seed_bed.name=Seed Bed
@@ -2423,6 +2438,37 @@ cropqt.farm.display.slice_overflow=§cToo many slices: %d / %d, raise the input 
 cropqt.farm.mode.input=Input Mode
 cropqt.farm.mode.farm=Production Mode
 cropqt.farm.mode.output=Output Mode
+
+# --- Crops: analyzer item GUI ---
+cropqt.analyzer.title=§6Crop Analyzer
+cropqt.analyzer.charge=§7Charge: §b%s§7 / §b%s §7EU
+cropqt.analyzer.hint=§7Put an unanalyzed seed in the left slot
+cropqt.analyzer.info.name=§aCrop: §f%s§7 (Tier %s)
+cropqt.analyzer.info.soil=§aSoil: §f%s
+cropqt.analyzer.info.subsoil=§aSubsoil: §f%s
+cropqt.analyzer.info.stats=§cGrowth %s  §eGain %s  §9Resistance %s
+
+# Material-driven crops: id is <material>_<type>, display names here
+cropqt.crop.copper_fiber.name=Copper Fiber
+cropqt.crop.tin_twig.name=Tin Twig
+cropqt.crop.iron_leaf.name=Iron Fern
+cropqt.crop.lead_leaf.name=Lead Leaf
+cropqt.crop.silver_leaf.name=Silver Leaf
+cropqt.crop.gold_leaf.name=Gold Leaf
+cropqt.crop.aluminium_leaf.name=Aluminium Leaf
+cropqt.crop.nickel_leaf.name=Nickel Leaf
+cropqt.crop.zinc_leaf.name=Zinc Leaf
+cropqt.crop.sulfur_flower.name=Sulfur Flower
+cropqt.crop.tungsten_leaf.name=Tungsten Leaf
+cropqt.crop.titanium_leaf.name=Titanium Leaf
+cropqt.crop.platinum_leaf.name=Platinum Leaf
+cropqt.crop.osmium_flower.name=Osmium Bloom
+cropqt.crop.iridium_flower.name=Iridium Bloom
+cropqt.crop.manganese_leaf.name=Pyrolusite Leaf
+cropqt.crop.uranium_238_leaf.name=Reactor Leaf
+cropqt.crop.mica_flower.name=Mica Flower
+cropqt.crop.salt_root.name=Salt Root
+cropqt.crop.oil_berry.name=Oil Berry
 
 # --- Crops: gene orb modes ---
 cropqt.gene.mode.species=Species

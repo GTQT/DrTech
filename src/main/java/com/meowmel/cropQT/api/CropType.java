@@ -1,5 +1,6 @@
 package com.meowmel.cropQT.api;
 
+import gregtech.api.unification.material.info.MaterialIconType;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -23,8 +24,8 @@ public class CropType {
     private final String id;
     private final String displayName;
     private final String texturePath; // 自定义作物贴图目录，null则使用id
-    private final String seedTexture; // 自定义种子袋贴图分组键，null则使用默认
     private final int seedColor;      // 种子袋染色RGB，0xFFFFFF为不着色
+    private final MaterialIconType seedIcon; // 种子材质；null 则用默认种子模型
     private final int tier;
     private final int maxGrowthStage;
     private final int harvestStage;
@@ -62,8 +63,8 @@ public class CropType {
         this.id = builder.id;
         this.displayName = builder.displayName;
         this.texturePath = builder.texturePath;
-        this.seedTexture = builder.seedTexture;
         this.seedColor = builder.seedColor;
+        this.seedIcon = builder.seedIcon;
         this.tier = builder.tier;
         this.maxGrowthStage = builder.maxGrowthStage;
         this.harvestStage = builder.harvestStage;
@@ -204,13 +205,24 @@ public class CropType {
     // ==================== Getters ====================
 
     public String getId() { return id; }
-    public String getDisplayName() { return displayName; }
+    /**
+     * 显示名。
+     *
+     * <p>存进去的通常是一个 lang key（生成的作物用 {@code cropqt.crop.<id>.name}），
+     * 这里查一次翻译。查不到会原样返回，所以直接塞中文名的手写作物也不受影响。
+     *
+     * <p>用 {@code net.minecraft.util.text.translation.I18n} 而不是 client 包那个 ——
+     * TOP 的 provider 跑在服务端，用 client 版会 {@code NoClassDefFoundError}。
+     */
+    public String getDisplayName() {
+        return net.minecraft.util.text.translation.I18n.translateToLocal(displayName);
+    }
     /** 作物贴图目录路径，未设定则返回id */
     public String getTexturePath() { return texturePath != null ? texturePath : id; }
-    /** 种子袋贴图分组键，未设定则返回null(使用默认种子袋贴图) */
-    public String getSeedTexture() { return seedTexture; }
     /** 种子袋染色RGB，未设定返回0xFFFFFF(不着色) */
     public int getSeedColor() { return seedColor; }
+    /** 种子材质；未设定返回 null（用默认种子模型）。 */
+    @Nullable public MaterialIconType getSeedIcon() { return seedIcon; }
     public int getTier() { return tier; }
     public int getMaxGrowthStage() { return maxGrowthStage; }
     public int getHarvestStage() { return harvestStage; }
@@ -321,8 +333,8 @@ public class CropType {
         private Map<String, List<ItemStack>> blockDrops = new HashMap<>();
         private Map<String, List<ChanceDrop>> blockChanceDrops = new HashMap<>();
         private String texturePath = null;    // 自定义贴图目录
-        private String seedTexture = null;   // 自定义种子袋贴图分组键
         private int seedColor = 0xFFFFFF;    // 种子袋染色RGB
+        private MaterialIconType seedIcon = null; // 种子材质
 
         private ISoilList soilTypes = null;   // null = 不限土壤
         private SubSoilRequirement subSoilRequirement = null;
@@ -399,9 +411,16 @@ public class CropType {
         /** 自定义作物贴图目录名(默认使用cropId) — 影响作物架TESR */
         public Builder texturePath(String path) { this.texturePath = path; return this; }
         /** 自定义种子袋贴图分组键(如 "oreberry")，指向 models/item/crop_seed_<key>.json，多个作物可共享 */
-        public Builder seedTexture(String key) { this.seedTexture = key; return this; }
-        /** 种子袋染色(如 Materials.Silver.materialRGB)，与seedTexture配合对白模着色 */
+        /** 种子染色(如 Materials.Silver.materialRGB)，给灰度种子模型上色 */
         public Builder seedColor(int rgb) { this.seedColor = rgb; return this; }
+
+        /**
+         * 种子材质。
+         *
+         * <p>设了就指向材质模型 {@code material_sets/<图标集>/<类型名>}，
+         * 不用再维护一份中间模型。
+         */
+        public Builder seedIcon(MaterialIconType icon) { this.seedIcon = icon; return this; }
         /** 设为false则不允许通过杂交产出此作物 */
         public Builder canBeBreedResult(boolean v) { this.canBeBreedResult = v; return this; }
 

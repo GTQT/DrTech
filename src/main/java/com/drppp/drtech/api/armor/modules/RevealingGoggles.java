@@ -3,7 +3,7 @@ package com.drppp.drtech.api.armor.modules;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.capability.GregtechCapabilities;
 import gregtech.api.capability.IElectricItem;
 import gregtech.api.items.metaitem.MetaItem;
@@ -24,7 +24,7 @@ import java.util.List;
  * Slot: Helmet
  *
  * Drains EU per tick to maintain the revealing effect.
- * The actual IGoggles interface is on MTArmorItem, which delegates to isActive().
+ * The actual IGoggles interface is on DrArmorItem, which delegates to isActive().
  */
 public class RevealingGoggles extends AbstractModule {
 
@@ -56,7 +56,7 @@ public class RevealingGoggles extends AbstractModule {
     }
 
     /**
-     * Called by MTArmorItem's IGoggles.showIngamePopups() delegation.
+     * Called by DrArmorItem's IGoggles.showIngamePopups() delegation.
      * Checks BOTH the NBT flag AND that the module is still installed.
      */
     public static boolean isActive(ItemStack armorPiece) {
@@ -109,6 +109,6 @@ public class RevealingGoggles extends AbstractModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.REVEALING_GOGGLES;
+        return DrMetaItems.REVEALING_GOGGLES;
     }
 }

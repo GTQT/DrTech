@@ -79,6 +79,18 @@ public class ItemEnvironmentalModule extends Item {
         return new ItemStack(com.drppp.drtech.common.items.ItemsInit.ENVIRONMENTAL_MODULE, 1, meta);
     }
 
+    /**
+     * 该 meta 用的模型名后缀。
+     *
+     * <p>模型是「底图 {@code blank} + 一层标签覆盖」，所以每个 meta 一套模型 ——
+     * 覆盖层的图是静态的，模型里就写死了，没法像染色那样运行时换。
+     * 名字与 {@link #VARIANTS} 同序，越界落回空白卡。
+     */
+    public static String getModelSuffix(int meta) {
+        BiomeDictionary.Type tag = getBiomeTag(meta);
+        return tag == null ? "blank" : tag.getName().toLowerCase();
+    }
+
     @Override
     public @NotNull String getTranslationKey(ItemStack stack) {
         int meta = stack.getMetadata();

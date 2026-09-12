@@ -284,7 +284,7 @@ public class MetaTileEntityCropBreeder extends MetaTileEntityCropMachine {
                 .child(new GTFluidSlot()
                         .pos(16, 22).size(18)
                         .syncHandler(GTFluidSlot.sync(importFluids.getTankAt(0))
-                                .showAmountOnSlot(false).accessibility(false, true)))
+                                .showAmountOnSlot(false).accessibility(true, true)))
                 .child(new ProgressWidget()
                         .value(progress)
                         .texture(GTGuiTextures.PROGRESS_BAR_ARROW, -1)
@@ -297,7 +297,7 @@ public class MetaTileEntityCropBreeder extends MetaTileEntityCropMachine {
                     .pos(76 + i % 3 * 18, 14 + i / 3 * 18)
                     .background(GTGuiTextures.SLOT, GTGuiTextures.IN_SLOT_OVERLAY)
                     .slot(SyncHandlers.itemSlot(importItems, i)
-                            .singletonSlotGroup().accessibility(true, false)));
+                            .singletonSlotGroup().accessibility(true, true)));
         }
         return panel
                 .child(new ItemSlot()

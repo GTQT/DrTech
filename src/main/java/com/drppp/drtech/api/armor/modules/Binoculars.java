@@ -1,7 +1,7 @@
 package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.IModule;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.util.input.KeyBind;
 import net.minecraft.entity.player.EntityPlayer;
@@ -52,6 +52,6 @@ public class Binoculars implements IModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.BINOCULARS;
+        return DrMetaItems.BINOCULARS;
     }
 }

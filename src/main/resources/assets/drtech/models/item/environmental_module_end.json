@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "drtech:items/environmental_module/blank",
+    "layer1": "drtech:items/environmental_module/end"
+  }
+}

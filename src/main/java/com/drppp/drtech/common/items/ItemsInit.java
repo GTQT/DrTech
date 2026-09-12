@@ -28,10 +28,8 @@ import com.drppp.drtech.common.wings.ItemWings;
 import com.drppp.drtech.common.wings.WingType;
 import com.drppp.drtech.common.glider.ItemHangGlider;
 import com.drppp.drtech.common.glider.ItemHangGliderPart;
-import com.meowmel.cropQT.item.ItemCropAnalyzer;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemEnvironmentalModule;
-import com.meowmel.cropQT.item.ItemWeedingShears;
 import gregtech.api.block.VariantItemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -62,8 +60,6 @@ public class ItemsInit {
     public static final Item ITEM_BLOCK_ADVANCED_CAULDRON = new ItemBlock(BlocksInit.BLOCK_ADVANCED_CAULDRON).setRegistryName(Tags.MODID, BlocksInit.BLOCK_ADVANCED_CAULDRON.getRegistryName().getPath());
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID, BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
     public static ItemCropSeed CROP_SEED = new ItemCropSeed();
-    public static ItemCropAnalyzer CROP_ANALYZER = new ItemCropAnalyzer();
-    public static ItemWeedingShears ITEM_WEEDING_SHEARS = new ItemWeedingShears();
     public static ItemEnvironmentalModule ENVIRONMENTAL_MODULE = new ItemEnvironmentalModule();
     public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
@@ -114,8 +110,6 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.YOT_TANK, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK, VariantItemBlock::new));
         event.getRegistry().register(CROP_SEED);
-        event.getRegistry().register(CROP_ANALYZER);
-        event.getRegistry().register(ITEM_WEEDING_SHEARS);
         event.getRegistry().register(ENVIRONMENTAL_MODULE);
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
@@ -160,19 +154,20 @@ public class ItemsInit {
         registerItemModel(BlocksInit.INDUSTRIAL_FARM_UNIT);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
         ModelLoader.setCustomMeshDefinition(CROP_SEED, new ItemCropSeed.SeedMeshDefinition());
-        // 种子袋变体模型(含默认 + 8个自定义，硬编码避免依赖CropRegistry时序)
+        // 环境模块：每个 meta 一套模型（底图 + 标签覆盖层），按 meta 动态选
+        registerEnvironmentalModuleModels();
+        // 种子变体模型（硬编码，避免依赖 CropRegistry 的登记时序）
+        // ① 默认模型 + ② 8 种种子材质模型（材料驱动的作物走这条，见 SeedMeshDefinition）
         ModelLoader.registerItemVariants(CROP_SEED,
                 new ModelResourceLocation(CROP_SEED.getRegistryName(), "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_oreberry", "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_flower", "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_grains", "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_magic", "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_spore", "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_bonsai", "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_botania", "inventory"),
-                new ModelResourceLocation(Tags.MODID + ":crop_seed_vanilla", "inventory"));
-        ModelLoader.setCustomModelResourceLocation(CROP_ANALYZER, 0, new ModelResourceLocation(CROP_ANALYZER.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(ITEM_WEEDING_SHEARS, 0, new ModelResourceLocation(ITEM_WEEDING_SHEARS.getRegistryName(), "inventory"));
+                seedMaterialModel("bonsai"),
+                seedMaterialModel("botania"),
+                seedMaterialModel("flower"),
+                seedMaterialModel("grain"),
+                seedMaterialModel("magic"),
+                seedMaterialModel("oreberry"),
+                seedMaterialModel("spore"),
+                seedMaterialModel("vanilla"));
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(WING_FAIRY_DUST, 0, new ModelResourceLocation(WING_FAIRY_DUST.getRegistryName(), "inventory"));
@@ -253,6 +248,39 @@ public class ItemsInit {
                     block.getMetaFromState(state),
                     new ModelResourceLocation(block.getRegistryName(),
                             statePropertiesToString(state.getProperties())));
+        }
+    }
+
+    /**
+     * 种子材质模型的资源位置。
+     *
+     * <p>种子材质（{@code MaterialIconType}）没有对应的矿物前缀，GT 不会替它们注册变体，
+     * 所以这边手动拼路径给 {@code registerItemVariants}。
+     */
+    private static ModelResourceLocation seedMaterialModel(String iconName) {
+        return new ModelResourceLocation(
+                gregtech.api.GTValues.MODID + ":material_sets/dull/" + iconName, "inventory");
+    }
+
+    /**
+     * 环境模块的模型：空白卡 + 28 个生物群系标签各一套，按 meta 动态选。
+     *
+     * <p>模型名形如 {@code drtech:environmental_module_<标签>}，标签清单与
+     * {@code ItemEnvironmentalModule} 的 meta 一一对应（meta 0 = blank）。
+     */
+    @SideOnly(Side.CLIENT)
+    private static void registerEnvironmentalModuleModels() {
+        ModelLoader.setCustomMeshDefinition(ENVIRONMENTAL_MODULE, stack ->
+                new ModelResourceLocation(Tags.MODID + ":environmental_module_"
+                        + com.meowmel.cropQT.item.ItemEnvironmentalModule.getModelSuffix(stack.getMetadata()),
+                        "inventory"));
+
+        int variants = com.meowmel.cropQT.item.ItemEnvironmentalModule.getVariantCount();
+        for (int meta = 0; meta < variants; meta++) {
+            ModelLoader.registerItemVariants(ENVIRONMENTAL_MODULE,
+                    new ModelResourceLocation(Tags.MODID + ":environmental_module_"
+                            + com.meowmel.cropQT.item.ItemEnvironmentalModule.getModelSuffix(meta),
+                            "inventory"));
         }
     }
 

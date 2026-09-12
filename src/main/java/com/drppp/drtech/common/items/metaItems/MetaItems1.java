@@ -1,19 +1,25 @@
 package com.drppp.drtech.common.items.metaItems;
 
 import com.drppp.drtech.DrTechMain;
+import com.drppp.drtech.api.armor.MaterialArmorModuleBuilder;
+import com.drppp.drtech.api.armor.Modules;
+import com.drppp.drtech.api.armor.modules.MaterialArmorModule;
 import com.drppp.drtech.common.items.baubles.ElectricFlightRingBehavior;
 import com.drppp.drtech.common.items.baubles.ElectricLifeSupportRingBehavior;
 import com.drppp.drtech.common.items.behavior.*;
 import gregtech.api.GTValues;
 import gregtech.api.items.metaitem.ElectricStats;
 import gregtech.api.items.metaitem.FilteredFluidStats;
+import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.items.metaitem.StandardMetaItem;
 import gregtech.common.items.behaviors.TooltipBehavior;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.common.Loader;
 
 
 public class MetaItems1 extends StandardMetaItem {
+
     public MetaItems1() {
         // Keep the container item enumerable even in JEI/HEI builds that query the
         // outer MetaItem before inspecting the creative tabs of its sub-items.
@@ -382,5 +388,59 @@ public class MetaItems1 extends StandardMetaItem {
                 .addComponents(new ConnectorWireBehavior(2));
         DrMetaItems.HIGH_VOLTAGE_WIRE = this.addItem(133, "high_voltage_wire").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64)
                 .addComponents(new ConnectorWireBehavior(3));
+
+        registerArmorModules();
+    }
+
+    /**
+     * 模块化装甲的模块与护甲板。
+     *
+     * <p>这批原本是独立物品 {@code meta_item} 的 meta 0~13；并进本物品时为避开上面已占的
+     * 号段，整体后移到 <b>300 起</b>。物品的 unlocalizedName 没变，所以 lang 与配方都不受影响
+     * —— 只有存档里按旧 meta 存的那些物品会失效。
+     *
+     * <p>护甲板的 meta 直接用 {@code Modules} 里的模块 id（1000 起），与上面的号段不冲突。
+     */
+    private void registerArmorModules() {
+        DrMetaItems.WIRELESS_RECEIVER = this.addItem(300, "wireless_receiver");
+        DrMetaItems.SHOCK_ABSORBER = this.addItem(301, "shock_absorber");
+        DrMetaItems.THICK_INSULATOR = this.addItem(302, "thick_insulator");
+        DrMetaItems.BINOCULARS = this.addItem(303, "binoculars");
+        DrMetaItems.AUTO_FEEDER = this.addItem(304, "auto_feeder");
+        DrMetaItems.OXYGEN_MASK = this.addItem(306, "oxygen_mask");
+        DrMetaItems.ANTI_GRAVITY = this.addItem(307, "anti_gravity");
+        DrMetaItems.SPRINT_MODULE = this.addItem(308, "sprint_module");
+        DrMetaItems.ENERGY_SHIELD = this.addItem(309, "energy_shield");
+        DrMetaItems.HEALING_MODULE = this.addItem(310, "healing_module");
+        DrMetaItems.APIARIST_SHIELD = this.addItem(311, "apiarist_shield");
+        DrMetaItems.REVEALING_GOGGLES = this.addItem(312, "revealing_goggles");
+        DrMetaItems.VIS_OPTIMIZER = this.addItem(313, "vis_optimizer");
+
+        for (Int2ObjectMap.Entry<MaterialArmorModuleBuilder> entry : Modules.getArmorModules().int2ObjectEntrySet()) {
+            MaterialArmorModuleBuilder builder = entry.getValue();
+            if (!builder.isRegistered()) {
+                continue;
+            }
+            MetaItem<?>.MetaValueItem metaValueItem = this.addItem(entry.getIntKey(),
+                    "armor_plating_" + builder.material).addComponents();
+            ((MaterialArmorModule) Modules.getModule(entry.getIntKey())).init(metaValueItem);
+            DrMetaItems.MATERIAL_ARMOR_PLATINGS.put(builder.material, metaValueItem);
+        }
+        // 全部模块/护甲板的 MetaValueItem 就绪后，把每个 IModule 作为物品行为挂上
+        Modules.init();
+    }
+
+    /**
+     * 护甲板共用一张模型。
+     *
+     * <p>它们靠 {@code armor_plating_<材料>} 的命名区分，但模型只有一份 ——
+     * 二十来个材料不值得各画一张。
+     */
+    @Override
+    protected String formatModelPath(MetaItem<?>.MetaValueItem metaValueItem) {
+        if (metaValueItem.unlocalizedName.startsWith("armor_plating_")) {
+            return "metaitems/armor_plating";
+        }
+        return super.formatModelPath(metaValueItem);
     }
 }

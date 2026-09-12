@@ -2,7 +2,7 @@ package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.unification.material.Materials;
 import net.minecraft.entity.player.EntityPlayer;
@@ -55,6 +55,6 @@ public class OxygenMask extends AbstractModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.OXYGEN_MASK;
+        return DrMetaItems.OXYGEN_MASK;
     }
 }

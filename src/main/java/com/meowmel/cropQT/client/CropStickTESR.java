@@ -16,6 +16,12 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 作物架TESR - 根据CropRenderType渲染植物
@@ -34,6 +40,58 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
 
+    // ==================== 帧解析 ====================
+
+    /** 一个目录最多探多少帧。目前最长的是 8 帧（trollplant），留足余量。 */
+    private static final int MAX_FRAMES = 16;
+
+    /** 目录名 → 该目录实际存在的帧（按阶段升序）。 */
+    private static final Map<String, TextureAtlasSprite[]> FRAME_CACHE = new HashMap<>();
+
+    /** 上次缓存对应的贴图图集；资源包重载会换一个新实例，靠它作废缓存。 */
+    private static TextureMap cachedAtlas;
+
+    /**
+     * 取某个作物在第 {@code stage} 阶段的贴图；一帧都没有时返回 {@code null}。
+     *
+     * <p>素材里存在<b>两套命名</b>：新的 {@code stage_N.png}（N 从 0 开始），
+     * 以及一批老的 {@code N.png}（N 从 1 开始，且往往少几帧）。
+     * 这里把整个目录探一遍拿到实际帧数，再把请求的阶段<b>夹进可用区间</b> ——
+     * 素材少几帧时最坏也只是「成熟期用倒数第二帧」，不会整株不显示。
+     */
+    @Nullable
+    private static TextureAtlasSprite frameOf(String texturePath, int stage) {
+        TextureMap atlas = Minecraft.getMinecraft().getTextureMapBlocks();
+        if (atlas != cachedAtlas) {
+            // 资源包重载过——旧的 sprite 已经失效，整个缓存作废
+            cachedAtlas = atlas;
+            FRAME_CACHE.clear();
+        }
+        TextureAtlasSprite[] frames = FRAME_CACHE.computeIfAbsent(texturePath, p -> probeFrames(atlas, p));
+        if (frames.length == 0) {
+            return null;
+        }
+        return frames[Math.min(Math.max(stage, 0), frames.length - 1)];
+    }
+
+    /** 把一个目录的帧按顺序探出来。两种命名都认，谁先探到用谁。 */
+    private static TextureAtlasSprite[] probeFrames(TextureMap atlas, String texturePath) {
+        TextureAtlasSprite missing = atlas.getMissingSprite();
+        List<TextureAtlasSprite> frames = new ArrayList<>();
+        String base = Tags.MODID + ":blocks/crop/" + texturePath + "/";
+        for (int i = 0; i < MAX_FRAMES; i++) {
+            TextureAtlasSprite sprite = atlas.getAtlasSprite(base + "stage_" + i);
+            if (sprite == missing) {
+                sprite = atlas.getAtlasSprite(base + i);
+            }
+            // 不能中途 break：老命名从 1 开始，第 0 帧本来就缺
+            if (sprite != missing) {
+                frames.add(sprite);
+            }
+        }
+        return frames.toArray(new TextureAtlasSprite[0]);
+    }
+
     @Override
     public void render(TileCropStick te, double x, double y, double z,
                        float partialTicks, int destroyStage, float alpha) {
@@ -44,17 +102,8 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
 
         int stage = Math.min(te.getGrowthStage(), type.getMaxGrowthStage());
 
-        // 获取贴图
-        String texPath = Tags.MODID + ":blocks/crop/" + type.getTexturePath() + "/stage_" + stage;
-        TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(texPath);
-
-        TextureAtlasSprite missing = Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
-        if (sprite == missing) {
-            // fallback到stage_0
-            texPath = Tags.MODID + ":blocks/crop/" + type.getTexturePath() + "/stage_0";
-            sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(texPath);
-            if (sprite == missing) return;
-        }
+        TextureAtlasSprite sprite = frameOf(type.getTexturePath(), stage);
+        if (sprite == null) return;
 
         // 植物高度
         int maxStage = type.getMaxGrowthStage();

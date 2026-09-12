@@ -111,7 +111,7 @@ public class TopProvider implements IProbeInfoProvider {
                         .getFormattedText());
             }
 
-            if (entityPlayer.getHeldItem(EnumHand.MAIN_HAND).getItem() == ItemsInit.CROP_ANALYZER) {
+            if (com.meowmel.cropQT.item.MetaItemCropTools.CROP_ANALYZER.isItemEqual(entityPlayer.getHeldItem(EnumHand.MAIN_HAND))) {
                 iProbeInfo.text(new TextComponentString(
                         TextFormatting.GREEN + "Tier: " + TextFormatting.WHITE +
                                 (type != null ? type.getTier() : "?")).getFormattedText());

@@ -1208,12 +1208,15 @@ item.advanced_rocket.name=高级火箭
 tile.drtech.water_mill.name=原始水车
 tile.drtech.wood_axle.name=传动轴
 tile.drtech.crop_stick.name=作物架
-item.drtech.crop_seed.name=种子袋
-item.drtech.crop_analyzer.name=作物分析器
-item.drtech.weeding_shears.name=除草剪
+item.drtech.crop_seed.name=种子
 # --- 作物系统：工具（meta item） ---
-metaitem.fertilizer_applicator.name=施肥器
+metaitem.fertilizer_applicator.name=肥料袋
 metaitem.watering_can.name=浇水壶
+metaitem.crop_analyzer.name=作物分析仪
+metaitem.crop_analyzer.tooltip.1=§7潜行右键：打开分析界面
+metaitem.crop_analyzer.tooltip.2=§7把未分析的种子放进输入槽，耗电后输出已分析的种子
+metaitem.crop_analyzer.tooltip.3=§7直接右键作物架：报告该株的土壤、水肥与环境分
+metaitem.crop_analyzer.tooltip.4=§8只有已分析的种子能扩繁、育种、提取
 
 # --- 作物系统：土壤组 ---
 cropqt.soil.farmland=耕地
@@ -1227,12 +1230,6 @@ cropqt.soil.gravel=沙砾
 cropqt.soil.soul_sand=灵魂沙
 cropqt.soil.brick=砖块
 cropqt.soil.water=水体
-
-# --- 作物系统：液体肥料 ---
-fluid.drtech.fertilizer=液体肥料
-fluid.fertilizer=液体肥料
-fluid.drtech.enriched_fertilizer=浓缩液体肥料
-fluid.enriched_fertilizer=浓缩液体肥料
 
 item.drtech.xp_berry.name=经验莓
 item.drtech.soar_xp_berry.name=飞升莓
@@ -1546,21 +1543,36 @@ drtech.gui.industrial_apiary.tooltip.2.enabled=启用处理状态
 behavior.matrix_gems.info=已存储数据:%s
 drtech.multiblock.crops.seed=§b种子信息:%s
 #流体
-gregtech.material.cold_sun_salt=冷太阳能盐
-gregtech.material.hot_sun_salt=热太阳能盐
-gregtech.material.chorus=紫菘果
-gregtech.material.demulsifier=破乳剂
-gregtech.material.high_energy_demulsifier=高能破乳剂
-gregtech.material.high_energy_chorus_solution=高能紫菘溶液
-gregtech.material.ender_precipitate=末影沉淀物
-gregtech.material.ender_extractant=末影萃取剂
-gregtech.material.extracted_chorus_solvent=萃取紫菘溶剂
-gregtech.material.chorus_waste=紫菘废液
-gregtech.material.ender_energy_factor=末影能量因子
-gregtech.material.high_energy_diesel=高能柴油
-gregtech.material.high_energy_gasoline=高能汽油
+drtech.material.cold_sun_salt=冷太阳能盐
+drtech.material.hot_sun_salt=热太阳能盐
+drtech.material.chorus=紫菘果
+drtech.material.demulsifier=破乳剂
+drtech.material.high_energy_demulsifier=高能破乳剂
+drtech.material.high_energy_chorus_solution=高能紫菘溶液
+drtech.material.ender_precipitate=末影沉淀物
+drtech.material.ender_extractant=末影萃取剂
+drtech.material.extracted_chorus_solvent=萃取紫菘溶剂
+drtech.material.chorus_waste=紫菘废液
+drtech.material.ender_energy_factor=末影能量因子
+drtech.material.high_energy_diesel=高能柴油
+drtech.material.high_energy_gasoline=高能汽油
+drtech.material.fertilizer=液体肥料
+drtech.material.enriched_fertilizer=浓缩液体肥料
 item.gregtech.material.chorus.dust=粉碎紫菘果
 item.gregtech.material.ender_precipitate.dust=末影沉淀物
+
+#作物产物的前缀名。key 是 item.material.oreprefix.<前缀名>，%s 由 GT 填材料名。
+#少了这几条不会报错，GT 会直接退化成材料名（「铁叶」变成「铁」），所以很容易漏。
+item.material.oreprefix.leaf=%s叶
+item.material.oreprefix.fiber=%s纤维
+item.material.oreprefix.twig=%s枝
+item.material.oreprefix.flower=%s花
+item.material.oreprefix.berry=%s浆果
+item.material.oreprefix.stem=%s茎
+item.material.oreprefix.wart=%s疣
+item.material.oreprefix.root=%s根
+item.material.oreprefix.blossom=%s花苞
+item.material.oreprefix.magic_essence=%s精华
 
 
 #收集器
@@ -2338,41 +2350,41 @@ drtech.machine.crop_synthesizer.iv.name=精英作物合成器
 drtech.machine.industrial_farm.name=工业农场
 
 # --- Crops: machine tutorials ---
-drtech.machine.seed_generator.tooltip.1=用途§8：把一份§e已分析§8的种子袋原样复制一份
-drtech.machine.seed_generator.tooltip.2=输入§8 种子袋（必须先分析）　§7输出§8 同样的种子袋
-drtech.machine.seed_generator.tooltip.3=消耗§b液体肥料§8：肥料越浓，每次用掉的 mB 越少
-drtech.machine.seed_generator.tooltip.4=耗时随电压档位递减，最低 §e20 tick
-drtech.machine.seed_generator.tooltip.5=未分析的种子不给复制§8——先用作物分析仪过一遍
-drtech.machine.seed_generator.tooltip.6=作物链的顺序§8：分析 → §e扩繁§8 → 育种 → 提取 / 合成
+drtech.machine.seed_generator.tooltip.1=本机用于把一份已分析的种子袋原样复制一份
+drtech.machine.seed_generator.tooltip.2=输入种子袋（必须先分析），输出同样的种子袋
+drtech.machine.seed_generator.tooltip.3=消耗液体肥料，肥料越浓，每次用掉的 mB 越少
+drtech.machine.seed_generator.tooltip.4=耗时随电压档位递减，最低 20 tick
+drtech.machine.seed_generator.tooltip.5=未分析的种子不给复制——先用作物分析仪过一遍
+drtech.machine.seed_generator.tooltip.6=作物链的顺序为分析 → 扩繁 → 育种 → 提取 / 合成
 
-drtech.machine.crop_manager.tooltip.1=用途§8：以机器为中心，自动照料一大片作物架
-drtech.machine.crop_manager.tooltip.2=范围§8：水平半径 §e3 + 2×档位§8（LV 为 5、IV 为 13），上下各 §e2§8 格
-drtech.machine.crop_manager.tooltip.3=每个周期扫一遍§8：收获成熟作物、给缺水的补水、给缺肥的补肥
-drtech.machine.crop_manager.tooltip.4=三件事各有开关§8，§c默认只开收获§8——浇水和施肥要你主动打开
+drtech.machine.crop_manager.tooltip.1=本机以自身为中心，自动照料一大片作物架
+drtech.machine.crop_manager.tooltip.2=本机作用范围为水平半径 3 + 2×档位（LV 为 5、IV 为 13），上下各 2 格
+drtech.machine.crop_manager.tooltip.3=每个周期扫一遍，收获成熟作物、给缺水的补水、给缺肥的补肥
+drtech.machine.crop_manager.tooltip.4=三件事各有开关，默认只开收获——浇水和施肥要你主动打开
 drtech.machine.crop_manager.tooltip.5=机器自带水罐与液肥罐，接管道补；液肥越浓，一桶顶得越久
-drtech.machine.crop_manager.tooltip.6=本机只认液体肥料§8，固体肥料请用施肥器手动施
-drtech.machine.crop_manager.tooltip.7=收获加成随档位提高，IV 档 §e+25%
+drtech.machine.crop_manager.tooltip.6=本机只认液体肥料，固体肥料请用施肥器手动施
+drtech.machine.crop_manager.tooltip.7=收获加成随档位提高，IV 档 +25%%
 
-drtech.machine.crop_breeder.tooltip.1=用途§8：把 §e2~4§8 颗已分析的亲本种子杂交成一颗新种子
-drtech.machine.crop_breeder.tooltip.2=走的是和作物架同一张§e变异表§8——田里试出来的组合，机器上照样成立
-drtech.machine.crop_breeder.tooltip.3=输入槽§8：LV ~ MV 给 3 个，HV 起给 §e6§8 个
-drtech.machine.crop_breeder.tooltip.4=成功率 §e40 + (档位 - LV) × 10§8 %，封顶 100%
-drtech.machine.crop_breeder.tooltip.5=失败照样扣亲本与液肥§8——育种是有成本的事
-drtech.machine.crop_breeder.tooltip.6=哪些组合能出什么，看 §eJEI 的杂交页
+drtech.machine.crop_breeder.tooltip.1=本机把 2~4 颗已分析的亲本种子杂交成一颗新种子
+drtech.machine.crop_breeder.tooltip.2=走的是和作物架同一张变异表——田里试出来的组合，机器上照样成立
+drtech.machine.crop_breeder.tooltip.3=输入槽在 LV ~ MV 给 3 个，HV 起给 6 个
+drtech.machine.crop_breeder.tooltip.4=成功率为 40 + (档位 - LV) × 10 %%，封顶 100%%
+drtech.machine.crop_breeder.tooltip.5=失败照样扣亲本与液肥——育种是有成本的事
+drtech.machine.crop_breeder.tooltip.6=哪些组合能出什么，看 JEI 的杂交页
 drtech.machine.crop_breeder.tooltip.7=子代属性取各亲本属性的平均值
 
-drtech.machine.gene_extractor.tooltip.1=用途§8：把一颗已分析的种子拆成 §e4 个基因球之一
-drtech.machine.gene_extractor.tooltip.2=一次只抽一样§8：物种 / 生长 / 产量 / 抗性，用界面按钮切换
-drtech.machine.gene_extractor.tooltip.3=§物种要 §e5 分钟§8，抽单项属性减半
-drtech.machine.gene_extractor.tooltip.4=基因球会被消耗§8——这一点和合成器相反
-drtech.machine.gene_extractor.tooltip.5=本机按 §e3 安培§8取电，比同档别的机器费电
+drtech.machine.gene_extractor.tooltip.1=本机把一颗已分析的种子拆成 4 个基因球之一
+drtech.machine.gene_extractor.tooltip.2=一次只抽一样，可选物种 / 生长 / 产量 / 抗性，用界面按钮切换
+drtech.machine.gene_extractor.tooltip.3=物种要 5 分钟，抽单项属性减半
+drtech.machine.gene_extractor.tooltip.4=基因球会被消耗——这一点和合成器相反
+drtech.machine.gene_extractor.tooltip.5=本机按 3 安培取电，比同档别的机器费电
 drtech.machine.gene_extractor.tooltip.6=拿到球之后，用合成器把四颗拼回一颗完整种子
 
-drtech.machine.crop_synthesizer.tooltip.1=用途§8：§e4 个基因球 + UUM§8 → 一颗分析好的完整种子
-drtech.machine.crop_synthesizer.tooltip.2=基因球不消耗§8——它是可反复使用的模板，只有 UUM 被吃掉
-drtech.machine.crop_synthesizer.tooltip.3=UUM 用量§8：作物 tier 决定底量，三围决定增量
-drtech.machine.crop_synthesizer.tooltip.4=耗时随 tier 增长（约 5 ~ 10 分钟），本机按 §e3 安培§8取电
-drtech.machine.crop_synthesizer.tooltip.5=和提取器配对§8：提取器负责拆、合成器负责拼
+drtech.machine.crop_synthesizer.tooltip.1=本机用 4 个基因球 + UUM 合成一颗分析好的完整种子
+drtech.machine.crop_synthesizer.tooltip.2=基因球不消耗——它是可反复使用的模板，只有 UUM 被吃掉
+drtech.machine.crop_synthesizer.tooltip.3=UUM 用量由作物 tier 决定底量，三围决定增量
+drtech.machine.crop_synthesizer.tooltip.4=耗时随 tier 增长（约 5 ~ 10 分钟），本机按 3 安培取电
+drtech.machine.crop_synthesizer.tooltip.5=和提取器配对，提取器负责拆、合成器负责拼
 drtech.machine.crop_synthesizer.tooltip.6=四颗球攒齐之后，每次合成就只花 UUM
 
 # --- Crops: farm components ---
@@ -2421,11 +2433,39 @@ cropqt.farm.mode.input=输入模式
 cropqt.farm.mode.farm=生产模式
 cropqt.farm.mode.output=输出模式
 
+# --- Crops: analyzer item GUI ---
+cropqt.analyzer.title=§6作物分析仪
+cropqt.analyzer.charge=§7电量：§b%s§7 / §b%s §7EU
+cropqt.analyzer.hint=§7把未分析的种子放进左边的槽位
+cropqt.analyzer.info.name=§a作物：§f%s§7（Tier %s）
+cropqt.analyzer.info.soil=§a土壤：§f%s
+cropqt.analyzer.info.subsoil=§a底土：§f%s
+cropqt.analyzer.info.stats=§c生长 %s  §e产量 %s  §9抗性 %s
+
+#材料驱动的作物：id = 材料名_外型，显示名在这里配
+cropqt.crop.copper_fiber.name=铜纤维草
+cropqt.crop.tin_twig.name=锡枝
+cropqt.crop.iron_leaf.name=铁蕨叶
+cropqt.crop.lead_leaf.name=铅叶草
+cropqt.crop.silver_leaf.name=银叶草
+cropqt.crop.gold_leaf.name=金叶草
+cropqt.crop.aluminium_leaf.name=铝土叶
+cropqt.crop.nickel_leaf.name=镍叶草
+cropqt.crop.zinc_leaf.name=电镀叶
+cropqt.crop.sulfur_flower.name=硫磺花
+cropqt.crop.tungsten_leaf.name=钨叶草
+cropqt.crop.titanium_leaf.name=钛叶草
+cropqt.crop.platinum_leaf.name=铂叶草
+cropqt.crop.osmium_flower.name=锇花
+cropqt.crop.iridium_flower.name=铱花
+cropqt.crop.manganese_leaf.name=软锰矿叶
+cropqt.crop.uranium_238_leaf.name=反应堆叶
+cropqt.crop.mica_flower.name=云母花
+cropqt.crop.salt_root.name=盐根
+cropqt.crop.oil_berry.name=石油浆果
+
 # --- Crops: gene orb modes ---
 cropqt.gene.mode.species=物种
 cropqt.gene.mode.growth=生长
 cropqt.gene.mode.gain=产量
 cropqt.gene.mode.resistance=抗性
-
-# 机器用法不在这里——那 5 台不走 RecipeMap，JEI 摆不出有意义的页，
-# 教程写在机器物品自己的 tooltip 里（见上面的 drtech.machine.*.tooltip.*）

@@ -4,6 +4,7 @@ import com.meowmel.cropQT.api.registries.FertilizerRegistry;
 import com.meowmel.cropQT.api.registries.HydrationRegistry;
 import com.meowmel.cropQT.tile.TileCropStick;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
+import gregtech.api.items.metaitem.stats.IItemModelDispatcher;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -29,10 +30,33 @@ import net.minecraft.world.World;
  * {@link FertilizerRegistry} 的登记表——所以第三方加的液体肥料只要登记过，
  * 灌进水壶就能用，不需要额外的物品。
  */
-public class WateringCanBehavior implements IItemBehaviour {
+public class WateringCanBehavior implements IItemBehaviour, IItemModelDispatcher {
 
     /** 一次用掉多少 mB。 */
     public static final int MB_PER_USE = 500;
+
+    /** 有液体时的模型序号，对应 {@code metaitems/watering_can/1.json}。 */
+    public static final int MODEL_FULL = 0;
+    /** 空壶时的模型序号，对应 {@code metaitems/watering_can/2.json}。 */
+    public static final int MODEL_EMPTY = 1;
+
+    /**
+     * 按壶里还有没有液体换模型。
+     *
+     * <p>索引从 0 开始，GT 会拼成 {@code metaitems/watering_can/<索引+1>.json}。
+     * 所以模型数量要配成 2（见 {@code MetaItemCropTools} 的 {@code setModelAmount}）。
+     */
+    @Override
+    public int getModelIndex(ItemStack itemStack, int maxIndex) {
+        IFluidHandlerItem handler = FluidUtil.getFluidHandler(itemStack);
+        if (handler == null) {
+            // 理论上不会——壶一定带流体能力。真拿不到就当空的，总比显示满的好
+            return MODEL_EMPTY;
+        }
+        FluidStack stored = handler.drain(Integer.MAX_VALUE, false);
+        boolean empty = stored == null || stored.amount <= 0;
+        return Math.min(empty ? MODEL_EMPTY : MODEL_FULL, maxIndex);
+    }
 
     @Override
     public ActionResult<ItemStack> onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand,

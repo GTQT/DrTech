@@ -32,7 +32,7 @@ public class RecipeHandler {
         event.getRegistry().register(
             new ShapedOreRecipe(
                 new ResourceLocation(Tags.MODID, "crop_analyzer"),
-                new ItemStack(ItemsInit.CROP_ANALYZER),
+                com.meowmel.cropQT.item.MetaItemCropTools.CROP_ANALYZER.getStackForm(),
                 " G ",
                 " R ",
                 " I ",
