@@ -151,15 +151,15 @@ public class HealingModule extends AbstractModule {
 
     @Override
     public void addHUDInfo(ItemStack armorPiece, NBTTagCompound armorData, List<String> hudStrings) {
-        hudStrings.add(I18n.format("mechtech.healing_module.active"));
+        hudStrings.add(I18n.format("drtech.healing_module.active"));
     }
 
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
-        lines.add(I18n.format("mechtech.healing_module.tooltip.1"));
-        lines.add(I18n.format("mechtech.healing_module.tooltip.2", ENERGY_PER_CYCLE));
-        lines.add(I18n.format("mechtech.healing_module.tooltip.3"));
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.healing_module.tooltip.1"));
+        lines.add(I18n.format("drtech.healing_module.tooltip.2", ENERGY_PER_CYCLE));
+        lines.add(I18n.format("drtech.healing_module.tooltip.3"));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     @Override

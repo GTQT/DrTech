@@ -113,7 +113,7 @@ public class AutoFeeder extends AbstractModule {
                 status = (armorData.getBoolean("feeder_enabled") ? I18n.format("metaarmor.hud.status.enabled") :
                         I18n.format("metaarmor.hud.status.disabled"));
             }
-            String result = I18n.format("mechtech.auto_feeder.mode", status);
+            String result = I18n.format("drtech.auto_feeder.mode", status);
             hudStrings.add(result);
         }
     }

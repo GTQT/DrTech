@@ -3,11 +3,12 @@ package com.meowmel.cropQT.machine;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.value.sync.DoubleSyncValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.ProgressWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+import com.drppp.drtech.common.blocks.BlocksInit;
+import com.drppp.drtech.api.metaTileEntity.DrtechMultiblockAbility;
 import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
@@ -15,8 +16,9 @@ import com.meowmel.cropQT.api.DropTracker;
 import com.meowmel.cropQT.api.FarmNutrientModel;
 import com.meowmel.cropQT.api.SubSoilRequirement;
 import com.meowmel.cropQT.api.registries.FertilizerRegistry;
+import com.meowmel.cropQT.api.capability.FarmType;
+import com.meowmel.cropQT.api.capability.IFarmPart;
 import com.meowmel.cropQT.api.registries.HydrationRegistry;
-import com.meowmel.cropQT.block.BlockIndustrialFarmUnit;
 import com.meowmel.cropQT.block.BlockSeedBed;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemEnvironmentalModule;
@@ -33,7 +35,6 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.metatileentity.multiblock.ui.MultiblockUIFactory;
 import gregtech.api.mui.GTGuiTextures;
 import gregtech.api.pattern.FormedStructureView;
-import gregtech.api.pattern.StructureContributionKey;
 import gregtech.api.pattern.StructurePieceKey;
 import gregtech.api.pattern.casing.DeclarativePatternBuilder;
 import gregtech.api.pattern.casing.GTStructureChannels;
@@ -42,6 +43,7 @@ import gregtech.api.pattern.element.Elements;
 import gregtech.api.pattern.element.IStructureElement;
 import gregtech.api.pattern.element.StructureDefinition;
 import gregtech.api.util.GTTransferUtils;
+import gregtech.api.util.GTUtility;
 import gregtech.client.renderer.ICubeRenderer;
 import gregtech.client.renderer.texture.Textures;
 import gregtech.common.blocks.BlockGlassCasing;
@@ -49,9 +51,11 @@ import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
@@ -62,33 +66,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static gregtech.api.util.RelativeDirection.BACK;
-import static gregtech.api.util.RelativeDirection.RIGHT;
-import static gregtech.api.util.RelativeDirection.UP;
+import static gregtech.api.util.RelativeDirection.*;
 
 /**
  * 工业农场：把作物架上的那一套搬进机器里，用 EU 换产出。
  *
- * <h2>结构</h2>
- * 三段拼接，横截面固定 5 宽 × 4 高，沿轴向堆叠 1~13 段：
- * <pre>
- * head：          body（可重复 1~13）：      tail：
- * " cCc "         " gUg "                    " cDc "
- * "cCCCc"         "g   g"                    "cDDDc"
- * "cC~Cc"         "csssc"                    "cDDDc"
- * "c   c"         "     "                    "c   c"
- * </pre>
- * 仓室<b>只能放在 head 段的 'C' 位</b>——源端就是这么限制的。
- * 末段 {@code 'D'} 在源端靠 StructureLib 的 {@code shouldSkip} 不做校验，GTQT 的 DSL 没有这个语义，
- * 所以这里退化成纯外壳（功能不受影响，仓室本来也不放那儿）。
+ * <h2>等级由升级仓与苗床的档次决定</h2>
+ * 只有一个控制器。体段顶部每段必须装一个升级仓（{@code IFarmPart}），
+ * 结构里的所有升级仓与所有苗床<b>必须同一档</b>，那个档就是农场的升级等级
+ * （{@link #upgradeTier}）：容量、基础耗电、每轮水肥用量、收割轮数加成、段数上限全跟着它走。
  *
- * <h2>等级由输入电压决定</h2>
- * 只有一个控制器。{@link #getFarmTier()} 读能量仓的最高输入电压换算成 GT 电压档，
- * 段数上限 = {@code 农场等级 - MV + 1}。喂什么电压，就是什么等级。
+ * <p>电压只决定<b>能喂多少功率</b>，而且还要受档次限制（{@code 能量仓档位 <= 升级等级}）。
+ * 两者之间的落差正是超频生长加速仓存在的理由 —— 用低档苗床配高压电，超频换生长速度。
  *
  * <h2>三种模式</h2>
  * <ul>
@@ -113,16 +107,14 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     private static final String PIECE_TAIL = "tail";
 
     /** 最少 / 最多堆叠段数。 */
-    private static final int MIN_SLICES = 1;
+    private static final int MIN_SLICES = 3;
     private static final int MAX_SLICES = 13;
 
     // ==================== 等级 ====================
 
-    /** 农场最低等级（对应源端的 MIN_CASING_TIER），同时是超频计算的基准。 */
+    /** 农场最低档次（对应源端的 MIN_CASING_TIER）。 */
     private static final int MIN_FARM_TIER = GTValues.MV;
-    /** 本项目只做到 IV。 */
-    private static final int MAX_FARM_TIER = GTValues.IV;
-    /** 超频次数上限——只作护栏，IV 档实际只会算出 3 次。 */
+    /** 超频次数上限——只作护栏，正常范围里用不满。 */
     private static final int MAX_OVERCLOCKS = 8;
 
     // ==================== 周期 ====================
@@ -147,8 +139,8 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     public static final int SLOT_SUB_SOIL = 1;
     /** 环境模块起始槽。 */
     public static final int SLOT_ENV_START = 2;
-    /** 环境模块槽数量，与环境强化单元的上限一致。 */
-    private static final int ENV_SLOT_COUNT = BlockIndustrialFarmUnit.ENVIRONMENTAL_MAX_COUNT;
+    /** 环境模块槽数量，与环境强化升级的上限一致。 */
+    private static final int ENV_SLOT_COUNT = 2;
     /** 内部槽总数。 */
     private static final int INVENTORY_SIZE = SLOT_ENV_START + ENV_SLOT_COUNT;
 
@@ -163,34 +155,25 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     /** 没有肥料时的模拟储肥量。 */
     private static final int SIMULATED_FERT_NOT_PROVIDED = 0;
 
-    // ==================== 单元计数 ====================
+    // ==================== 升级等级 ====================
 
-    /**
-     * 五种升级单元共用结构里的 {@code 'U'} 位，靠 match 回调把各自的类型写进
-     * 结构贡献（{@link StructureContributionKey}），成型时再一次性读出来。
-     *
-     * <p>不能用「校验前清零 + 回调累加」那种写法：{@code doStructureCheck()} <b>每 tick</b> 都会被调用，
-     * 但真正的结构匹配是事件驱动 / 异步的、隔很久才跑一次，那样清出来的计数绝大多数 tick 都是 0。
-     * 贡献是每次匹配现攒的，天然跟着匹配走。
-     */
-    private static final StructureContributionKey<Integer, Integer> ENV_UNIT_KEY =
-            StructureContributionKey.sum("drtech:industrial_farm/environmental_units");
-    private static final StructureContributionKey<Integer, Integer> GROWTH_UNIT_KEY =
-            StructureContributionKey.sum("drtech:industrial_farm/growth_units");
-    private static final StructureContributionKey<Integer, Integer> FERTILIZER_UNIT_KEY =
-            StructureContributionKey.sum("drtech:industrial_farm/fertilizer_units");
-    private static final StructureContributionKey<Integer, Integer> ADVANCED_HARVEST_UNIT_KEY =
-            StructureContributionKey.sum("drtech:industrial_farm/advanced_harvest_units");
-    private static final StructureContributionKey<Integer, Integer> OVERCLOCKED_UNIT_KEY =
-            StructureContributionKey.sum("drtech:industrial_farm/overclocked_units");
+    /** 结构里还没碰到过任何分档组件。 */
+    private static final int TIER_UNSET = -1;
+    /** 结构里出现了不止一种档次。 */
+    private static final int TIER_CONFLICT = -2;
 
     // ==================== 状态 ====================
 
     /** 内部库存：种子 / 底土 / 环境模块。 */
     private final ItemStackHandler farmInventory = createFarmInventory();
 
-    /** 农场等级，由输入电压换算。 */
-    private int farmTier = MIN_FARM_TIER;
+    /**
+     * 升级等级：由升级仓与苗床共同约定，结构里所有部件必须同一档。
+     *
+     * <p>这是整套机制的核心变量。容量、基础耗电、水肥消耗、收割轮数加成全跟着它走，
+     * 它同时还是能量仓电压的上限。电压与它之间的落差，就是超频生长加速仓的立足点。
+     */
+    private int upgradeTier = TIER_UNSET;
     /** 实际搭出来的段数。 */
     private int slices = MIN_SLICES;
     /** 当前模式。 */
@@ -202,12 +185,13 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     /** 本周期是否有肥料供给（用于营养计算）。 */
     private boolean hasFertilizer = false;
 
-    // 升级单元计数，成型时从结构贡献里读出
-    private int envUnitCount = 0;
-    private int growthUnitCount = 0;
-    private int fertilizerUnitCount = 0;
-    private int advancedHarvestUnitCount = 0;
-    private int overclockedUnitCount = 0;
+    /** 五种升级各装了几个，成型时从升级仓数出来。 */
+    private final EnumMap<FarmType, Integer> unitCounts = new EnumMap<>(FarmType.class);
+
+    /** 本周期实际执行了几次超频。没装超频仓时是 0。 */
+    private int expectedOCs = 0;
+    /** 本周期每 tick 实际耗电（含超频）。 */
+    private long expectedEUt = 0;
 
     /** 小数累积产出。 */
     private final DropTracker dropTracker = new DropTracker();
@@ -227,6 +211,21 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         return new MetaTileEntityIndustrialFarm(metaTileEntityId);
     }
 
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World world,
+                               @NotNull List<String> tooltip, boolean advanced) {
+        super.addInformation(stack, world, tooltip, advanced);
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.1"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.2"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.3"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.4"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.5"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.6"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.7"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.8"));
+        tooltip.add(I18n.format("drtech.machine.industrial_farm.tooltip.9"));
+    }
+
     // ==================== 结构定义 ====================
 
     private static final StructureDefinition<?> STRUCTURE_DEFINITION = StructureDefinition.getOrBuild(
@@ -238,21 +237,18 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     }
 
     private static StructureDefinition<?> buildStructure() {
-        return DeclarativePatternBuilder.start(RIGHT, UP, BACK)
+        return DeclarativePatternBuilder.start(RIGHT, DOWN, BACK)
                 .piece(PIECE_HEAD)
-                .aisle(" cCc ", "cCCCc", "cC~Cc", "c   c")
+                .aisle(" CCC ", "CCCCC", "CCCCC", "C   C")
                 .repeatablePiece(PIECE_BODY, MIN_SLICES, MAX_SLICES)
-                .aisle(" gUg ", "g   g", "csssc", "     ")
+                .aisle(" GUG ", "G   G", "CSSSC", "     ")
                 .withAisleChannel(GTStructureChannels.STRUCTURE_LENGTH.getName())
                 .piece(PIECE_TAIL)
-                .aisle(" cDc ", "cDDDc", "cDDDc", "c   c")
+                .aisle(" CCC ", "CCCCC", "CC~CC", "C   C")
                 .self('~', MetaTileEntityIndustrialFarm.class)
-                .blocks('c', getCasingState())
-                .blocks('D', getCasingState())
-                .blocks('g', getGlassesState())
-                .blocks('s', getSeedBedState())
-                .where('U', farmUnitsElement())
-                // 仓室只开在 head 段的 'C' 位——源端也是这么限制的
+                .blocks('G', getGlassesState())
+                .where('S', seedBedElement())
+                .hatch('U', DrtechMultiblockAbility.FARM_PART)
                 .casing('C', getCasingState())
                     .maintenance()
                     .energyInput(1, 2)
@@ -262,53 +258,56 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
                 .buildStructureDefinition();
     }
 
-    /** 五种升级单元共用 {@code 'U'}，命中哪个就把哪个的计数往结构贡献里加一。 */
-    private static IStructureElement farmUnitsElement() {
-        BlockIndustrialFarmUnit.UnitType[] types = BlockIndustrialFarmUnit.UnitType.values();
-        IStructureElement[] unitElements = new IStructureElement[types.length];
-        for (BlockIndustrialFarmUnit.UnitType type : types) {
-            unitElements[type.ordinal()] = Elements.onPass(
-                    context -> context.getCollector().emit(unitKey(type), 1),
-                    Elements.block(getUnitState(type)));
+    /**
+     * 苗床：11 档都收，但整座农场的苗床必须同一档。
+     *
+     * <p>用 {@code chain} 逐档试，命中哪一档就在回调里记下那一档 ——
+     * {@code Elements.onPass} 的回调没有返回值，没法当场把结构判失败，
+     * 所以冲突只能成型后再查（{@link #isUpgradeTierValid()}），
+     * 表现成「停机 + 界面红字」，跟段数校验同一套。
+     */
+    private static IStructureElement seedBedElement() {
+        BlockSeedBed.SeedBedType[] types = BlockSeedBed.SeedBedType.values();
+        IStructureElement[] byTier = new IStructureElement[types.length];
+        for (int i = 0; i < types.length; i++) {
+            int tier = types[i].getTier();
+            byTier[i] = Elements.onPass(
+                    context -> {
+                        // 预览 / 建造提示时没有控制器，那种情况下只判方块、不记档次
+                        if (context.getController() instanceof MetaTileEntityIndustrialFarm farm) {
+                            farm.agreeUpgradeTier(tier);
+                        }
+                    },
+                    Elements.block(getSeedBedState(types[i])));
         }
-        return Elements.chain(unitElements);
-    }
-
-    private static StructureContributionKey<Integer, Integer> unitKey(BlockIndustrialFarmUnit.UnitType type) {
-        switch (type) {
-            case ENVIRONMENTAL_ENHANCEMENT:       return ENV_UNIT_KEY;
-            case GROWTH_ACCELERATION:             return GROWTH_UNIT_KEY;
-            case FERTILIZER:                      return FERTILIZER_UNIT_KEY;
-            case ADVANCED_HARVESTING:             return ADVANCED_HARVEST_UNIT_KEY;
-            case OVERCLOCKED_GROWTH_ACCELERATION: return OVERCLOCKED_UNIT_KEY;
-            default: throw new IllegalArgumentException("Unknown unit type: " + type);
-        }
+        return Elements.chain(byTier);
     }
 
     // ==================== 方块 / 贴图 ====================
 
-    /** 控制器与所有外壳的方块。GTQT 会<b>反射</b>这个方法拿 CTM 基座，缺了会让组件静默失去连接纹理。 */
+    /**
+     * 农场的外壳：砖砌农业外壳（照搬源端）。
+     *
+     * <p>这个方法名是<b>反射约定</b>——{@code MultiblockControllerBase.getCasingBlock()} 会按名字找它，
+     * 拿到之后给所有贴在农场上的仓做底图。所以改了这里，外壳和升级仓的底色会一起变。
+     */
     public static IBlockState getCasingState() {
-        return MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.STAINLESS_CLEAN);
+        return BlocksInit.COMMON_CASING.getState(
+                com.drppp.drtech.common.blocks.metaBlocks.MetaCasing.MetalCasingType.BRICKED_AGRICULTURAL_CASING);
     }
 
     protected static IBlockState getGlassesState() {
         return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
 
-    protected static IBlockState getSeedBedState() {
-        return com.drppp.drtech.common.blocks.BlocksInit.SEED_BED
-                .getState(BlockSeedBed.SeedBedType.SEED_BED);
-    }
-
-    protected static IBlockState getUnitState(BlockIndustrialFarmUnit.UnitType type) {
-        return com.drppp.drtech.common.blocks.BlocksInit.INDUSTRIAL_FARM_UNIT.getState(type);
+    protected static IBlockState getSeedBedState(BlockSeedBed.SeedBedType type) {
+        return BlocksInit.SEED_BED.getState(type);
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public @NotNull ICubeRenderer getBaseTexture(IMultiblockPart sourcePart) {
-        return Textures.CLEAN_STAINLESS_STEEL_CASING;
+        return com.drppp.drtech.client.Textures.BRICKED_AGRICULTURAL_CASING;
     }
 
     @SideOnly(Side.CLIENT)
@@ -338,25 +337,35 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         // 匹配完了没人把结果写回去，读出来恒为 0——段数上限就永远不会生效。
         // 蒸馏塔 / 大型蒸馏器读的就是 getPieceRepeat，这里是同一套。
         this.slices = Math.max(MIN_SLICES, formed.getPieceRepeat(BODY_PIECE, 0));
-        this.envUnitCount = getAggregate(formed, ENV_UNIT_KEY);
-        this.growthUnitCount = getAggregate(formed, GROWTH_UNIT_KEY);
-        this.fertilizerUnitCount = getAggregate(formed, FERTILIZER_UNIT_KEY);
-        this.advancedHarvestUnitCount = getAggregate(formed, ADVANCED_HARVEST_UNIT_KEY);
-        this.overclockedUnitCount = getAggregate(formed, OVERCLOCKED_UNIT_KEY);
+
+        // 升级等级：苗床档次在匹配过程中已经记进 upgradeTier 了，
+        // 这里再让所有升级仓来跟它对齐——两边都必须同一档
+        this.unitCounts.clear();
+        for (IFarmPart part : getAbilities(DrtechMultiblockAbility.FARM_PART)) {
+            unitCounts.merge(part.getFarmType(), 1, Integer::sum);
+            agreeUpgradeTier(part.getPartTier());
+        }
 
         this.importItems = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
         this.exportItems = new ItemHandlerList(getAbilities(MultiblockAbility.EXPORT_ITEMS));
         this.importFluids = new FluidTankList(false, getAbilities(MultiblockAbility.IMPORT_FLUIDS));
         this.energyContainer = new EnergyContainerList(getAbilities(MultiblockAbility.INPUT_ENERGY));
-        this.farmTier = resolveFarmTier();
+        refreshExpectedOverclock();
         markDirty();
     }
 
-    /** 读结构贡献里的计数；一次都没命中时贡献不存在，按 0 算。 */
-    private static int getAggregate(@NotNull FormedStructureView formed,
-                                    @NotNull StructureContributionKey<Integer, Integer> key) {
-        Integer value = formed.getAggregate(key);
-        return value == null ? 0 : value;
+    /**
+     * 让一个分档组件（苗床或升级仓）跟当前约定的档次对齐。
+     *
+     * <p>第一个碰到的定调，之后每一个都必须一样；出现第二种就记成冲突，
+     * 由 {@link #isUpgradeTierValid()} 判停机。
+     */
+    private void agreeUpgradeTier(int tier) {
+        if (upgradeTier == TIER_UNSET) {
+            upgradeTier = tier;
+        } else if (upgradeTier != tier) {
+            upgradeTier = TIER_CONFLICT;
+        }
     }
 
     @Override
@@ -366,37 +375,116 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         this.exportItems = new ItemHandlerList();
         this.importFluids = new FluidTankList(false);
         this.energyContainer = new EnergyContainerList(Collections.emptyList());
+        this.upgradeTier = TIER_UNSET;
+        this.unitCounts.clear();
+        this.expectedOCs = 0;
+        this.expectedEUt = 0;
         this.progress = 0;
         this.maxProgress = 0;
     }
 
-    /** 由能量仓的最高输入电压换算农场等级。 */
-    private int resolveFarmTier() {
-        long voltage = this.energyContainer.getHighestInputVoltage();
-        for (int tier = MAX_FARM_TIER; tier >= MIN_FARM_TIER; tier--) {
-            if (voltage >= GTValues.V[tier]) {
-                return tier;
-            }
-        }
-        return MIN_FARM_TIER;
+    /**
+     * 升级等级是否可用：所有分档组件同档、且不低于农场最低档。
+     *
+     * <p>跟段数校验一样是「成型但停机」，不是结构错误——摆错一档就该给提示，
+     * 而不是让玩家对着不成型的机器猜哪里错了。
+     */
+    public boolean isUpgradeTierValid() {
+        return upgradeTier >= MIN_FARM_TIER && upgradeTier <= BlockSeedBed.MAX_TIER;
     }
 
-    public int getFarmTier() {
-        return farmTier;
+    /** 某个类型装了几个。 */
+    public int getUnitCount(FarmType type) {
+        return unitCounts.getOrDefault(type, 0);
     }
 
     public int getSlices() {
         return slices;
     }
 
-    /** 本等级允许的最大段数。 */
+    /**
+     * 本档次允许的最大段数。
+     *
+     * <p>照源端：段数不是「你想搭多长就搭多长」，而是由组件档次反推 ——
+     * 档次越高，农场能装的升级仓越多、也就被要求造得越长。
+     */
     public int getMaxSlicesForTier() {
-        return Math.min(MAX_SLICES, farmTier - MIN_FARM_TIER + 1);
+        return isUpgradeTierValid() ? Math.min(MAX_SLICES, BlockSeedBed.getMultiLength(upgradeTier)) : MIN_SLICES;
     }
 
-    /** 结构校验：段数不能超过等级允许的长度。 */
+    /** 结构校验：段数不能超过档次允许的长度。 */
     public boolean isSliceCountValid() {
         return slices <= getMaxSlicesForTier();
+    }
+
+    // 停机原因。界面靠它出红字，值本身要跨端同步，所以用 int。
+    public static final int ERROR_NONE = 0;
+    /** 段数超过档次允许的长度。 */
+    public static final int ERROR_SLICE_OVERFLOW = 1;
+    /** 升级仓与苗床档次不一致（或压根没装分档组件）。 */
+    public static final int ERROR_TIER_INVALID = 2;
+    /** 某种升级超出了数量上限。 */
+    public static final int ERROR_UNIT_CAP = 3;
+    /** 生长加速与超频同时装了。 */
+    public static final int ERROR_EXCLUSIVE = 4;
+    /** 能量仓电压超过了升级档次。 */
+    public static final int ERROR_VOLTAGE_OVER_TIER = 5;
+
+    /**
+     * 整机停在哪一步；{@link #ERROR_NONE} 表示配置没问题。
+     *
+     * <p>下面每一条在源端都是<b>结构错误</b>（不成型）。这里一律做成「成型但停机 + 界面红字」，
+     * 跟段数校验同一套：摆错一步就该给提示，而不是让玩家对着不成型的机器猜哪里错了。
+     */
+    public int getConfigError() {
+        if (!isUpgradeTierValid()) {
+            return ERROR_TIER_INVALID;
+        }
+        if (!isSliceCountValid()) {
+            return ERROR_SLICE_OVERFLOW;
+        }
+        for (FarmType type : FarmType.values()) {
+            if (type.isCapped() && getUnitCount(type) > type.getMaxCount()) {
+                return ERROR_UNIT_CAP;
+            }
+        }
+        // 源端 SE_OCGAU_EXCLUSIVITY
+        if (getUnitCount(FarmType.GROWTH_ACCELERATION) > 0
+                && getUnitCount(FarmType.OVERCLOCKED_GROWTH_ACCELERATION) > 0) {
+            return ERROR_EXCLUSIVE;
+        }
+        // 能量仓电压不得超过升级档次——想接高压电就得整套升上去
+        long voltage = this.energyContainer.getHighestInputVoltage();
+        if (voltage > 0 && GTUtility.getFloorTierByVoltage(voltage) > upgradeTier) {
+            return ERROR_VOLTAGE_OVER_TIER;
+        }
+        return ERROR_NONE;
+    }
+
+    public boolean isConfigurationValid() {
+        return getConfigError() == ERROR_NONE;
+    }
+
+    /** 停机原因的 lang 键；没问题时返回 null。 */
+    @Nullable
+    public static String configErrorKey(int error) {
+        switch (error) {
+            case ERROR_SLICE_OVERFLOW:      return "cropqt.farm.error.slice";
+            case ERROR_TIER_INVALID:        return "cropqt.farm.error.tier";
+            case ERROR_UNIT_CAP:            return "cropqt.farm.error.unit_cap";
+            case ERROR_EXCLUSIVE:           return "cropqt.farm.error.exclusive";
+            case ERROR_VOLTAGE_OVER_TIER:   return "cropqt.farm.error.voltage";
+            default:                        return null;
+        }
+    }
+
+    public int getUpgradeTier() {
+        return upgradeTier;
+    }
+
+    /** 实际执行了几次超频；没装超频仓或没落差时是 0。 */
+    public int getOverclockCount() {
+        return expectedOCs;
     }
 
     // ==================== 内部库存 ====================
@@ -412,9 +500,10 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
                 if (slot == SLOT_SUB_SOIL) {
                     return false;
                 }
-                // 槽位数 = 环境强化单元数，但不会超过槽位上限（单元不限量，槽位有限）
+                // 槽位数 = 环境强化升级数，但不会超过槽位上限（仓可以多装，槽位有限）
                 int envIndex = slot - SLOT_ENV_START;
-                if (envIndex < 0 || envIndex >= Math.min(envUnitCount, ENV_SLOT_COUNT)) {
+                if (envIndex < 0
+                        || envIndex >= Math.min(getUnitCount(FarmType.ENVIRONMENTAL_ENHANCEMENT), ENV_SLOT_COUNT)) {
                     return false;
                 }
                 return stack.getItem() instanceof ItemEnvironmentalModule
@@ -466,7 +555,7 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
 
     @Override
     protected void updateFormedValid() {
-        if (!isSliceCountValid()) {
+        if (!isConfigurationValid()) {
             return;
         }
         if (maxProgress <= 0) {
@@ -607,8 +696,8 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         if (!consumeWater() || !consumeFertilizer()) {
             return;
         }
-        // 扣电
-        long eu = getPowerUsage();
+        // 扣电（含超频）
+        long eu = getActualPowerUsage();
         if (this.energyContainer.getEnergyStored() < eu) {
             return;
         }
@@ -656,7 +745,7 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     private int getNutrientScore(CropType crop) {
         Set<BiomeDictionary.Type> biomeTags = new HashSet<>(
                 BiomeDictionary.getTypes(getWorld().getBiome(getPos())));
-        for (int i = 0; i < Math.min(envUnitCount, ENV_SLOT_COUNT); i++) {
+        for (int i = 0; i < Math.min(getUnitCount(FarmType.ENVIRONMENTAL_ENHANCEMENT), ENV_SLOT_COUNT); i++) {
             ItemStack module = farmInventory.getStackInSlot(SLOT_ENV_START + i);
             if (module.isEmpty() || !(module.getItem() instanceof ItemEnvironmentalModule)) {
                 continue;
@@ -681,77 +770,88 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     /**
      * 生长速度倍率：生长加速是加法、肥料是乘法、超频是 2^n。
      *
-     * <p>各单元的数量上限（环境 2 / 肥料 1 / 高级收割 2 / 超频 1）在这里<b>按效果封顶</b>，
-     * 不做结构校验——超出的单元不生效，但不会让已经搭好的机器失效。
+     * <p>超频那项读的是本周期实际算出来的 {@link #expectedOCs}，不是「有没有装超频仓」——
+     * 装了但没落差（比如苗床档次就是当前电压档）时超频次数是 0，那就该当没装。
      */
     public double getGrowthSpeedMultiplier() {
         double multiplier = 1.0d;
-        multiplier += growthUnitCount * BlockIndustrialFarmUnit.GROWTH_ACCELERATION_BONUS;
-        multiplier *= 1.0d + Math.min(fertilizerUnitCount, BlockIndustrialFarmUnit.FERTILIZER_MAX_COUNT)
-                * BlockIndustrialFarmUnit.FERTILIZER_GROWTH_MULTIPLIER;
-        if (overclockedUnitCount > 0) {
-            multiplier *= Math.pow(2.0d, getOverclockCount());
+        multiplier += getUnitCount(FarmType.GROWTH_ACCELERATION) * FarmType.GROWTH_ACCELERATION_BONUS;
+        multiplier *= 1.0d + Math.min(getUnitCount(FarmType.FERTILIZER),
+                FarmType.FERTILIZER.getMaxCount()) * FarmType.FERTILIZER_GROWTH_MULTIPLIER;
+        if (expectedOCs > 0) {
+            multiplier *= Math.pow(2.0d, expectedOCs);
         }
         return multiplier;
     }
 
-    /** 收割轮数倍率：等级 + 肥料加成是加法，高级收割是乘法。 */
+    /** 收割轮数倍率：苗床档次 + 肥料加成是加法，高级收割是乘法。 */
     public double getHarvestRoundMultiplier() {
         double multiplier = 1.0d;
-        multiplier += farmTier * 0.2d;
-        multiplier += Math.min(fertilizerUnitCount, BlockIndustrialFarmUnit.FERTILIZER_MAX_COUNT)
-                * BlockIndustrialFarmUnit.FERTILIZER_HARVEST_ROUND_BONUS;
-        multiplier *= 1.0d + Math.min(advancedHarvestUnitCount, BlockIndustrialFarmUnit.ADVANCED_HARVESTING_MAX_COUNT)
-                * BlockIndustrialFarmUnit.ADVANCED_HARVESTING_ROUND_MULTIPLIER;
+        multiplier += isUpgradeTierValid() ? BlockSeedBed.getHarvestRoundBonus(upgradeTier) : 0.0d;
+        multiplier += Math.min(getUnitCount(FarmType.FERTILIZER),
+                FarmType.FERTILIZER.getMaxCount()) * FarmType.FERTILIZER_HARVEST_ROUND_BONUS;
+        multiplier *= 1.0d + Math.min(getUnitCount(FarmType.ADVANCED_HARVESTING),
+                FarmType.ADVANCED_HARVESTING.getMaxCount()) * FarmType.ADVANCED_HARVESTING_ROUND_MULTIPLIER;
         return multiplier;
     }
 
     /**
-     * 超频次数：以 <b>MV（农场最低等级）</b>为基准，看当前等级能 4 倍它几次。
+     * 算本周期能超频几次。
      *
-     * <p>基准为什么是 MV 而不是农场自己的等级：后者恒等于能量仓电压（{@link #resolveFarmTier()} 就是
-     * 从电压反推的），拿它当基准的话「能 4 倍几次」永远是 0，超频单元会变成一个纯装饰方块。
-     * 源端之所以有超频余量，是因为它的基准来自<b>组件 tier</b>、而电压来自<b>仓室 tier</b>，两者天然有落差；
-     * 我们按你的决定把等级并成了电压一个变量，就得把基准钉在农场的最低等级上，这个落差才重新出现。
+     * <h2>落差从哪来</h2>
+     * 基准是<b>苗床档次决定的耗电</b>，上限是<b>能量仓的电压</b>——两个互相独立的变量。
+     * 用 MV 苗床配 EV 电就有 2 次超频可用；苗床和电压同档时超频次数是 0，装了也没用。
+     * 这正是源端的机制：那边基准来自组件 tier、上限来自仓室 tier。
      *
-     * <p>耗电不用另外加：{@link #getPowerUsage()} 本来就按 {@code V[farmTier]} 收，
-     * 而 {@code V[MV] × 4^超频次数} 正好等于 {@code V[farmTier]}——超频的电费已经付在基础耗电里了。
-     * 水肥则在 {@link #getOverclockPotencyMultiplier()} 里按 2^超频次数 放大，这是超频的实际代价。
+     * <p>没装超频仓时直接清零，不去算。
      */
-    private int getOverclockCount() {
-        if (overclockedUnitCount <= 0) {
-            return 0;
+    private void refreshExpectedOverclock() {
+        long powerUsage = getPowerUsage();
+        if (getUnitCount(FarmType.OVERCLOCKED_GROWTH_ACCELERATION) <= 0 || !isUpgradeTierValid()) {
+            this.expectedOCs = 0;
+            this.expectedEUt = powerUsage;
+            return;
         }
-        long eut = GTValues.V[MIN_FARM_TIER];
-        long ceiling = GTValues.V[farmTier];
+        // 从「苗床档次定的耗电」往上涨，看能 4 倍几次才撞到「能量仓给的电压」
+        long ceiling = this.energyContainer.getHighestInputVoltage();
+        long eut = powerUsage;
         int overclocks = 0;
         while (overclocks < MAX_OVERCLOCKS
                 && eut * (long) OverclockingLogic.STD_VOLTAGE_FACTOR <= ceiling) {
             eut *= (long) OverclockingLogic.STD_VOLTAGE_FACTOR;
             overclocks++;
         }
-        return overclocks;
+        this.expectedOCs = overclocks;
+        this.expectedEUt = eut;
     }
 
     /** 超频倍率（水肥消耗也要跟着放大）。 */
     private double getOverclockPotencyMultiplier() {
-        return overclockedUnitCount > 0 ? Math.pow(2.0d, getOverclockCount()) : 1.0d;
+        return expectedOCs > 0 ? Math.pow(2.0d, expectedOCs) : 1.0d;
     }
 
     // ==================== 耗电 / 耗水 / 耗肥 ====================
 
-    /** 基础耗电 + 各升级单元的附加耗电。 */
+    /** 基础耗电（苗床档次决定）+ 各升级的附加耗电。 */
     public long getPowerUsage() {
-        long base = GTValues.V[farmTier];
+        long base = isUpgradeTierValid() ? BlockSeedBed.getBaseEUt(upgradeTier) : GTValues.VA[MIN_FARM_TIER];
         long power = base;
-        power += (long) (base * BlockIndustrialFarmUnit.ENVIRONMENTAL_POWER_INCREASE
-                * Math.min(envUnitCount, BlockIndustrialFarmUnit.ENVIRONMENTAL_MAX_COUNT));
-        power += (long) (base * BlockIndustrialFarmUnit.GROWTH_ACCELERATION_POWER_INCREASE * growthUnitCount);
-        power += (long) (base * BlockIndustrialFarmUnit.FERTILIZER_POWER_INCREASE
-                * Math.min(fertilizerUnitCount, BlockIndustrialFarmUnit.FERTILIZER_MAX_COUNT));
-        power += (long) (base * BlockIndustrialFarmUnit.ADVANCED_HARVESTING_POWER_INCREASE
-                * Math.min(advancedHarvestUnitCount, BlockIndustrialFarmUnit.ADVANCED_HARVESTING_MAX_COUNT));
+        for (FarmType type : FarmType.values()) {
+            int count = getUnitCount(type);
+            if (count <= 0) {
+                continue;
+            }
+            if (type.isCapped()) {
+                count = Math.min(count, type.getMaxCount());
+            }
+            power += (long) (base * type.getPowerIncrease() * count);
+        }
         return Math.max(1L, power);
+    }
+
+    /** 本周期实际要扣的电（含超频）。 */
+    public long getActualPowerUsage() {
+        return expectedOCs > 0 ? expectedEUt : getPowerUsage();
     }
 
     /** 每周期要补的水量（"potency"，不是 mB）。 */
@@ -766,10 +866,9 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         return getWaterPotencyNeededPerCycle();
     }
 
-    /** 种子床容量：{@code (7 + 4×等级)²}，照搬源端。 */
+    /** 种子床容量，由苗床档次决定。 */
     public int getSeedBedCapacity() {
-        int diameter = 2 * (3 + 2 * farmTier) + 1;
-        return diameter * diameter;
+        return isUpgradeTierValid() ? BlockSeedBed.getCapacity(upgradeTier) : 0;
     }
 
     /** 按 potency 消耗流体；不足时返回 false 且不消耗。 */
@@ -805,7 +904,7 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         // 装了肥料单元才强制要求供肥；否则"没有肥"只是让营养低一点
         boolean ok = consumeFluidPotency(getFertilizerPotencyNeededPerCycle(), false);
         this.hasFertilizer = ok;
-        return fertilizerUnitCount == 0 || ok;
+        return getUnitCount(FarmType.FERTILIZER) == 0 || ok;
     }
 
     // ==================== 模式 ====================
@@ -865,14 +964,23 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
                 .addScreenChildren((parent, syncManager) -> {
                     parent.child(IKey.lang(getMetaFullName()).asWidget().pos(5, 5));
 
-                    IntSyncValue tierSync = new IntSyncValue(this::getFarmTier);
-                    syncManager.syncValue("cropqt_farm_tier", tierSync);
+                    // 档次（升级仓与苗床共同约定的那个）+ 段数 + 超频次数
+                    IntSyncValue tierSync = new IntSyncValue(this::getUpgradeTier);
+                    syncManager.syncValue("cropqt_farm_upgrade_tier", tierSync);
                     IntSyncValue slicesSync = new IntSyncValue(this::getSlices);
                     syncManager.syncValue("cropqt_farm_slices", slicesSync);
-                    parent.child(IKey.dynamic(() -> net.minecraft.client.resources.I18n.format(
-                                    "cropqt.farm.display.tier",
-                                    GTValues.VN[Math.min(tierSync.getIntValue(), GTValues.VN.length - 1)],
-                                    slicesSync.getIntValue()))
+                    IntSyncValue maxSlicesSync = new IntSyncValue(this::getMaxSlicesForTier);
+                    syncManager.syncValue("cropqt_farm_max_slices", maxSlicesSync);
+                    IntSyncValue ocSync = new IntSyncValue(this::getOverclockCount);
+                    syncManager.syncValue("cropqt_farm_oc", ocSync);
+
+                    parent.child(IKey.dynamic(() -> {
+                                int raw = tierSync.getIntValue();
+                                String name = raw >= 0 && raw < GTValues.VN.length ? GTValues.VN[raw] : "?";
+                                return net.minecraft.client.resources.I18n.format(
+                                        "cropqt.farm.display.tier",
+                                        name, slicesSync.getIntValue(), maxSlicesSync.getIntValue());
+                            })
                             .asWidget().pos(5, 18));
 
                     IntSyncValue modeSync = new IntSyncValue(this::getMode, this::setMode);
@@ -881,14 +989,20 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
                                     modeNameKey(modeSync.getIntValue())))
                             .asWidget().pos(5, 30));
 
-                    // 段数超过等级允许的长度时机器会停摆，得让玩家看见原因
-                    IntSyncValue maxSlicesSync = new IntSyncValue(this::getMaxSlicesForTier);
-                    syncManager.syncValue("cropqt_farm_max_slices", maxSlicesSync);
-                    parent.child(IKey.dynamic(() -> slicesSync.getIntValue() <= maxSlicesSync.getIntValue()
+                    // 超频次数只在真的超得动时才显示
+                    parent.child(IKey.dynamic(() -> ocSync.getIntValue() <= 0
                                     ? ""
                                     : net.minecraft.client.resources.I18n.format(
-                                            "cropqt.farm.display.slice_overflow",
-                                            slicesSync.getIntValue(), maxSlicesSync.getIntValue()))
+                                            "cropqt.farm.display.overclock", ocSync.getIntValue()))
+                            .asWidget().pos(5, 42));
+
+                    // 配置有问题时机器会停摆，得让玩家看见是哪一条
+                    IntSyncValue errorSync = new IntSyncValue(this::getConfigError);
+                    syncManager.syncValue("cropqt_farm_error", errorSync);
+                    parent.child(IKey.dynamic(() -> {
+                                String key = configErrorKey(errorSync.getIntValue());
+                                return key == null ? "" : net.minecraft.client.resources.I18n.format(key);
+                            })
                             .asWidget().pos(86, 30));
 
                     // 种子 / 底土 / 环境模块
@@ -929,12 +1043,11 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     }
 
     private static String modeNameKey(int mode) {
-        switch (mode) {
-            case MODE_FARM:   return "cropqt.farm.mode.farm";
-            case MODE_OUTPUT: return "cropqt.farm.mode.output";
-            case MODE_INPUT:
-            default:          return "cropqt.farm.mode.input";
-        }
+        return switch (mode) {
+            case MODE_FARM -> "cropqt.farm.mode.farm";
+            case MODE_OUTPUT -> "cropqt.farm.mode.output";
+            default -> "cropqt.farm.mode.input";
+        };
     }
 
     @Override

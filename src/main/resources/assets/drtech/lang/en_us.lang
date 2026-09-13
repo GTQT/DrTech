@@ -157,6 +157,7 @@ tile.advanced_cauldron.tooltip.1=Automatically refills itself from nearby water 
 tile.advanced_cauldron.tooltip.2=Checks a 3x3x3 area and consumes 1,000 mB water when not full.
 tile.drtech.Time_Table.name=Time Bottle AFK Table
 #MetaCasing
+tile.Meta_Machine_Casing.bricked_agricultural_casing.name=Bricked Agricultural Casing
 tile.Meta_Machine_Casing.gravitation_field_casing.name=Gravitational Field Casing
 tile.Meta_Machine_Casing.neutron_mechanical_casing.name=Neutron Mechanical Casing
 tile.Meta_Machine_Casing.mass_generation_casing.name=Mass Generation Mechanical Casing
@@ -2339,11 +2340,16 @@ drtech.machine.seed_generator.ev.name=Advanced Seed Generator III
 drtech.machine.seed_generator.iv.name=Elite Seed Generator
 
 # --- Crops: machines ---
-drtech.machine.crop_manager.lv.name=Basic Crop Manager
-drtech.machine.crop_manager.mv.name=Advanced Crop Manager
-drtech.machine.crop_manager.hv.name=Advanced Crop Manager II
-drtech.machine.crop_manager.ev.name=Advanced Crop Manager III
-drtech.machine.crop_manager.iv.name=Elite Crop Manager
+drtech.machine.crop_supervisor.lv.name=Basic Crop Supervisor
+drtech.machine.crop_supervisor.mv.name=Advanced Crop Supervisor
+drtech.machine.crop_supervisor.hv.name=Advanced Crop Supervisor II
+drtech.machine.crop_supervisor.ev.name=Advanced Crop Supervisor III
+drtech.machine.crop_supervisor.iv.name=Elite Crop Supervisor
+drtech.machine.crop_harvester.lv.name=Basic Crop Harvester
+drtech.machine.crop_harvester.mv.name=Advanced Crop Harvester
+drtech.machine.crop_harvester.hv.name=Advanced Crop Harvester II
+drtech.machine.crop_harvester.ev.name=Advanced Crop Harvester III
+drtech.machine.crop_harvester.iv.name=Elite Crop Harvester
 drtech.machine.crop_breeder.lv.name=Basic Crop Breeder
 drtech.machine.crop_breeder.mv.name=Advanced Crop Breeder
 drtech.machine.crop_breeder.hv.name=Advanced Crop Breeder II
@@ -2354,22 +2360,37 @@ drtech.machine.gene_extractor.iv.name=Elite Gene Extractor
 drtech.machine.crop_synthesizer.ev.name=Advanced Crop Synthesizer
 drtech.machine.crop_synthesizer.iv.name=Elite Crop Synthesizer
 drtech.machine.industrial_farm.name=Industrial Farm
+drtech.machine.industrial_farm.tooltip.1=§7Three sections: head takes hatches and maintenance, body stacks §f3-13§7 times, tail closes it off. Cross-section is fixed at 5x4
+drtech.machine.industrial_farm.tooltip.2=§7The farm tier comes from the §fupgrade hatches' tier§7 - every hatch and every Seed Bed §cmust share one tier§7, or the farm stops
+drtech.machine.industrial_farm.tooltip.3=§7That tier is also the §fcap on the energy hatch's voltage§7: higher power means upgrading the whole set
+drtech.machine.industrial_farm.tooltip.4=§7Each body slice needs exactly §f1§7 upgrade hatch on top - a 3-slice farm needs 3, the longest needs 13
+drtech.machine.industrial_farm.tooltip.5=§7The Seed Bed's tier sets capacity, base power, water/fertilizer per cycle and the harvest round bonus (see each Seed Bed's tooltip)
+drtech.machine.industrial_farm.tooltip.6=§7Three modes (button in the GUI): §eInput§7 takes in seeds and subsoil -> §aFarm§7 burns water and fertilizer to grow -> §cOutput§7 returns them
+drtech.machine.industrial_farm.tooltip.7=§7Output accrues as §ffractions§7 and is only pushed out once it reaches a whole item - a low tier is not "no output", it is "slow output"
+drtech.machine.industrial_farm.tooltip.8=§7Each upgrade has a count limit and Growth Acceleration is §cmutually exclusive§7 with Overclocking; too many slices, mismatched tiers or over-voltage also §cstop§7 it
+drtech.machine.industrial_farm.tooltip.9=§7Overclocking trades the §fgap§7 between the tier's base power and the energy hatch voltage for growth speed; at the same tier it does nothing
 
 # --- Crops: machine tutorials ---
-drtech.machine.seed_generator.tooltip.1=本机用于把一份已分析的种子袋原样复制一份
-drtech.machine.seed_generator.tooltip.2=输入种子袋（必须先分析），输出同样的种子袋
-drtech.machine.seed_generator.tooltip.3=消耗液体肥料，肥料越浓，每次用掉的 mB 越少
-drtech.machine.seed_generator.tooltip.4=耗时随电压档位递减，最低 20 tick
-drtech.machine.seed_generator.tooltip.5=未分析的种子不给复制——先用作物分析仪过一遍
-drtech.machine.seed_generator.tooltip.6=作物链的顺序为分析 → 扩繁 → 育种 → 提取 / 合成
+drtech.machine.seed_generator.tooltip.1=Turns one analyzed seed into two - the only net seed source in the crop chain
+drtech.machine.seed_generator.tooltip.2=Input 1 seed (must be analyzed), output 2 seeds with identical stats
+drtech.machine.seed_generator.tooltip.3=Consumes 100 fertilizer points per cycle: 50 mB of liquid fertilizer, or only 13 mB of enriched
+drtech.machine.seed_generator.tooltip.4=Duration falls with voltage tier, down to a floor of 20 ticks
+drtech.machine.seed_generator.tooltip.5=Unanalyzed seeds cannot be propagated - run them through the Crop Analyzer first
+drtech.machine.seed_generator.tooltip.6=Crop chain order: Analyze -> Propagate -> Breed -> Extract / Synthesize
 
-drtech.machine.crop_manager.tooltip.1=本机以自身为中心，自动照料一大片作物架
-drtech.machine.crop_manager.tooltip.2=本机作用范围为水平半径 3 + 2×档位（LV 为 5、IV 为 13），上下各 2 格
-drtech.machine.crop_manager.tooltip.3=每个周期扫一遍，收获成熟作物、给缺水的补水、给缺肥的补肥
-drtech.machine.crop_manager.tooltip.4=三件事各有开关，默认只开收获——浇水和施肥要你主动打开
-drtech.machine.crop_manager.tooltip.5=机器自带水罐与液肥罐，接管道补；液肥越浓，一桶顶得越久
-drtech.machine.crop_manager.tooltip.6=本机只认液体肥料，固体肥料请用施肥器手动施
-drtech.machine.crop_manager.tooltip.7=收获加成随档位提高，IV 档 +25%%
+drtech.machine.crop_supervisor.tooltip.1=Waters, fertilizes and de-weeds crop sticks in range
+drtech.machine.crop_supervisor.tooltip.2=%s input slots (scales with tier) for solid fertilizer - GT Fertilizer or bone meal
+drtech.machine.crop_supervisor.tooltip.3=Fertilizing eats solid fertilizer from the input slots first, and only falls back to the liquid tank
+drtech.machine.crop_supervisor.tooltip.4=Watering, fertilizing and weeding each have a toggle; only watering is on by default
+drtech.machine.crop_supervisor.tooltip.5=Weeding costs no energy and no fluids - it just clears the weeds
+drtech.machine.crop_supervisor.tooltip.6=Working radius is adjustable in the GUI (max %s), 2 blocks up and down; wrench sets the output side
+drtech.machine.crop_harvester.tooltip.1=Harvests mature crops in range
+drtech.machine.crop_harvester.tooltip.2=%s output slots (scales with tier)
+drtech.machine.crop_harvester.tooltip.3=Harvesting does not kill the crop - it resets to a seedling and regrows, so the same plant can be harvested repeatedly
+drtech.machine.crop_harvester.tooltip.4=Harvest only; watering and fertilizing are the Crop Supervisor's job
+drtech.machine.crop_harvester.tooltip.5=Working radius is adjustable in the GUI (max %s), 2 blocks up and down; wrench sets the output side
+drtech.machine.crop_supervisor.range=§7Radius: §f%s
+drtech.machine.crop_harvester.range=§7Radius: §f%s
 
 drtech.machine.crop_breeder.tooltip.1=本机把 2~4 颗已分析的亲本种子杂交成一颗新种子
 drtech.machine.crop_breeder.tooltip.2=走的是和作物架同一张变异表——田里试出来的组合，机器上照样成立
@@ -2380,11 +2401,12 @@ drtech.machine.crop_breeder.tooltip.6=哪些组合能出什么，看 JEI 的杂�
 drtech.machine.crop_breeder.tooltip.7=子代属性取各亲本属性的平均值
 
 drtech.machine.gene_extractor.tooltip.1=本机把一颗已分析的种子拆成 4 个基因球之一
-drtech.machine.gene_extractor.tooltip.2=一次只抽一样，可选物种 / 生长 / 产量 / 抗性，用界面按钮切换
+drtech.machine.gene_extractor.tooltip.2=Extracts one thing at a time: Species / Growth / Yield / Resistance
 drtech.machine.gene_extractor.tooltip.3=物种要 5 分钟，抽单项属性减半
 drtech.machine.gene_extractor.tooltip.4=基因球会被消耗——这一点和合成器相反
 drtech.machine.gene_extractor.tooltip.5=本机按 3 安培取电，比同档别的机器费电
 drtech.machine.gene_extractor.tooltip.6=拿到球之后，用合成器把四颗拼回一颗完整种子
+drtech.machine.gene_extractor.tooltip.7=§7Sneak + screwdriver§r cycles the extraction mode (plain screwdriver toggles "input from output side")
 
 drtech.machine.crop_synthesizer.tooltip.1=本机用 4 个基因球 + UUM 合成一颗分析好的完整种子
 drtech.machine.crop_synthesizer.tooltip.2=基因球不消耗——它是可反复使用的模板，只有 UUM 被吃掉
@@ -2395,11 +2417,89 @@ drtech.machine.crop_synthesizer.tooltip.6=四颗球攒齐之后，每次合成�
 
 # --- Crops: farm components ---
 tile.drtech.seed_bed.seed_bed.name=Seed Bed
-tile.drtech.industrial_farm_unit.environmental_enhancement.name=Environmental Enhancement Unit
-tile.drtech.industrial_farm_unit.growth_acceleration.name=Growth Acceleration Unit
-tile.drtech.industrial_farm_unit.fertilizer.name=Fertilizer Unit
-tile.drtech.industrial_farm_unit.advanced_harvesting.name=Advanced Harvesting Unit
-tile.drtech.industrial_farm_unit.overclocked_growth_acceleration.name=Overclocked Growth Acceleration Unit
+drtech.machine.farm_part.environmental_enhancement.mv.name=Environmental Enhancement Unit (MV)
+drtech.machine.farm_part.environmental_enhancement.hv.name=Environmental Enhancement Unit (HV)
+drtech.machine.farm_part.environmental_enhancement.ev.name=Environmental Enhancement Unit (EV)
+drtech.machine.farm_part.environmental_enhancement.iv.name=Environmental Enhancement Unit (IV)
+drtech.machine.farm_part.environmental_enhancement.luv.name=Environmental Enhancement Unit (LuV)
+drtech.machine.farm_part.environmental_enhancement.zpm.name=Environmental Enhancement Unit (ZPM)
+drtech.machine.farm_part.environmental_enhancement.uv.name=Environmental Enhancement Unit (UV)
+drtech.machine.farm_part.environmental_enhancement.uhv.name=Environmental Enhancement Unit (UHV)
+drtech.machine.farm_part.environmental_enhancement.uev.name=Environmental Enhancement Unit (UEV)
+drtech.machine.farm_part.environmental_enhancement.uiv.name=Environmental Enhancement Unit (UIV)
+drtech.machine.farm_part.environmental_enhancement.uxv.name=Environmental Enhancement Unit (UXV)
+drtech.machine.farm_part.growth_acceleration.mv.name=Growth Acceleration Unit (MV)
+drtech.machine.farm_part.growth_acceleration.hv.name=Growth Acceleration Unit (HV)
+drtech.machine.farm_part.growth_acceleration.ev.name=Growth Acceleration Unit (EV)
+drtech.machine.farm_part.growth_acceleration.iv.name=Growth Acceleration Unit (IV)
+drtech.machine.farm_part.growth_acceleration.luv.name=Growth Acceleration Unit (LuV)
+drtech.machine.farm_part.growth_acceleration.zpm.name=Growth Acceleration Unit (ZPM)
+drtech.machine.farm_part.growth_acceleration.uv.name=Growth Acceleration Unit (UV)
+drtech.machine.farm_part.growth_acceleration.uhv.name=Growth Acceleration Unit (UHV)
+drtech.machine.farm_part.growth_acceleration.uev.name=Growth Acceleration Unit (UEV)
+drtech.machine.farm_part.growth_acceleration.uiv.name=Growth Acceleration Unit (UIV)
+drtech.machine.farm_part.growth_acceleration.uxv.name=Growth Acceleration Unit (UXV)
+drtech.machine.farm_part.fertilizer.mv.name=Fertilizer Unit (MV)
+drtech.machine.farm_part.fertilizer.hv.name=Fertilizer Unit (HV)
+drtech.machine.farm_part.fertilizer.ev.name=Fertilizer Unit (EV)
+drtech.machine.farm_part.fertilizer.iv.name=Fertilizer Unit (IV)
+drtech.machine.farm_part.fertilizer.luv.name=Fertilizer Unit (LuV)
+drtech.machine.farm_part.fertilizer.zpm.name=Fertilizer Unit (ZPM)
+drtech.machine.farm_part.fertilizer.uv.name=Fertilizer Unit (UV)
+drtech.machine.farm_part.fertilizer.uhv.name=Fertilizer Unit (UHV)
+drtech.machine.farm_part.fertilizer.uev.name=Fertilizer Unit (UEV)
+drtech.machine.farm_part.fertilizer.uiv.name=Fertilizer Unit (UIV)
+drtech.machine.farm_part.fertilizer.uxv.name=Fertilizer Unit (UXV)
+drtech.machine.farm_part.advanced_harvesting.mv.name=Advanced Harvesting Unit (MV)
+drtech.machine.farm_part.advanced_harvesting.hv.name=Advanced Harvesting Unit (HV)
+drtech.machine.farm_part.advanced_harvesting.ev.name=Advanced Harvesting Unit (EV)
+drtech.machine.farm_part.advanced_harvesting.iv.name=Advanced Harvesting Unit (IV)
+drtech.machine.farm_part.advanced_harvesting.luv.name=Advanced Harvesting Unit (LuV)
+drtech.machine.farm_part.advanced_harvesting.zpm.name=Advanced Harvesting Unit (ZPM)
+drtech.machine.farm_part.advanced_harvesting.uv.name=Advanced Harvesting Unit (UV)
+drtech.machine.farm_part.advanced_harvesting.uhv.name=Advanced Harvesting Unit (UHV)
+drtech.machine.farm_part.advanced_harvesting.uev.name=Advanced Harvesting Unit (UEV)
+drtech.machine.farm_part.advanced_harvesting.uiv.name=Advanced Harvesting Unit (UIV)
+drtech.machine.farm_part.advanced_harvesting.uxv.name=Advanced Harvesting Unit (UXV)
+drtech.machine.farm_part.overclocked_growth_acceleration.mv.name=Overclocked Growth Acceleration Unit (MV)
+drtech.machine.farm_part.overclocked_growth_acceleration.hv.name=Overclocked Growth Acceleration Unit (HV)
+drtech.machine.farm_part.overclocked_growth_acceleration.ev.name=Overclocked Growth Acceleration Unit (EV)
+drtech.machine.farm_part.overclocked_growth_acceleration.iv.name=Overclocked Growth Acceleration Unit (IV)
+drtech.machine.farm_part.overclocked_growth_acceleration.luv.name=Overclocked Growth Acceleration Unit (LuV)
+drtech.machine.farm_part.overclocked_growth_acceleration.zpm.name=Overclocked Growth Acceleration Unit (ZPM)
+drtech.machine.farm_part.overclocked_growth_acceleration.uv.name=Overclocked Growth Acceleration Unit (UV)
+drtech.machine.farm_part.overclocked_growth_acceleration.uhv.name=Overclocked Growth Acceleration Unit (UHV)
+drtech.machine.farm_part.overclocked_growth_acceleration.uev.name=Overclocked Growth Acceleration Unit (UEV)
+drtech.machine.farm_part.overclocked_growth_acceleration.uiv.name=Overclocked Growth Acceleration Unit (UIV)
+drtech.machine.farm_part.overclocked_growth_acceleration.uxv.name=Overclocked Growth Acceleration Unit (UXV)
+tile.drtech.seed_bed.mv.name=Seed Bed (MV)
+tile.drtech.seed_bed.hv.name=Seed Bed (HV)
+tile.drtech.seed_bed.ev.name=Seed Bed (EV)
+tile.drtech.seed_bed.iv.name=Seed Bed (IV)
+tile.drtech.seed_bed.luv.name=Seed Bed (LuV)
+tile.drtech.seed_bed.zpm.name=Seed Bed (ZPM)
+tile.drtech.seed_bed.uv.name=Seed Bed (UV)
+tile.drtech.seed_bed.uhv.name=Seed Bed (UHV)
+tile.drtech.seed_bed.uev.name=Seed Bed (UEV)
+tile.drtech.seed_bed.uiv.name=Seed Bed (UIV)
+tile.drtech.seed_bed.uxv.name=Seed Bed (UXV)
+
+# --- Crops: industrial farm upgrade hatch ---
+drtech.machine.farm_part.tooltip.1=§7Tier: §f%s§7 - must match the Seed Bed and every other upgrade hatch in the farm
+drtech.machine.farm_part.tooltip.2=§7Fits on top of a farm body slice, one per slice; it also caps the energy hatch's voltage
+drtech.machine.farm_part.tooltip.max=§7At most §f%s§7 of these per farm
+drtech.machine.farm_part.environmental_enhancement.tooltip.1=§7Unlocks §f1§7 environmental module slot; modules add biomes the crop likes
+drtech.machine.farm_part.environmental_enhancement.tooltip.2=§7Modules go in the controller's GUI
+drtech.machine.farm_part.growth_acceleration.tooltip.1=§7Growth speed §a+%s§7 (additive)
+drtech.machine.farm_part.growth_acceleration.tooltip.2=§7No count limit - the farm's length is what caps it
+drtech.machine.farm_part.fertilizer.tooltip.1=§7Growth speed §a x%s
+drtech.machine.farm_part.fertilizer.tooltip.2=§7Harvest rounds §a+%s
+drtech.machine.farm_part.fertilizer.tooltip.3=§cRequires a constant fertilizer supply§7 - running dry stops the whole farm
+drtech.machine.farm_part.advanced_harvesting.tooltip.1=§7Harvest rounds §a x%s
+drtech.machine.farm_part.overclocked_growth_acceleration.tooltip.1=§7Trades the gap between the §fhatch tier§7 and the §fenergy hatch voltage§7 for growth speed
+drtech.machine.farm_part.overclocked_growth_acceleration.tooltip.2=§7Each overclock §adoubles§7 growth speed, and water/fertilizer use scales with it
+drtech.machine.farm_part.overclocked_growth_acceleration.tooltip.3=§cMutually exclusive with Growth Acceleration§7 - both together stops the farm
+
 
 # --- Crops: environmental modules ---
 item.drtech.environmental_module.blank.name=Blank Environmental Module
@@ -2433,11 +2533,16 @@ item.drtech.environmental_module.wasteland.name=Environmental Module: Wasteland
 item.drtech.environmental_module.beach.name=Environmental Module: Beach
 
 # --- Crops: industrial farm GUI ---
-cropqt.farm.display.tier=§7Tier: §b%s§7   Slices: §b%d
-cropqt.farm.display.slice_overflow=§cToo many slices: %d / %d, raise the input voltage
+cropqt.farm.display.tier=§7Tier: §b%s§7   Slices: §b%d§7 / §b%d
 cropqt.farm.mode.input=Input Mode
 cropqt.farm.mode.farm=Production Mode
 cropqt.farm.mode.output=Output Mode
+cropqt.farm.display.overclock=§dOverclock §b x%d
+cropqt.farm.error.slice=§cToo many slices - raise the tier
+cropqt.farm.error.tier=§cUpgrade hatches and Seed Bed tiers do not match
+cropqt.farm.error.unit_cap=§cToo many of one upgrade type
+cropqt.farm.error.exclusive=§cGrowth Acceleration and Overclocking are mutually exclusive
+cropqt.farm.error.voltage=§cEnergy hatch voltage exceeds the upgrade tier
 
 # --- Crops: analyzer item GUI ---
 cropqt.analyzer.title=§6Crop Analyzer
@@ -2446,7 +2551,7 @@ cropqt.analyzer.hint=§7Put an unanalyzed seed in the left slot
 cropqt.analyzer.info.name=§aCrop: §f%s§7 (Tier %s)
 cropqt.analyzer.info.soil=§aSoil: §f%s
 cropqt.analyzer.info.subsoil=§aSubsoil: §f%s
-cropqt.analyzer.info.stats=§cGrowth %s  §eGain %s  §9Resistance %s
+cropqt.analyzer.info.stats=§cGrowth %s  §eGain %s  §bResistance %s
 
 # Material-driven crops: id is <material>_<type>, display names here
 cropqt.crop.copper_fiber.name=Copper Fiber

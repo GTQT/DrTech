@@ -60,11 +60,11 @@ public class MetaTileEntityArmorWorkbench extends MetaTileEntity {
             {151, 60}
     };
 
-    private static final String REQUIRED = "mechtech.modular_workbench.error1";
-    private static final String INCOMPATIBLE = "mechtech.modular_workbench.error2";
-    private static final String NOT_MODULE = "mechtech.modular_workbench.error3";
-    private static final String MAX_MODULES = "mechtech.modular_workbench.error4";
-    private static final String INVALID_SLOT = "mechtech.modular_workbench.error5";
+    private static final String REQUIRED = "drtech.modular_workbench.error1";
+    private static final String INCOMPATIBLE = "drtech.modular_workbench.error2";
+    private static final String NOT_MODULE = "drtech.modular_workbench.error3";
+    private static final String MAX_MODULES = "drtech.modular_workbench.error4";
+    private static final String INVALID_SLOT = "drtech.modular_workbench.error5";
 
     private ItemStack lastArmor = ItemStack.EMPTY;
     private CustomItemHandler mainSlot;

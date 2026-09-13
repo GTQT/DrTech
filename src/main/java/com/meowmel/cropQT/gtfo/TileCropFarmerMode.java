@@ -29,7 +29,7 @@ import static com.meowmel.cropQT.block.BlockCropStick.VANILLA_SEED_MAP;
  * 让收割机留着种子去下一格，而不是把种子在这块地上白扔一次。
  *
  * <p><b>本模式不浇水也不施肥。</b>GTFO 的收割机没有流体仓，给不了水肥；
- * 大田自动化要浇水施肥请用作物管理器（{@code MetaTileEntityCropManager}）。
+ * 大田自动化要浇水施肥请用作物监管机（{@code MetaTileEntityCropSupervisor}）。
  * 这里能做的是别把种子种到明显长不出东西的地方。
  */
 public class TileCropFarmerMode implements FarmerMode {

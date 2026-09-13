@@ -89,7 +89,7 @@ public class MaterialArmorModule implements IArmorModule, IDurabilityModule, ISp
 
     @Override
     public String getLocalizedName() {
-        return I18n.format("mechtech.modules.armor_plating.name", material.getLocalizedName());
+        return I18n.format("drtech.modules.armor_plating.name", material.getLocalizedName());
     }
 
     @Override
@@ -105,18 +105,18 @@ public class MaterialArmorModule implements IArmorModule, IDurabilityModule, ISp
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
         if (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54)) {
-            lines.add(I18n.format("mechtech.modules.armor_plating.tooltip.sneak"));
+            lines.add(I18n.format("drtech.modules.armor_plating.tooltip.sneak"));
         } else {
-            lines.add(I18n.format("mechtech.modules.armor_plating.tooltip.unsneak"));
+            lines.add(I18n.format("drtech.modules.armor_plating.tooltip.unsneak"));
         }
         NBTTagCompound nbt = itemStack.getTagCompound();
         int damaged = 0;
         if (nbt != null)
             damaged = (int) getDamage(nbt);
-        lines.add(I18n.format("mechtech.modules.armor_plating.tooltip.1", durability - damaged, durability));
-        lines.add(I18n.format("mechtech.modules.armor_plating.tooltip.2", armor));
-        lines.add(I18n.format("mechtech.modules.armor_plating.tooltip.3", toughness));
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.modules.armor_plating.tooltip.1", durability - damaged, durability));
+        lines.add(I18n.format("drtech.modules.armor_plating.tooltip.2", armor));
+        lines.add(I18n.format("drtech.modules.armor_plating.tooltip.3", toughness));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     public void init(MetaItem<?>.MetaValueItem metaValueItem) {
@@ -125,7 +125,7 @@ public class MaterialArmorModule implements IArmorModule, IDurabilityModule, ISp
         this.metaValueItem
                 .addComponents(((IItemColorProvider) (stack, layer) -> material.getMaterialRGB()))
                 // name provider
-                .addComponents(((IItemNameProvider) (stack, name) -> I18n.format("mechtech.modules.armor_plating.name", material.getLocalizedName())))
+                .addComponents(((IItemNameProvider) (stack, name) -> I18n.format("drtech.modules.armor_plating.name", material.getLocalizedName())))
                 // stack size provider
                 .addComponents((IItemMaxStackSizeProvider) (itemStack, i) -> 64)
                 // durability handler

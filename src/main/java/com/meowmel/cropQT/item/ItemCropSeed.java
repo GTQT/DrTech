@@ -167,7 +167,7 @@ public class ItemCropSeed extends Item {
                 TextFormatting.GRAY + " (生长速度)");
         tooltip.add(TextFormatting.YELLOW + "Gain: " + stats.getGain() +
                 TextFormatting.GRAY + " (产量)");
-        tooltip.add(TextFormatting.BLUE + "Resistance: " + stats.getResistance() +
+        tooltip.add(TextFormatting.AQUA + "Resistance: " + stats.getResistance() +
                 TextFormatting.GRAY + " (抗性)");
 
     }

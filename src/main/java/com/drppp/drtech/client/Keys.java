@@ -16,7 +16,7 @@ public class Keys {
     public static final KeyBind AUTO_FEEDER_MODE_SWITCH = EnumHelper.addEnum(
             KeyBind.class, "AUTO_FEEDER_MODE_SWITCH",
             new Class[]{String.class, IKeyConflictContext.class, int.class},
-            "mechtech.key.auto_feeder.mode_switch", KeyConflictContext.IN_GAME, Keyboard.KEY_RSHIFT);
+            "drtech.key.auto_feeder.mode_switch", KeyConflictContext.IN_GAME, Keyboard.KEY_RSHIFT);
 
     private Keys() {
     }

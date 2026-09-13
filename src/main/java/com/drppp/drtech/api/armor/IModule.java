@@ -174,7 +174,7 @@ public interface IModule extends IItemBehaviour {
      */
     @SideOnly(Side.CLIENT)
     default String getLocalizedName() {
-        return I18n.format("mechtech.modules." + getModuleId() + ".name");
+        return I18n.format("drtech.modules." + getModuleId() + ".name");
     }
 
     /**
@@ -202,6 +202,6 @@ public interface IModule extends IItemBehaviour {
      */
     @Override
     default void addInformation(ItemStack itemStack, List<String> lines) {
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 }

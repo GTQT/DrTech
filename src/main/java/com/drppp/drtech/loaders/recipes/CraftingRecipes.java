@@ -460,58 +460,13 @@ public class CraftingRecipes {
     }
 
     private static void multiblock() {
-
-
-        ModHandler.addShapedRecipe(true, "large_alloy_smelter", DrTechMetaTileEntities.LARGE_ALLOY_SMELTER.getStackForm(),
-                "ADA", "WSW", "WWW",
-                'W', new ItemStack(MetaBlocks.METAL_CASING, 1, 2),
-                'A', new UnificationEntry(circuit, MarkerMaterials.Tier.MV),
-                'S', ELECTRIC_BLAST_FURNACE.getStackForm(),
-                'D', new UnificationEntry(OrePrefix.plate, Materials.Aluminium)
-        );
-
-
-        ModHandler.addShapedRecipe(true, "large_alloy_smelter", DrTechMetaTileEntities.DRONE_PAD.getStackForm(),
+        ModHandler.addShapedRecipe(true, "drone_pad", DrTechMetaTileEntities.DRONE_PAD.getStackForm(),
                 "ADA", "WSW", "WWW",
                 'W', new ItemStack(MetaBlocks.METAL_CASING, 1, 3),
                 'A', new UnificationEntry(circuit, MarkerMaterials.Tier.HV),
                 'S', FISHER[3].getStackForm(),
                 'D', new UnificationEntry(OrePrefix.plate, Materials.StainlessSteel)
         );
-        if (DrtConfig.machine.EnableIndustrialMachines) {
-            ModHandler.addShapedRecipe(true, "large_extruder", DrTechMetaTileEntities.LARGE_EXTRUDER.getStackForm(),
-                    "LCL", "PSP", "OWO",
-                    'L', new UnificationEntry(pipeLargeItem, Ultimet),
-                    'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
-                    'S', gregtech.common.metatileentities.MetaTileEntities.EXTRUDER[EV].getStackForm(),
-                    'P', MetaItems.ELECTRIC_PISTON_EV.getStackForm(),
-                    'O', new UnificationEntry(spring, MolybdenumDisilicide),
-                    'W', new UnificationEntry(cableGtSingle, Platinum));
-
-
-
-            ModHandler.addShapedRecipe("larger_roller_press", DrTechMetaTileEntities.INDUSTRIAL_ROLLER_PRESS.getStackForm(),
-                    "ACA",
-                    "BSB",
-                    "ACA",
-                    'S', FORMING_PRESS[EV].getStackForm(),
-                    'C', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
-                    'A', new UnificationEntry(plate, Titanium),
-                    'B', BENDER[EV].getStackForm()
-
-            );
-            ModHandler.addShapedRecipe("larger_cable_press", DrTechMetaTileEntities.INDUSTRIAL_CABLE_PRESS.getStackForm(),
-                    "ACA",
-                    "BSB",
-                    "ACA",
-                    'S', WIREMILL[IV].getStackForm(),
-                    'C', new UnificationEntry(circuit, MarkerMaterials.Tier.IV),
-                    'A', new UnificationEntry(plate, BlueSteel),
-                    'B', gregtech.common.metatileentities.MetaTileEntities.HULL[IV].getStackForm()
-
-            );
-
-        }
     }
 
     private static void updateChip() {

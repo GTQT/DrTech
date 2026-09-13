@@ -57,6 +57,8 @@ public class Textures {
     public static OrientedOverlayRenderer GENE_EXTRACTOR_OVERLAY;
     //seed_generator
     public static OrientedOverlayRenderer SEED_GENERATOR_OVERLAY;
+    //工业农场的砖砌农业外壳
+    public static SimpleOverlayRenderer BRICKED_AGRICULTURAL_CASING;
 
     public static void init() {
         CENTRIFUGE = new OrientedOverlayRenderer("overlay/centrifuge");
@@ -66,6 +68,7 @@ public class Textures {
         CROP_SYNTHESIZER_OVERLAY = new OrientedOverlayRenderer("machines/crop_synthesizer");
         GENE_EXTRACTOR_OVERLAY = new OrientedOverlayRenderer("machines/gene_extractor");
         SEED_GENERATOR_OVERLAY = new OrientedOverlayRenderer("machines/seed_generator");
+        BRICKED_AGRICULTURAL_CASING = new SimpleOverlayRenderer("bricked_agricultural_casing");
         ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
         YOT_TANK_CASING = new SimpleOverlayRenderer("casings/yot_tank_casing");
         TFFT_TANK_CASING = new SimpleOverlayRenderer("casings/tfft_casing");

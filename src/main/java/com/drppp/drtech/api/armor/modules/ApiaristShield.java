@@ -32,11 +32,11 @@ public class ApiaristShield extends AbstractModule {
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
         if (Loader.isModLoaded("forestry")) {
-            lines.add(I18n.format("mechtech.apiarist_shield.tooltip.1"));
+            lines.add(I18n.format("drtech.apiarist_shield.tooltip.1"));
         } else {
-            lines.add(I18n.format("mechtech.apiarist_shield.tooltip.disabled"));
+            lines.add(I18n.format("drtech.apiarist_shield.tooltip.disabled"));
         }
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     @Override

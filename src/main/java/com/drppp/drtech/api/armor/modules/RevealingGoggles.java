@@ -92,19 +92,19 @@ public class RevealingGoggles extends AbstractModule {
             String status = active
                     ? I18n.format("metaarmor.hud.status.enabled")
                     : I18n.format("metaarmor.hud.status.disabled");
-            hudStrings.add(I18n.format("mechtech.revealing_goggles.mode", status));
+            hudStrings.add(I18n.format("drtech.revealing_goggles.mode", status));
         }
     }
 
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
         if (Loader.isModLoaded("thaumcraft")) {
-            lines.add(I18n.format("mechtech.revealing_goggles.tooltip.1"));
-            lines.add(I18n.format("mechtech.revealing_goggles.tooltip.2", ENERGY_PER_TICK));
+            lines.add(I18n.format("drtech.revealing_goggles.tooltip.1"));
+            lines.add(I18n.format("drtech.revealing_goggles.tooltip.2", ENERGY_PER_TICK));
         } else {
-            lines.add(I18n.format("mechtech.revealing_goggles.tooltip.disabled"));
+            lines.add(I18n.format("drtech.revealing_goggles.tooltip.disabled"));
         }
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     @Override

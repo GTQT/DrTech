@@ -119,16 +119,16 @@ public class EnergyShield extends AbstractModule implements ISpecialArmorModule 
                         ? I18n.format("metaarmor.hud.status.enabled")
                         : I18n.format("metaarmor.hud.status.disabled");
             }
-            hudStrings.add(I18n.format("mechtech.energy_shield.mode", status));
+            hudStrings.add(I18n.format("drtech.energy_shield.mode", status));
         }
     }
 
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
-        lines.add(I18n.format("mechtech.energy_shield.tooltip.1"));
-        lines.add(I18n.format("mechtech.energy_shield.tooltip.2", EU_PER_DAMAGE));
-        lines.add(I18n.format("mechtech.energy_shield.tooltip.3", MAX_ABSORB));
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.energy_shield.tooltip.1"));
+        lines.add(I18n.format("drtech.energy_shield.tooltip.2", EU_PER_DAMAGE));
+        lines.add(I18n.format("drtech.energy_shield.tooltip.3", MAX_ABSORB));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     @Override

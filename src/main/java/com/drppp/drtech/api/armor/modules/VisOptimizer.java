@@ -61,12 +61,12 @@ public class VisOptimizer extends AbstractModule {
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
         if (Loader.isModLoaded("thaumcraft")) {
-            lines.add(I18n.format("mechtech.vis_optimizer.tooltip.1", DISCOUNT_PER_MODULE));
-            lines.add(I18n.format("mechtech.vis_optimizer.tooltip.2"));
+            lines.add(I18n.format("drtech.vis_optimizer.tooltip.1", DISCOUNT_PER_MODULE));
+            lines.add(I18n.format("drtech.vis_optimizer.tooltip.2"));
         } else {
-            lines.add(I18n.format("mechtech.vis_optimizer.tooltip.disabled"));
+            lines.add(I18n.format("drtech.vis_optimizer.tooltip.disabled"));
         }
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     @Override

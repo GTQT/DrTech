@@ -128,7 +128,7 @@ public class TopProvider implements IProbeInfoProvider {
                         TextFormatting.YELLOW + "Gain:       " +
                                 TextFormatting.WHITE + " " + tile.getStats().getGain()).getFormattedText());
                 iProbeInfo.text(new TextComponentString(
-                        TextFormatting.BLUE + "Resistance: " +
+                        TextFormatting.AQUA + "Resistance: " +
                                 TextFormatting.WHITE + " " + tile.getStats().getResistance()).getFormattedText());
             }
         }

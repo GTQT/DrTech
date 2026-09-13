@@ -22,7 +22,7 @@
 | 2 | **水 + 肥料**（储量模型） | 作物架存水与肥，随生长 tick 消耗，储量越高加成越大。**不做 WeedEX** |
 | 3 | **确定性杂交** | `MutationRegistry` + 变异池，**替换**现有加权轮盘的**实现**；**配方表保持现有 ~100 条不变** |
 | 4 | **5 台单方块机器** | 只做 **LV → IV**（5 档），基因提取/合成为 EV→IV（2 档） |
-| 5 | **工业农场多方块** | 完整可变长度版，5 种升级单元，三种模式。**取代现有作物模拟机** |
+| 5 | **工业农场多方块** | 完整可变长度版，5 种升级**仓**，三种模式。**取代现有作物模拟机** |
 | 6 | **137 个作物补归属** | 土壤组 + 底土要求**全加**，旧的 `requiredBlocks` **全部迁移到新 API** |
 | 7 | **Flower 渲染形状** | 第三种作物渲染形状 |
 
@@ -213,15 +213,46 @@ return base * waterBonus * fertBonus;
 
 **统一约束**：
 
-- 继承 GTQT 的 `MetaTileEntity` / `SimpleMachineMetaTileEntity`
-- **不建自定义 RecipeMap**，机器内部实现 `checkRecipe`；JEI 侧生成"展示用"示例配方
-- UI 用 MUI2 `buildUI`
+- **有进有出的四台**（种子生成 / 育种 / 提取 / 合成）继承 `SimpleMachineMetaTileEntity`
+  （经由公共基类 `MetaTileEntityCropMachine`），每台配一张**空的** `RecipeMap`
+  （见 `api/recipes/CropRecipeMaps`）—— 只为撑起 CEU 那套自动界面与自动 IO，
+  **永远不往里加配方**。UI 由 CEU 自动规划，机器不写 `buildUI`
+- **作物监管机 / 作物收割机不是配方机器**（没有配方表），所以它们照
+  `MetaTileEntityUniversalCollector` 自包含：自己的 `update()`、自己维护自动输出、
+  自己手绘界面。不挂 RecipeMap
+
+**工业农场的等级来自组件档次，不是电压**（对齐 CropsNH）：
+
+- 五个升级单元是**多方块仓**（`MetaTileEntityFarmPart` + `IFarmPart`），挂在体段顶部的 `'U'` 位，
+  每段一个；`'U'` 只认这种仓，所以每段都必须装
+- 苗床 `BlockSeedBed` **分 11 档**（MV~UXV），农场档次由「所有升级仓 + 所有苗床」共同约定，
+  必须同档；那一档决定容量 / 基础耗电 / 每轮水肥 / 收割轮数加成 / 段数上限
+- 仓档次同时是**能量仓电压的上限**（源端是玻璃 tier 干这事）
+- 超频生长加速仓拿「档次定的基础耗电」与「能量仓电压」的**落差**换生长速度 ——
+  两个变量独立，落差才存在
+- 各升级的数量上限、生长加速与超频的**互斥**，源端是结构错误；这里做成「成型但停机 + 界面红字」
+
+> GTCEu 比 GTNH **少一个 UMV 档**，所以 `UXV` 在这边是 12 而不是 13 —— MV~UXV 是 **11 档**，不是 12。
 - 包路径 `com.meowmel.cropQT.machine/`，MTE 的 `ResourceLocation` 用 `drtech:` 命名空间
+
+**分离式结构**（对齐 GTQT 的 `MetaTileEntityPressureMachine` + `PressureSingleRecipeLogic`）：
+
+- MTE 只当**壳**：槽位、罐、tooltip。界面由 CEU 自动生成
+- 干活逻辑在 `com.meowmel.cropQT.api.capability.impl/` 下的 `XxxRecipeLogic`，
+  公共部分在抽象基类 `CropMachineRecipeLogic<M> extends RecipeLogicEnergy`
+- **不查配方表**：`shouldSearchForRecipes()` 恒返回 false，把基类那个「该不该开新配方」
+  的时机拿来做「该不该开下一轮」，开工走 `shouldSearchForRecipes()`、
+  推进走 `updateRecipeProgress()`、收尾走 `completeRecipe()`
+- 进度 / 扣电 / 存档 / 网络同步 / 电源开关 / `IWorkable` 全部由 `AbstractRecipeLogic` 提供
+- 自动输出、充电槽、输出面配置、设备设置弹窗由 `SimpleMachineMetaTileEntity` 提供
+- 界面上装不下的额外控件（管理器的收获/浇水/施肥、提取机的 4 档模式）走
+  **潜行 + 螺丝刀**，普通螺丝刀保留基类的「允许从输出面输入」
 
 | # | 类名（建议） | 电压档 | 源端行为要点 |
 |---|---|---|---|
-| 1 | `MetaTileEntityCropManager` | LV/MV/HV/EV/IV | 半径 `3+2×tier`（最大 13）、高 ±2；水/肥两个储量罐；4 个开关 |
-| 2 | `MetaTileEntitySeedGenerator` | LV/MV/HV/EV/IV | 复制已分析种子，消耗液体肥料 |
+| 1 | `MetaTileEntityCropSupervisor` | LV/MV/HV/EV/IV | 半径界面可调（上限 `(tier+1)²`）、高 ±2；水/肥两个储量罐 + 固体肥料输入槽；浇水/施肥/除草三个开关 |
+| 1b | `MetaTileEntityCropHarvester` | LV/MV/HV/EV/IV | 半径同上；输出槽 `(tier+1)²` 个；只收割 |
+| 2 | `MetaTileEntitySeedGenerator` | LV/MV/HV/EV/IV | 1 份已分析种子 → **2 份**（全链唯一的净产出环节）；消耗液体肥料 |
 | 3 | `MetaTileEntityCropBreeder` | LV/MV/HV/EV/IV | 2~4 亲本 → mutation；输出概率 `min(100, 40+(tier-LV)×10)` |
 | 4 | `MetaTileEntityCropGeneExtractor` | EV/IV | 种子 → **GTQT 的 `TOOL_DATA_ORB`**（NBT 区分 4 种数据） |
 | 5 | `MetaTileEntityCropSynthesizer` | EV/IV | 4 个已填充 Orb + UUM → 完整种子 |
@@ -533,12 +564,23 @@ private static final StructureDefinition<?> STRUCTURE_DEFINITION =
 
 | 文件 | 动作 | 状态 |
 |---|---|---|
-| `machine/MetaTileEntityCropMachine.java` | 新增：**5 台的公共基类**（单轮状态机 / 进度同步 / 存档 / 进度条同步值） | ✅ 计划外 |
-| `machine/MetaTileEntitySeedGenerator.java` | 新增：复制已分析种子，消耗液肥 | ✅ |
-| `machine/MetaTileEntityCropManager.java` | 新增：范围照料（收获 / 浇水 / 施肥，3 开关） | ✅ |
-| `machine/MetaTileEntityCropBreeder.java` | 新增：2~4 亲本 → mutation | ✅ |
-| `machine/MetaTileEntityCropGeneExtractor.java` | 新增：种子 → 基因球 | ✅ |
-| `machine/MetaTileEntityCropSynthesizer.java` | 新增：4 球 + UUM → 种子 | ✅ |
+| `machine/MetaTileEntityCropMachine.java` | 新增：**5 台的公共基类**；后改为继承 `SimpleMachineMetaTileEntity`，只留 `createLogic` 抽象方法 | ✅ 计划外 |
+| `api/recipes/CropRecipeMaps.java` | 新增：四张**空** RecipeMap，只为撑起 CEU 自动界面与自动 IO；空表不产生 JEI 页面 | ✅ 计划外 |
+| `api/capability/impl/CropMachineRecipeLogic.java` | 新增：公共基类，继承 `RecipeLogicEnergy`；`shouldSearchForRecipes()` 恒 false，不查配方表 | ✅ 重构 |
+| `api/capability/impl/SeedGeneratorRecipeLogic.java` | 新增：1 份已分析种子 → 2 份，消耗液肥（按浓度折算 mB） | ✅ 重构 |
+| `api/capability/impl/CropRangeLogic.java` | 新增：两台范围机器共用的选区（作物架缓存 + 扫描 + 50 tick 周期 + 进度） | ✅ 计划外 |
+| `api/capability/impl/CropSupervisorLogic.java` | 新增：浇水 / 施肥 / 除草三个独立开关；施肥优先吃输入槽的固体肥料 | ✅ 重构 |
+| `api/capability/impl/CropHarvesterLogic.java` | 新增：只收割成熟作物，没有开关 | ✅ 重构 |
+| `api/capability/impl/CropBreederRecipeLogic.java` | 新增：2~4 亲本 → mutation | ✅ 重构 |
+| `api/capability/impl/CropGeneExtractorRecipeLogic.java` | 新增：种子 → 基因球（4 种模式，螺丝刀切） | ✅ 重构 |
+| `api/capability/impl/CropSynthesizerRecipeLogic.java` | 新增：4 球 + UUM → 种子；含 `minimumTierFor` / `uumCost` | ✅ 重构 |
+| `machine/MetaTileEntitySeedGenerator.java` | 新增：种子扩繁机（槽位 / 罐 / tooltip） | ✅ |
+| `machine/MetaTileEntityCropRangeMachine.java` | 新增：两台共用的基类。**自包含**（照 `MetaTileEntityUniversalCollector`）：可调半径 / 自动输出 / 手绘界面，不挂 RecipeMap | ✅ 计划外 |
+| `machine/MetaTileEntityCropSupervisor.java` | 新增：作物监管机（输入槽 + 2 罐 + 3 开关 + 半径选择） | ✅ |
+| `machine/MetaTileEntityCropHarvester.java` | 新增：作物收割机（输出槽网格 + 半径选择，照物品收集器） | ✅ |
+| `machine/MetaTileEntityCropBreeder.java` | 新增：育种机（槽位 / 罐 / tooltip） | ✅ |
+| `machine/MetaTileEntityCropGeneExtractor.java` | 新增：提取机（槽位 / 螺丝刀切模式） | ✅ |
+| `machine/MetaTileEntityCropSynthesizer.java` | 新增：合成机（4 球槽 + UUM 罐） | ✅ |
 | `api/CropGeneOrb.java` | 新增：基因球的 NBT 编解码（复用 GT 的 `TOOL_DATA_ORB`） | ✅ 计划外 |
 | `jei/CropMachineCategory.java` + `CropMachineRecipeWrapper.java` | 新增：机器示例配方页 | ✅ |
 | `jei/CropJEIPlugin.java` | 改：注册机器分类 | ✅ |
@@ -550,7 +592,8 @@ private static final StructureDefinition<?> STRUCTURE_DEFINITION =
 | 机器 | ID 段 | 档位 |
 |---|---|---|
 | 种子生成器 | 200–204 | LV / MV / HV / EV / IV |
-| 作物管理器 | 210–214 | LV / MV / HV / EV / IV |
+| 作物监管机 | 210–214 | LV / MV / HV / EV / IV |
+| 作物收割机 | 215–219 | LV / MV / HV / EV / IV |
 | 作物育种机 | 220–224 | LV / MV / HV / EV / IV |
 | 基因提取器 | 230–231 | EV / IV |
 | 作物合成器 | 240–241 | EV / IV |
@@ -568,7 +611,7 @@ private static final StructureDefinition<?> STRUCTURE_DEFINITION =
 | 1 | **JEI 做成 1 个分类 4 页，不是 4 个分类** | 4 台机器的配方页结构完全一致（输入 → 输出 + 一句说明），做 4 个分类是重复代码 |
 | 2 | 抽了 `MetaTileEntityCropMachine` 公共基类 | 5 台共享「能不能开工 → 扣电推进 → 跑完结算」这套状态机 + 进度同步 + 存档，不抽就是复制 5 遍 |
 | 3 | 提取器的模式选择用**界面按钮**，不用电路槽 | 源端用电路槽选 1~4。电路槽要接 GT 的幽灵电路体系，而这 5 台都不走 RecipeMap，为它单独接一套不划算 |
-| 4 | **作物管理器只吃液体肥料** | 源端还支持物品肥料，但本系统的固体肥料已改成带耐久的施肥器工具（见 M3 偏差 1） |
+| 4 | ~~**作物管理器只吃液体肥料**~~ | **已推翻**：`FertilizerRegistry` 现在有 `ITEMS` 表，登记了 GT 的 `MetaItems.FERTILIZER` 与原版骨粉；作物监管机施肥时优先吃固体 |
 | 5 | 最低电压档用**作物 tier** 代理 | 源端用 `crop.getMachineBreedingRecipeTier()`，我们没这个字段。改用 `clamp(作物tier, EV, IV)`，上界就是 IV（我们只做两档） |
 | 6 | 育种机**不排除同种亲本** | 源端按物种去重，导致 2 颗同种种子无法育种。但我们的配方表里本来就有 `stickreed × stickreed → ferru` 这类，去重会把它们废掉 |
 | 7 | EU/t 用 `GTValues.V[tier]` | 源端的 `VP = V * 30/32` 是 GT5U 的东西，**GTQT 里没有这个数组** |
@@ -578,7 +621,7 @@ private static final StructureDefinition<?> STRUCTURE_DEFINITION =
 
 | 机器 | 项 | 值 |
 |---|---|---|
-| 作物管理器 | 扫描范围 | 水平 `3 + 2×档位`（LV 5 → IV 13），**垂直恒为 2** |
+| 作物监管机 / 作物收割机 | 扫描范围 | 水平**界面可调**（下限 1、上限 `(tier+1)²`，LV 4 → IV 36），**垂直恒为 2** |
 | | 罐容量 | 水 `档位×32000`、液肥 `档位×144×64×4` |
 | | 耗电 | 收获 `V[tier]/8`，浇水/施肥各 `V[tier]/32` |
 | | 开关默认 | 收获 **开**、浇水 **关**、施肥 **关** |
@@ -673,7 +716,7 @@ private static final StructureDefinition<?> STRUCTURE_DEFINITION =
 | # | 偏差 | 说明 |
 |---|---|---|
 | 1 | `SubSoilRequirement` 内加了静态清单 `getAll()` | 底土页要枚举 25 份要求，而它们散在 `SubSoilRequirements` 的静态字段里。所有实例都经由该类的构造函数产生，所以在构造函数里登记一次就能拿到完整清单，不用再维护第二份列表 |
-| 2 | GTFO 农场**不浇水施肥** | GTFO 的收割机没有流体仓，给不了水肥。这是平台限制，不是漏做——大田的水肥自动化由 M6 的作物管理器负责。已写进 `TileCropFarmerMode` 的类注释 |
+| 2 | GTFO 农场**不浇水施肥** | GTFO 的收割机没有流体仓，给不了水肥。这是平台限制，不是漏做——大田的水肥自动化由 M6 的作物监管机负责。已写进 `TileCropFarmerMode` 的类注释 |
 | 3 | 收割机的非成功返回从 `FAIL` 改成 `PASS` | `FAIL` / `PASS` 在 GTFO 里都只是「这次不成」，但语义上「这块地不认这株作物」是 PASS。顺带挡掉了往地里种 `weed` |
 | 4 | **lang 没补新 key** | 审计了全库 553 个引用的 key：`en_us` 与 `zh_cn` 的 key 集合**完全一致**（互相都没有多余项），cropQT 引用的 key 无缺失。新 JEI 页签的标题沿用既有惯例（`CropOutputCategory` 等本来就是硬编码中文），没有引入需要翻译的新 key |
 | 5 | **删掉 JEI 的「作物机器」页** | 那 5 台机器的配方是逐条查作物表的动态逻辑，JEI 里只能手摆几页假示例（小麦→小麦、小麦+南瓜→甘蔗），教不会任何东西。改成**机器物品自己的 tooltip 教程**：每台 6~7 行，讲清用途、输入输出、消耗、以及那条最容易踩的坑。为此删掉 `CropMachineCategory` / `CropMachineRecipeWrapper` 与 `CropMachineUID` |
@@ -740,7 +783,7 @@ M1 数据层 ──┬─→ M2 土壤/底土 ──→ M5 137作物补归属
 | 3 | **固体肥料的形态** | 做成**施肥器工具**（`fertilizer_applicator`，自带 64 次耐久，用完即弃），不复用 GT 的肥料粉、也不做消耗品 | 原计划「优先复用 GT 的 `MetaItems.FERTILIZER`」，但用户要求走 GT 的 Behavior + 耐久体系 | ✅ M3 已落地 |
 | 4 | **保水性/保肥性具体数值** | 高 4000 / 中 2500 / 低 1000 / 极低 250 四档，按 §2.1 的表分配 | 源端语义只给了定性描述，没有具体数 | ✅ M1 已落地 |
 | 5 | **存档不兼容的处理** | 不做任何迁移，被删的机器方块直接消失 | 已确认开发中的包不用管存档。实际执行时旧模拟机**没删**（转为纯原版作物），所以只有它内部作物架状态的存档会丢 | ✅ M7 已落地 |
-| 6 | **GTFO 农场适配深度** | 只让它能读土壤/底土、按新规则种植收割，不接储量 | 要求「跟着适配」但没说深度；保守处理。**实现时发现收割机根本没有流体仓**——想接储量也接不了，水肥自动化由 M6 的作物管理器负责 | ✅ M8 已落地 |
+| 6 | **GTFO 农场适配深度** | 只让它能读土壤/底土、按新规则种植收割，不接储量 | 要求「跟着适配」但没说深度；保守处理。**实现时发现收割机根本没有流体仓**——想接储量也接不了，水肥自动化由 M6 的作物监管机负责 | ✅ M8 已落地 |
 
 ---
 

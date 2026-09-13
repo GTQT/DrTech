@@ -1,13 +1,67 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "minecraft:cube_all"
+    "model": "minecraft:cube_bottom_top",
+    "textures": {
+      "top": "drtech:blocks/industrial_farm/seed_bed",
+      "bottom": "drtech:blocks/industrial_farm/seed_bed"
+    }
   },
   "variants": {
     "variant": {
-      "seed_bed": {
+      "mv": {
         "textures": {
-          "all": "drtech:blocks/seed_bed"
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_2"
+        }
+      },
+      "hv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_3"
+        }
+      },
+      "ev": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_4"
+        }
+      },
+      "iv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_5"
+        }
+      },
+      "luv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_6"
+        }
+      },
+      "zpm": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_7"
+        }
+      },
+      "uv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_8"
+        }
+      },
+      "uhv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_9"
+        }
+      },
+      "uev": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_10"
+        }
+      },
+      "uiv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_11"
+        }
+      },
+      "uxv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_12"
         }
       }
     }

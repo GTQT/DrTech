@@ -137,7 +137,6 @@ public class ItemsInit {
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
         // 工业农场的两个组件方块走 VariantItemBlock，才能按 meta 出不同子物品
         event.getRegistry().register(createItemBlock(BlocksInit.SEED_BED, VariantItemBlock::new));
-        event.getRegistry().register(createItemBlock(BlocksInit.INDUSTRIAL_FARM_UNIT, VariantItemBlock::new));
     }
 
     @SideOnly(Side.CLIENT)
@@ -151,7 +150,6 @@ public class ItemsInit {
         registerItemModel(BlocksInit.YOT_TANK);
         registerItemModel(BlocksInit.TFFT_TANK);
         registerItemModel(BlocksInit.SEED_BED);
-        registerItemModel(BlocksInit.INDUSTRIAL_FARM_UNIT);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
         ModelLoader.setCustomMeshDefinition(CROP_SEED, new ItemCropSeed.SeedMeshDefinition());
         // 环境模块：每个 meta 一套模型（底图 + 标签覆盖层），按 meta 动态选

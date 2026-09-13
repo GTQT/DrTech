@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.LongSyncValue;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
+import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
@@ -148,7 +149,7 @@ public class CropAnalyzerBehavior implements ItemUIFactory, IItemBehaviour {
                 buildStatBar(tile.getStats().getGrowth()) + TextFormatting.WHITE + " " + tile.getStats().getGrowth()));
         player.sendMessage(new TextComponentString(TextFormatting.YELLOW + "  Gain:       " +
                 buildStatBar(tile.getStats().getGain()) + TextFormatting.WHITE + " " + tile.getStats().getGain()));
-        player.sendMessage(new TextComponentString(TextFormatting.BLUE + "  Resistance: " +
+        player.sendMessage(new TextComponentString(TextFormatting.AQUA + "  Resistance: " +
                 buildStatBar(tile.getStats().getResistance()) + TextFormatting.WHITE + " " +
                 tile.getStats().getResistance()));
     }
@@ -255,17 +256,25 @@ public class CropAnalyzerBehavior implements ItemUIFactory, IItemBehaviour {
                 .background(GTGuiTextures.SLOT, GTGuiTextures.OUT_SLOT_OVERLAY)
                 .slot(SyncHandlers.itemSlot(output, 0).singletonSlotGroup().accessibility(false, true)));
 
+        // 电量与信息区的底衬。面板本身是浅色背景，而这两块用的都是 §7 深灰字，
+        // 直接压上去根本看不清 —— 垫一层 GT 自己的深色 LCD（`display.png`）就好了。
+        // 必须加在文字之前：MUI2 按 child() 的先后顺序画，先加的在下面。
+        panel.child(new Widget<>()
+                .pos(4, 44)
+                .size(168, 63)
+                .background(GTGuiTextures.DISPLAY));
+
         // 电量
         panel.child(IKey.dynamic(() -> I18n.format(
                         "cropqt.analyzer.charge", chargeSync.getLongValue(), CAPACITY))
-                .asWidget().pos(6, 48));
+                .asWidget().pos(10, 46));
 
         // 信息区：直接读输出槽里的种子（它已经被 MUI2 同步到客户端了），
         // 不需要额外的同步通道
-        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 0)).asWidget().pos(6, 62));
-        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 1)).asWidget().pos(6, 74));
-        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 2)).asWidget().pos(6, 86));
-        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 3)).asWidget().pos(6, 98));
+        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 0)).asWidget().pos(10, 58));
+        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 1)).asWidget().pos(10, 70));
+        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 2)).asWidget().pos(10, 82));
+        panel.child(IKey.dynamic(() -> infoLine(output.getStackInSlot(0), 3)).asWidget().pos(10, 94));
 
         return panel.bindPlayerInventory();
     }
