@@ -1,7 +1,7 @@
 package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.AbstractModule;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.network.ArmorNetworkHandler;
 import com.drppp.drtech.network.packets.CModularArmorSwitchModuleMode;
 import gregtech.api.GTValues;
@@ -148,19 +148,19 @@ public class AntiGravity extends AbstractModule {
             } else {
                 status = I18n.format("metaarmor.hud.status.disabled");
             }
-            hudStrings.add(I18n.format("mechtech.anti_gravity.mode", status));
+            hudStrings.add(I18n.format("drtech.anti_gravity.mode", status));
         }
     }
 
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
-        lines.add(I18n.format("mechtech.anti_gravity.tooltip.1"));
-        lines.add(I18n.format("mechtech.anti_gravity.tooltip.2", ENERGY_PER_TICK));
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.anti_gravity.tooltip.1"));
+        lines.add(I18n.format("drtech.anti_gravity.tooltip.2", ENERGY_PER_TICK));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.ANTI_GRAVITY;
+        return DrMetaItems.ANTI_GRAVITY;
     }
 }

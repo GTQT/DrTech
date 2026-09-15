@@ -5,6 +5,11 @@
   },
   "variants": {
     "variant": {
+      "bricked_agricultural_casing": {
+        "textures": {
+          "all": "drtech:blocks/bricked_agricultural_casing"
+        }
+      },
       "gravitation_field_casing": {
         "textures": {
           "all": "drtech:blocks/gravitation_field_casing"

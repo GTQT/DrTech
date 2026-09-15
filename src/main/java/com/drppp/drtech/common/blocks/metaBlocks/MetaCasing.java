@@ -33,6 +33,8 @@ public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
 
     public enum MetalCasingType implements IStringSerializable {
 
+        // 工业农场的外壳——照搬 CropsNH 的砖砌农业外壳
+        BRICKED_AGRICULTURAL_CASING("bricked_agricultural_casing"),
         GRAVITATION_FIELD_CASING("gravitation_field_casing"),
         NEUTRON_MACHINE_CASING("neutron_mechanical_casing"),
         ASEPTIC_MACHINE_CASING("aseptic_machine_casing"),

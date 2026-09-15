@@ -21,6 +21,10 @@ public class DrtechMaterials {
     public static Material EnderEnergyFactor;
     public static Material HighEnergyDiesel;
     public static Material HighEnergyGasoline;
+    /** 液体肥料。工业农场、种子生成机这些能吃管道肥的机器用。 */
+    public static Material Fertilizer;
+    /** 浓缩液体肥料，同样一桶补更多肥。 */
+    public static Material EnrichedFertilizer;
     private static int startId = 0;
 
     private static int getMaterialsId() {
@@ -47,5 +51,7 @@ public class DrtechMaterials {
         EnderEnergyFactor = new Material.Builder(getMaterialsId(), getRL("ender_energy_factor")).fluid().color(0x26F0B3).build();
         HighEnergyDiesel = new Material.Builder(getMaterialsId(), getRL("high_energy_diesel")).fluid().color(0xD7A32B).build();
         HighEnergyGasoline = new Material.Builder(getMaterialsId(), getRL("high_energy_gasoline")).fluid().color(0xD98942).build();
+        Fertilizer = new Material.Builder(getMaterialsId(), getRL("fertilizer")).fluid().color(0x7A5230).build();
+        EnrichedFertilizer = new Material.Builder(getMaterialsId(), getRL("enriched_fertilizer")).fluid().color(0x4A2F19).build();
     }
 }

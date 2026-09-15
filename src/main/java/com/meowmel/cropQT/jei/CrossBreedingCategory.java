@@ -12,6 +12,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nullable;
+
+/**
+ * 杂交配方页。
+ *
+ * <p>父本槽位按数量排开（2~4 个），中间用 "+" 连、产物在右侧。
+ */
 public class CrossBreedingCategory implements IRecipeCategory<CrossBreedingRecipeWrapper> {
 
     private final IDrawable background;
@@ -42,24 +48,19 @@ public class CrossBreedingCategory implements IRecipeCategory<CrossBreedingRecip
     public void setRecipe(IRecipeLayout layout, CrossBreedingRecipeWrapper recipe, IIngredients ingredients) {
         IGuiItemStackGroup stacks = layout.getItemStacks();
 
-        // 左: 亲本A (slot 0)
-        stacks.init(0, true, 10, 24);
-        stacks.set(0, recipe.getParent1Seed());
+        // 父本：槽位 0..n-1
+        for (int i = 0; i < recipe.getParentCount(); i++) {
+            stacks.init(i, true, CrossBreedingRecipeWrapper.slotX(i), CrossBreedingRecipeWrapper.slotY());
+            stacks.set(i, recipe.getParentSeeds().get(i));
+        }
 
-        // 中: 亲本B (slot 1)
-        stacks.init(1, true, 50, 24);
-        stacks.set(1, recipe.getParent2Seed());
-
-        // 右: 产物 (slot 2)
-        stacks.init(2, false, 120, 24);
-        stacks.set(2, recipe.getResultSeed());
+        // 产物：槽位 n
+        int resultIndex = recipe.getParentCount();
+        stacks.init(resultIndex, false,
+                CrossBreedingRecipeWrapper.resultSlotX(), CrossBreedingRecipeWrapper.slotY());
+        stacks.set(resultIndex, recipe.getResultSeed());
     }
 
-    @Override
-    public void drawExtras(Minecraft minecraft) {
-        // "+" 号
-        minecraft.fontRenderer.drawString("+", 35, 28, 0x808080);
-        // 箭头
-        minecraft.fontRenderer.drawString("→", 80, 28, 0x808080);
-    }
+    // 分隔符（父本间的 "+" 与产物前的 "→"）画在 CrossBreedingRecipeWrapper#drawInfo 里——
+    // JEI 的 drawExtras 拿不到当前配方，只有 wrapper 知道这一页有几个父本。
 }

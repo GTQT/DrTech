@@ -1,8 +1,19 @@
 package com.drppp.drtech.common.items.metaItems;
 
-import com.meowmel.cropQT.item.MetaCrops;
+import com.meowmel.cropQT.item.MetaItemCropTools;
+import gregtech.api.items.armor.ArmorMetaItem;
 import gregtech.api.items.metaitem.MetaItem;
+import gregtech.api.unification.material.Material;
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 全模组的 MetaItem 物品清单。
+ *
+ * <p>只放「物品字段」和构造它们的入口 {@link #MetaItemsInit()}；每个物品类的
+ * {@code registerSubItems()} 负责把自己那一批挂进来。物品类都在本包或子包里。
+ */
 public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem ENERGY_ELEMENT_1;
     public static MetaItem<?>.MetaValueItem ENERGY_ELEMENT_2;
@@ -108,6 +119,35 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem MEDIUM_VOLTAGE_WIRE;
     public static MetaItem<?>.MetaValueItem HIGH_VOLTAGE_WIRE;
 
+    // ==================== 模块化装甲 ====================
+
+    /** 无线接收器（给装甲当遥控用）。 */
+    public static MetaItem<?>.MetaValueItem WIRELESS_RECEIVER;
+
+    // 模块。meta 号见 MetaItems1（300~312 区段）——它们原本是独立物品的 0~13，
+    // 合并进 meta_items 时为了避让已有的号段整体后移。
+    public static MetaItem<?>.MetaValueItem SHOCK_ABSORBER;
+    public static MetaItem<?>.MetaValueItem THICK_INSULATOR;
+    public static MetaItem<?>.MetaValueItem BINOCULARS;
+    public static MetaItem<?>.MetaValueItem AUTO_FEEDER;
+    public static MetaItem<?>.MetaValueItem OXYGEN_MASK;
+    public static MetaItem<?>.MetaValueItem ANTI_GRAVITY;
+    public static MetaItem<?>.MetaValueItem SPRINT_MODULE;
+    public static MetaItem<?>.MetaValueItem ENERGY_SHIELD;
+    public static MetaItem<?>.MetaValueItem HEALING_MODULE;
+    public static MetaItem<?>.MetaValueItem APIARIST_SHIELD;
+    public static MetaItem<?>.MetaValueItem REVEALING_GOGGLES;
+    public static MetaItem<?>.MetaValueItem VIS_OPTIMIZER;
+
+    // 四件套。它们是另一个物品（DrArmorItem），meta 0~3。
+    public static ArmorMetaItem<?>.ArmorMetaValueItem MODULAR_HELMET;
+    public static ArmorMetaItem<?>.ArmorMetaValueItem MODULAR_CHESTPLATE;
+    public static ArmorMetaItem<?>.ArmorMetaValueItem MODULAR_LEGGINGS;
+    public static ArmorMetaItem<?>.ArmorMetaValueItem MODULAR_BOOTS;
+
+    /** 材料 → 护甲板物品。meta 用的是 {@code Modules} 里的模块 id（1000 起）。 */
+    public static final Map<Material, MetaItem<?>.MetaValueItem> MATERIAL_ARMOR_PLATINGS = new HashMap<>();
+
     // Loot Table
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_STONE_AGE;
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_STEAM_AGE;
@@ -160,55 +200,17 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH4;
     public static MetaItem<?>.MetaValueItem LOOT_TABLE_WITCH5;
 
-    public static MetaItem<?>.MetaValueItem ARGENTIA_LEAF;
-    public static MetaItem<?>.MetaValueItem AURONIA_LEAF;
-    public static MetaItem<?>.MetaValueItem BAUXIA_LEAF;
-    public static MetaItem<?>.MetaValueItem BOBS_YER_UNCLE_BERRY;
-    public static MetaItem<?>.MetaValueItem CANOLA_FLOWER;
-    public static MetaItem<?>.MetaValueItem COPPON_FIBER;
-    public static MetaItem<?>.MetaValueItem FERROFERN_LEAF;
-    public static MetaItem<?>.MetaValueItem GALVANIA_LEAF;
-    public static MetaItem<?>.MetaValueItem HEMP_STEM;
-    public static MetaItem<?>.MetaValueItem HOPS;
-    public static MetaItem<?>.MetaValueItem INDIGO_BLOSSOM;
-    public static MetaItem<?>.MetaValueItem IRIDINE_FLOWER;
-    public static MetaItem<?>.MetaValueItem MAGIC_ESSENCE;
-    public static MetaItem<?>.MetaValueItem MICADIA_FLOWER;
-    public static MetaItem<?>.MetaValueItem MILK_WART;
-    public static MetaItem<?>.MetaValueItem NICKELBACK_LEAF;
-    public static MetaItem<?>.MetaValueItem OIL_BERRY;
-    public static MetaItem<?>.MetaValueItem OSMIANTH_FLOWER;
-    public static MetaItem<?>.MetaValueItem PLATINA_LEAF;
-    public static MetaItem<?>.MetaValueItem PLUMBILIA_LEAF;
-    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_0;
-    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_1;
-    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_2;
-    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_3;
-    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_BANANA;
-    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_CANADA;
-    public static MetaItem<?>.MetaValueItem PYROLUSIUM_LEAF_NO_EGG;
-    public static MetaItem<?>.MetaValueItem REACTORIA_LEAF;
-    public static MetaItem<?>.MetaValueItem REACTORIA_STEM;
-    public static MetaItem<?>.MetaValueItem SALTY_ROOT;
-    public static MetaItem<?>.MetaValueItem SCHEELINIUM_LEAF;
-    public static MetaItem<?>.MetaValueItem SPACE_FLOWER;
-    public static MetaItem<?>.MetaValueItem STAR_WART;
-    public static MetaItem<?>.MetaValueItem STARGATIUM_LEAF;
-    public static MetaItem<?>.MetaValueItem THIOSULFINE_FLOWER;
-    public static MetaItem<?>.MetaValueItem THUNDER_FLOWER;
-    public static MetaItem<?>.MetaValueItem TINE_TWIG;
-    public static MetaItem<?>.MetaValueItem TITANIA_LEAF;
-    public static MetaItem<?>.MetaValueItem UUA_BERRY;
-    public static MetaItem<?>.MetaValueItem UUM_BERRY;
-
     public static void MetaItemsInit() {
         MetaItems1 metaItem = new MetaItems1();
         metaItem.setRegistryName("meta_items");
 
-        MetaCrops metaItemCrops = new MetaCrops();
-        metaItemCrops.setRegistryName("meta_crops");
+        DrArmorItem armorItem = new DrArmorItem();
+        armorItem.setRegistryName("meta_armor");
 
         MetaItemLootTable metaItemLootTable = new MetaItemLootTable();
         metaItemLootTable.setRegistryName("loot_table");
+
+        MetaItemCropTools cropTools = new MetaItemCropTools();
+        cropTools.setRegistryName("crop_tools");
     }
 }

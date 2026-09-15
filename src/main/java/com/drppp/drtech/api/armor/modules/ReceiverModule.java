@@ -1,7 +1,7 @@
 package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.IModule;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -15,7 +15,7 @@ public class ReceiverModule implements IModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.WIRELESS_RECEIVER;
+        return DrMetaItems.WIRELESS_RECEIVER;
     }
 
     @Override

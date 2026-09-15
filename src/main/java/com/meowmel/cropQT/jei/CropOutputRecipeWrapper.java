@@ -7,6 +7,7 @@ import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -73,12 +74,7 @@ public class CropOutputRecipeWrapper implements IRecipeWrapper {
         int visibleOutputs = Math.min(allOutputs.size(), 8);
         drawChanceDropLabels(mc, visibleOutputs);
 
-        if (cropType.getLootTable() != null) {
-            mc.fontRenderer.drawString(TextFormatting.LIGHT_PURPLE + "* 战利品表", 50, 14, 0x8844AA);
-        } else if (cropType.getRequiredBlocks() != null && cropType.getRequiredBlocks().length > 0) {
-            String requiredBlock = getDisplayBlockName(cropType.getRequiredBlocks()[0]);
-            mc.fontRenderer.drawString(TextFormatting.RED + "* " + requiredBlock, 50, 14, 0xAA4444);
-        }
+        drawRequirements(mc);
 
         if (!hasBlockDrops) {
             return;
@@ -127,6 +123,37 @@ public class CropOutputRecipeWrapper implements IRecipeWrapper {
             int hiddenLines = wrappedLines.size() - visibleLines;
             mc.fontRenderer.drawString(TextFormatting.GRAY + "... 还有 " + hiddenLines + " 行", 6, sectionY, 0x888888);
         }
+    }
+
+    /**
+     * 种植条件：土壤组 + 底土要求。
+     *
+     * <p>土壤是种植时的<b>硬门槛</b>，底土不满足只是长得慢，所以两者分开显示、
+     * 用不同颜色区分严重程度。
+     */
+    private void drawRequirements(Minecraft mc) {
+        StringBuilder line = new StringBuilder();
+        line.append(TextFormatting.DARK_RED).append("土壤:")
+                .append(TextFormatting.WHITE).append(soilName());
+        if (cropType.hasSubSoilRequirement()) {
+            line.append(TextFormatting.DARK_RED).append("  底土:")
+                    .append(TextFormatting.WHITE).append(cropType.getSubSoilRequirement().getDisplayName());
+        }
+        if (cropType.getLootTable() != null) {
+            line.append(TextFormatting.LIGHT_PURPLE).append("  *战利品表");
+        }
+        mc.fontRenderer.drawString(line.toString(), 50, 14, 0xAA4444);
+    }
+
+    /** 土壤组名的本地化；没配 lang key 时退回内部名。 */
+    private String soilName() {
+        if (cropType.getSoilTypes() == null) {
+            return "不限";
+        }
+        String name = cropType.getSoilTypes().getName();
+        String key = "cropqt.soil." + name;
+        String text = I18n.format(key);
+        return text.startsWith("cropqt.soil.") ? name : text;
     }
 
     private void drawChanceDropLabels(Minecraft mc, int visibleOutputs) {

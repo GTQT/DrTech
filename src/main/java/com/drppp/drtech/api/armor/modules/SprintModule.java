@@ -1,7 +1,7 @@
 package com.drppp.drtech.api.armor.modules;
 
 import com.drppp.drtech.api.armor.AbstractModule;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.network.ArmorNetworkHandler;
 import com.drppp.drtech.network.packets.CModularArmorSwitchModuleMode;
 import gregtech.api.capability.GregtechCapabilities;
@@ -31,7 +31,7 @@ import java.util.UUID;
 public class SprintModule extends AbstractModule {
 
     private static final UUID SPRINT_MODIFIER_UUID = UUID.fromString("d6103cbc-b90b-4c4a-b3ee-1e89effcf5c8");
-    private static final String SPRINT_MODIFIER_NAME = "mechtech.sprint_module";
+    private static final String SPRINT_MODIFIER_NAME = "drtech.sprint_module";
 
     /** EU drained per tick while sprinting */
     private static final int ENERGY_PER_TICK_SPRINT = 64;
@@ -145,12 +145,12 @@ public class SprintModule extends AbstractModule {
                         ? I18n.format("metaarmor.hud.status.enabled")
                         : I18n.format("metaarmor.hud.status.disabled");
             }
-            hudStrings.add(I18n.format("mechtech.sprint_module.mode", status));
+            hudStrings.add(I18n.format("drtech.sprint_module.mode", status));
         }
     }
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.SPRINT_MODULE;
+        return DrMetaItems.SPRINT_MODULE;
     }
 }

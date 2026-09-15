@@ -26,6 +26,12 @@ public class DrtConfig {
     @Config.Name("模块化装甲")
     public static ModularArmorConfig armor = new ModularArmorConfig();
 
+    // ========== 作物模块 ==========
+    @Config.Comment("作物系统相关配置（生长倍率、杂交成功率、渲染形状）")
+    @Config.Name("作物")
+    public static com.meowmel.cropQT.handler.CropConfig crop =
+            new com.meowmel.cropQT.handler.CropConfig();
+
     // --------------------------------------------
     // 无人机配置类
     // --------------------------------------------

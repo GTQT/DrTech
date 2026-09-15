@@ -3,36 +3,39 @@ package com.meowmel.cropQT.api;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
- * 环境因素计算器: 光照、湿度、营养值
+ * 环境因素计算器：光照、湿度、营养值。
+ *
+ * <p>营养值来自作物架脚下的<b>土壤组</b>（{@link SoilRegistry}），没有写死的方块表——
+ * 「这块地天生好不好」由 {@link ISoilList#getBaseNutrients()} 定义，
+ * 「能存多少水 / 肥」由保水保肥上限定义。
+ *
+ * <p>底土（y-2）不参与营养计算。它是独立的门槛，见 {@link SubSoilRequirement}。
  */
 public class EnvironmentCalculator {
 
-    private static final Map<Block, Float> NUTRIENT_MAP = new HashMap<>();
+    /** 土壤相对作物架的垂直偏移——作物架直接踩着的那一格。 */
+    public static final int SOIL_DEPTH = 1;
 
-    static {
-        NUTRIENT_MAP.put(Blocks.DIRT, 0.5f);
-        NUTRIENT_MAP.put(Blocks.FARMLAND, 1.0f);
-        NUTRIENT_MAP.put(Blocks.GRASS, 0.6f);
-        NUTRIENT_MAP.put(Blocks.MYCELIUM, 0.7f);
-        NUTRIENT_MAP.put(Blocks.IRON_BLOCK, 0.8f);
-        NUTRIENT_MAP.put(Blocks.GOLD_BLOCK, 0.8f);
-        NUTRIENT_MAP.put(Blocks.DIAMOND_BLOCK, 0.9f);
-        NUTRIENT_MAP.put(Blocks.REDSTONE_BLOCK, 0.8f);
-        NUTRIENT_MAP.put(Blocks.LAPIS_BLOCK, 0.7f);
-        NUTRIENT_MAP.put(Blocks.EMERALD_BLOCK, 0.9f);
-        NUTRIENT_MAP.put(Blocks.SOUL_SAND, 0.4f);
-        NUTRIENT_MAP.put(Blocks.END_STONE, 0.3f);
+    /** 底土相对作物架的垂直偏移，与 {@link SubSoilRequirement} 保持一致。 */
+    public static final int SUB_SOIL_DEPTH = SubSoilRequirement.SUB_SOIL_DEPTH;
+
+    /** 脚下不是任何已登记土壤组时的兜底营养值——比最贫瘠的土壤还差一点。 */
+    private static final float BARREN_NUTRIENTS = 0.10f;
+
+    private EnvironmentCalculator() {
     }
+
+    // ==================== 光照 / 湿度 ====================
 
     public static float calcLight(World world, BlockPos cropPos) {
         int skyLight = world.getLightFor(EnumSkyBlock.SKY, cropPos.up());
@@ -58,9 +61,9 @@ public class EnvironmentCalculator {
             }
         }
 
-        IBlockState below = world.getBlockState(cropPos.down());
-        if (below.getBlock() == Blocks.FARMLAND) {
-            int moisture = below.getBlock().getMetaFromState(below);
+        IBlockState soil = soilState(world, cropPos);
+        if (soil.getBlock() == Blocks.FARMLAND) {
+            int moisture = soil.getBlock().getMetaFromState(soil);
             if (moisture > 0) {
                 humidity += 0.5f;
             }
@@ -73,60 +76,111 @@ public class EnvironmentCalculator {
         return Math.min(1.0f, humidity);
     }
 
+    // ==================== 营养 ====================
+
+    /**
+     * 营养值（0~1）：由脚下的土壤组决定。
+     *
+     * <p>不是任何已登记土壤组时按 {@link #BARREN_NUTRIENTS} 处理——玩家把作物架
+     * 架在钻石块上不再能换来高营养，矿物来源改由底土机制负责。
+     */
     public static float calcNutrients(World world, BlockPos cropPos) {
-        BlockPos below1 = cropPos.down();
-        BlockPos below2 = cropPos.down(2);
+        ISoilList soil = SoilRegistry.getSoilFor(soilState(world, cropPos));
+        return soil == null ? BARREN_NUTRIENTS : soil.getBaseNutrients();
+    }
 
-        float nutrient = 0;
-        IBlockState state1 = world.getBlockState(below1);
-        IBlockState state2 = world.getBlockState(below2);
+    // ==================== 格子取样 ====================
 
-        nutrient += NUTRIENT_MAP.getOrDefault(state1.getBlock(), 0.2f);
-        nutrient += NUTRIENT_MAP.getOrDefault(state2.getBlock(), 0.1f) * 0.5f;
+    /** 作物架脚下那格（土壤）。 */
+    public static IBlockState soilState(World world, BlockPos cropPos) {
+        return world.getBlockState(cropPos.down(SOIL_DEPTH));
+    }
 
-        return Math.min(1.0f, nutrient);
+    /** 再往下一格（底土）。 */
+    public static IBlockState subSoilState(World world, BlockPos cropPos) {
+        return world.getBlockState(cropPos.down(SUB_SOIL_DEPTH));
+    }
+
+    // ==================== 方块 ID 采集 ====================
+
+    /**
+     * 土壤那格的方块 ID，形如 {@code ["mod:name:meta", "mod:name"]}。
+     *
+     * <p>两种形式都给，调用方按需匹配带不带元数据。
+     */
+    public static List<String> getSoilId(World world, BlockPos cropPos) {
+        return idsOf(soilState(world, cropPos));
+    }
+
+    /** 底土那格的方块 ID，格式同 {@link #getSoilId}。 */
+    public static List<String> getSubSoilId(World world, BlockPos cropPos) {
+        return idsOf(subSoilState(world, cropPos));
     }
 
     /**
-     * 获取作物架下方1~2格的所有方块ID(含meta)
-     * 返回列表, canGrowAt中遍历匹配
+     * 土壤 + 底土的方块 ID 合并。
+     *
+     * <p>给「按底下方块区分掉落」的作物用——它们不区分是哪一格，只要下方有就行。
      */
-    public static List<String> getBlocksBelowIds(World world, BlockPos cropPos) {
-        List<String> result = new ArrayList<>();
-        for (int depth = 1; depth <= 2; depth++) {
-            IBlockState state = world.getBlockState(cropPos.down(depth));
-            Block block = state.getBlock();
-            int meta = block.getMetaFromState(state);
-            result.add(block.getRegistryName().toString() + ":" + meta);
-            result.add(block.getRegistryName().toString());
+    public static List<String> getSoilAndSubSoilIds(World world, BlockPos cropPos) {
+        List<String> ids = new ArrayList<>(4);
+        ids.addAll(idsOf(soilState(world, cropPos)));
+        ids.addAll(idsOf(subSoilState(world, cropPos)));
+        return ids;
+    }
+
+    private static List<String> idsOf(IBlockState state) {
+        Block block = state.getBlock();
+        ResourceLocation name = block.getRegistryName();
+        if (name == null) {
+            return Collections.emptyList();
         }
-        return result;
+        int meta = block.getMetaFromState(state);
+        List<String> ids = new ArrayList<>(2);
+        ids.add(name + ":" + meta);
+        ids.add(name.toString());
+        return ids;
+    }
+
+    // ==================== 汇总 ====================
+
+    /** 储量满时的加成上限：水 30%、肥 50%，叠起来最多 1.95 倍。 */
+    public static final float WATER_BONUS = 0.30f;
+    public static final float FERTILIZER_BONUS = 0.50f;
+
+    /** 不带储量加成的环境分（等于水位与肥位都是 0）。 */
+    public static float calcEnvironmentScore(World world, BlockPos cropPos) {
+        return calcEnvironmentScore(world, cropPos, 0f, 0f);
     }
 
     /**
-     * 检查blockBelow是否匹配requiredBlock
-     * 支持两种格式:
-     *   "modid:name:meta" 精确匹配(含meta)
-     *   "modid:name" 只匹配方块不管meta
+     * 带储量加成的环境分。
+     *
+     * <p>水和肥都是<b>正向加成</b>：没水没肥不会掉到基础分以下，喂满了才显著加速。
+     * 这是刻意的——作物不该因为断水就停摆，否则玩家离线一趟回来会发现整个农场死光。
+     *
+     * @param waterRatio      水位 0~1
+     * @param fertilizerRatio 肥位 0~1
      */
-    public static boolean matchesBlock(String actual, String required) {
-        if (actual.equals(required)) return true;
-        // actual是 "mod:name:meta", required是 "mod:name" -> 去掉meta比较
-        String actualNoMeta = actual.substring(0, actual.lastIndexOf(':'));
-        return actualNoMeta.equals(required);
-    }
-
-    public static float calcEnvironmentScore(World world, BlockPos cropPos) {
+    public static float calcEnvironmentScore(World world, BlockPos cropPos,
+                                             float waterRatio, float fertilizerRatio) {
         float light = calcLight(world, cropPos);
         float humidity = calcHumidity(world, cropPos);
         float nutrients = calcNutrients(world, cropPos);
-        return (light * 0.35f + humidity * 0.30f + nutrients * 0.35f);
+        float base = light * 0.35f + humidity * 0.30f + nutrients * 0.35f;
+        return base * (1f + clamp01(waterRatio) * WATER_BONUS)
+                * (1f + clamp01(fertilizerRatio) * FERTILIZER_BONUS);
     }
 
+    private static float clamp01(float value) {
+        return value < 0f ? 0f : (value > 1f ? 1f : value);
+    }
+
+    /** 由环境分与属性推算一轮生长的基准 tick 数。机器（育种机 / 工业农场）算周期用。 */
     public static int calcGrowthTicks(float envScore, CropStats cropStats, int cropTier) {
         int baseTicks = 200 + cropTier * 50;
         float envMod = 1.5f - envScore;
         float statMod = 1.0f / cropStats.getGrowthRateMultiplier();
-        return Math.max(50, (int)(baseTicks * envMod * statMod));
+        return Math.max(50, (int) (baseTicks * envMod * statMod));
     }
 }

@@ -5,7 +5,7 @@ import com.drppp.drtech.api.armor.AbsorbResult;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ISpecialArmorModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.network.ArmorNetworkHandler;
 import com.drppp.drtech.network.packets.CModularArmorSwitchModuleMode;
 import gregtech.api.items.metaitem.MetaItem;
@@ -68,7 +68,7 @@ public class ShockAbsorber implements IModule, ISpecialArmorModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.SHOCK_ABSORBER;
+        return DrMetaItems.SHOCK_ABSORBER;
     }
 
     @Override

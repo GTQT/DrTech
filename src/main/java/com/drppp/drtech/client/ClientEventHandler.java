@@ -5,7 +5,7 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
 import com.drppp.drtech.api.armor.modules.Binoculars;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.items.armor.ArmorUtils;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.client.Minecraft;
@@ -92,7 +92,7 @@ public class ClientEventHandler {
         float zoom = (float) (1 / DrtConfig.armor.binocularZoom);
 
         if (Mouse.isButtonDown(1)) {
-            ItemStack binoculars = MTMetaItems.BINOCULARS.getStackForm();
+            ItemStack binoculars = DrMetaItems.BINOCULARS.getStackForm();
             ItemStack stack = player.getHeldItemMainhand();
             if (stack.getItem() != binoculars.getItem() || stack.getMetadata() != binoculars.getMetadata()) {
                 stack = player.getHeldItemOffhand();

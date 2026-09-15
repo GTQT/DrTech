@@ -1,6 +1,6 @@
 ﻿{
 	"recipes": {
-		"tool_ore_shapeless": "thecodewarrior.hooked.common.items.ShapelessOreToolRecipeFactory"
+		"tool_ore_shapeless": "com.drppp.drtech.hooked.ShapelessOreToolRecipeFactory"
 	}
 }
 

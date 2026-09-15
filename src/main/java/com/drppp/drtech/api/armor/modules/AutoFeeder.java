@@ -3,7 +3,7 @@ package com.drppp.drtech.api.armor.modules;
 import com.drppp.drtech.client.Keys;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import com.drppp.drtech.network.ArmorNetworkHandler;
 import com.drppp.drtech.network.packets.CModularArmorSwitchModuleMode;
 import gregtech.api.items.metaitem.MetaItem;
@@ -102,7 +102,7 @@ public class AutoFeeder extends AbstractModule {
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.AUTO_FEEDER;
+        return DrMetaItems.AUTO_FEEDER;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class AutoFeeder extends AbstractModule {
                 status = (armorData.getBoolean("feeder_enabled") ? I18n.format("metaarmor.hud.status.enabled") :
                         I18n.format("metaarmor.hud.status.disabled"));
             }
-            String result = I18n.format("mechtech.auto_feeder.mode", status);
+            String result = I18n.format("drtech.auto_feeder.mode", status);
             hudStrings.add(result);
         }
     }

@@ -3,7 +3,7 @@ package com.drppp.drtech.api.armor.modules;
 import com.drppp.drtech.api.armor.AbstractModule;
 import com.drppp.drtech.api.armor.IModule;
 import com.drppp.drtech.api.armor.ModularArmor;
-import com.drppp.drtech.common.items.MTMetaItems;
+import com.drppp.drtech.common.items.metaItems.DrMetaItems;
 import gregtech.api.items.metaitem.MetaItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -18,7 +18,7 @@ import java.util.List;
  * Slot: All armor slots
  *
  * Discount per module: 5%, max 20% across all 4 slots.
- * The actual IVisDiscountGear interface is on MTArmorItem,
+ * The actual IVisDiscountGear interface is on DrArmorItem,
  * which delegates to getDiscount().
  */
 public class VisOptimizer extends AbstractModule {
@@ -43,7 +43,7 @@ public class VisOptimizer extends AbstractModule {
     }
 
     /**
-     * Called by MTArmorItem's IVisDiscountGear.getVisDiscount() delegation.
+     * Called by DrArmorItem's IVisDiscountGear.getVisDiscount() delegation.
      */
     public static int getDiscount(ItemStack armorPiece) {
         if (!Loader.isModLoaded("thaumcraft")) {
@@ -61,16 +61,16 @@ public class VisOptimizer extends AbstractModule {
     @Override
     public void addInformation(ItemStack itemStack, List<String> lines) {
         if (Loader.isModLoaded("thaumcraft")) {
-            lines.add(I18n.format("mechtech.vis_optimizer.tooltip.1", DISCOUNT_PER_MODULE));
-            lines.add(I18n.format("mechtech.vis_optimizer.tooltip.2"));
+            lines.add(I18n.format("drtech.vis_optimizer.tooltip.1", DISCOUNT_PER_MODULE));
+            lines.add(I18n.format("drtech.vis_optimizer.tooltip.2"));
         } else {
-            lines.add(I18n.format("mechtech.vis_optimizer.tooltip.disabled"));
+            lines.add(I18n.format("drtech.vis_optimizer.tooltip.disabled"));
         }
-        lines.add(I18n.format("mechtech.modular_armor.usable"));
+        lines.add(I18n.format("drtech.modular_armor.usable"));
     }
 
     @Override
     public MetaItem<?>.MetaValueItem getMetaValueItem() {
-        return MTMetaItems.VIS_OPTIMIZER;
+        return DrMetaItems.VIS_OPTIMIZER;
     }
 }

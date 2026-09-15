@@ -7,6 +7,13 @@ import java.util.Random;
 /**
  * 作物三维属性: Growth(生长速度), Gain(产量), Resistance(抗性)
  * 范围1-31
+ *
+ * <p>附带一个 {@code analyzed} 标志：未分析的种子看不到具体属性，也不能进种子生成机。
+ * 用作物分析仪分析种子即可解开，也可以丢进格雷扫描仪，见
+ * {@code CropAnalyzerBehavior} 与 {@code CropScannerLogic}。
+ *
+ * <p>它放在这里而不是单独一个类，是因为它和三维属性共用同一份 NBT——
+ * 种子的 NBT 里就是 {@code cropId} + 这几个属性键。
  */
 public class CropStats {
     public static final int MIN_STAT = 1;
@@ -16,11 +23,18 @@ public class CropStats {
     private int growth;
     private int gain;
     private int resistance;
+    /** 是否已被分析。新品种子、杂交子代默认未分析。 */
+    private boolean analyzed;
 
     public CropStats(int growth, int gain, int resistance) {
+        this(growth, gain, resistance, false);
+    }
+
+    public CropStats(int growth, int gain, int resistance, boolean analyzed) {
         this.growth = clamp(growth);
         this.gain = clamp(gain);
         this.resistance = clamp(resistance);
+        this.analyzed = analyzed;
     }
 
     public CropStats() { this(1, 1, 1); }
@@ -92,6 +106,7 @@ public class CropStats {
         nbt.setInteger("statGrowth", growth);
         nbt.setInteger("statGain", gain);
         nbt.setInteger("statResistance", resistance);
+        nbt.setBoolean("statAnalyzed", analyzed);
         return nbt;
     }
 
@@ -99,12 +114,22 @@ public class CropStats {
         return new CropStats(
                 nbt.getInteger("statGrowth"),
                 nbt.getInteger("statGain"),
-                nbt.getInteger("statResistance"));
+                nbt.getInteger("statResistance"),
+                nbt.getBoolean("statAnalyzed"));
     }
 
     public int getGrowth() { return growth; }
     public int getGain() { return gain; }
     public int getResistance() { return resistance; }
+
+    /** 这袋种子是否已被分析过。未分析的种子不显示属性，也不能进种子生成机。 */
+    public boolean isAnalyzed() { return analyzed; }
+
+    /** 标记为已分析（就地修改并返回自身，便于链式调用）。 */
+    public CropStats analyze() {
+        this.analyzed = true;
+        return this;
+    }
 
     private static int clamp(int v) { return Math.max(MIN_STAT, Math.min(MAX_STAT, v)); }
 
