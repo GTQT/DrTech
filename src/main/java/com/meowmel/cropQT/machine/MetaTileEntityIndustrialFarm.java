@@ -56,6 +56,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
@@ -195,6 +198,9 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
 
     /** 小数累积产出。 */
     private final DropTracker dropTracker = new DropTracker();
+
+    /** 「产物是战利品表」的作物攒下的抽取次数，小数部分留到下一周期。 */
+    private double lootRollProgress = 0.0d;
 
     // 成型后填充的聚合 handler
     private ItemHandlerList importItems = new ItemHandlerList();
@@ -717,7 +723,44 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
             dropTracker.add(chanceDrop.item,
                     chanceDrop.item.getCount() * chanceDrop.chance * rounds * progressPerCycle);
         }
+        accumulateLootRolls(crop, rounds * progressPerCycle);
         pushCompletedDrops();
+    }
+
+    /**
+     * 给「产物是战利品表」的作物（钓鱼竿）攒抽取次数。
+     *
+     * <p>固定掉落表能按小数累积（1.3 份就攒 1.3），战利品表没这回事 ——
+     * 它只能整次抽取。所以这里把预期次数攒成一个小数，
+     * 每跨过 1 就真抽一次表，抽出来的东西原样进 {@link DropTracker}。
+     *
+     * <p>抽表要 {@link WorldServer}（{@code getHarvestDrops()} 里也是这么判的），
+     * 客户端那一侧整个 {@code updateFormedValid} 都不跑，不用额外挡。
+     */
+    private void accumulateLootRolls(CropType crop, double expectedRolls) {
+        String table = crop.getLootTable();
+        if (table == null || table.isEmpty() || expectedRolls <= 0.0d) {
+            return;
+        }
+        this.lootRollProgress += expectedRolls;
+        int whole = (int) this.lootRollProgress;
+        if (whole <= 0) {
+            return;
+        }
+        this.lootRollProgress -= whole;
+
+        if (!(getWorld() instanceof WorldServer server)) {
+            return;
+        }
+        LootTable lootTable = server.getLootTableManager()
+                .getLootTableFromLocation(new ResourceLocation(table));
+        // 一次抽表要建一次 LootContext，别在循环里重复建
+        LootContext context = new LootContext.Builder(server).build();
+        for (int i = 0; i < whole; i++) {
+            for (ItemStack rolled : lootTable.generateLootForPools(getWorld().rand, context)) {
+                dropTracker.add(rolled, rolled.getCount());
+            }
+        }
     }
 
     /** 把攒够整数的产出推进输出总线。 */
