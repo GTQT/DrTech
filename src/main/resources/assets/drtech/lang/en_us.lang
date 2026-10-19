@@ -2575,6 +2575,8 @@ cropqt.crop.mica_flower.name=Mica Flower
 cropqt.crop.salt_root.name=Salt Root
 cropqt.crop.oil_berry.name=Oil Berry
 
+cropqt.crop.fishing_rod_crop.name=Fishing Rod
+
 # --- Crops: gene orb modes ---
 cropqt.gene.mode.species=Species
 cropqt.gene.mode.growth=Growth

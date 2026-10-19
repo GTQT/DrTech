@@ -2569,6 +2569,8 @@ cropqt.crop.mica_flower.name=云母花
 cropqt.crop.salt_root.name=盐根
 cropqt.crop.oil_berry.name=石油浆果
 
+cropqt.crop.fishing_rod_crop.name=钓鱼竿
+
 # --- Crops: gene orb modes ---
 cropqt.gene.mode.species=物种
 cropqt.gene.mode.growth=生长

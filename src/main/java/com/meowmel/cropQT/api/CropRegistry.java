@@ -37,6 +37,7 @@ public class CropRegistry {
             "weed", "wheat", "potato", "carrot", "pumpkin", "melon", "beetroot",
             "reed", "cactus", "chorus_crop", "lotus_leaf", "nether_wart_crop",
             "brown_mushroom", "red_mushroom", "dandelion", "rose", "bonsai", "cocoa",
+            "fishing_rod_crop",
     };
 
     private static final Map<String, CropType> REGISTRY = new HashMap<>();
@@ -102,6 +103,17 @@ public class CropRegistry {
                 .addChanceDrop(MetaItems.PLANT_BALL.getStackForm(), 0.5f)
                 .lightRequirement(0)
                 .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0x6B8E3A).renderType(CropRenderType.CROSS).build());
+
+        // ---------------- 特殊作物 ----------------
+        // 钓鱼竿：产物不是固定掉落表，而是整张原版钓鱼战利品表
+        // （鱼 / 垃圾 / 宝藏三选一，各自再随机）。它种在水面上，要够湿才长。
+        register(new CropType.Builder("fishing_rod_crop").displayName("cropqt.crop.fishing_rod_crop.name")
+                .tier(4).soil(SoilTypes.water)
+                .maxGrowthStage(5).harvestStage(5).stageRequirement(26)
+                .lootTable("minecraft:gameplay/fishing")
+                .waterRequirement(0.5f)
+                .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0x4A90C4)
+                .renderType(CropRenderType.CROSS).build());
 
         // ---------------- 农田作物 ----------------
         register(new CropType.Builder("wheat").displayName("小麦").tier(1).soil(SoilTypes.farmland)
