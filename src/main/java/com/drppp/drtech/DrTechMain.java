@@ -67,6 +67,7 @@ import com.drppp.drtech.lootgames.minigame.gameoflight.client.TESRGOLMaster;
 import com.drppp.drtech.lootgames.minigame.gameoflight.TileEntityGOLMaster;
 import com.drppp.drtech.lootgames.packets.NetworkHandler;
 import com.drppp.drtech.lootgames.registry.ModBlocks;
+import com.drppp.drtech.personalspace.PersonalSpaceModule;
 import gregtech.api.GregTechAPI;
 import gregtech.api.cover.CoverDefinition;
 import gregtech.api.metatileentity.registry.MTEManager;
@@ -87,6 +88,9 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -149,6 +153,7 @@ public class DrTechMain {
         // LootGames init
         ModBlocks.registerTileEntities();
         NetworkHandler.registerPackets();
+        PersonalSpaceModule.preInit(event);
         LootGames.gameManager = new GameManager();
         ModLootTables.init();
         ModRewardBoxes.init();
@@ -219,6 +224,7 @@ public class DrTechMain {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         CraftingRecipes.load();
+        PersonalSpaceModule.init(event);
         DrTechReceipeManager.init();
         SyncInit.init();
         proxy.initClientControls();
@@ -260,9 +266,20 @@ public class DrTechMain {
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
         if (OpenComputersCompat.isAvailable()) event.registerServerCommand(new OpenComputersPairingCommand());
+        PersonalSpaceModule.onServerStarting(event);
     }
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
+    }
+
+    @EventHandler
+    public void serverStopping(FMLServerStoppingEvent event) {
+        PersonalSpaceModule.onServerStopping(event);
+    }
+
+    @EventHandler
+    public void serverStopped(FMLServerStoppedEvent event) {
+        PersonalSpaceModule.onServerStopped(event);
     }
 }
