@@ -724,6 +724,9 @@ public class CraftingRecipes {
                 'A', new UnificationEntry(gearSmall, Materials.StainlessSteel),
                 'B', new UnificationEntry(gearSmall, Materials.Steel)
         );
+
+        // coprQT × CropsNH 完全复刻：作物机器/种子床/升级组件/工具合成配方
+        com.meowmel.cropQT.recipes.CropCraftingRecipes.load();
     }
 
 

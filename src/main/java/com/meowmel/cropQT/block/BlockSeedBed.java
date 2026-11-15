@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  * <h2>档位与 meta</h2>
  * meta 是枚举序号，从 MV 起算。源端的 meta 就等于 GT 档位号，但 1.7.10 的 GTNH
  * 比 1.12.2 的 GTCEu <b>多一个 UMV 档</b>，所以两边档位号在 UIV 之后会错开：
- * 我们到 UXV 为止只有 <b>11 档</b>（MV..UXV，即 2..12）。
+ * 源端 UMV 对应本仓库 UXV、源端 UXV 对应本仓库 OpV，最终是 <b>12 档</b>（MV..OpV，即 2..13）。
  *
  * <p>各档数值全部照搬源端，见 {@link #getCapacity} 一带。
  */
@@ -36,8 +36,13 @@ public class BlockSeedBed extends VariantBlock<BlockSeedBed.SeedBedType> {
 
     /** 最低档。 */
     public static final int MIN_TIER = GTValues.MV;
-    /** 最高档。GTCEu 没有 UMV，所以这里是 12 而不是源端的 13。 */
-    public static final int MAX_TIER = GTValues.UXV;
+    /**
+     * 最高档。
+     *
+     * <p>源端是 UXV（索引 13）。GTNH 的 UMV 在 GTCEu 里叫 UXV，源端 UXV 对应本仓库的 OpV，
+     * 所以这里取 {@link GTValues#OpV}，档位序列与源端 UXV 一一对应（MV..OpV 共 {@code 12} 档）。
+     */
+    public static final int MAX_TIER = GTValues.OpV;
 
     /** 每档的储水/储肥容量。 */
     private static final int[] CAPACITY = new int[MAX_TIER - MIN_TIER + 1];
@@ -117,10 +122,10 @@ public class BlockSeedBed extends VariantBlock<BlockSeedBed.SeedBedType> {
 
     // ==================== 枚举 ====================
 
-    /** 11 档，序号即 meta。 */
+    /** 12 档，序号即 meta。 */
     public enum SeedBedType implements IStringSerializable {
         MV("mv"), HV("hv"), EV("ev"), IV("iv"), LUV("luv"), ZPM("zpm"),
-        UV("uv"), UHV("uhv"), UEV("uev"), UIV("uiv"), UXV("uxv");
+        UV("uv"), UHV("uhv"), UEV("uev"), UIV("uiv"), UXV("uxv"), OP("opv");
 
         private final String name;
 

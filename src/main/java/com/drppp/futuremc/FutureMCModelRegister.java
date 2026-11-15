@@ -19,20 +19,13 @@ public final class FutureMCModelRegister {
 
     @SubscribeEvent
     public static void register(ModelRegistryEvent event) {
-        for (Block block : new Block[] {FutureMCMain.SMOOTH_BASALT, FutureMCMain.CALCITE,
-                FutureMCMain.AMETHYST_BLOCK, FutureMCMain.BUDDING_AMETHYST,
-                FutureMCMain.SMALL_AMETHYST_BUD, FutureMCMain.MEDIUM_AMETHYST_BUD,
-                FutureMCMain.LARGE_AMETHYST_BUD, FutureMCMain.AMETHYST_CLUSTER,
-                FutureMCMain.LANTERN, FutureMCMain.SOUL_LANTERN, FutureMCMain.CHAIN,
-                FutureMCMain.COMPOSTER, FutureMCMain.DRIED_GHAST}) {
+        for (Block block : new Block[] {FutureMCMain.DRIED_GHAST}) {
             Item item = Item.getItemFromBlock(block);
             if (item != null) {
                 ModelLoader.setCustomModelResourceLocation(item, 0,
                         new ModelResourceLocation(block.getRegistryName(), "inventory"));
             }
         }
-        ModelLoader.setCustomModelResourceLocation(FutureMCMain.AMETHYST_SHARD, 0,
-                new ModelResourceLocation(FutureMCMain.AMETHYST_SHARD.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(FutureMCMain.HAPPY_GHAST_HARNESS, 0,
                 new ModelResourceLocation(FutureMCMain.HAPPY_GHAST_HARNESS.getRegistryName(), "inventory"));
         ModelLoader.setCustomStateMapper(FutureMCMain.DRIED_GHAST, new StateMapperBase() {

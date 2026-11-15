@@ -94,13 +94,6 @@ public class MachineRecipes {
                 .EUt(1920)
                 .buildAndRegister();
 
-        MACERATOR_RECIPES.recipeBuilder()
-                .inputs(new ItemStack(com.drppp.futuremc.FutureMCMain.CALCITE))
-                .output(dust, Calcite, 4)
-                .duration(100)
-                .EUt(2)
-                .buildAndRegister();
-
         MIXER_RECIPES.recipeBuilder()
                 .input(DrMetaItems.SKULL_DUST, 1)
                 .input(Blocks.SOUL_SAND, 2)

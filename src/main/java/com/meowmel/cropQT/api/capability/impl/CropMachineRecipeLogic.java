@@ -145,4 +145,24 @@ public abstract class CropMachineRecipeLogic<M extends MetaTileEntityCropMachine
     protected World world() {
         return machine.getWorld();
     }
+
+    /**
+     * 单方块超频口径，对齐源端 {@code MTEBasicMachine.calculateOverclockedNess}：
+     * 每超频一次 <b>EU×4、时长÷2</b>（{@code OverclockCalculator.durationDecreasePerOC}
+     * 默认 2），直到 EU×4 超过机器上限。
+     *
+     * @param baseEut      基础 EU/t
+     * @param baseDuration 基础时长（tick）
+     * @param ceiling      机器可接受的最高 EU/t（{@code V[tier] * 安数}）
+     * @return {@code {eut, duration}}；基础值本身超上限时原样返回
+     */
+    protected static int[] overclock(long baseEut, int baseDuration, long ceiling) {
+        long eut = Math.max(1L, baseEut);
+        int duration = Math.max(1, baseDuration);
+        while (eut <= ceiling / 4) {
+            eut *= 4;
+            duration = Math.max(1, duration / 2);
+        }
+        return new int[]{(int) Math.min(Integer.MAX_VALUE, eut), duration};
+    }
 }

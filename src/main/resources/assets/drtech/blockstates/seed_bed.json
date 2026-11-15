@@ -73,6 +73,12 @@
           "side": "drtech:blocks/industrial_farm/seed_bed_side_12",
           "bottom": "drtech:blocks/industrial_farm/seed_bed_side_12"
         }
+      },
+      "opv": {
+        "textures": {
+          "side": "drtech:blocks/industrial_farm/seed_bed_side_13",
+          "bottom": "drtech:blocks/industrial_farm/seed_bed_side_13"
+        }
       }
     }
   }

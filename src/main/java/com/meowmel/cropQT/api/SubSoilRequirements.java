@@ -61,6 +61,17 @@ public final class SubSoilRequirements {
             .addOreDict("oreQuartz")
             .addOreDict("blockQuartz");
     public static final SubSoilRequirement thulium = metal("thulium", "Thulium", Materials.Thulium);
+    public static final SubSoilRequirement thorium = metal("thorium", "Thorium", Materials.Thorium);
+    /** 钴：钴矿石莓（NH {@code cobaltOreBerry}）的底土。 */
+    public static final SubSoilRequirement cobalt = metal("cobalt", "Cobalt", Materials.Cobalt);
+
+    // ==================== 宝石（源端作物用） ====================
+
+    /** 橄榄石：橄榄石作物（NH {@code olivia}）的底土。 */
+    public static final SubSoilRequirement olivine = gem("olivine", "Olivine", Materials.Olivine);
+    /** 下界之星：星之疣（NH {@code starWart}）的底土。GT 的 NetherStar 是 gem 材料，有压缩块。 */
+    public static final SubSoilRequirement netherStar = gem("nether_star", "NetherStar", Materials.NetherStar);
+
     public static final SubSoilRequirement salt = SubSoilRequirement.of("salt")
             .addMaterial(Materials.Salt)
             .addMaterial(Materials.RockSalt)
@@ -115,6 +126,9 @@ public final class SubSoilRequirements {
     public static final SubSoilRequirement water = SubSoilRequirement.of("water", new ItemStack(Items.WATER_BUCKET))
             .addBlock(Blocks.WATER)
             .addBlock(Blocks.FLOWING_WATER);
+    /** 头颅：精华矿石莓（NH {@code essenceOreBerry}）的底土，源端是 {@code skull}（任意 meta）。 */
+    public static final SubSoilRequirement skull = SubSoilRequirement.of("skull")
+            .addBlock(Blocks.SKULL);
 
     /**
      * 机械脑：硅 / 磷 / 钠夸德 / 中子素，四种压缩块任意一种都算满足。
@@ -169,6 +183,14 @@ public final class SubSoilRequirements {
                 .addBlock(ore)
                 .addBlock(block)
                 .addOreDict("ore" + oreDictName)
+                .addOreDict("block" + oreDictName);
+    }
+
+    /** 宝石类：招牌用 GT 的宝石，匹配走 材料 + {@code gemX} + {@code blockX} 三路。 */
+    private static SubSoilRequirement gem(String name, String oreDictName, Material material) {
+        return SubSoilRequirement.of(name, OreDictUnifier.get(OrePrefix.gem, material))
+                .addMaterial(material)
+                .addOreDict("gem" + oreDictName)
                 .addOreDict("block" + oreDictName);
     }
 

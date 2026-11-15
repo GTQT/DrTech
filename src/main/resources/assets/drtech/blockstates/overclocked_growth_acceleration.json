@@ -1,0 +1,22 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all"
+  },
+  "variants": {
+    "variant": {
+      "mv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_2" } },
+      "hv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_3" } },
+      "ev": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_4" } },
+      "iv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_5" } },
+      "luv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_6" } },
+      "zpm": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_7" } },
+      "uv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_8" } },
+      "uhv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_9" } },
+      "uev": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_10" } },
+      "uiv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_11" } },
+      "uxv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_12" } },
+      "opv": { "textures": { "all": "drtech:blocks/industrial_farm/overclocked_growth_acceleration_13" } }
+    }
+  }
+}

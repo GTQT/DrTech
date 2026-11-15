@@ -8,7 +8,11 @@ import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.api.EnvironmentCalculator;
 import com.meowmel.cropQT.api.GrowthRequirement;
 import com.meowmel.cropQT.api.ISoilList;
+import com.meowmel.cropQT.api.CropConstants;
+import com.meowmel.cropQT.machine.MetaTileEntityCropManager;
+import com.meowmel.cropQT.machine.MetaTileEntityIndustrialFarm;
 import com.meowmel.cropQT.tile.TileCropStick;
+import gregtech.api.GTValues;
 import gregtech.api.util.GTUtility;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -73,6 +77,105 @@ public class TopProvider implements IProbeInfoProvider {
                 iProbeInfo.text("容量" + s.getFluidBank().getStored() + "/" + s.getFluidBank().getCapacity());
             }
         }
+        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityCropManager) {
+            MetaTileEntityCropManager manager =
+                    (MetaTileEntityCropManager) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
+            int tier = manager.getTier();
+            String tierName = tier >= 0 && tier < GTValues.VN.length ? GTValues.VN[tier] : "?";
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.GREEN + "作物管理机: " + TextFormatting.WHITE + tierName).getFormattedText());
+
+            int radius = manager.getWorkingRadius();
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.YELLOW + "工作范围: " + TextFormatting.WHITE
+                            + (radius * 2 + 1) + "×" + (radius * 2 + 1)
+                            + TextFormatting.GRAY + "  垂直 ±" + manager.getVerticalRadius())
+                    .getFormattedText());
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.YELLOW + "已缓存作物架: " + TextFormatting.WHITE
+                            + manager.getCachedCropCount()).getFormattedText());
+
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.AQUA + "水: " + TextFormatting.WHITE
+                            + manager.getWaterTank().getFluidAmount() + TextFormatting.GRAY + " / "
+                            + TextFormatting.WHITE + manager.getWaterTank().getCapacity())
+                    .getFormattedText());
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.AQUA + "WeedEX: " + TextFormatting.WHITE
+                            + (manager.getWeedExTank().getFluidAmount() + manager.getWeedExBuffer())
+                            + TextFormatting.GRAY + " / "
+                            + TextFormatting.WHITE
+                            + (manager.getWeedExTank().getCapacity() + manager.getWeedExBufferCapacity())
+                            + TextFormatting.GRAY + "（缓冲 " + manager.getWeedExBuffer() + "）")
+                    .getFormattedText());
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.AQUA + "液肥: " + TextFormatting.WHITE
+                            + manager.getFertilizerTank().getFluidAmount() + TextFormatting.GRAY + " / "
+                            + TextFormatting.WHITE + manager.getFertilizerTank().getCapacity())
+                    .getFormattedText());
+
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.GOLD + "开关: "
+                            + toggle("水", manager.isWaterEnabled())
+                            + toggle("除草", manager.isWeedExEnabled())
+                            + toggle("施肥", manager.isFertilizerEnabled())
+                            + toggle("收割", manager.isHarvestEnabled())).getFormattedText());
+
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.YELLOW + "耗电: " + TextFormatting.WHITE
+                            + manager.getPowerUsage() + " EU/t"
+                            + TextFormatting.GRAY + "  辅助 " + TextFormatting.WHITE
+                            + manager.getPowerUsageSecondary() + " EU/t").getFormattedText());
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.GREEN + "收割加成: " + TextFormatting.WHITE
+                            + String.format("%.0f%%", manager.getHarvestBonusChance() * 100.0f))
+                    .getFormattedText());
+        }
+        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityIndustrialFarm) {
+            MetaTileEntityIndustrialFarm farm =
+                    (MetaTileEntityIndustrialFarm) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
+            int tier = farm.getUpgradeTier();
+            String tierName = tier >= 0 && tier < GTValues.VN.length ? GTValues.VN[tier] : "?";
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.GREEN + "工业农场: " + TextFormatting.WHITE + tierName).getFormattedText());
+            int glassTier = farm.getGlassTier();
+            if (glassTier >= 0 && glassTier < GTValues.VN.length) {
+                iProbeInfo.text(new TextComponentString(
+                        TextFormatting.GRAY + "玻璃: " + TextFormatting.WHITE
+                                + GTValues.VN[glassTier]).getFormattedText());
+            }
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.YELLOW + "苗床容量: " + TextFormatting.WHITE
+                            + farm.getSeedBedCapacity()).getFormattedText());
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.YELLOW + "收获倍率: " + TextFormatting.WHITE
+                            + String.format("%.0f%%", farm.getHarvestRoundMultiplier() * 100.0d)
+                            + TextFormatting.GRAY + "  "
+                            + TextFormatting.YELLOW + "生长倍率: " + TextFormatting.WHITE
+                            + String.format("%.0f%%", farm.getGrowthSpeedMultiplier() * 100.0d))
+                    .getFormattedText());
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.AQUA + "水/周期: " + TextFormatting.WHITE
+                            + farm.getWaterPotencyNeededPerCycle() + " L").getFormattedText());
+            iProbeInfo.text(new TextComponentString(
+                    TextFormatting.AQUA + (farm.hasFertilizerUnit() ? "浓缩液肥/周期: " : "液肥/周期: ")
+                            + TextFormatting.WHITE + farm.getFertilizerPotencyNeededPerCycle() + " L")
+                    .getFormattedText());
+            int nutrientScore = farm.getNutrientScoreForDisplay();
+            if (nutrientScore >= 0) {
+                iProbeInfo.text(new TextComponentString(
+                        TextFormatting.LIGHT_PURPLE + "营养分: " + TextFormatting.WHITE + nutrientScore
+                                + TextFormatting.GRAY + " / " + CropConstants.MAX_NUTRIENT_SCORE)
+                        .getFormattedText());
+            }
+            if (!farm.isConfigurationValid()) {
+                String key = MetaTileEntityIndustrialFarm.configErrorKey(farm.getConfigError());
+                if (key != null) {
+                    iProbeInfo.text(new TextComponentString(
+                            TextFormatting.RED + I18n.translateToLocal(key)).getFormattedText());
+                }
+            }
+        }
         if (world.getTileEntity(iProbeHitData.getPos()) instanceof TileCropStick) {
             TileCropStick tile = (TileCropStick) world.getTileEntity(iProbeHitData.getPos());
             CropType type = tile.getCropType();
@@ -132,5 +235,11 @@ public class TopProvider implements IProbeInfoProvider {
                                 TextFormatting.WHITE + " " + tile.getStats().getResistance()).getFormattedText());
             }
         }
+    }
+
+    /** TOP 里的开关小标签。 */
+    private static String toggle(String name, boolean enabled) {
+        return (enabled ? TextFormatting.GREEN : TextFormatting.DARK_GRAY) + name
+                + (enabled ? "开" : "关") + TextFormatting.WHITE + "  ";
     }
 }

@@ -68,12 +68,19 @@ public class CropSynthesizerRecipeLogic extends CropMachineRecipeLogic<MetaTileE
         }
         // 5 分钟起步，按 log16 增长到 10 分钟
         double factor = 1.0 + Math.log(Math.max(1, resolved.crop.getTier())) / DURATION_LOG_BASE;
-        return (int) (BASE_DURATION * factor);
+        int base = (int) (BASE_DURATION * factor);
+        // 源端 calculateOverclockedNess(VP[minTier] * 3, duration)，上限 V[mTier] * 3
+        return overclock(baseEutPerTick(), base, GTValues.V[machine.getTier()] * AMPERAGE)[1];
     }
 
     @Override
     protected long getEnergyPerTick() {
-        return resolved == null ? 0L : GTValues.V[minimumTierFor(resolved.crop)] * AMPERAGE;
+        return overclock(baseEutPerTick(), 1, GTValues.V[machine.getTier()] * AMPERAGE)[0];
+    }
+
+    /** 源端 VP[作物要求的最低档] * 3；GTQT 的 VA 与 GT5U 的 VP 数值相同（V - V/16）。 */
+    private long baseEutPerTick() {
+        return resolved == null ? 0L : GTValues.VA[minimumTierFor(resolved.crop)] * AMPERAGE;
     }
 
     @Override
@@ -156,13 +163,13 @@ public class CropSynthesizerRecipeLogic extends CropMachineRecipeLogic<MetaTileE
     /**
      * 合成某作物需要的最低机器电压档。
      *
-     * <p>源端取「作物的育种机档位」，我们没有那个字段，用作物 tier 作代理并夹在 EV~IV 之间
-     * ——我们只做 EV / IV 两档，上界就是 IV。
+     * <p>源端取「作物的育种机档位」夹在 EV..UMV 之间。GTQT 没有 UMV，UMV 按数值映射为 UXV；
+     * 我们的作物没有育种机档位字段，用作物 tier 作代理。
      *
      * <p>提取器也用这个判据，所以它是 public static 的。
      */
     public static int minimumTierFor(CropType crop) {
-        return Math.min(GTValues.IV, Math.max(GTValues.EV, crop.getTier()));
+        return Math.min(GTValues.UXV, Math.max(GTValues.EV, crop.getTier()));
     }
 
     /** UUM 用量：tier 决定底量，三围决定增量。 */

@@ -59,6 +59,21 @@ public class CropType {
     /** 作为亲本被其它作物杂交所需的最低生长进度（0~1）；{@code < 0} 表示禁止。 */
     private final float breedingThreshold;
 
+    // ==================== 源端对齐字段（CropsNH ICropCard） ====================
+
+    /** 允许种在种子床里的最低 tier；{@code < 0} 表示沿用 {@link #tier}。 */
+    private final int minSeedBedTier;
+    /** 育种机/基因机所需的最低 tier；{@code < 0} 表示沿用 {@link #tier}。 */
+    private final int machineBreedingRecipeTier;
+    /** 单株一次收获的平均轮数基数（源端 {@code getDropChance()}）。 */
+    private final float dropChance;
+    /** 是否会在作物架上蔓延杂草（源端 {@code spreadsWeeds}）。 */
+    private final boolean spreadsWeeds;
+    /** 复制催化剂：种子机消耗其中一个物品即可复制该作物。 */
+    private final List<ItemStack> duplicationCatalysts;
+    /** 是否从 NEI/JEI 的作物列表里隐藏。 */
+    private final boolean hideFromNEI;
+
     private CropType(Builder builder) {
         this.id = builder.id;
         this.displayName = builder.displayName;
@@ -88,6 +103,12 @@ public class CropType {
         this.growthDuration = builder.growthDuration;
         this.crossingThreshold = builder.crossingThreshold;
         this.breedingThreshold = builder.breedingThreshold;
+        this.minSeedBedTier = builder.minSeedBedTier;
+        this.machineBreedingRecipeTier = builder.machineBreedingRecipeTier;
+        this.dropChance = builder.dropChance;
+        this.spreadsWeeds = builder.spreadsWeeds;
+        this.duplicationCatalysts = new ArrayList<>(builder.duplicationCatalysts);
+        this.hideFromNEI = builder.hideFromNEI;
     }
 
     // ==================== 后续追加掉落物(init阶段使用) ====================
@@ -121,6 +142,91 @@ public class CropType {
     }
 
     // ==================== 掉落计算 ====================
+
+    /**
+     * 源端掉落模型：平均收获轮数 {@code dropChance * 1.03^gain * multiplier}，
+     * 每轮每个条目按 {@code chance} 期望展开；小数部分按概率进位，
+     * 整数量按 {@code (stackSize + (gain+1)/100)} 放大。
+     *
+     * <p>与旧 {@link #rollDrops} 的区别：旧版给固定掉落加整数 yieldBonus、
+     * 概率掉落只掷一次；源端是「先算期望轮数，再算每条目的期望数量」。
+     */
+    public List<ItemStack> rollDropsExpected(Random rand, int gain, double roundsMultiplier,
+                                             List<String> blocksBelowIds) {
+        double avgRounds = Math.max(0.0d, dropChance) * Math.pow(1.03d, gain) * Math.max(0.0d, roundsMultiplier);
+        int rounds = (int) avgRounds;
+        if (rand.nextDouble() < avgRounds - rounds) {
+            rounds++;
+        }
+        double avgIncrease = (gain + 1) / 100.0d;
+
+        List<DropEntry> entries = resolveDropEntries(blocksBelowIds);
+        List<ItemStack> result = new ArrayList<>();
+        for (DropEntry entry : entries) {
+            double expected = (entry.stack.getCount() + avgIncrease) * entry.chance * rounds;
+            int count = (int) expected;
+            if (rand.nextDouble() < expected - count) {
+                count++;
+            }
+            if (count <= 0) {
+                continue;
+            }
+            ItemStack copy = entry.stack.copy();
+            copy.setCount(Math.min(count, copy.getMaxStackSize() * 64));
+            result.add(copy);
+        }
+        return result;
+    }
+
+    /** 解析本次收获实际生效的掉落条目：方块特定掉落优先，否则默认表。 */
+    private List<DropEntry> resolveDropEntries(List<String> blocksBelowIds) {
+        List<DropEntry> entries = new ArrayList<>();
+        if (blocksBelowIds != null && !blockDrops.isEmpty()) {
+            for (String blockId : blocksBelowIds) {
+                String noMeta = blockId.contains(":")
+                        ? blockId.substring(0, blockId.lastIndexOf(':')) : blockId;
+                if (addBlockEntries(entries, blockId) || addBlockEntries(entries, noMeta)) {
+                    return entries;
+                }
+            }
+        }
+        for (ItemStack drop : drops) {
+            entries.add(new DropEntry(drop, 1.0d));
+        }
+        for (ChanceDrop cd : chanceDrops) {
+            entries.add(new DropEntry(cd.item, cd.chance));
+        }
+        return entries;
+    }
+
+    private boolean addBlockEntries(List<DropEntry> entries, String blockId) {
+        List<ItemStack> fixed = blockDrops.get(blockId);
+        List<ChanceDrop> chance = blockChanceDrops.get(blockId);
+        if (fixed == null && chance == null) {
+            return false;
+        }
+        if (fixed != null) {
+            for (ItemStack drop : fixed) {
+                entries.add(new DropEntry(drop, 1.0d));
+            }
+        }
+        if (chance != null) {
+            for (ChanceDrop cd : chance) {
+                entries.add(new DropEntry(cd.item, cd.chance));
+            }
+        }
+        return true;
+    }
+
+    private static final class DropEntry {
+        private final ItemStack stack;
+        private final double chance;
+
+        private DropEntry(ItemStack stack, double chance) {
+            this.stack = stack;
+            this.chance = chance;
+        }
+    }
 
     /**
      * 获取本次收获的所有掉落物(固定+概率)
@@ -215,7 +321,7 @@ public class CropType {
      * TOP 的 provider 跑在服务端，用 client 版会 {@code NoClassDefFoundError}。
      */
     public String getDisplayName() {
-        return net.minecraft.util.text.translation.I18n.translateToLocal(displayName);
+        return gregtech.api.util.LocalizationUtils.format(displayName);
     }
     /** 作物贴图目录路径，未设定则返回id */
     public String getTexturePath() { return texturePath != null ? texturePath : id; }
@@ -276,6 +382,32 @@ public class CropType {
 
     /** 作为亲本被杂交所需的最低生长进度（0~1）；返回负数表示不能被杂交。 */
     public float getBreedingThreshold() { return breedingThreshold; }
+
+    // ==================== 源端对齐字段 ====================
+
+    /** 允许种进种子床的最低 tier（源端 {@code getMinSeedBedTier}）。未设定时沿用作物 tier。 */
+    public int getMinSeedBedTier() { return minSeedBedTier >= 0 ? minSeedBedTier : tier; }
+
+    /** 育种机/基因机所需的最低 tier（源端 {@code getMachineBreedingRecipeTier}）。未设定时沿用作物 tier。 */
+    public int getMachineBreedingRecipeTier() { return machineBreedingRecipeTier >= 0 ? machineBreedingRecipeTier : tier; }
+
+    /** 单株一次收获的平均轮数基数（源端 {@code getDropChance}，默认 1.0）。 */
+    public float getDropChance() { return dropChance; }
+
+    /** 是否会在作物架上蔓延杂草。 */
+    public boolean spreadsWeeds() { return spreadsWeeds; }
+
+    /** 复制催化剂（只读）；空表示不需要催化剂。 */
+    public List<ItemStack> getDuplicationCatalysts() { return Collections.unmodifiableList(duplicationCatalysts); }
+
+    /** 是否从 NEI/JEI 的作物列表里隐藏。 */
+    public boolean isHiddenFromNEI() { return hideFromNEI; }
+
+    /** init 阶段追加复制催化剂（依赖其它 mod 的物品在 preInit 时还不存在）。 */
+    public CropType addDuplicationCatalystLate(ItemStack catalyst) {
+        this.duplicationCatalysts.add(catalyst);
+        return this;
+    }
 
     /**
      * 光照与湿度是否达标。
@@ -342,6 +474,13 @@ public class CropType {
         private int growthDuration = -1;         // <=0 表示按 tier 推导
         private float crossingThreshold = 0.8f;
         private float breedingThreshold = 0.8f;
+
+        private int minSeedBedTier = -1;
+        private int machineBreedingRecipeTier = -1;
+        private float dropChance = 1.0f;
+        private boolean spreadsWeeds = true;
+        private List<ItemStack> duplicationCatalysts = new ArrayList<>();
+        private boolean hideFromNEI = false;
 
         public Builder(String id) { this.id = id; this.displayName = id; }
 
@@ -455,6 +594,29 @@ public class CropType {
 
         /** 作为亲本被杂交所需的最低生长进度（0~1）；传负数表示不能被杂交。 */
         public Builder breedingThreshold(float v) { this.breedingThreshold = v; return this; }
+
+        // ==================== 源端对齐字段 ====================
+
+        /** 允许种进种子床的最低 tier；不设则沿用作物 tier。 */
+        public Builder minSeedBedTier(int tier) { this.minSeedBedTier = tier; return this; }
+
+        /** 育种机/基因机所需的最低 tier；不设则沿用作物 tier。 */
+        public Builder machineBreedingRecipeTier(int tier) { this.machineBreedingRecipeTier = tier; return this; }
+
+        /** 单株一次收获的平均轮数基数（源端默认 1.0）。 */
+        public Builder dropChance(float chance) { this.dropChance = chance; return this; }
+
+        /** 是否会蔓延杂草（源端默认 true）。 */
+        public Builder spreadsWeeds(boolean v) { this.spreadsWeeds = v; return this; }
+
+        /** 复制催化剂；种子机消耗其中一个即可复制该作物。 */
+        public Builder duplicationCatalysts(ItemStack... catalysts) {
+            this.duplicationCatalysts.addAll(Arrays.asList(catalysts));
+            return this;
+        }
+
+        /** 是否从 NEI/JEI 的作物列表里隐藏。 */
+        public Builder hideFromNEI(boolean v) { this.hideFromNEI = v; return this; }
         /** 光照小于等于某值 (蘑菇/暗处作物) */
         public Builder lightRequirementLess(float max) {
             this.lightRequirement = max;

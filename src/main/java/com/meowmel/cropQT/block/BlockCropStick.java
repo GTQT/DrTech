@@ -2,11 +2,18 @@ package com.meowmel.cropQT.block;
 
 import com.drppp.drtech.Tags;
 import com.meowmel.cropQT.tile.TileCropStick;
+import com.meowmel.cropQT.api.CropConstants;
 import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.SoilRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
+import com.meowmel.cropQT.api.potency.IPotencyData;
+import com.meowmel.cropQT.api.registries.FertilizerRegistry;
 import com.meowmel.cropQT.item.ItemCropSeed;
+import com.meowmel.cropQT.item.tool.ItemCropSpade;
+import com.meowmel.cropQT.item.tool.ItemPlantCure;
+import com.meowmel.cropQT.item.tool.ItemPlantLens;
+import com.meowmel.cropQT.item.tool.ItemWeedEX;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -14,6 +21,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -101,6 +109,24 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         TileCropStick tile = (TileCropStick) te;
         ItemStack held = player.getHeldItem(hand);
 
+        // 工具优先：透镜 / 植物药 / WeedEX 罐 / 作物铲都是「专属交互」，
+        // 不先拦下来会被后面的种植/施肥/收获分支抢走。
+        if (!held.isEmpty()) {
+            Item item = held.getItem();
+            if (item instanceof ItemPlantLens) {
+                return ((ItemPlantLens) item).onCropStickUse(world, pos, tile, player, held);
+            }
+            if (item instanceof ItemPlantCure) {
+                return ((ItemPlantCure) item).onCropStickUse(world, pos, tile, player, held);
+            }
+            if (item instanceof ItemWeedEX) {
+                return ((ItemWeedEX) item).onCropStickUse(world, pos, tile, player, held);
+            }
+            if (item instanceof ItemCropSpade) {
+                return ((ItemCropSpade) item).onCropStickUse(world, pos, tile, player, held);
+            }
+        }
+
         // 除草：只认矿辞，不认具体物品——GT 的电动剪刀、各种 mod 的剪刀都在 toolShears 里
         if (isWeedingTool(held) && tile.isWeedPlant()) {
             tile.destroyCrop();
@@ -118,6 +144,20 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
             String id = VANILLA_SEED_MAP.get(held.getItem());
             if (id != null) return tryPlant(tile, player, held, id, new CropStats(1, 1, 1));
         }
+        // 手动施肥：源端阈值 10 / 上限 100，按 PotencyData 的每次消耗单位数扣物品。
+        if (!held.isEmpty() && tile.hasCrop()) {
+            IPotencyData fertilizer = FertilizerRegistry.getFertilizerData(held);
+            if (fertilizer != null) {
+                int units = fertilizer.getUnitsConsumedPerApplication();
+                if (held.getCount() >= units && tile.addFertilizer(fertilizer.getPotency(),
+                        CropConstants.MANUAL_FERTILIZER_MIN_THRESHOLD,
+                        CropConstants.MANUAL_FERTILIZER_MAX_STORAGE, false)) {
+                    if (!player.isCreative()) held.shrink(units);
+                    return true;
+                }
+                return false;
+            }
+        }
         if (!held.isEmpty() && held.getItem() == Item.getItemFromBlock(this)) {
             if (!tile.hasCrop() && !tile.isDoubleCropStick()) {
                 tile.setDoubleCropStick(true);
@@ -127,7 +167,7 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
             return false;
         }
         if (held.isEmpty()) {
-            if (tile.hasCrop() && tile.isMature()) return doHarvest(world, pos, tile, player);
+            if (tile.canHarvest()) return doHarvest(world, pos, tile, player);
         }
         return false;
     }
@@ -241,8 +281,16 @@ public class BlockCropStick extends Block implements ITileEntityProvider {
         if (!canPlaceBlockAt(w, p)) { dropBlockAsItem(w, p, s, 0); w.setBlockToAir(p); }
     }
 
-    @Override public void randomTick(World w, BlockPos p, IBlockState s, Random r) {}
-    @Override protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, DOUBLE, HAS_CROP, RENDER_STAGE); }
+    @Override
+    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        super.onEntityCollision(worldIn, pos, state, entityIn);
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TileCropStick) {
+            ((TileCropStick) te).onEntityCollision(entityIn);
+        }
+    }
+
+    @Override public void randomTick(World w, BlockPos p, IBlockState s, Random r) {}    @Override protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, DOUBLE, HAS_CROP, RENDER_STAGE); }
 
     @Override public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);

@@ -105,22 +105,17 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
         TextureAtlasSprite sprite = frameOf(type.getTexturePath(), stage);
         if (sprite == null) return;
 
-        // 植物高度
-        int maxStage = type.getMaxGrowthStage();
-        float plantHeight = maxStage > 0 ? (0.2f + 0.75f * ((float) stage / maxStage)) : 0.5f;
-
         // 光照
         int combinedLight = te.getWorld().getCombinedLight(te.getPos().up(), 0);
         int sky = (combinedLight >> 16) & 0xFFFF;
         int block = combinedLight & 0xFFFF;
 
-        // UV
+        // 源端三种株型都是固定几何 + 整图 UV：阶段只决定用哪一帧，
+        // 不再按进度缩放高度或裁剪 UV（贴图本身已经画满整张图）。
         float u0 = sprite.getMinU();
         float u1 = sprite.getMaxU();
         float v0 = sprite.getMinV();
         float v1 = sprite.getMaxV();
-        // 根据植物高度裁剪UV顶部
-        float vCrop = v0 + (1.0f - plantHeight) * (v1 - v0);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
@@ -135,11 +130,11 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
         CropRenderType renderType = CropConfig.resolveRenderTypeOrDefault(type.getRenderType());
 
         if (renderType == CropRenderType.HASH) {
-            drawHash(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
+            drawHash(buf, u0, u1, v0, v1, sky, block);
         } else if (renderType == CropRenderType.FLOWER) {
-            drawFlower(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
+            drawFlower(buf, u0, u1, v0, v1, sky, block);
         } else {
-            drawCross(buf, plantHeight, u0, u1, vCrop, v1, sky, block);
+            drawCross(buf, u0, u1, v0, v1, sky, block);
         }
 
         tess.draw();
@@ -149,119 +144,204 @@ public class CropStickTESR extends TileEntitySpecialRenderer<TileCropStick> {
     }
 
     /**
-     * CROSS模式 - 两个45°对角面
+     * CROSS / X 模式 - 两个 45° 对角面。
+     *
+     * <p>几何逐字取自源端 {@code XPlantRenderer}：高 12/16，四角内缩 2/16，
+     * UV 用整张图，四个面各画正反两面。
      */
-    private void drawCross(BufferBuilder buf, float h,
+    private void drawCross(BufferBuilder buf,
                            float u0, float u1, float v0, float v1,
                            int sky, int block) {
-        // 面1: 从(0.15, 0, 0.15)到(0.85, h, 0.85)
-        quad(buf, 0.15f, 0, 0.15f, 0.85f, h, 0.85f, u0, u1, v0, v1, sky, block);
-        // 面1反面
-        quad(buf, 0.85f, 0, 0.85f, 0.15f, h, 0.15f, u0, u1, v0, v1, sky, block);
-        // 面2: 从(0.85, 0, 0.15)到(0.15, h, 0.85)
-        quad(buf, 0.85f, 0, 0.15f, 0.15f, h, 0.85f, u0, u1, v0, v1, sky, block);
-        // 面2反面
-        quad(buf, 0.15f, 0, 0.85f, 0.85f, h, 0.15f, u0, u1, v0, v1, sky, block);
+        final float lo = 2.0f / 16.0f;
+        final float hi = 14.0f / 16.0f;
+        final float h = 12.0f / 16.0f;
+
+        // plane 1 front
+        quadV(buf, lo, 0, lo, u1, v1,
+            lo, h, lo, u1, v0,
+            hi, h, hi, u0, v0,
+            hi, 0, hi, u0, v1, sky, block);
+        // plane 1 back
+        quadV(buf, hi, 0, hi, u1, v1,
+            hi, h, hi, u1, v0,
+            lo, h, lo, u0, v0,
+            lo, 0, lo, u0, v1, sky, block);
+        // plane 2 front
+        quadV(buf, lo, 0, hi, u0, v1,
+            hi, 0, lo, u1, v1,
+            hi, h, lo, u1, v0,
+            lo, h, hi, u0, v0, sky, block);
+        // plane 2 back
+        quadV(buf, hi, 0, lo, u0, v1,
+            lo, 0, hi, u1, v1,
+            lo, h, hi, u1, v0,
+            hi, h, lo, u0, v0, sky, block);
     }
 
     /**
-     * HASH模式 - 四个面沿方块四边排列
-     * 类似 #字型，从上方看:
+     * HASH 模式 - 四个面沿方块四边排列，整格高。
      *
-     *   ----  (北面, z=0.25)
-     *  |    |
-     *  |    | (西面x=0.25, 东面x=0.75)
-     *  |    |
-     *   ----  (南面, z=0.75)
+     * <p>几何逐字取自源端 {@code HashPlantRenderer}：面固定在 x=4/16、z=4/16、
+     * z=12/16、x=12/16，沿轴从 0 铺到 1，各自正反两面。
      */
-    private void drawHash(BufferBuilder buf, float h,
+    private void drawHash(BufferBuilder buf,
                           float u0, float u1, float v0, float v1,
                           int sky, int block) {
-        float inset = 0.25f;
-        float outer = 1.0f - inset;
+        final float in = 4.0f / 16.0f;
+        final float out = 12.0f / 16.0f;
+        final float h = 1.0f;
 
-        // 北面 (沿X轴, z=inset) 正反
-        quadFlat(buf, 0, 0, inset, 1, h, inset, u0, u1, v0, v1, sky, block, 'z');
-        quadFlat(buf, 1, 0, inset, 0, h, inset, u0, u1, v0, v1, sky, block, 'z');
-        // 南面 (沿X轴, z=outer) 正反
-        quadFlat(buf, 0, 0, outer, 1, h, outer, u0, u1, v0, v1, sky, block, 'z');
-        quadFlat(buf, 1, 0, outer, 0, h, outer, u0, u1, v0, v1, sky, block, 'z');
-        // 西面 (沿Z轴, x=inset) 正反
-        quadFlat(buf, inset, 0, 0, inset, h, 1, u0, u1, v0, v1, sky, block, 'x');
-        quadFlat(buf, inset, 0, 1, inset, h, 0, u0, u1, v0, v1, sky, block, 'x');
-        // 东面 (沿Z轴, x=outer) 正反
-        quadFlat(buf, outer, 0, 0, outer, h, 1, u0, u1, v0, v1, sky, block, 'x');
-        quadFlat(buf, outer, 0, 1, outer, h, 0, u0, u1, v0, v1, sky, block, 'x');
+        // plane 1 front / back（z = 4/16，沿 X 展开）
+        quadV(buf, 0, 0, in, u1, v1,
+            0, h, in, u1, v0,
+            1, h, in, u0, v0,
+            1, 0, in, u0, v1, sky, block);
+        quadV(buf, 0, 0, in, u1, v1,
+            1, 0, in, u0, v1,
+            1, h, in, u0, v0,
+            0, h, in, u1, v0, sky, block);
+        // plane 2 front / back（x = 4/16，沿 Z 展开）
+        quadV(buf, in, 0, 0, u0, v1,
+            in, 0, 1, u1, v1,
+            in, h, 1, u1, v0,
+            in, h, 0, u0, v0, sky, block);
+        quadV(buf, in, 0, 0, u0, v1,
+            in, h, 0, u0, v0,
+            in, h, 1, u1, v0,
+            in, 0, 1, u1, v1, sky, block);
+        // plane 3 front / back（z = 12/16，沿 X 展开）
+        quadV(buf, 0, 0, out, u0, v1,
+            1, 0, out, u1, v1,
+            1, h, out, u1, v0,
+            0, h, out, u0, v0, sky, block);
+        quadV(buf, 0, 0, out, u0, v1,
+            0, h, out, u0, v0,
+            1, h, out, u1, v0,
+            1, 0, out, u1, v1, sky, block);
+        // plane 4 front / back（x = 12/16，沿 Z 展开）
+        quadV(buf, out, 0, 1, u0, v1,
+            out, 0, 0, u1, v1,
+            out, h, 0, u1, v0,
+            out, h, 1, u0, v0, sky, block);
+        quadV(buf, out, 0, 1, u0, v1,
+            out, h, 1, u0, v0,
+            out, h, 0, u1, v0,
+            out, 0, 0, u1, v1, sky, block);
     }
 
     /**
-     * FLOWER模式 - 四个面沿方块中线排成 # 字，向四边各外扩 2/16。
+     * FLOWER 模式 - 花比作物架宽一圈，同一面用两段错位贴图拼出来。
      *
-     * <p>和 HASH 的区别在位置与尺寸：HASH 的面贴在离边 1/4 处、宽刚好 1 格；
-     * FLOWER 的面在 1/4 与 3/4 处，并且两端各出界 2/16，让花比作物架宽一圈。
-     * 布局取自源端的 FlowerPlantRenderer。
+     * <p>几何逐字取自源端 {@code FlowerPlantRenderer}：高 12/16，四个方向各两段
+     * （6..18 与 -2..10，单位 1/16），并用 0.002/16 的深度错位避免 z-fighting。
      */
-    private void drawFlower(BufferBuilder buf, float h,
+    private void drawFlower(BufferBuilder buf,
                             float u0, float u1, float v0, float v1,
                             int sky, int block) {
-        // 面沿轴展开时两端各出界 2/16
-        float out = -0.125f;
-        float far = 1.125f;
-        float near = 0.25f;
-        float away = 0.75f;
+        final float h = 12.0f / 16.0f;
 
-        // 南北两个面 (沿X轴展开, Z 固定在 1/4 与 3/4)
-        quadFlat(buf, out, 0, near, far, h, near, u0, u1, v0, v1, sky, block, 'z');
-        quadFlat(buf, far, 0, near, out, h, near, u0, u1, v0, v1, sky, block, 'z');
-        quadFlat(buf, out, 0, away, far, h, away, u0, u1, v0, v1, sky, block, 'z');
-        quadFlat(buf, far, 0, away, out, h, away, u0, u1, v0, v1, sky, block, 'z');
+        final float z4a = 4.001f / 16.0f;
+        final float z4b = 3.999f / 16.0f;
+        final float x4a = 3.999f / 16.0f;
+        final float x4b = 4.001f / 16.0f;
+        final float z12a = 11.999f / 16.0f;
+        final float z12b = 12.001f / 16.0f;
+        final float x12a = 11.999f / 16.0f;
+        final float x12b = 12.001f / 16.0f;
 
-        // 东西两个面 (沿Z轴展开, X 固定在 1/4 与 3/4)
-        quadFlat(buf, near, 0, out, near, h, far, u0, u1, v0, v1, sky, block, 'x');
-        quadFlat(buf, near, 0, far, near, h, out, u0, u1, v0, v1, sky, block, 'x');
-        quadFlat(buf, away, 0, out, away, h, far, u0, u1, v0, v1, sky, block, 'x');
-        quadFlat(buf, away, 0, far, away, h, out, u0, u1, v0, v1, sky, block, 'x');
+        final float left = -2.0f / 16.0f;
+        final float midStart = 6.0f / 16.0f;
+        final float midEnd = 10.0f / 16.0f;
+        final float right = 18.0f / 16.0f;
+
+        // plane 1 front / back（z ≈ 4/16）
+        quadV(buf, midStart, 0, z4a, u1, v1,
+            midStart, h, z4a, u1, v0,
+            right, h, z4a, u0, v0,
+            right, 0, z4a, u0, v1, sky, block);
+        quadV(buf, left, 0, z4b, u1, v1,
+            left, h, z4b, u1, v0,
+            midEnd, h, z4b, u0, v0,
+            midEnd, 0, z4b, u0, v1, sky, block);
+        quadV(buf, midStart, 0, z4a, u1, v1,
+            right, 0, z4a, u0, v1,
+            right, h, z4a, u0, v0,
+            midStart, h, z4a, u1, v0, sky, block);
+        quadV(buf, left, 0, z4b, u1, v1,
+            midEnd, 0, z4b, u0, v1,
+            midEnd, h, z4b, u0, v0,
+            left, h, z4b, u1, v0, sky, block);
+
+        // plane 2 front / back（x ≈ 4/16）
+        quadV(buf, x4a, 0, midStart, u0, v1,
+            x4a, 0, right, u1, v1,
+            x4a, h, right, u1, v0,
+            x4a, h, midStart, u0, v0, sky, block);
+        quadV(buf, x4b, 0, left, u0, v1,
+            x4b, 0, midEnd, u1, v1,
+            x4b, h, midEnd, u1, v0,
+            x4b, h, left, u0, v0, sky, block);
+        quadV(buf, x4a, 0, midStart, u0, v1,
+            x4a, h, midStart, u0, v0,
+            x4a, h, right, u1, v0,
+            x4a, 0, right, u1, v1, sky, block);
+        quadV(buf, x4b, 0, left, u0, v1,
+            x4b, h, left, u0, v0,
+            x4b, h, midEnd, u1, v0,
+            x4b, 0, midEnd, u1, v1, sky, block);
+
+        // plane 3 front / back（z ≈ 12/16）
+        quadV(buf, midStart, 0, z12a, u0, v1,
+            right, 0, z12a, u1, v1,
+            right, h, z12a, u1, v0,
+            midStart, h, z12a, u0, v0, sky, block);
+        quadV(buf, left, 0, z12b, u0, v1,
+            midEnd, 0, z12b, u1, v1,
+            midEnd, h, z12b, u1, v0,
+            left, h, z12b, u0, v0, sky, block);
+        quadV(buf, midStart, 0, z12a, u0, v1,
+            midStart, h, z12a, u0, v0,
+            right, h, z12a, u1, v0,
+            right, 0, z12a, u1, v1, sky, block);
+        quadV(buf, left, 0, z12b, u0, v1,
+            left, h, z12b, u0, v0,
+            midEnd, h, z12b, u1, v0,
+            midEnd, 0, z12b, u1, v1, sky, block);
+
+        // plane 4 front / back（x ≈ 12/16）
+        quadV(buf, x12a, 0, right, u0, v1,
+            x12a, 0, midStart, u1, v1,
+            x12a, h, midStart, u1, v0,
+            x12a, h, right, u0, v0, sky, block);
+        quadV(buf, x12b, 0, midEnd, u0, v1,
+            x12b, 0, left, u1, v1,
+            x12b, h, left, u1, v0,
+            x12b, h, midEnd, u0, v0, sky, block);
+        quadV(buf, x12a, 0, right, u0, v1,
+            x12a, h, right, u0, v0,
+            x12a, h, midStart, u1, v0,
+            x12a, 0, midStart, u1, v1, sky, block);
+        quadV(buf, x12b, 0, midEnd, u0, v1,
+            x12b, h, midEnd, u0, v0,
+            x12b, h, left, u1, v0,
+            x12b, 0, left, u1, v1, sky, block);
     }
 
-    /**
-     * 绘制一个对角四边形(CROSS用)
-     * 从(x0,y0,z0)底部到(x1,y1,z1)顶部
-     */
-    private void quad(BufferBuilder buf,
-                      float x0, float y0, float z0,
-                      float x1, float y1, float z1,
-                      float u0, float u1, float v0, float v1,
-                      int sky, int block) {
-        buf.pos(x0, y0, z0).tex(u0, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-        buf.pos(x0, y1, z0).tex(u0, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-        buf.pos(x1, y1, z1).tex(u1, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-        buf.pos(x1, y0, z1).tex(u1, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
+    /** 四个顶点各带自己的 UV——株型的正反面 UV 会镜像，不能共用同一组角。 */
+    private void quadV(BufferBuilder buf,
+                       float x0, float y0, float z0, float uA, float vA,
+                       float x1, float y1, float z1, float uB, float vB,
+                       float x2, float y2, float z2, float uC, float vC,
+                       float x3, float y3, float z3, float uD, float vD,
+                       int sky, int block) {
+        vertex(buf, x0, y0, z0, uA, vA, sky, block);
+        vertex(buf, x1, y1, z1, uB, vB, sky, block);
+        vertex(buf, x2, y2, z2, uC, vC, sky, block);
+        vertex(buf, x3, y3, z3, uD, vD, sky, block);
     }
 
-    /**
-     * 绘制一个平行于某轴的四边形(HASH用)
-     * axis='z': 面朝南北(沿X轴展开)
-     * axis='x': 面朝东西(沿Z轴展开)
-     */
-    private void quadFlat(BufferBuilder buf,
-                          float x0, float y0, float z0,
-                          float x1, float y1, float z1,
-                          float u0, float u1, float v0, float v1,
-                          int sky, int block, char axis) {
-        if (axis == 'z') {
-            // 沿X轴展开, Z固定
-            float z = z0;
-            buf.pos(x0, y0, z).tex(u0, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-            buf.pos(x0, y1, z).tex(u0, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-            buf.pos(x1, y1, z).tex(u1, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-            buf.pos(x1, y0, z).tex(u1, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-        } else {
-            // 沿Z轴展开, X固定
-            float x = x0;
-            buf.pos(x, y0, z0).tex(u0, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-            buf.pos(x, y1, z0).tex(u0, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-            buf.pos(x, y1, z1).tex(u1, v0).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-            buf.pos(x, y0, z1).tex(u1, v1).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
-        }
+    private void vertex(BufferBuilder buf, float x, float y, float z,
+                        float u, float v, int sky, int block) {
+        buf.pos(x, y, z).tex(u, v).lightmap(sky, block).color(255, 255, 255, 255).endVertex();
     }
 }

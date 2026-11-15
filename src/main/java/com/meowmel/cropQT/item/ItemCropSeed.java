@@ -8,6 +8,7 @@ import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.api.ISoilList;
 import com.meowmel.cropQT.api.SubSoilRequirement;
 import gregtech.api.GTValues;
+import gregtech.api.util.TextFormattingUtil;
 import gregtech.api.unification.material.info.MaterialIconType;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -119,57 +120,106 @@ public class ItemCropSeed extends Item {
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
         String cropId = getCropId(stack);
-        if (!cropId.isEmpty()) {
-            CropType type = CropRegistry.get(cropId);
-            if (type != null) {
-                return type.getDisplayName() + "种子";
-            }
-            return cropId + "种子";
+        if (cropId.isEmpty()) {
+            // 有 NBT 却没有作物 id：源端叫 unknown；完全没有 NBT 才是 empty。
+            return gregtech.api.util.LocalizationUtils.format(
+                    stack.hasTagCompound() ? "cropqt.seed.unknown" : "cropqt.seed.empty");
         }
-        return "空种子";
+        CropType type = CropRegistry.get(cropId);
+        if (type == null) {
+            return gregtech.api.util.LocalizationUtils.format("cropqt.seed.invalid");
+        }
+        return gregtech.api.util.LocalizationUtils.format(
+                "cropqt.seed.format", type.getDisplayName());
     }
 
+    /**
+     * 种子 tooltip —— 按 CropsNH {@code ItemGenericSeed#addInformation} 的顺序与文案：
+     * 三围 → tier → 土壤 → 不能杂交/不能蔓延 → 生长需求 → 种子床最低档。
+     *
+     * <p>未分析的种子只显示一句「Scan to view stats」；源端也是这样，分析之前不泄露三围。
+     * 数字统一走 {@link TextFormattingUtil#formatNumbers(Object)}，与源端
+     * {@code NumberFormatUtil.formatNumber} 的显示效果一致。
+     */
     @Override
     public void addInformation(@NotNull ItemStack stack, @Nullable World world,
                                @NotNull List<String> tooltip, @NotNull ITooltipFlag flag) {
-        String cropId = getCropId(stack);
-        if (cropId.isEmpty()) {
-            tooltip.add(TextFormatting.GRAY + "右键作物架进行种植");
-            tooltip.add(TextFormatting.GRAY + "或用原版种子直接右键作物架");
+        if (!stack.hasTagCompound()) {
             return;
         }
-
-        CropType type = CropRegistry.get(cropId);
-        if (type != null) {
-            tooltip.add(TextFormatting.GRAY + "Tier: " + type.getTier());
-
-            // 种植条件写在种子上，省得种下去才发现不对。
-            // 底土尤其要写：土壤不满足会当场拒绝种植并提示，底土不满足只是长得极慢，
-            // 不写清楚玩家根本不知道为什么这株不长。
-            tooltip.add(TextFormatting.GRAY + "土壤: " + TextFormatting.WHITE
-                    + describeSoil(type.getSoilTypes()));
-            tooltip.add(TextFormatting.GRAY + "底土: " + TextFormatting.WHITE
-                    + describeSubSoil(type.getSubSoilRequirement()));
-        }
-
         CropStats stats = getCropStats(stack);
-        tooltip.add("");
-        // 未分析的种子不显示三围——那正是「分析」这一步的意义，
-        // 而且扩繁/育种/提取都要求已分析，得在这里告诉玩家怎么处理
         if (!stats.isAnalyzed()) {
-            tooltip.add(TextFormatting.RED + "未分析");
-            tooltip.add(TextFormatting.GRAY + "拿作物分析仪潜行右键打开界面，把种子放进去分析");
-            tooltip.add(TextFormatting.GRAY + "也可以丢进格雷扫描仪");
-            tooltip.add(TextFormatting.DARK_GRAY + "未分析的种子不能扩繁、育种、提取");
+            tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                    "cropqt_tooltip.genericSeed.scanToViewStats"));
             return;
         }
-        tooltip.add(TextFormatting.RED + "Growth: " + stats.getGrowth() +
-                TextFormatting.GRAY + " (生长速度)");
-        tooltip.add(TextFormatting.YELLOW + "Gain: " + stats.getGain() +
-                TextFormatting.GRAY + " (产量)");
-        tooltip.add(TextFormatting.AQUA + "Resistance: " + stats.getResistance() +
-                TextFormatting.GRAY + " (抗性)");
 
+        tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                "cropqt_tooltip.genericSeed.growth", TextFormattingUtil.formatNumbers(stats.getGrowth())));
+        tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                "cropqt_tooltip.genericSeed.gain", TextFormattingUtil.formatNumbers(stats.getGain())));
+        tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                "cropqt_tooltip.genericSeed.resistance",
+                TextFormattingUtil.formatNumbers(stats.getResistance())));
+
+        String cropId = getCropId(stack);
+        CropType type = cropId.isEmpty() ? null : CropRegistry.get(cropId);
+        if (type == null) {
+            return;
+        }
+
+        tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                "cropqt_tooltip.genericSeed.tier", TextFormattingUtil.formatNumbers(type.getTier())));
+
+        // 土壤组 tooltip（源端 getSoilTypes().getUnlocalizedItemTooltip() 的等价物）
+        tooltip.add(soilTooltip(type.getSoilTypes()));
+
+        if (type.getBreedingThreshold() < 0.0f) {
+            tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                    "cropqt_tooltip.genericSeed.cannotBreedOnSticks"));
+        }
+        if (type.getCrossingThreshold() < 0.0f) {
+            tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                    "cropqt_tooltip.genericSeed.cannotSpreadToOtherSticks.0"));
+            tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                    "cropqt_tooltip.genericSeed.cannotSpreadToOtherSticks.1"));
+        }
+
+        // cropQT 没有源端那套 IGrowthRequirement 对象，生长门槛就是光照与湿度两项，
+        // 这里按同样的位置逐条列出。
+        tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                "cropqt_tooltip.genericSeed.light", describeRange(
+                        type.getLightCompare(), type.getLightRequirement(), type.getLightRequirementMax())));
+        tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                "cropqt_tooltip.genericSeed.humidity", describeRange(
+                        type.getHumidityCompare(), type.getWaterRequirement(), type.getWaterRequirementMax())));
+
+        if (type.getMinSeedBedTier() >= 0) {
+            int tier = type.getMinSeedBedTier();
+            String tierName = TextFormatting.AQUA + GTValues.VN[tier] + TextFormatting.RESET;
+            tooltip.add(gregtech.api.util.LocalizationUtils.format(
+                    "cropqt_tooltip.genericSeed.minSeedBedTier", tierName));
+        }
+    }
+
+    /** 土壤组 tooltip；{@code null} 表示不限土壤。 */
+    private static String soilTooltip(@Nullable ISoilList soil) {
+        String key = soil == null ? "cropqt.soil.global.tooltip" : "cropqt.soil." + soil.getName() + ".tooltip";
+        String text = gregtech.api.util.LocalizationUtils.format(key);
+        return text.startsWith("cropqt.soil.") ? describeSoil(soil) : text;
+    }
+
+    /** 光照/湿度门槛的区间文字：{@code 9+} / {@code ≤9} / {@code 3..9}。 */
+    private static String describeRange(com.meowmel.cropQT.api.CompareMode mode, float min, float max) {
+        switch (mode) {
+            case LESS:
+                return TextFormattingUtil.formatNumbers(min) + "-";
+            case RANGE:
+                return TextFormattingUtil.formatNumbers(min) + ".." + TextFormattingUtil.formatNumbers(max);
+            case GREATER:
+            default:
+                return TextFormattingUtil.formatNumbers(min) + "+";
+        }
     }
 
     /**
@@ -213,14 +263,23 @@ public class ItemCropSeed extends Item {
 
     // ==================== 种子袋染色 ====================
 
-    /** 根据种子袋内的作物类型，对双层白模贴图上色 */
+    /**
+     * 根据种子袋内的作物类型，对双层白模贴图上色。
+     *
+     * <p>源端 {@code ItemGenericSeed} 是双 pass：第 0 层染 {@code color1}（作物主色），
+     * 第 1 层染 {@code color2}（几乎都是白色，用来留高光）。这里用 tintIndex 还原：
+     * 只有第 0 层跟着 {@code seedColor} 走，其余层保持原色不染。
+     */
     public static class SeedColorHandler implements net.minecraft.client.renderer.color.IItemColor {
         @Override
         public int colorMultiplier(ItemStack stack, int tintIndex) {
+            if (tintIndex != 0) {
+                return 0xFFFFFF; // 高光层不着色
+            }
             String cropId = getCropId(stack);
             if (!cropId.isEmpty()) {
                 CropType type = CropRegistry.get(cropId);
-                if (type != null && type.getSeedColor() != 0xFFFFFF) {
+                if (type != null) {
                     return type.getSeedColor();
                 }
             }
@@ -238,7 +297,7 @@ public class ItemCropSeed extends Item {
      * 颜色由 {@link SeedColorHandler} 染成材料色；没设就用默认的 {@code drtech:crop_seed}。
      *
      * <p><b>seedIcon 指向的模型必须已经注册成变体</b>，见
-     * {@code ItemsInit.registerItemModels()} —— 那 8 个种子材质没有对应的矿物前缀，
+     * {@code ItemsInit.registerItemModels()} —— 那 9 个种子材质没有对应的矿物前缀，
      * GT 不会替我们注册。
      */
     public static class SeedMeshDefinition implements ItemMeshDefinition {

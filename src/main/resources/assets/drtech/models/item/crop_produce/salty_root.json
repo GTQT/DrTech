@@ -1,0 +1,7 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "drtech:items/blank",
+        "layer1": "drtech:items/metaitems/crops/salty_root"
+    }
+}

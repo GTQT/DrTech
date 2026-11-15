@@ -37,17 +37,17 @@ import gregtech.api.recipes.builders.SimpleRecipeBuilder;
  */
 public final class CropRecipeMaps {
 
-    /** 种子生成器：1 进 1 出 + 1 个肥料罐。 */
+    /** 种子生成器：2 进 1 出 + 1 个肥料罐（种子 + 可选催化剂）。 */
     public static final RecipeMap<SimpleRecipeBuilder> SEED_GENERATOR = build(
-            "crop_seed_generator", 1, 1, 1, 0);
+            "crop_seed_generator", 2, 1, 1, 0);
 
     /** 育种机：最多 6 个亲本槽（低档只用前 3 个）+ 1 个输出 + 1 个液肥罐。 */
     public static final RecipeMap<SimpleRecipeBuilder> CROP_BREEDER = build(
             "crop_breeder", 6, 1, 1, 0);
 
-    /** 基因提取机：1 进 1 出，没有罐。 */
+    /** 基因提取机：种子 + 数据球 + 电路，1 出，没有罐。 */
     public static final RecipeMap<SimpleRecipeBuilder> GENE_EXTRACTOR = build(
-            "gene_extractor", 1, 1, 0, 0);
+            "gene_extractor", 3, 1, 0, 0);
 
     /** 作物合成器：4 个基因球槽 + 1 个输出 + 1 个 UUM 罐。 */
     public static final RecipeMap<SimpleRecipeBuilder> CROP_SYNTHESIZER = build(

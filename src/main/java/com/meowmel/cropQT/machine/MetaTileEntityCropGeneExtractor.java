@@ -1,6 +1,6 @@
 package com.meowmel.cropQT.machine;
 
-import codechicken.lib.raytracer.CuboidRayTraceResult;
+import com.meowmel.cropQT.api.CropTooltips;
 import com.drppp.drtech.client.Textures;
 import com.meowmel.cropQT.api.capability.impl.CropGeneExtractorRecipeLogic;
 import com.meowmel.cropQT.api.recipes.CropRecipeMaps;
@@ -9,13 +9,10 @@ import gregtech.api.capability.impl.NotifiableItemStackHandler;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.recipes.RecipeMap;
+import gregtech.common.items.MetaItems;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +23,8 @@ import java.util.List;
 /**
  * 基因提取器：把一颗已分析的种子拆成 4 个基因球之一。
  *
- * <p>一次只提取一样——用<b>潜行 + 螺丝刀</b>切换要抽的是物种还是某一项属性。
- * 源端用「电路槽选 1~4」，这里换成螺丝刀：这 4 台机器都不走 RecipeMap 的配方逻辑，
- * 为它单独接一套幽灵电路不划算；而 CEU 的标准面板里也没有塞按钮的地方。
- * 普通螺丝刀（不潜行）保留基类行为：切「允许从输出面输入」。
+ * <p>抽哪一项由<b>第二个输入槽的编程电路</b>决定（1 物种 / 2 生长 / 3 产量 / 4 抗性），
+ * 与源端 {@code MTECropGeneExtractor} 一致；第三个槽放空数据球，抽完消耗。
  *
  * <p>这里是机器的「壳」—— 槽位、tooltip。界面由 CEU 照
  * {@link CropRecipeMaps#GENE_EXTRACTOR} 自动生成，干活逻辑全在
@@ -37,7 +32,13 @@ import java.util.List;
  */
 public class MetaTileEntityCropGeneExtractor extends MetaTileEntityCropMachine {
 
+    /** 输入槽 0：待提取的已分析种子。 */
     public static final int SLOT_INPUT = 0;
+    /** 输入槽 1：空数据球，成功后被消耗。 */
+    public static final int SLOT_DATA_ORB = 1;
+    /** 输入槽 2：编程电路 1..4，选择抽取项。 */
+    public static final int SLOT_CIRCUIT = 2;
+    /** 输出槽 0：带内容的基因球。 */
     public static final int SLOT_OUTPUT = 0;
 
     public MetaTileEntityCropGeneExtractor(ResourceLocation metaTileEntityId, int tier) {
@@ -54,44 +55,48 @@ public class MetaTileEntityCropGeneExtractor extends MetaTileEntityCropMachine {
         return new MetaTileEntityCropGeneExtractor(metaTileEntityId, getTier());
     }
 
-    /** 本机的逻辑，带完整类型。 */
-    private CropGeneExtractorRecipeLogic logic() {
-        return (CropGeneExtractorRecipeLogic) workable;
-    }
-
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, @NotNull List<String> tooltip, boolean advanced) {
         super.addInformation(stack, world, tooltip, advanced);
-        tooltip.add(I18n.format("drtech.machine.gene_extractor.tooltip.1"));
-        tooltip.add(I18n.format("drtech.machine.gene_extractor.tooltip.2"));
-        tooltip.add(I18n.format("drtech.machine.gene_extractor.tooltip.3"));
-        tooltip.add(I18n.format("drtech.machine.gene_extractor.tooltip.4"));
-        tooltip.add(I18n.format("drtech.machine.gene_extractor.tooltip.5"));
-        tooltip.add(I18n.format("drtech.machine.gene_extractor.tooltip.6"));
-        tooltip.add(I18n.format("drtech.machine.gene_extractor.tooltip.7"));
+        tooltip.add(CropTooltips.machineType(getTooltipKey()));
+        tooltip.add(I18n.format("drtech_tooltip.cropGeneExtractor.0"));
+        tooltip.add(I18n.format("drtech_tooltip.cropGeneExtractor.1"));
+        tooltip.add(I18n.format("drtech_tooltip.cropGeneExtractor.2"));
     }
 
     @Override
-    public boolean onScrewdriverClick(EntityPlayer player, EnumHand hand, EnumFacing facing,
-                                      CuboidRayTraceResult hitResult) {
-        if (player.isSneaking() && !player.getEntityWorld().isRemote) {
-            CropGeneExtractorRecipeLogic logic = logic();
-            logic.cycleMode();
-            player.sendStatusMessage(new TextComponentTranslation(logic.currentModeNameKey()), true);
-            return true;
-        }
-        return super.onScrewdriverClick(player, hand, facing, hitResult);
+    protected String getTooltipKey() {
+        return "cropGeneExtractor";
     }
 
     // ==================== 槽位 ====================
 
     @Override
     protected @NotNull IItemHandlerModifiable createImportItemHandler() {
-        // 只收「已分析」的种子
-        return new NotifiableItemStackHandler(this, 1, this, false) {
+        return new NotifiableItemStackHandler(this, 3, this, false) {
             @Override
             public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-                return !ItemCropSeed.getCropId(stack).isEmpty() && ItemCropSeed.getCropStats(stack).isAnalyzed();
+                if (stack.isEmpty()) {
+                    return false;
+                }
+                switch (slot) {
+                    case SLOT_INPUT:
+                        // 只收「已分析」的种子
+                        return !ItemCropSeed.getCropId(stack).isEmpty()
+                                && ItemCropSeed.getCropStats(stack).isAnalyzed();
+                    case SLOT_DATA_ORB:
+                        // 空数据球，或本系统的基因球（可覆写）
+                        return MetaItems.TOOL_DATA_ORB.isItemEqual(stack);
+                    case SLOT_CIRCUIT:
+                        return MetaItems.INTEGRATED_CIRCUIT.isItemEqual(stack);
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slot == SLOT_CIRCUIT ? 1 : super.getSlotLimit(slot);
             }
         };
     }
@@ -99,5 +104,11 @@ public class MetaTileEntityCropGeneExtractor extends MetaTileEntityCropMachine {
     @Override
     protected @NotNull IItemHandlerModifiable createExportItemHandler() {
         return new NotifiableItemStackHandler(this, 1, this, true);
+    }
+
+    /** 本机用实体电路槽选模式，不需要 CEU 的幽灵电路槽。 */
+    @Override
+    public boolean hasGhostCircuitInventory() {
+        return false;
     }
 }
