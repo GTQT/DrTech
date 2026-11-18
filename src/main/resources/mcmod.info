@@ -11,8 +11,8 @@
     "dependencies": []
 },
 {
-    "modid": "futuremc",
-    "name": "Future MC",
+    "modid": "drtechfuturemc",
+    "name": "DrTech Future MC",
     "description": "Backports selected vanilla features introduced after Minecraft 1.12.2.",
     "version": "1.0.0",
     "mcversion": "1.12.2",

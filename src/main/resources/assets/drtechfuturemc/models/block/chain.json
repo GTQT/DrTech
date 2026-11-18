@@ -1,0 +1,6 @@
+{
+  "parent": "drtechfuturemc:block/template_chain",
+  "textures": {
+    "texture": "drtechfuturemc:blocks/chain"
+  }
+}

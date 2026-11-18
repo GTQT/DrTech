@@ -1,0 +1,7 @@
+{
+  "parent": "drtechfuturemc:block/template_hanging_lantern",
+  "textures": {
+    "lantern": "drtechfuturemc:blocks/soul_lantern"
+  }
+}
+

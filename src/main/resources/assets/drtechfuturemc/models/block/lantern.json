@@ -1,0 +1,6 @@
+{
+  "parent": "drtechfuturemc:block/template_lantern",
+  "textures": {
+    "lantern": "drtechfuturemc:blocks/lantern"
+  }
+}

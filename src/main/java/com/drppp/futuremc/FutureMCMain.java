@@ -42,7 +42,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 @Mod(modid = FutureMCMain.MODID, name = "Future MC", version = "1.0.0", acceptedMinecraftVersions = "[1.12.2]")
 @Mod.EventBusSubscriber(modid = FutureMCMain.MODID)
 public final class FutureMCMain {
-    public static final String MODID = "futuremc";
+    public static final String MODID = "drtechfuturemc";
     public static final CreativeTabs TAB = new FutureMCCreativeTabs();
     @Mod.Instance(MODID)
     public static FutureMCMain instance;

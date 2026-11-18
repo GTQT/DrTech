@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down": { "model": "drtechfuturemc:amethyst_cluster", "x": 180 },
+    "facing=east": { "model": "drtechfuturemc:amethyst_cluster", "x": 90, "y": 90 },
+    "facing=north": { "model": "drtechfuturemc:amethyst_cluster", "x": 90 },
+    "facing=south": { "model": "drtechfuturemc:amethyst_cluster", "x": 90, "y": 180 },
+    "facing=up": { "model": "drtechfuturemc:amethyst_cluster" },
+    "facing=west": { "model": "drtechfuturemc:amethyst_cluster", "x": 90, "y": 270 }
+  }
+}

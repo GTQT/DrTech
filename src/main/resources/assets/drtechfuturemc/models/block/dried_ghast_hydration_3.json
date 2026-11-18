@@ -1,0 +1,13 @@
+{
+  "parent": "drtechfuturemc:block/dried_ghast",
+  "textures": {
+    "bottom": "drtechfuturemc:blocks/dried_ghast_hydration_3_bottom",
+    "east": "drtechfuturemc:blocks/dried_ghast_hydration_3_east",
+    "north": "drtechfuturemc:blocks/dried_ghast_hydration_3_north",
+    "particle": "drtechfuturemc:blocks/dried_ghast_hydration_3_north",
+    "south": "drtechfuturemc:blocks/dried_ghast_hydration_3_south",
+    "tentacles": "drtechfuturemc:blocks/dried_ghast_hydration_3_tentacles",
+    "top": "drtechfuturemc:blocks/dried_ghast_hydration_3_top",
+    "west": "drtechfuturemc:blocks/dried_ghast_hydration_3_west"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents1"
+      },
+      "when": {
+        "level": "1"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents2"
+      },
+      "when": {
+        "level": "2"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents3"
+      },
+      "when": {
+        "level": "3"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents4"
+      },
+      "when": {
+        "level": "4"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents5"
+      },
+      "when": {
+        "level": "5"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents6"
+      },
+      "when": {
+        "level": "6"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents7"
+      },
+      "when": {
+        "level": "7"
+      }
+    },
+    {
+      "apply": {
+        "model": "drtechfuturemc:composter_contents_ready"
+      },
+      "when": {
+        "level": "8"
+      }
+    }
+  ]
+}

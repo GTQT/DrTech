@@ -1,0 +1,6 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "drtechfuturemc:blocks/amethyst_cluster"
+  }
+}
