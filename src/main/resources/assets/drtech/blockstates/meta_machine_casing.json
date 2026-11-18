@@ -25,11 +25,6 @@
           "all": "drtech:blocks/aseptic_machine_casing"
         }
       },
-      "tfft_casing": {
-        "textures": {
-          "all": "drtech:blocks/tfft_casing"
-        }
-      },
       "solar_tower_casing": {
         "textures": {
           "all": "drtech:blocks/solar_tower_casing"

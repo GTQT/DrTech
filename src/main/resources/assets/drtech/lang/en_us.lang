@@ -120,16 +120,6 @@ metaitem.inulin.name=Inulin
 metaitem.natural_rubber.name=Natural Rubber Ball
 
 ##  Fluid Cores
-metaitem.fluid_core.t1.name=Fluid Storage Core T1
-metaitem.fluid_core.t2.name=Fluid Storage Core T2
-metaitem.fluid_core.t3.name=Fluid Storage Core T3
-metaitem.fluid_core.t4.name=Fluid Storage Core T4
-metaitem.fluid_core.t5.name=Fluid Storage Core T5
-metaitem.fluid_core.t6.name=Fluid Storage Core T6
-metaitem.fluid_core.t7.name=Fluid Storage Core T7
-metaitem.fluid_core.t8.name=Fluid Storage Core T8
-metaitem.fluid_core.t9.name=Fluid Storage Core T9
-metaitem.fluid_core.t10.name=Fluid Storage Core T10
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=Titanium-Reinforced Borosilicate Glass Block
 tile.glasses_casing.w_boron_silicate_glass_block.name=Tungsten-Reinforced Borosilicate Glass Block
@@ -166,7 +156,6 @@ tile.Meta_Machine_Casing.resonator_casing.name=Resonator Cavity
 tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=High Voltage Capacitor Block Casing
 tile.Meta_Machine_Casing.element_constrains_machine_casing.name=Element Constraint Mechanical Casing
 tile.Meta_Machine_Casing.aseptic_machine_casing.name=Aseptic Farm Mechanical Casing
-tile.Meta_Machine_Casing.tfft_casing.name=TFFT Mechanical Casing
 tile.Meta_Machine_Casing.solar_tower_casing.name=Solar Thermal Tower Mechanical Casing
 tile.Meta_Machine_Casing.salt_inhibition_casing.name=Salt Inhibition Mechanical Casing
 tile.Meta_Machine_Casing.heat_inhibition_casing.name=Heat Inhibition Mechanical Casing
@@ -179,17 +168,6 @@ tile.Meta_Machine_Casing.cable_press_casing.name=Wire Rolling Mill Mechanical Ca
 tile.Meta_Machine_Casing.sieve_net_casing.name=Sieve Mesh Block
 tile.Meta_Machine_Casing.sieve_casing.name=Screening Mechanical Casing
 tile.Meta_Machine_Casing.centrifuge_casing.name=Centrifuge Mechanical Casing
-#TFFT_TANK
-tile.tfft_part.tfft_part_tier_t1.name=Fluid Unit Block (T1)
-tile.tfft_part.tfft_part_tier_t2.name=Fluid Unit Block (T2)
-tile.tfft_part.tfft_part_tier_t3.name=Fluid Unit Block (T3)
-tile.tfft_part.tfft_part_tier_t4.name=Fluid Unit Block (T4)
-tile.tfft_part.tfft_part_tier_t5.name=Fluid Unit Block (T5)
-tile.tfft_part.tfft_part_tier_t6.name=Fluid Unit Block (T6)
-tile.tfft_part.tfft_part_tier_t7.name=Fluid Unit Block (T7)
-tile.tfft_part.tfft_part_tier_t8.name=Fluid Unit Block (T8)
-tile.tfft_part.tfft_part_tier_t9.name=Fluid Unit Block (T9)
-tile.tfft_part.tfft_part_tier_t10.name=Fluid Unit Block (T10)
 #Machine
 drtech.machine.annihilation_generator.name=Annihilation Generator
 drtech.machine.advanced_fusion_reactor.name=Advanced Fusion Reactor
@@ -201,7 +179,6 @@ drtech.machine.log_factory.name=Log Synthesis Plant
 drtech.machine.molecular_recombination.name=Large Molecular Recombiner
 drtech.machine.mob_killer.name=怪物模拟仓
 drtech.machine.deep_ground_pump.name=Deep Geothermal Pump
-drtech.machine.tfft_tank.name=T.F.F.T Tank
 drtech.machine.trans_tower.name=Energy Transmission Tower
 drtech.machine.solar_tower.name=Solar Thermal Tower
 drtech.machine.nuclear_generator.name=Fission Reactor
@@ -284,20 +261,13 @@ drtech.machine.logcreate.tip.2=闂?Saw = 1x  Circular Saw = 2x  Chainsaw = 4x
 drtech.machine.logcreate.tip.3=闂?Fixed operation time: 5 seconds
 drtech.machine.recombination.tip.1=闂?Parallel = 2 * voltage tier
 drtech.machine.recombination.tip.2=闂?Molecular transformation!
-drtech.multiblock.tfft_tank.fluid_capacity=§c流体缓存：§r%s L
 drtech.multiblock.lbh.changep=Switch work type
 drtech.multiblock.lbh.changew=Switch work mode
 metaitem.pipe_1.tooltip.1=Pipe length: 1
 metaitem.pipe_5.tooltip.1=Pipe length: 5
 metaitem.pipe_10.tooltip.1=Pipe length: 10
 drtech.deep_ground_pump.deep=Current depth: %s
-gtqt.multiblock.tfft_tank.fluid_type=%s Fluid type: %s Storage: %s
-gtqt.multiblock.tfft.computation=Fill: %s
 gtqt.multiblock.power_substation.stored=Capacity: %s
-gtqtcore.multiblock.tfft.threshold_decrement=Move fluid backward
-gtqtcore.multiblock.tfft.threshold_increment=Move fluid forward
-gtqtcore.multiblock.tfft.clearfluid=Clear current fluid
-gtqtcore.multiblock.tfft.isoutput=Toggle output state
 drtech.multiblock.power_substation.output=Fluid output state: %s
 drtech.multiblock.power_substation.eut=Power consumption: %s EU/t
 drtech.universal.tooltip.energy_eut=闂佸綊妫跨粩顤沶it power: 闂佸綊妫块幏?d EU/t

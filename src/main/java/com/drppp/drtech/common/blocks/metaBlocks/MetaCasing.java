@@ -38,7 +38,6 @@ public class MetaCasing extends VariantBlock<MetaCasing.MetalCasingType> {
         GRAVITATION_FIELD_CASING("gravitation_field_casing"),
         NEUTRON_MACHINE_CASING("neutron_mechanical_casing"),
         ASEPTIC_MACHINE_CASING("aseptic_machine_casing"),
-        TFFT_CASING("tfft_casing"),
         HEAT_CUT_OFF_CASING("heat_cut_off_casing"),
         SOLAR_TOWER_CASING("solar_tower_casing"),
         SALT_INHIBITION_CASING("salt_inhibition_casing"),

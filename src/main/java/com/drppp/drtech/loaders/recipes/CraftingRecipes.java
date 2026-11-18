@@ -329,16 +329,6 @@ public class CraftingRecipes {
                 'H', gregtech.common.metatileentities.MetaTileEntities.HULL[gregtech.api.GTValues.HV].getStackForm(),
                 'W', new UnificationEntry(wireFine, RedAlloy));
 
-        ModHandler.addShapedRecipe("tfft_tank", DrTechMetaTileEntities.TFFT.getStackForm(),
-                "WAW", "EFE", "MBM",
-                'W', new UnificationEntry(OrePrefix.screw, Materials.TungstenSteel),
-                'E', new UnificationEntry(circuit, MarkerMaterials.Tier.EV),
-                'F', new ItemStack(BlocksInit.COMMON_CASING, 1, 4),
-                'M', MetaItems.FIELD_GENERATOR_LV,
-                'A', new UnificationEntry(OrePrefix.plate, Materials.Polytetrafluoroethylene),
-                'B', new UnificationEntry(OrePrefix.rotor, Materials.StainlessSteel)
-        );
-
         ModHandler.addShapedRecipe("mob_killer", DrTechMetaTileEntities.MOB_KILLER.getStackForm(),
                 "WAW", "AFA", "SSS",
                 'W', MetaItems.ROBOT_ARM_HV,

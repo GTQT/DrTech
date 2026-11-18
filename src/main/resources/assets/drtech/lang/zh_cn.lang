@@ -1274,16 +1274,6 @@ metaitem.inulin.name=菊粉
 metaitem.natural_rubber.name=天然橡胶团
 
 ##  Fluid Cores
-metaitem.fluid_core.t1.name=流体存储核心 T1
-metaitem.fluid_core.t2.name=流体存储核心 T2
-metaitem.fluid_core.t3.name=流体存储核心 T3
-metaitem.fluid_core.t4.name=流体存储核心 T4
-metaitem.fluid_core.t5.name=流体存储核心 T5
-metaitem.fluid_core.t6.name=流体存储核心 T6
-metaitem.fluid_core.t7.name=流体存储核心 T7
-metaitem.fluid_core.t8.name=流体存储核心 T8
-metaitem.fluid_core.t9.name=流体存储核心 T9
-metaitem.fluid_core.t10.name=流体存储核心 T10
 #Blocks
 tile.glasses_casing.ti_boron_silicate_glass_block.name=钛强化硅酸盐硼玻璃
 tile.glasses_casing.w_boron_silicate_glass_block.name=钨强化硅酸盐硼玻璃
@@ -1320,7 +1310,6 @@ tile.Meta_Machine_Casing.resonator_casing.name=谐振腔
 tile.Meta_Machine_Casing.high_voltage_capacitor_block_casing.name=高压流电容方块
 tile.Meta_Machine_Casing.element_constrains_machine_casing.name=元素约束机械方块
 tile.Meta_Machine_Casing.aseptic_machine_casing.name=无菌农场机械方块
-tile.Meta_Machine_Casing.tfft_casing.name=TFFT机械方块
 tile.Meta_Machine_Casing.solar_tower_casing.name=太阳能热塔机械方块
 tile.Meta_Machine_Casing.salt_inhibition_casing.name=盐抑制机械方块
 tile.Meta_Machine_Casing.heat_inhibition_casing.name=热抑制机械方块
@@ -1333,17 +1322,6 @@ tile.Meta_Machine_Casing.cable_press_casing.name=线材轧机机械方块
 tile.Meta_Machine_Casing.sieve_net_casing.name=筛网方块
 tile.Meta_Machine_Casing.sieve_casing.name=筛选机械方块
 tile.Meta_Machine_Casing.centrifuge_casing.name=离心机械方块
-#TFFT_TANK
-tile.tfft_part.tfft_part_tier_t1.name=流体单元方块(T1)
-tile.tfft_part.tfft_part_tier_t2.name=流体单元方块(T2)
-tile.tfft_part.tfft_part_tier_t3.name=流体单元方块(T3)
-tile.tfft_part.tfft_part_tier_t4.name=流体单元方块(T4)
-tile.tfft_part.tfft_part_tier_t5.name=流体单元方块(T5)
-tile.tfft_part.tfft_part_tier_t6.name=流体单元方块(T6)
-tile.tfft_part.tfft_part_tier_t7.name=流体单元方块(T7)
-tile.tfft_part.tfft_part_tier_t8.name=流体单元方块(T8)
-tile.tfft_part.tfft_part_tier_t9.name=流体单元方块(T9)
-tile.tfft_part.tfft_part_tier_t10.name=流体单元方块(T10)
 
 #Machine
 drtech.machine.annihilation_generator.name=湮灭发电机
@@ -1356,7 +1334,6 @@ drtech.machine.log_factory.name=原木拟生厂
 drtech.machine.molecular_recombination.name=大型分子重组仪
 drtech.machine.mob_killer.name=怪物模拟仓
 drtech.machine.deep_ground_pump.name=深热地泵
-drtech.machine.tfft_tank.name=T.F.F.T储罐
 drtech.machine.trans_tower.name=能量输送塔
 drtech.machine.solar_tower.name=太阳能集热塔
 drtech.machine.nuclear_generator.name=裂变反应堆
@@ -1439,20 +1416,13 @@ drtech.machine.logcreate.tip.2=§3锯 = 1x  圆锯 = 2x  链锯 = 4x
 drtech.machine.logcreate.tip.3=§3工作速度固定为5秒
 drtech.machine.recombination.tip.1=§3并行=2*电压等级
 drtech.machine.recombination.tip.2=§3分子之间的转换！
-drtech.multiblock.tfft_tank.fluid_capacity=§c流体缓存：§r%s L
 drtech.multiblock.lbh.changep=切换工作类型
 drtech.multiblock.lbh.changew=切换工作方式
 metaitem.pipe_1.tooltip.1=管道长度:1
 metaitem.pipe_5.tooltip.1=管道长度:5
 metaitem.pipe_10.tooltip.1=管道长度:10
 drtech.deep_ground_pump.deep=当前深度:%s
-gtqt.multiblock.tfft_tank.fluid_type=%s 流体类型:%s 存储：%s
-gtqt.multiblock.tfft.computation=填充：%s
 gtqt.multiblock.power_substation.stored=容量：%s
-gtqtcore.multiblock.tfft.threshold_decrement=流体向后一
-gtqtcore.multiblock.tfft.threshold_increment=流体向前一
-gtqtcore.multiblock.tfft.clearfluid=清空当前流体
-gtqtcore.multiblock.tfft.isoutput=输出状态切换
 drtech.multiblock.power_substation.output=流体输出状态:%s
 drtech.multiblock.power_substation.eut=耗电量:§3%s EU/T
 drtech.universal.tooltip.energy_eut=§c单元耗电：§r%d EU/T

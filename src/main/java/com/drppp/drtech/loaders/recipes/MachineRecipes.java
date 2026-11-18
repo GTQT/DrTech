@@ -163,17 +163,6 @@ public class MachineRecipes {
                 .buildAndRegister();
 
         ASSEMBLER_RECIPES.recipeBuilder()
-                .input(OrePrefix.frameGt, Steel)
-                .input(OrePrefix.plate, EnderPearl, 4)
-                .input(OrePrefix.plate, Steel, 4)
-                .circuitMeta(6)
-                .fluidInputs(Polytetrafluoroethylene.getFluid(144))
-                .outputs(new ItemStack(BlocksInit.COMMON_CASING, 1, 4))
-                .EUt(480)
-                .duration(100)
-                .buildAndRegister();
-
-        ASSEMBLER_RECIPES.recipeBuilder()
                 .input(Blocks.GOLD_BLOCK, 64)
                 .output(DrMetaItems.GOLD_COIN)
                 .EUt(16)

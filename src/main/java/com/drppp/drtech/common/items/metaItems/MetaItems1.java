@@ -357,20 +357,6 @@ public class MetaItems1 extends StandardMetaItem {
         DrMetaItems.SNAPDRAGON = this.addItem(71, "snapdragon");
         DrMetaItems.LUCKY_CLOVER = this.addItem(72, "lucky_clover");
 
-        /* --------------------------------------------------------------------- Fluid Cores ---------------------------------------------------------------------- */
-
-
-        DrMetaItems.FLUID_CORE_T1 = this.addItem(100, "fluid_core.t1");
-        DrMetaItems.FLUID_CORE_T2 = this.addItem(101, "fluid_core.t2");
-        DrMetaItems.FLUID_CORE_T3 = this.addItem(102, "fluid_core.t3");
-        DrMetaItems.FLUID_CORE_T4 = this.addItem(103, "fluid_core.t4");
-        DrMetaItems.FLUID_CORE_T5 = this.addItem(104, "fluid_core.t5");
-        DrMetaItems.FLUID_CORE_T6 = this.addItem(105, "fluid_core.t6");
-        DrMetaItems.FLUID_CORE_T7 = this.addItem(106, "fluid_core.t7");
-        DrMetaItems.FLUID_CORE_T8 = this.addItem(107, "fluid_core.t8");
-        DrMetaItems.FLUID_CORE_T9 = this.addItem(108, "fluid_core.t9");
-        DrMetaItems.FLUID_CORE_T10 = this.addItem(109, "fluid_core.t10");
-
         DrMetaItems.FUSION_FIRST_WALL_PLATE = this.addItem(120, "fusion_first_wall_plate").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
         DrMetaItems.FUSION_MAGNET_COIL = this.addItem(121, "fusion_magnet_coil").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);
         DrMetaItems.FUSION_COOLING_CHANNEL = this.addItem(122, "fusion_cooling_channel").setCreativeTabs(DrTechMain.DrTechTab).setMaxStackSize(64);

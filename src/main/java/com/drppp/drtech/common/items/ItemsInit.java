@@ -107,7 +107,6 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING2, VariantItemBlock::new));
         event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING3, VariantItemBlock::new));
-        event.getRegistry().register(createItemBlock(BlocksInit.TFFT_TANK, VariantItemBlock::new));
         event.getRegistry().register(CROP_SEED);
         event.getRegistry().register(ENVIRONMENTAL_MODULE);
         event.getRegistry().register(ITEM_XP_BERRY);
@@ -146,7 +145,6 @@ public class ItemsInit {
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING);
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING2);
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING3);
-        registerItemModel(BlocksInit.TFFT_TANK);
         registerItemModel(BlocksInit.SEED_BED);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
         ModelLoader.setCustomMeshDefinition(CROP_SEED, new ItemCropSeed.SeedMeshDefinition());
