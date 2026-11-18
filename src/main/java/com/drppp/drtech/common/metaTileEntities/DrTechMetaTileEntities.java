@@ -15,9 +15,6 @@ import com.drppp.drtech.common.metaTileEntities.muti.electric.generator.Annihila
 import com.drppp.drtech.common.metaTileEntities.muti.electric.generator.MetaTileEntityLargeLightningRod;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.standard.*;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityEnergyTransTower;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityYotTank;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetatileEntityTwentyFiveFluidTank;
-import com.drppp.drtech.common.metaTileEntities.muti.mutipart.MetaTileEntityYotHatch;
 import com.drppp.drtech.common.metaTileEntities.single.EnergySink;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityArmorWorkbench;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityIndustrialApiary;
@@ -59,10 +56,7 @@ public class DrTechMetaTileEntities {
     public static MetaTileEntutyLargeBeeHive LARGE_BEE_HIVE;
     public static MetaTileEntityExtremeExterminationChamber MOB_KILLER;
     public static MetaTileEntitySolarTower SOLAR_TOWER;
-    public static MetatileEntityTwentyFiveFluidTank TFFT;
     public static MetaTileEntityEnergyTransTower TRANS_TOWER;
-    public static MetaTileEntityYotHatch YOT_HARCH;
-    public static MetaTileEntityYotTank YOUT_TANK;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER1;
     public static MetaTileentityConcreteBackfiller CONCRETE_BACK_FILLER2;
     public static MetaTileEntityLargeLightningRod LARGE_LIGHTING_ROD;
@@ -127,10 +121,7 @@ public class DrTechMetaTileEntities {
         LARGE_BEE_HIVE = registerMetaTileEntity(12, new MetaTileEntutyLargeBeeHive(getDrId("large_bee_hive")));
         MOB_KILLER = registerMetaTileEntity(13, new MetaTileEntityExtremeExterminationChamber(getDrId("mob_killer")));
         SOLAR_TOWER = registerMetaTileEntity(14, new MetaTileEntitySolarTower(getDrId("solar_tower")));
-        TFFT = registerMetaTileEntity(15, new MetatileEntityTwentyFiveFluidTank(getDrId("tfft_tank")));
         TRANS_TOWER = registerMetaTileEntity(16, new MetaTileEntityEnergyTransTower(getDrId("trans_tower")));
-        YOT_HARCH = registerMetaTileEntity(17, new MetaTileEntityYotHatch(getDrId("yot_hatch")));
-        YOUT_TANK = registerMetaTileEntity(18, new MetaTileEntityYotTank(getDrId("yot_tank")));
         CONCRETE_BACK_FILLER1 = registerMetaTileEntity(19, new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller1"), 1));
         CONCRETE_BACK_FILLER2 = registerMetaTileEntity(20, new MetaTileentityConcreteBackfiller(getDrId("concrete_backfiller2"), 2));
         LARGE_LIGHTING_ROD = registerMetaTileEntity(21, new MetaTileEntityLargeLightningRod(getDrId("large_lighting_rod")));

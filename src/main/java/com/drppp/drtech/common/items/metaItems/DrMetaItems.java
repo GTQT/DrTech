@@ -91,18 +91,6 @@ public final class DrMetaItems {
     public static MetaItem<?>.MetaValueItem SNAPDRAGON;
     public static MetaItem<?>.MetaValueItem LUCKY_CLOVER;
 
-    //  Fluid Cores
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T1;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T2;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T3;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T4;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T5;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T6;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T7;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T8;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T9;
-    public static MetaItem<?>.MetaValueItem FLUID_CORE_T10;
-
     // Fusion reactor parts
     public static MetaItem<?>.MetaValueItem FUSION_FIRST_WALL_PLATE;
     public static MetaItem<?>.MetaValueItem FUSION_MAGNET_COIL;
