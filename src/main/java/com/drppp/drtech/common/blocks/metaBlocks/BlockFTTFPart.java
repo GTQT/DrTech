@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartType> {
+public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.TFFTPartType> {
 
     public BlockFTTFPart() {
         super(Material.IRON);
@@ -31,7 +31,7 @@ public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartTy
         setResistance(10.0f);
         setSoundType(SoundType.METAL);
         setHarvestLevel(ToolClasses.WRENCH, 3);
-        setDefaultState(getState(BlockYotTankPartType.TFFT_PART_TIER_T1));
+        setDefaultState(getState(TFFTPartType.TFFT_PART_TIER_T1));
         setCreativeTab(DrTechMain.DrTechTab);
     }
 
@@ -46,14 +46,14 @@ public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartTy
                                @NotNull ITooltipFlag advanced) {
         super.addInformation(stack, world, tooltip, advanced);
 
-        BlockYotTankPartType capType = getState(stack);
+        TFFTPartType capType = getState(stack);
         if (capType.getCapacity() != 0) {
-            tooltip.add(I18n.format("drtech.multiblock.yot_tank.fluid_capacity", Long.toString(capType.getCapacity()).replaceAll("(\\d)(?=(\\d{3})+$)", "$1,")));
+            tooltip.add(I18n.format("drtech.multiblock.tfft_tank.fluid_capacity", Long.toString(capType.getCapacity()).replaceAll("(\\d)(?=(\\d{3})+$)", "$1,")));
             tooltip.add(I18n.format("drtech.universal.tooltip.energy_eut", capType.getEut()));
         }
     }
 
-    public enum BlockYotTankPartType implements IStringSerializable, ITFFTData {
+    public enum TFFTPartType implements IStringSerializable, ITFFTData {
 
         TFFT_PART_TIER_T1(1, 1000000L, 1),
         TFFT_PART_TIER_T2(2, 4000000L, 2),
@@ -70,13 +70,13 @@ public class BlockFTTFPart extends VariantBlock<BlockFTTFPart.BlockYotTankPartTy
         private final long capacity;
         private final int eut;
 
-        BlockYotTankPartType() {
+        TFFTPartType() {
             this.tier = -1;
             this.capacity = 0;
             this.eut = 0;
         }
 
-        BlockYotTankPartType(int tier, long capacity, int eut) {
+        TFFTPartType(int tier, long capacity, int eut) {
             this.tier = tier;
             this.capacity = capacity;
             this.eut = eut;

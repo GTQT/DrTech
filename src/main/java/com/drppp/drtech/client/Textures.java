@@ -22,7 +22,6 @@ public class Textures {
     public static OrientedOverlayRenderer INDUSTRIAL_MACHINE;
 
     public static SimpleOverlayRenderer ELEMENT_CONSTRAINS_MACHINE_CASING;
-    public static SimpleOverlayRenderer YOT_TANK_CASING;
     public static SimpleOverlayRenderer TFFT_TANK_CASING;
     public static SimpleOverlayRenderer SALT_INHIBITION_CASING;
     public static SimpleOverlayRenderer JIAO_BAN_CASING;
@@ -70,7 +69,6 @@ public class Textures {
         SEED_GENERATOR_OVERLAY = new OrientedOverlayRenderer("machines/seed_generator");
         BRICKED_AGRICULTURAL_CASING = new SimpleOverlayRenderer("bricked_agricultural_casing");
         ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
-        YOT_TANK_CASING = new SimpleOverlayRenderer("casings/yot_tank_casing");
         TFFT_TANK_CASING = new SimpleOverlayRenderer("casings/tfft_casing");
         INDUSTRIAL_MACHINE = new OrientedOverlayRenderer("multiblock/industrial_machine");
         TFFT_OVERLAY = new OrientedOverlayRenderer("multiblock/tfft_tank");

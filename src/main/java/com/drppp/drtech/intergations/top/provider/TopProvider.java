@@ -3,7 +3,6 @@ package com.drppp.drtech.intergations.top.provider;
 import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.items.ItemsInit;
 import com.drppp.drtech.common.metaTileEntities.muti.electric.standard.MetaTileentityCropsSimulateMachine;
-import com.drppp.drtech.common.metaTileEntities.muti.electric.store.MetaTileEntityYotTank;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.api.EnvironmentCalculator;
 import com.meowmel.cropQT.api.GrowthRequirement;
@@ -64,13 +63,6 @@ public class TopProvider implements IProbeInfoProvider {
                             .item(stack)
                             .text(stack.getDisplayName() + (stack.getCount() > 1 ? " x" + stack.getCount() : ""));
                 }
-            }
-        }
-        if (GTUtility.getMetaTileEntity(world, iProbeHitData.getPos()) instanceof MetaTileEntityYotTank) {
-            var s = (MetaTileEntityYotTank) GTUtility.getMetaTileEntity(world, iProbeHitData.getPos());
-            if (s.isActive() && s.isWorkingEnabled()) {
-                iProbeInfo.text("流体:" + s.getFluid().getLocalizedName());
-                iProbeInfo.text("容量" + s.getFluidBank().getStored() + "/" + s.getFluidBank().getCapacity());
             }
         }
         if (world.getTileEntity(iProbeHitData.getPos()) instanceof TileCropStick) {

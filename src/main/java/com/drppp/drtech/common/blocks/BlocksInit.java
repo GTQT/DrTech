@@ -28,7 +28,6 @@ public class BlocksInit {
     public static final BlockFusionReactorCasing FUSION_REACTOR_CASING = new BlockFusionReactorCasing();
     public static final BlockFusionReactorCasing2 FUSION_REACTOR_CASING2 = new BlockFusionReactorCasing2();
     public static final BlockFusionReactorCasing3 FUSION_REACTOR_CASING3 = new BlockFusionReactorCasing3();
-    public static final BlockYotTankPart YOT_TANK = new BlockYotTankPart();
     public static final BlockFTTFPart TFFT_TANK = new BlockFTTFPart();
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
     public static final BlockTimeTable BLOCK_TIME_TABLE = new BlockTimeTable();
@@ -57,7 +56,6 @@ public class BlocksInit {
         event.getRegistry().register(FUSION_REACTOR_CASING);
         event.getRegistry().register(FUSION_REACTOR_CASING2);
         event.getRegistry().register(FUSION_REACTOR_CASING3);
-        event.getRegistry().register(YOT_TANK);
         event.getRegistry().register(TFFT_TANK);
         event.getRegistry().register(BLOCK_ADVANCED_CAULDRON);
         GameRegistry.registerTileEntity(TileEntityAdvancedCauldron.class, new ResourceLocation(Tags.MODID, "advanced_cauldron"));

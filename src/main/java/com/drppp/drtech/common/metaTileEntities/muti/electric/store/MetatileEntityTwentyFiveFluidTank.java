@@ -470,7 +470,7 @@ public class MetatileEntityTwentyFiveFluidTank extends MultiblockWithDisplayBase
                                 continue;
                             }
                             TextFormatting color = idx == syncedCircuit ? TextFormatting.GOLD : TextFormatting.GRAY;
-                            richText.add(KeyUtil.lang(color, "gtqt.multiblock.yot_tank.fluid_type",
+                            richText.add(KeyUtil.lang(color, "gtqt.multiblock.tfft_tank.fluid_type",
                                             KeyUtil.string(TextFormatting.WHITE, String.valueOf(idx)),
                                             KeyUtil.string(TextFormatting.WHITE, slotFluid[j]),
                                             KeyUtil.string(TextFormatting.WHITE, slotStored[j])))

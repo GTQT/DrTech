@@ -273,7 +273,7 @@ head：          body（可重复 1~13）：      tail：
 
 总长 = `2 + slices`，`slices = clamp(组件等级 - MV + 1, 1, 13)`（**长度由搭建时的组件等级决定**）
 
-**GTQT DSL 写法**（先例：`MetaTileEntityYotTank.java:338` 的 `repeatablePiece`）：
+**GTQT DSL 写法**（先例：`MetatileEntityTwentyFiveFluidTank.java:362` 的 `repeatablePiece`）：
 
 ```java
 private static final StructureDefinition<?> STRUCTURE_DEFINITION =

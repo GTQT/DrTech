@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * FormedStructureView.getAggregate(key) 读取。
  *
  * 替代旧版"自定义 TraceabilityPredicate + PatternMatchContext 计数"方案，
- * 供 TFFT / YotTank 等多方块使用。
+ * 供 TFFT 等多方块使用。
  */
 public class BatteryContributionElement<T> implements ITypedStructureElement<Object> {
 
