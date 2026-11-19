@@ -1,0 +1,13 @@
+{
+  "parent": "qtfuturemc:block/dried_ghast",
+  "textures": {
+    "bottom": "qtfuturemc:blocks/dried_ghast_hydration_0_bottom",
+    "east": "qtfuturemc:blocks/dried_ghast_hydration_0_east",
+    "north": "qtfuturemc:blocks/dried_ghast_hydration_0_north",
+    "particle": "qtfuturemc:blocks/dried_ghast_hydration_0_north",
+    "south": "qtfuturemc:blocks/dried_ghast_hydration_0_south",
+    "tentacles": "qtfuturemc:blocks/dried_ghast_hydration_0_tentacles",
+    "top": "qtfuturemc:blocks/dried_ghast_hydration_0_top",
+    "west": "qtfuturemc:blocks/dried_ghast_hydration_0_west"
+  }
+}
