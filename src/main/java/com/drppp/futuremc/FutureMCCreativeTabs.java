@@ -10,7 +10,7 @@ public final class FutureMCCreativeTabs extends CreativeTabs {
 
     @Override
     public ItemStack createIcon() {
-        return new ItemStack(FutureMCMain.AMETHYST_SHARD);
+        return new ItemStack(FutureMCMain.DRIED_GHAST);
     }
 
 }

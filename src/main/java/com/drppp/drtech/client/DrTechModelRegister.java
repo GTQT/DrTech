@@ -62,6 +62,12 @@ public final class DrTechModelRegister {
 
     @SideOnly(Side.CLIENT)
     public static void onModelRegistration() {
+        // Personal dimension portal block item
+        if (com.drppp.drtech.personalspace.proxy.CommonProxy.itemBlockPersonalPortal != null) {
+            ModelLoader.setCustomModelResourceLocation(
+                    com.drppp.drtech.personalspace.proxy.CommonProxy.itemBlockPersonalPortal, 0,
+                    new ModelResourceLocation(Tags.MODID + ":personal_portal", "inventory"));
+        }
         // LootGames models
         // DUNGEON_BRICKS - register all 7 variants directly from blockstate
         Item dungeonBricksItem = Item.getItemFromBlock(ModBlocks.DUNGEON_BRICKS);

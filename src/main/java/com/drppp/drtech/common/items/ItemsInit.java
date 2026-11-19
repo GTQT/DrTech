@@ -30,6 +30,10 @@ import com.drppp.drtech.common.glider.ItemHangGlider;
 import com.drppp.drtech.common.glider.ItemHangGliderPart;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemEnvironmentalModule;
+import com.meowmel.cropQT.item.tool.ItemCropSpade;
+import com.meowmel.cropQT.item.tool.ItemPlantCure;
+import com.meowmel.cropQT.item.tool.ItemPlantLens;
+import com.meowmel.cropQT.item.tool.ItemWeedEX;
 import gregtech.api.block.VariantItemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -61,6 +65,12 @@ public class ItemsInit {
     public static final Item ITEM_BLOCK_TIME_TABLE = new ItemBlock(BlocksInit.BLOCK_TIME_TABLE).setRegistryName(Tags.MODID, BlocksInit.BLOCK_TIME_TABLE.getRegistryName().getPath());
     public static ItemCropSeed CROP_SEED = new ItemCropSeed();
     public static ItemEnvironmentalModule ENVIRONMENTAL_MODULE = new ItemEnvironmentalModule();
+    // 源端工具五件套（ItemSpade/ItemReinforcedSpade/ItemPlantLens/ItemPlantCure/ItemWeedEX）
+    public static ItemCropSpade CROP_SPADE = new ItemCropSpade("crop_spade", false);
+    public static ItemCropSpade REINFORCED_CROP_SPADE = new ItemCropSpade("reinforced_crop_spade", true);
+    public static ItemPlantLens PLANT_LENS = new ItemPlantLens();
+    public static ItemPlantCure PLANT_CURE = new ItemPlantCure();
+    public static ItemWeedEX WEEDEX_CAN = new ItemWeedEX();
     public static ItemXpBerry ITEM_XP_BERRY = new ItemXpBerry();
     public static ItemSoarXpBerry ITEM_SOAR_XP_BERRY = new ItemSoarXpBerry();
     public static final ItemSimpleDrTech WING_FAIRY_DUST = new ItemSimpleDrTech("fairy_dust");
@@ -109,6 +119,11 @@ public class ItemsInit {
         event.getRegistry().register(createItemBlock(BlocksInit.FUSION_REACTOR_CASING3, VariantItemBlock::new));
         event.getRegistry().register(CROP_SEED);
         event.getRegistry().register(ENVIRONMENTAL_MODULE);
+        event.getRegistry().register(CROP_SPADE);
+        event.getRegistry().register(REINFORCED_CROP_SPADE);
+        event.getRegistry().register(PLANT_LENS);
+        event.getRegistry().register(PLANT_CURE);
+        event.getRegistry().register(WEEDEX_CAN);
         event.getRegistry().register(ITEM_XP_BERRY);
         event.getRegistry().register(ITEM_SOAR_XP_BERRY);
         event.getRegistry().register(WING_FAIRY_DUST);
@@ -133,8 +148,14 @@ public class ItemsInit {
         event.getRegistry().register(DRONE_PROGRAM_CARD);
         event.getRegistry().register(DRONE_UPGRADE_MODULE);
         event.getRegistry().register(new ItemBlock(CROP_STICK).setRegistryName(CROP_STICK.getRegistryName()));
-        // 工业农场的两个组件方块走 VariantItemBlock，才能按 meta 出不同子物品
+        // 工业农场的组件方块走 VariantItemBlock，才能按 meta 出不同子物品
         event.getRegistry().register(createItemBlock(BlocksInit.SEED_BED, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.ENVIRONMENTAL_ENHANCEMENT, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.GROWTH_ACCELERATION, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.FERTILIZER_UNIT, VariantItemBlock::new));
+        event.getRegistry().register(createItemBlock(BlocksInit.ADVANCED_HARVESTING, VariantItemBlock::new));
+        event.getRegistry().register(
+                createItemBlock(BlocksInit.OVERCLOCKED_GROWTH_ACCELERATION, VariantItemBlock::new));
     }
 
     @SideOnly(Side.CLIENT)
@@ -146,12 +167,27 @@ public class ItemsInit {
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING2);
         registerItemModel(BlocksInit.FUSION_REACTOR_CASING3);
         registerItemModel(BlocksInit.SEED_BED);
+        registerItemModel(BlocksInit.ENVIRONMENTAL_ENHANCEMENT);
+        registerItemModel(BlocksInit.GROWTH_ACCELERATION);
+        registerItemModel(BlocksInit.FERTILIZER_UNIT);
+        registerItemModel(BlocksInit.ADVANCED_HARVESTING);
+        registerItemModel(BlocksInit.OVERCLOCKED_GROWTH_ACCELERATION);
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(CROP_STICK), 0, new ModelResourceLocation(CROP_STICK.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(CROP_SPADE, 0,
+                new ModelResourceLocation(CROP_SPADE.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(REINFORCED_CROP_SPADE, 0,
+                new ModelResourceLocation(REINFORCED_CROP_SPADE.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(PLANT_LENS, 0,
+                new ModelResourceLocation(PLANT_LENS.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(PLANT_CURE, 0,
+                new ModelResourceLocation(PLANT_CURE.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(WEEDEX_CAN, 0,
+                new ModelResourceLocation(WEEDEX_CAN.getRegistryName(), "inventory"));
         ModelLoader.setCustomMeshDefinition(CROP_SEED, new ItemCropSeed.SeedMeshDefinition());
         // 环境模块：每个 meta 一套模型（底图 + 标签覆盖层），按 meta 动态选
         registerEnvironmentalModuleModels();
         // 种子变体模型（硬编码，避免依赖 CropRegistry 的登记时序）
-        // ① 默认模型 + ② 8 种种子材质模型（材料驱动的作物走这条，见 SeedMeshDefinition）
+        // ① 默认模型 + ② 9 种种子材质模型（材料驱动的作物走这条，见 SeedMeshDefinition）
         ModelLoader.registerItemVariants(CROP_SEED,
                 new ModelResourceLocation(CROP_SEED.getRegistryName(), "inventory"),
                 seedMaterialModel("bonsai"),
@@ -161,6 +197,7 @@ public class ItemsInit {
                 seedMaterialModel("magic"),
                 seedMaterialModel("oreberry"),
                 seedMaterialModel("spore"),
+                seedMaterialModel("troll"),
                 seedMaterialModel("vanilla"));
         ModelLoader.setCustomModelResourceLocation(ITEM_XP_BERRY, 0, new ModelResourceLocation(ITEM_XP_BERRY.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(ITEM_SOAR_XP_BERRY, 0, new ModelResourceLocation(ITEM_SOAR_XP_BERRY.getRegistryName(), "inventory"));

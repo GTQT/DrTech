@@ -1,5 +1,7 @@
 package com.meowmel.cropQT.api.mutation;
 
+import gregtech.api.GTValues;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,9 +29,18 @@ public class CropMutation {
     /** 未显式指定时的权重。 */
     public static final int DEFAULT_WEIGHT = 1;
 
+    /** 育种机默认 EU/t（源端 {@code TierEU.RECIPE_LV}）。 */
+    public static final int DEFAULT_MACHINE_EUT = 30;
+    /** 育种机默认时长（源端 {@code 20 * GTRecipeBuilder.SECONDS}，tier=LV）。 */
+    public static final int DEFAULT_MACHINE_DURATION = 400;
+
     private final String result;
     private final List<String> parents;
     private int weight = DEFAULT_WEIGHT;
+    private int breedingMachineEUt = DEFAULT_MACHINE_EUT;
+    private int breedingMachineDuration = DEFAULT_MACHINE_DURATION;
+    /** 只能在育种机里发生（源端 {@code machineOnly()}）。 */
+    private boolean machineOnly = false;
 
     /**
      * @param result  产物作物 id
@@ -48,6 +59,49 @@ public class CropMutation {
     public CropMutation weight(int weight) {
         this.weight = Math.max(1, weight);
         return this;
+    }
+
+    /**
+     * 按作物 tier 设置育种机配方（源端 {@code setBreedingMachineRecipeTier}）。
+     *
+     * <p>EU/t = {@code VA[clamp(tier, LV, UXV)]}；时长 = {@code 400 * 1.3^(tier-1)}。
+     * 源端用 {@code VP}，GTQT 的 {@code VA} 数值等价（都是 V*30/32）。
+     */
+    public CropMutation setBreedingMachineRecipeTier(int tier) {
+        int clamped = Math.max(GTValues.LV, Math.min(GTValues.UXV, tier));
+        this.breedingMachineEUt = (int) GTValues.VA[clamped];
+        this.breedingMachineDuration = (int) (DEFAULT_MACHINE_DURATION * Math.pow(1.3, Math.max(0, tier - 1)));
+        return this;
+    }
+
+    /** 直接指定育种机 EU/t（链式）。 */
+    public CropMutation setBreedingMachineRecipeEUt(int eut) {
+        this.breedingMachineEUt = Math.max(1, eut);
+        return this;
+    }
+
+    /** 直接指定育种机时长（tick，链式）。 */
+    public CropMutation setBreedingMachineRecipeDuration(int ticks) {
+        this.breedingMachineDuration = Math.max(1, ticks);
+        return this;
+    }
+
+    /** 标记为只能由育种机触发的变异。 */
+    public CropMutation machineOnly() {
+        this.machineOnly = true;
+        return this;
+    }
+
+    public int getBreedingMachineRecipeEUt() {
+        return breedingMachineEUt;
+    }
+
+    public int getBreedingMachineRecipeDuration() {
+        return breedingMachineDuration;
+    }
+
+    public boolean isMachineOnly() {
+        return machineOnly;
     }
 
     /**

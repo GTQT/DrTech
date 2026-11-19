@@ -44,6 +44,20 @@ public abstract class MetaTileEntityCropMachine extends SimpleMachineMetaTileEnt
      */
     protected abstract CropMachineRecipeLogic<?> createLogic(RecipeMap<?> recipeMap);
 
+    /**
+     * tooltip / 名字的键片段，与源端的 {@code cropsnh_tooltip.<key>} 对应：
+     * {@code seedGenerator}、{@code cropBreeder}、{@code cropGeneExtractor}、{@code cropSynthesizer}。
+     */
+    protected abstract String getTooltipKey();
+
+    /**
+     * 物品显示名按档位取 {@code drtech_tooltip.<key>.name.<tier>}，与源端每档一个名字一致。
+     */
+    @Override
+    public String getMetaName() {
+        return com.meowmel.cropQT.api.CropTooltips.name(getTooltipKey(), getTier());
+    }
+
     @Override
     protected AbstractRecipeLogic createWorkable(RecipeMap<?> recipeMap) {
         return createLogic(recipeMap);

@@ -38,6 +38,26 @@ public final class SoilTypes {
     /** 水体。给需要在水中生长的作物用。 */
     public static final SoilList water = new SoilList("water");
 
+    // ==================== 源端（CropsNH）复合土壤组 ====================
+    //
+    // 下面四个组是 NH 的语义组，靠 CompoundSoilList 拼出来，不重复登记方块。
+    // 只有油砂是新的实体组（NH 的 oilSands 由矿辞识别），其余都是并集。
+
+    /** 油砂：GT 的三种油砂矿（主世界 / 下界 / 末地）。NH 的 {@code SoilLoader} 同样按矿辞登记。 */
+    public static final SoilList oilSands = new SoilList("oil_sands");
+
+    /** NH 的 {@code mushroom}：石头 + 泥土/草 + 菌丝，比本模组旧的 mushroom 组更宽。 */
+    public static final CompoundSoilList mushroomAll =
+            new CompoundSoilList("mushroom_all", stone, dirtGrass, mushroom);
+
+    /** NH 的 {@code sugarcane}：沙子 + 泥土/草。 */
+    public static final CompoundSoilList sugarcane =
+            new CompoundSoilList("sugarcane", sand, dirtGrass);
+
+    /** NH 的 {@code oil}：沙子 + 沙砾 + 灵魂沙 + 油砂。油莓用。 */
+    public static final CompoundSoilList oil =
+            new CompoundSoilList("oil", sand, gravel, soulsand, oilSands);
+
     private static final int HIGH = 4000;
     private static final int MID = 2500;
     private static final int LOW = 1000;
@@ -87,6 +107,12 @@ public final class SoilTypes {
         brick.registerBlock(Blocks.BRICK_BLOCK)
                 .setWaterCapacity(LOW).setFertilizerCapacity(LOW).setBaseNutrients(0.20f);
 
+        // 油砂：三种矿都可能由别的 mod 注册，按矿辞匹配；没有装对应矿时永不命中。
+        oilSands.registerOreDict("oreOilsands")
+                .registerOreDict("oreNetherrackOilsands")
+                .registerOreDict("oreEndstoneOilsands")
+                .setWaterCapacity(TINY).setFertilizerCapacity(TINY).setBaseNutrients(0.10f);
+
         water.registerBlock(Blocks.WATER)
                 .registerBlock(Blocks.FLOWING_WATER)
                 .setWaterCapacity(0).setFertilizerCapacity(0).setBaseNutrients(0.10f);
@@ -119,6 +145,7 @@ public final class SoilTypes {
         SoilRegistry.register(sand);
         SoilRegistry.register(gravel);
         SoilRegistry.register(brick);
+        SoilRegistry.register(oilSands);
         SoilRegistry.register(water);
         SoilRegistry.register(stone);
         SoilRegistry.register(dirtGrass);

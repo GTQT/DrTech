@@ -20,13 +20,13 @@ import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityArmorWorkbe
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityIndustrialApiary;
 import com.meowmel.cropQT.machine.MetaTileEntityCropBreeder;
 import com.meowmel.cropQT.machine.MetaTileEntityCropGeneExtractor;
-import com.meowmel.cropQT.api.capability.FarmType;
 import com.meowmel.cropQT.machine.MetaTileEntityCropHarvester;
 import com.meowmel.cropQT.machine.MetaTileEntityCropSupervisor;
 import com.meowmel.cropQT.machine.MetaTileEntityCropSynthesizer;
 import com.meowmel.cropQT.machine.MetaTileEntityIndustrialFarm;
-import com.meowmel.cropQT.machine.part.MetaTileEntityFarmPart;
+import com.meowmel.cropQT.handler.CropConfig;
 import com.meowmel.cropQT.machine.MetaTileEntitySeedGenerator;
+import com.meowmel.cropQT.machine.MetaTileEntityCropManager;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityLaserPipeBending;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityLightsaberAssembler;
 import com.drppp.drtech.common.metaTileEntities.single.MetaTileEntityUniversalCollector;
@@ -94,22 +94,16 @@ public class DrTechMetaTileEntities {
     public static EnergySink ENERGY_SINK;
 
     // 作物系统
-    public static MetaTileEntitySeedGenerator[] CROP_SEED_GENERATOR = new MetaTileEntitySeedGenerator[5];
+    public static MetaTileEntityCropManager[] CROP_MANAGER = new MetaTileEntityCropManager[12];
+    public static MetaTileEntitySeedGenerator[] CROP_SEED_GENERATOR = new MetaTileEntitySeedGenerator[12];
     public static MetaTileEntityCropSupervisor[] CROP_SUPERVISOR = new MetaTileEntityCropSupervisor[5];
     public static MetaTileEntityCropHarvester[] CROP_HARVESTER = new MetaTileEntityCropHarvester[5];
-    public static MetaTileEntityCropBreeder[] CROP_BREEDER = new MetaTileEntityCropBreeder[5];
-    public static MetaTileEntityCropGeneExtractor[] CROP_GENE_EXTRACTOR = new MetaTileEntityCropGeneExtractor[5];
-    public static MetaTileEntityCropSynthesizer[] CROP_SYNTHESIZER = new MetaTileEntityCropSynthesizer[5];
+    public static MetaTileEntityCropBreeder[] CROP_BREEDER = new MetaTileEntityCropBreeder[12];
+    public static MetaTileEntityCropGeneExtractor[] CROP_GENE_EXTRACTOR = new MetaTileEntityCropGeneExtractor[9];
+    public static MetaTileEntityCropSynthesizer[] CROP_SYNTHESIZER = new MetaTileEntityCropSynthesizer[9];
 
     /** 工业农场：单控制器，等级由升级仓与苗床的档次决定。 */
     public static MetaTileEntityIndustrialFarm INDUSTRIAL_FARM;
-
-    /** 工业农场的升级仓，按类型分组、每组按档位排列。 */
-    public static MetaTileEntityFarmPart[] ENVIRONMENTAL_ENHANCEMENT_FARM_PARTS = new MetaTileEntityFarmPart[10];
-    public static MetaTileEntityFarmPart[] GROWTH_ACCELERATION_FARM_PARTS = new MetaTileEntityFarmPart[10];
-    public static MetaTileEntityFarmPart[] FERTILIZER_FARM_PARTS = new MetaTileEntityFarmPart[10];
-    public static MetaTileEntityFarmPart[] ADVANCED_HARVESTING_FARM_PARTS = new MetaTileEntityFarmPart[10];
-    public static MetaTileEntityFarmPart[] OVERCLOCKED_GROWTH_ACCELERATION_FARM_PARTS = new MetaTileEntityFarmPart[10];
 
     public static void initialization() {
         // 发电机
@@ -181,68 +175,51 @@ public class DrTechMetaTileEntities {
         ARMOR_WORKBENCH = registerMetaTileEntity(250, new MetaTileEntityArmorWorkbench(getDrId("armor_workbench")));
         ENERGY_SINK = registerMetaTileEntity(251, new EnergySink(getDrId("energy_sink")));
 
-        // 作物系统
+        // 作物系统：完全复刻 CropsNH 的 5 类单方块 + 工业农场。
+        // ID 规划见 docs/coprqt-cropsnh-full-parity-plan.md。
+        for (int i = 0; i < CROP_MANAGER.length; i++) {
+            int tier = i + 1;
+            String tierName = GTValues.VN[tier].toLowerCase();
+            CROP_MANAGER[i] = registerMetaTileEntity(300 + i, new MetaTileEntityCropManager(getDrId("crop_manager." + tierName), tier));
+        }
         for (int i = 0; i < CROP_SEED_GENERATOR.length; i++) {
             int tier = i + 1;
             String tierName = GTValues.VN[tier].toLowerCase();
-            CROP_SEED_GENERATOR[i] = registerMetaTileEntity(300 + i, new MetaTileEntitySeedGenerator(getDrId("seed_generator." + tierName), tier));
-        }
-        for (int i = 0; i < CROP_SUPERVISOR.length; i++) {
-            int tier = i + 1;
-            String tierName = GTValues.VN[tier].toLowerCase();
-            CROP_SUPERVISOR[i] = registerMetaTileEntity(310 + i, new MetaTileEntityCropSupervisor(getDrId("crop_supervisor." + tierName), tier));
-        }
-        for (int i = 0; i < CROP_HARVESTER.length; i++) {
-            int tier = i + 1;
-            String tierName = GTValues.VN[tier].toLowerCase();
-            CROP_HARVESTER[i] = registerMetaTileEntity(320 + i, new MetaTileEntityCropHarvester(getDrId("crop_harvester." + tierName), tier));
+            CROP_SEED_GENERATOR[i] = registerMetaTileEntity(312 + i, new MetaTileEntitySeedGenerator(getDrId("seed_generator." + tierName), tier));
         }
         for (int i = 0; i < CROP_BREEDER.length; i++) {
             int tier = i + 1;
             String tierName = GTValues.VN[tier].toLowerCase();
-            CROP_BREEDER[i] = registerMetaTileEntity(330 + i, new MetaTileEntityCropBreeder(getDrId("crop_breeder." + tierName), tier));
+            CROP_BREEDER[i] = registerMetaTileEntity(324 + i, new MetaTileEntityCropBreeder(getDrId("crop_breeder." + tierName), tier));
         }
         for (int i = 0; i < CROP_GENE_EXTRACTOR.length; i++) {
-            int tier = i + 1;
+            int tier = i + GTValues.EV;
             String tierName = GTValues.VN[tier].toLowerCase();
-            CROP_GENE_EXTRACTOR[i] = registerMetaTileEntity(340 + i, new MetaTileEntityCropGeneExtractor(getDrId("gene_extractor." + tierName), tier));
+            CROP_GENE_EXTRACTOR[i] = registerMetaTileEntity(336 + i, new MetaTileEntityCropGeneExtractor(getDrId("gene_extractor." + tierName), tier));
         }
         for (int i = 0; i < CROP_SYNTHESIZER.length; i++) {
-            int tier = i + 1;
+            int tier = i + GTValues.EV;
             String tierName = GTValues.VN[tier].toLowerCase();
-            CROP_SYNTHESIZER[i] = registerMetaTileEntity(350 + i, new MetaTileEntityCropSynthesizer(getDrId("crop_synthesizer." + tierName), tier));
+            CROP_SYNTHESIZER[i] = registerMetaTileEntity(345 + i, new MetaTileEntityCropSynthesizer(getDrId("crop_synthesizer." + tierName), tier));
+        }
+
+        // 旧版监管机/收割机：源端没有对应机器，默认不注册，仅在配置打开时保留。
+        if (CropConfig.isLegacyCropMachinesEnabled()) {
+            for (int i = 0; i < CROP_SUPERVISOR.length; i++) {
+                int tier = i + 1;
+                String tierName = GTValues.VN[tier].toLowerCase();
+                CROP_SUPERVISOR[i] = registerMetaTileEntity(1100 + i, new MetaTileEntityCropSupervisor(getDrId("crop_supervisor." + tierName), tier));
+            }
+            for (int i = 0; i < CROP_HARVESTER.length; i++) {
+                int tier = i + 1;
+                String tierName = GTValues.VN[tier].toLowerCase();
+                CROP_HARVESTER[i] = registerMetaTileEntity(1110 + i, new MetaTileEntityCropHarvester(getDrId("crop_harvester." + tierName), tier));
+            }
         }
 
 
         INDUSTRIAL_FARM = registerMetaTileEntity(360,
                 new MetaTileEntityIndustrialFarm(getDrId("industrial_farm")));
-
-
-        for (int i = 0; i < ENVIRONMENTAL_ENHANCEMENT_FARM_PARTS.length; i++) {
-            int tier = i + 2;
-            String tierName = GTValues.VN[tier].toLowerCase();
-            ENVIRONMENTAL_ENHANCEMENT_FARM_PARTS[i] = registerMetaTileEntity(370 + i, new MetaTileEntityFarmPart(getDrId("farm_part.environmental_enhancement."+ tierName), tier, FarmType.ENVIRONMENTAL_ENHANCEMENT));
-        }
-        for (int i = 0; i < GROWTH_ACCELERATION_FARM_PARTS.length; i++) {
-            int tier = i + 2;
-            String tierName = GTValues.VN[tier].toLowerCase();
-            GROWTH_ACCELERATION_FARM_PARTS[i] = registerMetaTileEntity(380 + i, new MetaTileEntityFarmPart(getDrId("farm_part.growth_acceleration."+ tierName), tier, FarmType.GROWTH_ACCELERATION));
-        }
-        for (int i = 0; i < FERTILIZER_FARM_PARTS.length; i++) {
-            int tier = i + 2;
-            String tierName = GTValues.VN[tier].toLowerCase();
-            FERTILIZER_FARM_PARTS[i] = registerMetaTileEntity(390 + i, new MetaTileEntityFarmPart(getDrId("farm_part.fertilizer."+ tierName), tier, FarmType.FERTILIZER));
-        }
-        for (int i = 0; i < ADVANCED_HARVESTING_FARM_PARTS.length; i++) {
-            int tier = i + 2;
-            String tierName = GTValues.VN[tier].toLowerCase();
-            ADVANCED_HARVESTING_FARM_PARTS[i] = registerMetaTileEntity(400 + i, new MetaTileEntityFarmPart(getDrId("farm_part.advanced_harvesting."+ tierName), tier, FarmType.ADVANCED_HARVESTING));
-        }
-        for (int i = 0; i < OVERCLOCKED_GROWTH_ACCELERATION_FARM_PARTS.length; i++) {
-            int tier = i + 2;
-            String tierName = GTValues.VN[tier].toLowerCase();
-            OVERCLOCKED_GROWTH_ACCELERATION_FARM_PARTS[i] = registerMetaTileEntity(410 + i, new MetaTileEntityFarmPart(getDrId("farm_part.overclocked_growth_acceleration."+ tierName), tier, FarmType.OVERCLOCKED_GROWTH_ACCELERATION));
-        }
     }
 
     public static @NotNull ResourceLocation getDrId(@NotNull String path) {

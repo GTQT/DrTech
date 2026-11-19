@@ -26,18 +26,40 @@ import java.util.Map;
 public class CropRegistry {
 
     /**
-     * 手写作物的 id，同时也是它们的生长贴图目录名。
+     * 手写作物的<b>生长贴图目录名</b>（不是作物 id）。
      *
      * <p><b>这张表是给图集拼接用的</b>（见 {@code CropTextureStitcher}）：拼接发生在
      * preInit，那时候注册表还是空的，没法从 {@link #getAll()} 里拿。
+     * 目录名和作物 id 可以不同（比如 {@code sugarCane} 用 {@code sugar_cane}，
+     * 石中百合用 {@code stone_lilies/stone}），以 {@link CropType#getTexturePath()} 为准。
      * 加作物时这里和 {@link #registerVanillaCrops()} 要一起改 ——
      * {@link #ensureRegistered()} 末尾会核对一遍，漏了会在日志里报出来。
      */
     public static final String[] VANILLA_CROP_IDS = {
+            // 旧手写作物
             "weed", "wheat", "potato", "carrot", "pumpkin", "melon", "beetroot",
             "reed", "cactus", "chorus_crop", "lotus_leaf", "nether_wart_crop",
             "brown_mushroom", "red_mushroom", "dandelion", "rose", "bonsai", "cocoa",
             "fishing_rod_crop",
+            // CropsNH 测试作物（CropParityCrops）
+            "sugar_cane", "blue_orchid", "stone_lilies/stone", "olivia", "star_wart",
+            "space_flower", "redstraw", "magical_nightshade", "god_of_thunder", "oil_berry",
+            "zomplant", "trollplant", "bonsai_oak", "enderbloom",
+            // 第二批：盆景树（CropBonsais）
+            "bonsai_spruce", "bonsai_birch", "bonsai_jungle", "bonsai_acacia", "bonsai_dark_oak",
+            // 第二批：原版花（CropVanillaFlowers）
+            "allium", "azure_bluet", "oxeye_daisy", "pink_tulip", "red_tulip",
+            "orange_tulip", "white_tulip", "poppy",
+            // 第三批：矿石莓（CropOreBerries）
+            "ore_berries/tin", "ore_berries/aluminium", "ore_berries/copper", "ore_berries/gold",
+            "ore_berries/iron", "ore_berries/cobalt", "ore_berries/essence",
+            // 第三批：石中百合（CropStoneLilies）
+            "stone_lilies/sand", "stone_lilies/clay", "stone_lilies/netherStone",
+            "stone_lilies/endStone", "stone_lilies/redGranite", "stone_lilies/blackGranite",
+            "stone_lilies/basalt", "stone_lilies/marble", "stone_lilies/soulSand",
+            // 第三批：怪物系（CropMobs）
+            "goldfish", "inkbloom", "spidernip", "corpseplant", "blazereed",
+            "corium", "egg_plant", "slimeplant", "creeperweed", "tearstalks",
     };
 
     private static final Map<String, CropType> REGISTRY = new HashMap<>();
@@ -74,13 +96,26 @@ public class CropRegistry {
         }
         vanillaRegistered = true;
         registerVanillaCrops();
+        CropParityCrops.registerAll();
+        CropBonsais.registerAll();
+        CropVanillaFlowers.registerAll();
+        CropOreBerries.registerAll();
+        CropStoneLilies.registerAll();
+        CropMobs.registerAll();
 
-        // 核对：VANILLA_CROP_IDS 是给图集拼接用的另一份清单，漏改会让那株作物的贴图拼不进图集
-        for (String id : VANILLA_CROP_IDS) {
-            if (!REGISTRY.containsKey(id)) {
+        // 核对：VANILLA_CROP_IDS 是给图集拼接用的目录清单，漏改会让那株作物的贴图拼不进图集。
+        // 表里放的是目录名，所以要拿已登记作物的 getTexturePath() 反查，而不是 id。
+        java.util.Set<String> usedTexturePaths = new java.util.HashSet<>();
+        for (CropType crop : REGISTRY.values()) {
+            if (crop.getTexturePath() != null) {
+                usedTexturePaths.add(crop.getTexturePath());
+            }
+        }
+        for (String dir : VANILLA_CROP_IDS) {
+            if (!usedTexturePaths.contains(dir)) {
                 gregtech.api.util.GTLog.logger.error(
-                        "手写作物「{}」在 VANILLA_CROP_IDS 里但没登记 —— 它的生长贴图不会进图集，游戏里会看不见",
-                        id);
+                        "贴图目录「{}」在 VANILLA_CROP_IDS 里但没有作物用它 —— 图集里会白拼一堆贴图",
+                        dir);
             }
         }
     }
@@ -96,13 +131,14 @@ public class CropRegistry {
     private static void registerVanillaCrops() {
 
         // ---------------- 杂草 ----------------
-        // 空作物架上自己长出来的东西，土壤不限
-        register(new CropType.Builder("weed").displayName("杂草").tier(0)
+        // 空作物架上自己长出来的东西，土壤不限。
+        // 数值对齐 CropsNH CropWeed：tier 1 / 600t / 4 阶段 / 无掉落 / 不显示在 JEI
+        register(new CropType.Builder("weed").displayName("杂草").tier(1)
                 .soil(SoilRegistry.getAllSoils())
-                .maxGrowthStage(5).harvestStage(5).stageRequirement(12)
-                .addChanceDrop(MetaItems.PLANT_BALL.getStackForm(), 0.5f)
+                .growthDuration(600).maxGrowthStage(4).harvestStage(4).stageRequirement(12)
                 .lightRequirement(0)
-                .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0x6B8E3A).renderType(CropRenderType.CROSS).build());
+                .hideFromNEI(true)
+                .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0x6B8E3A).renderType(CropRenderType.HASH).build());
 
         // ---------------- 特殊作物 ----------------
         // 钓鱼竿：产物不是固定掉落表，而是整张原版钓鱼战利品表
@@ -116,36 +152,62 @@ public class CropRegistry {
                 .renderType(CropRenderType.CROSS).build());
 
         // ---------------- 农田作物 ----------------
+        // 以下四条的 tier / 时长 / 阶段 / 掉落 / 光照 / 渲染 / 掉落倍率对齐 CropsNH
         register(new CropType.Builder("wheat").displayName("小麦").tier(1).soil(SoilTypes.farmland)
-                .maxGrowthStage(7).harvestStage(7).stageRequirement(15)
-                .addDrop(new ItemStack(Items.WHEAT)).addDrop(new ItemStack(Items.WHEAT_SEEDS))
+                .growthDuration(1000).maxGrowthStage(7).harvestStage(7).stageRequirement(15)
+                .addDrop(new ItemStack(Items.WHEAT))
+                .lightRequirement(9)
+                .dropChance(0.95f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.PLAINS,
+                        net.minecraftforge.common.BiomeDictionary.Type.LUSH)
                 .seedIcon(CropQTMaterialIconType.grain).seedColor(0xD8C15A)
-                .renderType(CropRenderType.CROSS).build());
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("potato").displayName("马铃薯").tier(1).soil(SoilTypes.farmland)
-                .maxGrowthStage(7).harvestStage(7).stageRequirement(15)
+                .growthDuration(800).maxGrowthStage(3).harvestStage(3).stageRequirement(15)
                 .addDrop(new ItemStack(Items.POTATO))
-                .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0xC8A165)
-                .renderType(CropRenderType.CROSS).build());
+                .lightRequirement(9)
+                .dropChance(0.95f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.PLAINS,
+                        net.minecraftforge.common.BiomeDictionary.Type.COLD,
+                        net.minecraftforge.common.BiomeDictionary.Type.CONIFEROUS)
+                .texturePath("potato")
+                .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0xC0A51B)
+                .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("carrot").displayName("胡萝卜").tier(1).soil(SoilTypes.farmland)
-                .maxGrowthStage(7).harvestStage(7).stageRequirement(15)
+        register(new CropType.Builder("carrot").displayName("胡萝卜").tier(2).soil(SoilTypes.farmland)
+                .growthDuration(800).maxGrowthStage(3).harvestStage(3).stageRequirement(15)
                 .addDrop(new ItemStack(Items.CARROT))
+                .lightRequirement(9)
+                .dropChance(0.9025f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.PLAINS,
+                        net.minecraftforge.common.BiomeDictionary.Type.HOT,
+                        net.minecraftforge.common.BiomeDictionary.Type.SANDY)
                 .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0xE07A28)
-                .renderType(CropRenderType.CROSS).build());
+                .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("pumpkin").displayName("南瓜").tier(1).soil(SoilTypes.farmland)
-                .maxGrowthStage(4).harvestStage(4).stageRequirement(20)
-                .addDrop(new ItemStack(Items.PUMPKIN_SEEDS))
+        register(new CropType.Builder("pumpkin").displayName("南瓜").tier(2).soil(SoilTypes.farmland)
+                .growthDuration(1000).maxGrowthStage(4).harvestStage(4).stageRequirement(20)
                 .addDrop(new ItemStack(Blocks.PUMPKIN))
-                .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0xE08A1E)
-                .renderType(CropRenderType.CROSS).build());
+                .lightRequirement(9)
+                .dropChance(0.9025f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.PLAINS,
+                        net.minecraftforge.common.BiomeDictionary.Type.WET)
+                .texturePath("pumpkin")
+                .seedIcon(CropQTMaterialIconType.vanilla).seedColor(0xCAB16E)
+                .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("melon").displayName("西瓜").tier(1).soil(SoilTypes.farmland)
-                .maxGrowthStage(4).harvestStage(4).stageRequirement(20)
-                .addDrop(new ItemStack(Items.MELON, 2))
-                .seedIcon(CropQTMaterialIconType.oreberry).seedColor(0x6FA82F)
-                .renderType(CropRenderType.CROSS).build());
+        register(new CropType.Builder("melon").displayName("西瓜").tier(2).soil(SoilTypes.farmland)
+                .growthDuration(1200).maxGrowthStage(4).harvestStage(4).stageRequirement(20)
+                .addChanceDrop(new ItemStack(Items.MELON, 4), 0.6666f)
+                .addChanceDrop(new ItemStack(Blocks.MELON_BLOCK), 0.3333f)
+                .lightRequirement(9)
+                .dropChance(0.9025f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.WET,
+                        net.minecraftforge.common.BiomeDictionary.Type.LUSH)
+                .texturePath("melon")
+                .seedIcon(CropQTMaterialIconType.grain).seedColor(0x2A220B)
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("beetroot").displayName("甜菜根").tier(1).soil(SoilTypes.farmland)
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(16)
@@ -160,9 +222,14 @@ public class CropRegistry {
                 .seedIcon(CropQTMaterialIconType.grain).seedColor(0x8FBF5A)
                 .renderType(CropRenderType.HASH).build());
 
-        register(new CropType.Builder("cactus").displayName("仙人掌").tier(2).soil(SoilTypes.sand)
-                .maxGrowthStage(4).harvestStage(4).stageRequirement(22)
-                .addDrop(new ItemStack(Blocks.CACTUS, 2))
+        register(new CropType.Builder("cactus").displayName("仙人掌").tier(3).soil(SoilTypes.sand)
+                .growthDuration(450).maxGrowthStage(3).harvestStage(3).stageRequirement(22)
+                .addDrop(new ItemStack(Blocks.CACTUS))
+                .lightRequirement(0)
+                .dropChance(0.857375f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.SANDY,
+                        net.minecraftforge.common.BiomeDictionary.Type.HOT,
+                        net.minecraftforge.common.BiomeDictionary.Type.DRY)
                 .seedIcon(CropQTMaterialIconType.spore).seedColor(0x4C8B3A)
                 .renderType(CropRenderType.HASH).build());
 
@@ -201,11 +268,17 @@ public class CropRegistry {
                 .seedIcon(CropQTMaterialIconType.spore).seedColor(0xD14B3A).renderType(CropRenderType.CROSS).build());
 
         // ---------------- 花与树 ----------------
-        register(new CropType.Builder("dandelion").displayName("蒲公英").tier(1).soil(SoilTypes.dirtGrass)
-                .maxGrowthStage(4).harvestStage(4).stageRequirement(14)
-                .addDrop(new ItemStack(Items.DYE, 2, 11))
-                .seedIcon(CropQTMaterialIconType.flower).seedColor(0xF2D24B)
-                .renderType(CropRenderType.FLOWER).build());
+        register(new CropType.Builder("dandelion").displayName("蒲公英").tier(2).soil(SoilTypes.dirtGrass)
+                .growthDuration(600).maxGrowthStage(4).harvestStage(4).stageRequirement(14)
+                .addChanceDrop(new ItemStack(Items.DYE, 1, 11), 0.75f)
+                .addChanceDrop(new ItemStack(Blocks.YELLOW_FLOWER, 1, 0), 0.25f)
+                .dropChance(0.9025f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.PLAINS,
+                        net.minecraftforge.common.BiomeDictionary.Type.LUSH,
+                        net.minecraftforge.common.BiomeDictionary.Type.FOREST)
+                .texturePath("dandelion")
+                .seedIcon(CropQTMaterialIconType.flower).seedColor(0x8E6B13)
+                .renderType(CropRenderType.HASH).build());
 
         register(new CropType.Builder("rose").displayName("玫瑰").tier(1).soil(SoilTypes.dirtGrass)
                 .maxGrowthStage(4).harvestStage(4).stageRequirement(14)
@@ -222,10 +295,17 @@ public class CropRegistry {
                 .seedIcon(CropQTMaterialIconType.bonsai).seedColor(0x5A8B3A)
                 .renderType(CropRenderType.CROSS).build());
 
-        register(new CropType.Builder("cocoa").displayName("可可豆").tier(3).soil(SoilTypes.dirtGrass)
-                .maxGrowthStage(4).harvestStage(4).stageRequirement(24)
-                .addDrop(new ItemStack(Items.DYE, 2, 3))
-                .seedIcon(CropQTMaterialIconType.oreberry).seedColor(0x8B5A2B)
-                .renderType(CropRenderType.CROSS).build());
+        register(new CropType.Builder("cocoa").displayName("可可豆").tier(3).soil(SoilTypes.farmland)
+                .growthDuration(1700).maxGrowthStage(4).harvestStage(4).stageRequirement(24)
+                .addDrop(new ItemStack(Items.DYE, 1, 3))
+                .lightRequirement(9)
+                .dropChance(0.857375f)
+                .likedBiomes(net.minecraftforge.common.BiomeDictionary.Type.JUNGLE,
+                        net.minecraftforge.common.BiomeDictionary.Type.WET,
+                        net.minecraftforge.common.BiomeDictionary.Type.DENSE,
+                        net.minecraftforge.common.BiomeDictionary.Type.LUSH)
+                .texturePath("cocoa")
+                .seedIcon(CropQTMaterialIconType.oreberry).seedColor(0x734120)
+                .renderType(CropRenderType.HASH).build());
     }
 }

@@ -1,11 +1,11 @@
 package com.meowmel.cropQT.api.capability.impl;
 
+import com.drppp.drtech.api.unification.material.DrtechMaterials;
 import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
 import com.meowmel.cropQT.api.mutation.CropMutation;
 import com.meowmel.cropQT.api.mutation.MutationRegistry;
-import com.meowmel.cropQT.api.registries.FertilizerRegistry;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.machine.MetaTileEntityCropBreeder;
 import gregtech.api.GTValues;
@@ -23,35 +23,25 @@ import java.util.function.Supplier;
 /**
  * 作物育种机的干活逻辑：把 2~4 颗已分析的亲本种子杂交成一颗新种子。
  *
- * <p>产物由 {@link MutationRegistry} 的确定性配方决定——与世界里的作物架走同一张配方表，
- * 所以玩家在田里试出来的组合，在机器上照样成立。
- *
- * <p><b>失败也消耗材料</b>：掷骰没中照样扣亲本与液肥。这是源端行为，
- * 也是「育种是有成本的事」这个设计的一部分。
- *
- * <h2>「方案」每轮重算一次</h2>
- * {@link #canStart()} 顺手把这一轮的方案解析好放进 {@link #resolved}，
- * 后面的 {@link #getWorkDuration()} / {@link #onWorkComplete()} 直接读它。
- * 状态机每轮会问两次 {@code canStart()}（开工前、收尾前），所以收尾时读到的是
- * 按<b>当时</b>的槽位重新算过的方案 —— 玩家中途换了亲本，产出就跟着换。
+ * <p>数值全部对齐源端 {@code MTECropBreeder}：
+ * <ul>
+ *   <li>液肥按 mB 直接扣，不再做 potency 折算（罐里只收浓缩液肥）；</li>
+ *   <li>配方耗时 / EU 来自变异配方本身（{@link CropMutation#getBreedingMachineRecipeEUt()}），
+ *       机器按自身电压对它们做超频；EU 高于机器电压的配方直接跳过；</li>
+ *   <li>成功率 {@code min(100, 40 + (tier - LV) * 10)}，失败照样扣料。</li>
+ * </ul>
  */
 public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntityCropBreeder> {
 
-    /** 每点作物 tier 消耗的液肥（mB，按浓缩液肥计）。 */
+    /** 每档机器每轮的基础液肥消耗（mB）。 */
     public static final int FERTILIZER_PER_TIER = 144;
-    /** 每点属性消耗的液肥。 */
-    public static final int FERTILIZER_PER_STAT = FERTILIZER_PER_TIER / 2;
-
-    /** 浓缩液体肥料的浓度基线（点数/mB）。普通液体肥料按浓度折算成更多 mB。 */
-    private static final int BASELINE_POTENCY = 8;
+    /** 每点属性（growth + gain + resistance）附加的液肥消耗（mB）。 */
+    public static final int FERTILIZER_PER_STAT = 72;
 
     /** 成功率 = min(100, 40 + (档位 - LV) * 10)。 */
     private static final int MIN_CHANCE = 40;
     private static final int MAX_CHANCE = 100;
     private static final int CHANCE_PER_TIER = 10;
-
-    /** 基准耗时（tick），每个档位 ×1.3。 */
-    private static final int BASE_DURATION = 400;
 
     /** 本轮解析出来的育种方案；{@code null} 表示条件不满足。 */
     @Nullable
@@ -78,16 +68,12 @@ public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntit
 
     @Override
     protected int getWorkDuration() {
-        if (resolved == null) {
-            return -1;
-        }
-        // 产物越高级，一轮越久
-        return (int) (BASE_DURATION * Math.pow(1.3, Math.max(0, resolved.output.getTier() - 1)));
+        return resolved == null ? -1 : resolved.duration;
     }
 
     @Override
     protected long getEnergyPerTick() {
-        return resolved == null ? 0L : GTValues.V[machine.getTier()];
+        return resolved == null ? 0L : resolved.eut;
     }
 
     @Override
@@ -96,7 +82,8 @@ public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntit
             return;
         }
         // 无论成功与否都要扣料
-        machine.getImportFluids().getTankAt(0).drain(resolved.fluid, true);
+        machine.getImportFluids().getTankAt(0).drain(new FluidStack(
+                DrtechMaterials.EnrichedFertilizer.getFluid(), resolved.fluid), true);
         consumeOneParentEach();
 
         // 掷骰决定这一次有没有出种子。用世界的随机源，和 MutationRegistry 的
@@ -114,6 +101,7 @@ public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntit
         List<String> parentIds = new ArrayList<>();
         List<CropStats> parentStats = new ArrayList<>();
         int slots = machine.getInputSlots();
+        int analyzedSlots = 0;
         for (int slot = 0; slot < slots; slot++) {
             ItemStack seed = machine.getImportItems().getStackInSlot(slot);
             if (seed.isEmpty()) {
@@ -126,14 +114,21 @@ public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntit
             }
             parentIds.add(cropId);
             parentStats.add(stats);
+            analyzedSlots++;
         }
-        // 同种亲本允许重复——配方表里本来就有 stickreed × stickreed 这种
-        if (parentIds.size() < CropMutation.MIN_PARENTS) {
+        // 源端要求至少两颗已分析亲本；同种亲本允许重复（配方表里有自交配方）
+        if (analyzedSlots < CropMutation.MIN_PARENTS) {
             return null;
         }
 
         CropMutation mutation = MutationRegistry.pickDeterministic(parentIds, machine.getWorld().rand);
         if (mutation == null) {
+            return null;
+        }
+        // 配方 EU 高于机器电压：这台机器做不了
+        int recipeEut = mutation.getBreedingMachineRecipeEUt();
+        long machineVoltage = GTValues.V[machine.getTier()];
+        if (recipeEut > machineVoltage) {
             return null;
         }
         CropType output = CropRegistry.get(mutation.getResult());
@@ -142,21 +137,23 @@ public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntit
         }
 
         CropStats childStats = averageStats(parentStats);
-        int fluid = fluidCost(output, childStats);
+        int fluid = fluidCost(childStats);
         FluidStack stored = machine.getImportFluids().getTankAt(0).getFluid();
-        int potency = stored == null ? 0 : FertilizerRegistry.getFertilizer(stored.getFluid());
-        if (potency <= 0 || stored.amount < fluid) {
+        if (stored == null || stored.getFluid() != DrtechMaterials.EnrichedFertilizer.getFluid()
+                || stored.amount < fluid) {
             return null;
         }
 
+        int[] overclock = CropMachineRecipeLogic.overclock(recipeEut,
+                mutation.getBreedingMachineRecipeDuration(), machineVoltage);
         ItemStack child = ItemCropSeed.createSeedBag(mutation.getResult(), childStats);
         if (!GTTransferUtils.insertItem(machine.getExportItems(), child, true).isEmpty()) {
             return null;
         }
-        return new Resolved(mutation, output, childStats, fluid, child);
+        return new Resolved(mutation, output, childStats, fluid, child, overclock[0], overclock[1]);
     }
 
-    /** 子代属性 = 各亲本属性的算术平均，向下取整。 */
+    /** 子代属性 = 各亲本属性的算术平均，向下取整（源端 getNewSeedStats）。 */
     private static CropStats averageStats(List<CropStats> parents) {
         int growth = 0, gain = 0, resistance = 0;
         for (CropStats stats : parents) {
@@ -169,19 +166,15 @@ public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntit
     }
 
     /**
-     * 一次育种的液肥用量（mB）。
+     * 一轮育种的液肥用量（mB，浓缩液肥）。
      *
-     * <p>按浓度折算：浓缩液体肥料是基线，普通液体肥料要按比例多消耗。
+     * <p>源端公式：{@code max(1, tier * 144) + max(1, (gr + ga + re) * 72)}。
+     * 这里的 {@code tier} 是机器档位。
      */
-    private int fluidCost(CropType output, CropStats stats) {
-        int base = Math.max(1, output.getTier() * FERTILIZER_PER_TIER)
-                + Math.max(1, (stats.getGrowth() + stats.getGain() + stats.getResistance()) * FERTILIZER_PER_STAT);
-        FluidStack stored = machine.getImportFluids().getTankAt(0).getFluid();
-        int potency = stored == null ? BASELINE_POTENCY : FertilizerRegistry.getFertilizer(stored.getFluid());
-        if (potency <= 0) {
-            return base;
-        }
-        return Math.max(1, base * BASELINE_POTENCY / potency);
+    private int fluidCost(CropStats stats) {
+        return Math.max(1, machine.getTier() * FERTILIZER_PER_TIER)
+                + Math.max(1, (stats.getGrowth() + stats.getGain() + stats.getResistance())
+                        * FERTILIZER_PER_STAT);
     }
 
     /** 每个用到的亲本槽各扣一颗。 */
@@ -201,13 +194,18 @@ public class CropBreederRecipeLogic extends CropMachineRecipeLogic<MetaTileEntit
         final CropStats stats;
         final int fluid;
         final ItemStack child;
+        final int eut;
+        final int duration;
 
-        Resolved(CropMutation mutation, CropType output, CropStats stats, int fluid, ItemStack child) {
+        Resolved(CropMutation mutation, CropType output, CropStats stats, int fluid, ItemStack child,
+                 int eut, int duration) {
             this.mutation = mutation;
             this.output = output;
             this.stats = stats;
             this.fluid = fluid;
             this.child = child;
+            this.eut = eut;
+            this.duration = duration;
         }
     }
 }

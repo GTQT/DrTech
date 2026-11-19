@@ -9,23 +9,21 @@ import com.meowmel.cropQT.machine.MetaTileEntityCropGeneExtractor;
 import gregtech.api.GTValues;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.recipes.RecipeMap;
+import gregtech.api.recipes.ingredients.IntCircuitIngredient;
 import gregtech.api.util.GTTransferUtils;
+import gregtech.common.items.MetaItems;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.function.Supplier;
 
 /**
  * 基因提取机的干活逻辑：把一颗已分析的种子拆成 4 个基因球之一。
  *
- * <p>一次只提取一样——用界面上的按钮切换要抽的是物种还是某一项属性。
+ * <p>抽哪一项由<b>电路槽里的编程电路</b>决定，对齐源端 {@code MTECropGeneExtractor}：
+ * 1 = 物种，2 = 生长，3 = 产量，4 = 抗性。数据球放第二个输入槽，
+ * 抽完消耗一颗种子 + 一个空数据球，产出一个带内容的基因球。
  *
- * <p><b>基因球会被消耗</b>——和合成器相反（合成器的球是反复用的模板）。
- *
- * <h2>模式是即时生效的</h2>
- * {@link #getMode()} 在 {@link #canStart()} 和 {@link #onWorkComplete()} 里各读一次，
- * 所以玩家在一轮跑到一半时切模式，出来的球就跟着变，不用等这一轮跑完。
- * 这是刻意的：按钮就在界面上，想让玩家点得动。
+ * <p>机器电压必须够这台作物要求的「育种机档位」；耗时物种 5 分钟、单项属性 2.5 分钟。
  */
 public class CropGeneExtractorRecipeLogic extends CropMachineRecipeLogic<MetaTileEntityCropGeneExtractor> {
 
@@ -33,15 +31,16 @@ public class CropGeneExtractorRecipeLogic extends CropMachineRecipeLogic<MetaTil
     public static final int DURATION_SPECIES = 6000;
     public static final int DURATION_STAT = DURATION_SPECIES / 2;
 
+    /** 电路值 → 抽取模式。 */
+    public static final int CIRCUIT_MIN = 1;
+    public static final int CIRCUIT_MAX = 4;
+
     /** 抽取模式：物种 / 生长 / 产量 / 抗性。 */
     public static final int MODE_SPECIES = 0;
     public static final int MODE_GROWTH = 1;
     public static final int MODE_GAIN = 2;
     public static final int MODE_RESISTANCE = 3;
     public static final int MODE_COUNT = 4;
-
-    /** 当前抽取模式，界面可切换。 */
-    private int mode = MODE_SPECIES;
 
     public CropGeneExtractorRecipeLogic(MetaTileEntityCropGeneExtractor machine, RecipeMap<?> recipeMap,
                                         Supplier<IEnergyContainer> energy) {
@@ -69,75 +68,67 @@ public class CropGeneExtractorRecipeLogic extends CropMachineRecipeLogic<MetaTil
         if (machine.getTier() < CropSynthesizerRecipeLogic.minimumTierFor(crop)) {
             return false;
         }
-        return GTTransferUtils.insertItem(machine.getExportItems(), orbFor(cropId, stats), true).isEmpty();
+        if (!hasDataOrb()) {
+            return false;
+        }
+        int mode = getMode();
+        if (mode < 0) {
+            return false;
+        }
+        return GTTransferUtils.insertItem(machine.getExportItems(), orbFor(cropId, stats, mode), true).isEmpty();
     }
 
     @Override
     protected int getWorkDuration() {
-        return mode == MODE_SPECIES ? DURATION_SPECIES : DURATION_STAT;
+        int base = getMode() == MODE_SPECIES ? DURATION_SPECIES : DURATION_STAT;
+        // 源端 calculateOverclockedNess(VP[minTier], getRecipeDuration(circuit))：
+        // 机器档位高于作物要求档位时按 EU×4 / 时长÷2 超频
+        return overclock(baseEutPerTick(), base, GTValues.V[machine.getTier()])[1];
     }
 
     @Override
     protected long getEnergyPerTick() {
+        return overclock(baseEutPerTick(), 1, GTValues.V[machine.getTier()])[0];
+    }
+
+    /** 源端 VP[作物要求的最低档]；GTQT 的 VA 与 GT5U 的 VP 数值相同。 */
+    private long baseEutPerTick() {
         CropType crop = CropRegistry.get(ItemCropSeed.getCropId(input()));
-        return crop == null ? 0L : GTValues.V[CropSynthesizerRecipeLogic.minimumTierFor(crop)];
+        return crop == null ? 0L : GTValues.VA[CropSynthesizerRecipeLogic.minimumTierFor(crop)];
     }
 
     @Override
     protected void onWorkComplete() {
         ItemStack input = input();
-        ItemStack orb = orbFor(ItemCropSeed.getCropId(input), ItemCropSeed.getCropStats(input));
+        int mode = getMode();
+        ItemStack orb = orbFor(ItemCropSeed.getCropId(input), ItemCropSeed.getCropStats(input),
+                Math.max(MODE_SPECIES, mode));
 
+        // 消耗一颗种子和一个空数据球
         machine.getImportItems().extractItem(MetaTileEntityCropGeneExtractor.SLOT_INPUT, 1, false);
+        machine.getImportItems().extractItem(MetaTileEntityCropGeneExtractor.SLOT_DATA_ORB, 1, false);
         GTTransferUtils.insertItem(machine.getExportItems(), orb, false);
         machine.markDirty();
     }
 
-    // ==================== 模式 ====================
+    // ==================== 模式（编程电路） ====================
 
+    /**
+     * 当前模式，由电路槽里的编程电路决定。
+     *
+     * @return 0..3；没有电路或电路值越界时返回 -1
+     */
     public int getMode() {
-        return mode;
-    }
-
-    /** 螺丝刀切下一档。 */
-    public void cycleMode() {
-        setMode(mode + 1);
-    }
-
-    public void setMode(int mode) {
-        this.mode = Math.floorMod(mode, MODE_COUNT);
-        machine.markDirty();
-    }
-
-    /** 当前模式的 lang 键，给聊天栏提示用。 */
-    public String currentModeNameKey() {
-        return modeNameKey(mode);
-    }
-
-    /** 模式名，用于聊天栏提示与 tooltip。 */
-    public static String modeNameKey(int mode) {
-        switch (mode) {
-            case MODE_GROWTH:     return "cropqt.gene.mode.growth";
-            case MODE_GAIN:       return "cropqt.gene.mode.gain";
-            case MODE_RESISTANCE: return "cropqt.gene.mode.resistance";
-            case MODE_SPECIES:
-            default:              return "cropqt.gene.mode.species";
+        ItemStack circuit = machine.getImportItems()
+                .getStackInSlot(MetaTileEntityCropGeneExtractor.SLOT_CIRCUIT);
+        if (circuit.isEmpty() || !MetaItems.INTEGRATED_CIRCUIT.isItemEqual(circuit)) {
+            return -1;
         }
-    }
-
-    // ==================== 存档 ====================
-
-    @Override
-    public NBTTagCompound serializeNBT() {
-        NBTTagCompound data = super.serializeNBT();
-        data.setInteger("GeneMode", mode);
-        return data;
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound compound) {
-        super.deserializeNBT(compound);
-        mode = compound.getInteger("GeneMode");
+        int config = IntCircuitIngredient.getCircuitConfiguration(circuit);
+        if (config < CIRCUIT_MIN || config > CIRCUIT_MAX) {
+            return -1;
+        }
+        return config - CIRCUIT_MIN;
     }
 
     // ==================== 材料 ====================
@@ -146,8 +137,15 @@ public class CropGeneExtractorRecipeLogic extends CropMachineRecipeLogic<MetaTil
         return machine.getImportItems().getStackInSlot(MetaTileEntityCropGeneExtractor.SLOT_INPUT);
     }
 
-    /** 按当前模式造出结果球。 */
-    private ItemStack orbFor(String cropId, CropStats stats) {
+    /** 数据球槽里必须放一个空数据球（或任意可写的数据球）。 */
+    private boolean hasDataOrb() {
+        ItemStack orb = machine.getImportItems()
+                .getStackInSlot(MetaTileEntityCropGeneExtractor.SLOT_DATA_ORB);
+        return !orb.isEmpty() && MetaItems.TOOL_DATA_ORB.isItemEqual(orb);
+    }
+
+    /** 按模式造出结果球。 */
+    private ItemStack orbFor(String cropId, CropStats stats, int mode) {
         switch (mode) {
             case MODE_GROWTH:
                 return CropGeneOrb.createStat(CropGeneOrb.Kind.GROWTH, stats.getGrowth());

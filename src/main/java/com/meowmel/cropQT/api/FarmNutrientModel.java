@@ -110,13 +110,12 @@ public final class FarmNutrientModel {
     }
 
     /**
-     * 平均掉落倍数：产量属性越高掉得越多。
+     * 平均收获轮数：源端 {@code dropChance * 1.03^gain}。
      *
-     * <p>这是 {@link CropStats#getYieldBonus} 的<b>期望值</b>——那个方法是
-     * {@code gain/8} 再加一个 {@code (gain%8)/31} 概率的 +1。农场要的是每周期的期望产出，
-     * 不能每周期掷一次骰，所以在这里把随机项摊平成概率。
+     * <p>旧版是 {@code 1 + gain/8 + (gain%8)/31}（cropQT 自己的产量期望），
+     * P1 起统一回源端公式；{@code dropChance} 来自 {@link CropType#getDropChance()}。
      */
-    public static double getAvgDropRounds(int gain) {
-        return 1.0d + gain / 8.0d + (gain % 8) / 31.0d;
+    public static double getAvgDropRounds(float dropChance, int gain) {
+        return Math.max(0.0d, dropChance) * Math.pow(1.03d, gain);
     }
 }

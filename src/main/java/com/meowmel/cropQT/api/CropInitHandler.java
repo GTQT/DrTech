@@ -4,6 +4,7 @@ import com.drppp.drtech.common.items.ItemsInit;
 import com.meowmel.cropQT.api.mutation.MutationPools;
 import com.meowmel.cropQT.api.unification.material.CropMaterialScanner;
 import com.meowmel.cropQT.api.registries.HydrationRegistry;
+import com.meowmel.cropQT.api.registries.WeedEXRegistry;
 import com.meowmel.cropQT.block.BlockCropStick;
 import com.meowmel.cropQT.event.CropTickHandler;
 import com.meowmel.cropQT.integration.CropScannerLogic;
@@ -37,6 +38,7 @@ public class CropInitHandler {
         SoilTypes.ensureRegistered();
         HydrationRegistry.registerDefaults();
         FertilizerRegistry.registerDefaults();
+        WeedEXRegistry.registerDefaults();
         // 材料驱动的作物先登记（产物物品是 OreDictUnifier 取的，那时已经建好了索引），
         // 再补手写的原版作物
         CropMaterialScanner.registerCrops();
@@ -45,6 +47,8 @@ public class CropInitHandler {
         BlockCropStick.initVanillaSeedMap();
         // 让 GT 的扫描仪能分析种子（走 GT 的 registerCustomScannerLogic，不是 mixin）
         gregtech.api.recipes.machines.RecipeMapScanner.registerCustomScannerLogic(new CropScannerLogic());
+        // 四台机器的伪配方（JEI 展示用）必须等全部作物与变异登记之后再建表
+        com.meowmel.cropQT.recipes.CropFakeRecipes.load();
     }
     public static void clienInit()
     {

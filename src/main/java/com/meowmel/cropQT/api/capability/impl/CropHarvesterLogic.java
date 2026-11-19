@@ -45,8 +45,8 @@ public class CropHarvesterLogic extends CropRangeLogic<MetaTileEntityCropHarvest
         if (!consumeEnergy(energyPerAction(HARVEST_ENERGY_DIVISOR))) {
             return;
         }
-        // 先取掉落再收割，反过来 stage 归零就掉不出东西了
-        List<ItemStack> drops = crop.getHarvestDrops();
+        // 先取掉落再收割，反过来 stage 归零就掉不出东西了；倍率照源端 1 + 0.05*tier
+        List<ItemStack> drops = crop.getHarvestDrops(1.0d + 0.05d * machine.getTier());
         crop.harvest();
         for (ItemStack drop : drops) {
             GTTransferUtils.insertItem(machine.getExportItems(), drop, false);

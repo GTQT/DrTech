@@ -8,7 +8,7 @@ import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.ProgressWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.drppp.drtech.common.blocks.BlocksInit;
-import com.drppp.drtech.api.metaTileEntity.DrtechMultiblockAbility;
+import com.meowmel.cropQT.api.CropConstants;
 import com.meowmel.cropQT.api.CropRegistry;
 import com.meowmel.cropQT.api.CropStats;
 import com.meowmel.cropQT.api.CropType;
@@ -17,14 +17,15 @@ import com.meowmel.cropQT.api.FarmNutrientModel;
 import com.meowmel.cropQT.api.SubSoilRequirement;
 import com.meowmel.cropQT.api.registries.FertilizerRegistry;
 import com.meowmel.cropQT.api.capability.FarmType;
-import com.meowmel.cropQT.api.capability.IFarmPart;
 import com.meowmel.cropQT.api.registries.HydrationRegistry;
+import com.meowmel.cropQT.block.BlockFarmUpgrade;
 import com.meowmel.cropQT.block.BlockSeedBed;
 import com.meowmel.cropQT.item.ItemCropSeed;
 import com.meowmel.cropQT.item.ItemEnvironmentalModule;
 import gregtech.api.GTValues;
 import gregtech.api.capability.impl.EnergyContainerList;
 import gregtech.api.capability.impl.FluidTankList;
+import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.impl.ItemHandlerList;
 import gregtech.api.items.itemhandlers.GTItemStackHandler;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -68,6 +69,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -79,13 +81,13 @@ import static gregtech.api.util.RelativeDirection.*;
 /**
  * 工业农场：把作物架上的那一套搬进机器里，用 EU 换产出。
  *
- * <h2>等级由升级仓与苗床的档次决定</h2>
- * 只有一个控制器。体段顶部每段必须装一个升级仓（{@code IFarmPart}），
- * 结构里的所有升级仓与所有苗床<b>必须同一档</b>，那个档就是农场的升级等级
+ * <h2>等级由苗床与升级方块的档次决定</h2>
+ * 只有一个控制器。体段顶部的 {@code U} 位摆的是五种升级组件方块（源端 {@code IFUpgradeElement}），
+ * 结构里的所有升级组件与所有苗床<b>必须同一档</b>，那个档就是农场的升级等级
  * （{@link #upgradeTier}）：容量、基础耗电、每轮水肥用量、收割轮数加成、段数上限全跟着它走。
  *
- * <p>电压只决定<b>能喂多少功率</b>，而且还要受档次限制（{@code 能量仓档位 <= 升级等级}）。
- * 两者之间的落差正是超频生长加速仓存在的理由 —— 用低档苗床配高压电，超频换生长速度。
+ * <p>电压只决定<b>能喂多少功率</b>；能喂到多高由玻璃档位约束（源端 {@code 能量仓档位 <= 玻璃档}）。
+ * 电压与基础耗电之间的落差正是超频生长加速组件存在的理由 —— 用低档苗床配高压电，超频换生长速度。
  *
  * <h2>三种模式</h2>
  * <ul>
@@ -109,16 +111,17 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     private static final StructurePieceKey BODY_PIECE = StructurePieceKey.of(PIECE_BODY);
     private static final String PIECE_TAIL = "tail";
 
-    /** 最少 / 最多堆叠段数。 */
-    private static final int MIN_SLICES = 3;
-    private static final int MAX_SLICES = 13;
+    /** 源端 body 段数下限 1（整机至少 1 段 = 头 + 1 体 + 尾）。 */
+    private static final int MIN_SLICES = CropConstants.FARM_MIN_SLICES;
+    /** 源端 MAX_SLICES = 1 + MAX_CASING_TIER - MIN_CASING_TIER，MV..OpV 即 12。 */
+    private static final int MAX_SLICES = CropConstants.FARM_MAX_SLICES;
 
     // ==================== 等级 ====================
 
     /** 农场最低档次（对应源端的 MIN_CASING_TIER）。 */
     private static final int MIN_FARM_TIER = GTValues.MV;
-    /** 超频次数上限——只作护栏，正常范围里用不满。 */
-    private static final int MAX_OVERCLOCKS = 8;
+    /** 顶档（本仓库 OpV，对应源端 UXV）。 */
+    private static final int MAX_FARM_TIER = BlockSeedBed.MAX_TIER;
 
     // ==================== 周期 ====================
 
@@ -177,6 +180,11 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
      * 它同时还是能量仓电压的上限。电压与它之间的落差，就是超频生长加速仓的立足点。
      */
     private int upgradeTier = TIER_UNSET;
+    /**
+     * 结构里玻璃的等级（GT 玻璃方块自带档位）。源端要求玻璃 ≥ MV，
+     * 并且高档次农场必须用对应档位的玻璃（源端 {@code chainAllGlasses}）。
+     */
+    private int glassTier = TIER_UNSET;
     /** 实际搭出来的段数。 */
     private int slices = MIN_SLICES;
     /** 当前模式。 */
@@ -252,9 +260,9 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
                 .piece(PIECE_TAIL)
                 .aisle(" CCC ", "CCCCC", "CC~CC", "C   C")
                 .self('~', MetaTileEntityIndustrialFarm.class)
-                .blocks('G', getGlassesState())
+                .where('G', glassElement())
                 .where('S', seedBedElement())
-                .hatch('U', DrtechMultiblockAbility.FARM_PART)
+                .where('U', upgradeElement())
                 .casing('C', getCasingState())
                     .maintenance()
                     .energyInput(1, 2)
@@ -289,6 +297,76 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         return Elements.chain(byTier);
     }
 
+    /**
+     * 玻璃：GT 四种玻璃各自带档位，整座结构必须同档且 ≥ MV。
+     *
+     * <p>源端用 {@code chainAllGlasses} 记录玻璃档，并校验能量仓的
+     * {@code getTierForStructure()} 不得超过玻璃档（源端 UMV 以上才豁免）。
+     * 这里同样的档位会被记下来供停机校验使用。
+     */
+    private static IStructureElement glassElement() {
+        BlockGlassCasing.CasingType[] types = BlockGlassCasing.CasingType.values();
+        IStructureElement[] byType = new IStructureElement[types.length];
+        for (int i = 0; i < types.length; i++) {
+            BlockGlassCasing.CasingType type = types[i];
+            byType[i] = Elements.onPass(
+                    context -> {
+                        if (context.getController() instanceof MetaTileEntityIndustrialFarm farm) {
+                            farm.agreeGlassTier(glassTierOf(type));
+                        }
+                    },
+                    Elements.block(MetaBlocks.TRANSPARENT_CASING.getState(type)));
+        }
+        return Elements.chain(byType);
+    }
+
+    /**
+     * 五类升级组件方块 + 木框架（源端 {@code U} 位允许木框架）。
+     *
+     * <p>照源端：升级是方块，不是仓；每种方块 × 每一档都会在结构匹配时
+     * 累计一次数量并参与「全结构同档」的约定。
+     */
+    /**
+     * 玻璃档位。编译依赖的 GTQT 发行 jar 里 {@code CasingType} 还没有
+     * {@code getGlassTier}（源码分支才加了 {@code IGlassTier}），所以这里按枚举名
+     * 写死，与源码里的构造参数保持一致：Tempered=MV、Cleanroom=HV、Laminated=IV、Fusion=UV。
+     */
+    private static int glassTierOf(BlockGlassCasing.CasingType type) {
+        switch (type) {
+            case CLEANROOM_GLASS:
+                return GTValues.HV;
+            case LAMINATED_GLASS:
+                return GTValues.IV;
+            case FUSION_GLASS:
+                return GTValues.UV;
+            case TEMPERED_GLASS:
+            default:
+                return GTValues.MV;
+        }
+    }
+
+    private static IStructureElement upgradeElement() {
+        List<IStructureElement> elements = new ArrayList<>();
+        BlockSeedBed.SeedBedType[] types = BlockSeedBed.SeedBedType.values();
+        for (BlockFarmUpgrade block : BlockFarmUpgrade.all().keySet()) {
+            FarmType type = block.getFarmType();
+            for (BlockSeedBed.SeedBedType variant : types) {
+                int tier = variant.getTier();
+                elements.add(Elements.onPass(
+                        context -> {
+                            if (context.getController() instanceof MetaTileEntityIndustrialFarm farm) {
+                                farm.addUpgradeUnit(type);
+                                farm.agreeUpgradeTier(tier);
+                            }
+                        },
+                        Elements.block(block.getState(variant))));
+            }
+        }
+        // 源端允许木框架占一个升级位。
+        elements.add(Elements.frames(gregtech.api.unification.material.Materials.Wood));
+        return Elements.chain(elements.toArray(new IStructureElement[0]));
+    }
+
     // ==================== 方块 / 贴图 ====================
 
     /**
@@ -300,10 +378,6 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     public static IBlockState getCasingState() {
         return BlocksInit.COMMON_CASING.getState(
                 com.drppp.drtech.common.blocks.metaBlocks.MetaCasing.MetalCasingType.BRICKED_AGRICULTURAL_CASING);
-    }
-
-    protected static IBlockState getGlassesState() {
-        return MetaBlocks.TRANSPARENT_CASING.getState(BlockGlassCasing.CasingType.TEMPERED_GLASS);
     }
 
     protected static IBlockState getSeedBedState(BlockSeedBed.SeedBedType type) {
@@ -344,13 +418,8 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         // 蒸馏塔 / 大型蒸馏器读的就是 getPieceRepeat，这里是同一套。
         this.slices = Math.max(MIN_SLICES, formed.getPieceRepeat(BODY_PIECE, 0));
 
-        // 升级等级：苗床档次在匹配过程中已经记进 upgradeTier 了，
-        // 这里再让所有升级仓来跟它对齐——两边都必须同一档
-        this.unitCounts.clear();
-        for (IFarmPart part : getAbilities(DrtechMultiblockAbility.FARM_PART)) {
-            unitCounts.merge(part.getFarmType(), 1, Integer::sum);
-            agreeUpgradeTier(part.getPartTier());
-        }
+        // 升级等级与组件个数在结构匹配时已由回调记下（苗床 + 五类升级方块同一套约定）。
+        // 这里不再额外清空/累加，否则会把刚匹配到的计数抹掉。
 
         this.importItems = new ItemHandlerList(getAbilities(MultiblockAbility.IMPORT_ITEMS));
         this.exportItems = new ItemHandlerList(getAbilities(MultiblockAbility.EXPORT_ITEMS));
@@ -374,6 +443,24 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         }
     }
 
+    /**
+     * 每次结构检查前清空「这一遍数出来的」组件计数与档位。
+     *
+     * <p>结构匹配的回调只会在匹配成功时触发，但一次结构检查可能调用多次
+     * （初始成型、增量复检、拆改后重查）；不在这里归零，计数会一遍遍累加。
+     * 清空放在这里而不是 {@link #formStructure}，是因为成型回调只跑一次，
+     * 而计数必须在“匹配过程中”就攒好。
+     */
+    @Override
+    public void checkStructurePattern() {
+        this.upgradeTier = TIER_UNSET;
+        this.glassTier = TIER_UNSET;
+        if (unitCounts != null) {
+            this.unitCounts.clear();
+        }
+        super.checkStructurePattern();
+    }
+
     @Override
     public void invalidateStructure() {
         super.invalidateStructure();
@@ -382,6 +469,7 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         this.importFluids = new FluidTankList(false);
         this.energyContainer = new EnergyContainerList(Collections.emptyList());
         this.upgradeTier = TIER_UNSET;
+        this.glassTier = TIER_UNSET;
         this.unitCounts.clear();
         this.expectedOCs = 0;
         this.expectedEUt = 0;
@@ -396,7 +484,30 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
      * 而不是让玩家对着不成型的机器猜哪里错了。
      */
     public boolean isUpgradeTierValid() {
-        return upgradeTier >= MIN_FARM_TIER && upgradeTier <= BlockSeedBed.MAX_TIER;
+        return upgradeTier >= MIN_FARM_TIER && upgradeTier <= MAX_FARM_TIER;
+    }
+
+    /** 玻璃等级是否可用：源端要求 ≥ MV，且整座结构同档。 */
+    public boolean isGlassTierValid() {
+        return glassTier >= BlockSeedBed.MIN_TIER && glassTier <= BlockSeedBed.MAX_TIER;
+    }
+
+    public int getGlassTier() {
+        return glassTier;
+    }
+
+    /** 结构匹配时记录玻璃档位；混档记成冲突。 */
+    private void agreeGlassTier(int tier) {
+        if (glassTier == TIER_UNSET) {
+            glassTier = tier;
+        } else if (glassTier != tier) {
+            glassTier = TIER_CONFLICT;
+        }
+    }
+
+    /** 结构匹配时累计某个升级方块的个数。 */
+    private void addUpgradeUnit(FarmType type) {
+        unitCounts.merge(type, 1, Integer::sum);
     }
 
     /** 某个类型装了几个。 */
@@ -433,8 +544,12 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     public static final int ERROR_UNIT_CAP = 3;
     /** 生长加速与超频同时装了。 */
     public static final int ERROR_EXCLUSIVE = 4;
-    /** 能量仓电压超过了升级档次。 */
+    /** 能量仓电压超过了升级档次（已废弃：源端无此规则，留作旧存档兼容的占位值）。 */
     public static final int ERROR_VOLTAGE_OVER_TIER = 5;
+    /** 玻璃等级低于 MV，或结构里混用了不同档位的玻璃。 */
+    public static final int ERROR_GLASS_TIER = 6;
+    /** 能量仓类型不合法：没装 OCGAU 却接了多安仓、多安与普通混用、接了激光仓，或 OCGAU 下多安仓超过 1 个。 */
+    public static final int ERROR_HATCH_TYPE = 7;
 
     /**
      * 整机停在哪一步；{@link #ERROR_NONE} 表示配置没问题。
@@ -445,6 +560,15 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     public int getConfigError() {
         if (!isUpgradeTierValid()) {
             return ERROR_TIER_INVALID;
+        }
+        if (!isGlassTierValid()) {
+            return ERROR_GLASS_TIER;
+        }
+        // 源端：玻璃档以下不允许接更高档的能量仓（`glassTier < UMV && hatch.getTierForStructure() > glassTier`）。
+        // 本仓库没有 UMV 玻璃，四种 GT 玻璃最高到 UV，因此这条一直生效。
+        if (energyContainer != null && glassTier >= 0
+                && energyContainer.getHighestInputVoltage() > GTValues.V[glassTier]) {
+            return ERROR_GLASS_TIER;
         }
         if (!isSliceCountValid()) {
             return ERROR_SLICE_OVERFLOW;
@@ -459,12 +583,55 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
                 && getUnitCount(FarmType.OVERCLOCKED_GROWTH_ACCELERATION) > 0) {
             return ERROR_EXCLUSIVE;
         }
-        // 能量仓电压不得超过升级档次——想接高压电就得整套升上去
-        long voltage = this.energyContainer.getHighestInputVoltage();
-        if (voltage > 0 && GTUtility.getFloorTierByVoltage(voltage) > upgradeTier) {
-            return ERROR_VOLTAGE_OVER_TIER;
+        // 源端超频生长加速仓只从 ZPM 起注册（BlockOverclockedGrowthAccelerationUnit.MIN_TIER = ZPM）。
+        if (getUnitCount(FarmType.OVERCLOCKED_GROWTH_ACCELERATION) > 0
+                && upgradeTier < GTValues.ZPM) {
+            return ERROR_TIER_INVALID;
+        }
+        // 源端没有「能量仓电压不得超过升级档次」这条规则：高压仓只是喂得进更多功率，
+        // 想把这部分功率转成超频，必须装超频生长加速仓（OCGAU），否则多出来的电压没有去处。
+        if (!isEnergyHatchConfigurationValid()) {
+            return ERROR_HATCH_TYPE;
         }
         return ERROR_NONE;
+    }
+
+    /**
+     * 源端 OCGAU 的 exotic hatch 规则：
+     * <ul>
+     *   <li>没装 OCGAU 时不允许接多安能量仓；</li>
+     *   <li>装了 OCGAU 时多安仓最多 1 个，且不能与普通能量仓混用；</li>
+     *   <li>激光仓一律不允许（本仓库激光走独立的 {@code INPUT_LASER} 能力，结构也接不进来，
+     *       这里仍显式挡一次，和源端行为一致）。</li>
+     * </ul>
+     * 只在结构成型后检查：成型前 {@code getAbilities} 是空的，会把「还没接仓」误判成合法。
+     */
+    private boolean isEnergyHatchConfigurationValid() {
+        if (!isStructureFormed()) {
+            return true;
+        }
+        if (!getAbilities(MultiblockAbility.INPUT_LASER).isEmpty()) {
+            return false;
+        }
+        List<IEnergyContainer> energyHatches = getAbilities(MultiblockAbility.INPUT_ENERGY);
+        if (energyHatches == null || energyHatches.isEmpty()) {
+            return true;
+        }
+        int multiAmp = 0;
+        for (IEnergyContainer hatch : energyHatches) {
+            if (hatch.getInputAmperage() > 2) {
+                multiAmp++;
+            }
+        }
+        boolean hasOcgau = getUnitCount(FarmType.OVERCLOCKED_GROWTH_ACCELERATION) > 0;
+        if (hasOcgau) {
+            // 源端 MAX_MULTIAMP_EHATCH_AMOUNT = 1
+            if (multiAmp > 1) {
+                return false;
+            }
+            return multiAmp == 0 || multiAmp == energyHatches.size();
+        }
+        return multiAmp == 0;
     }
 
     public boolean isConfigurationValid() {
@@ -480,6 +647,8 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
             case ERROR_UNIT_CAP:            return "cropqt.farm.error.unit_cap";
             case ERROR_EXCLUSIVE:           return "cropqt.farm.error.exclusive";
             case ERROR_VOLTAGE_OVER_TIER:   return "cropqt.farm.error.voltage";
+            case ERROR_GLASS_TIER:          return "cropqt.farm.error.glass";
+            case ERROR_HATCH_TYPE:          return "cropqt.farm.error.hatch";
             default:                        return null;
         }
     }
@@ -493,14 +662,58 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         return expectedOCs;
     }
 
+    // ---- 只读查询：给 TOP / GUI 用。源端的 scanner 文本在 GTCEu 里没有对应 API（没有 getInfoData），
+    // ---- 所以把同样的字段暴露成 getter，由显示层自行排版。
+
+    /** 种子槽里的种子；只读，别拿去改。 */
+    public ItemStack getSeedStack() {
+        return getSeed();
+    }
+
+    /** 种子对应的作物；没有种子或 id 已失效时返回 null。 */
+    @Nullable
+    public CropType getSeedCrop() {
+        ItemStack seed = getSeed();
+        if (seed.isEmpty()) {
+            return null;
+        }
+        return CropRegistry.get(ItemCropSeed.getCropId(seed));
+    }
+
+    /** 当前种子的营养分；没种子返回 -1（源端也是只在有种子时才报这一行）。 */
+    public int getNutrientScoreForDisplay() {
+        CropType crop = getSeedCrop();
+        return crop == null ? -1 : getNutrientScore(crop);
+    }
+
+    /** 肥料单元是否已装：决定每周期报的是普通液肥还是浓缩液肥。 */
+    public boolean hasFertilizerUnit() {
+        return getUnitCount(FarmType.FERTILIZER) > 0;
+    }
+
     // ==================== 内部库存 ====================
 
     private ItemStackHandler createFarmInventory() {
         return new GTItemStackHandler(this, INVENTORY_SIZE) {
             @Override
             public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+                // 源端：机器跑着的时候不许插东西（输入模式自己吞种子/底土走 setStackInSlot，不受影响）。
+                if (maxProgress > 0) {
+                    return false;
+                }
                 if (slot == SLOT_SEED) {
-                    return isAnalyzedSeed(stack) && !needsSubSoil(stack);
+                    if (!isAnalyzedSeed(stack) || needsSubSoil(stack)) {
+                        return false;
+                    }
+                    CropType crop = CropRegistry.get(ItemCropSeed.getCropId(stack));
+                    if (crop == null || crop.getMinSeedBedTier() > upgradeTier) {
+                        return false;
+                    }
+                    // 源端用「模拟成有肥状态后生长速度 > 0」判可种；这能挡住高 tier 作物塞进低档苗床。
+                    int growthRate = FarmNutrientModel.getGrowthRate(
+                            getNutrientScore(crop), crop.getTier(),
+                            ItemCropSeed.getCropStats(stack).getGrowth());
+                    return growthRate > 0;
                 }
                 // 底土禁止手动插入——只能由输入模式从输入总线吞
                 if (slot == SLOT_SUB_SOIL) {
@@ -517,8 +730,24 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
             }
 
             @Override
+            public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                // 源端：运行中不可抽；有底土时种子/底土只能走输出模式。
+                if (maxProgress > 0) {
+                    return ItemStack.EMPTY;
+                }
+                if (slot < SLOT_ENV_START && !getSubSoil().isEmpty()) {
+                    return ItemStack.EMPTY;
+                }
+                return super.extractItem(slot, amount, simulate);
+            }
+
+            @Override
             public int getSlotLimit(int slot) {
-                return slot < SLOT_ENV_START ? 64 : 1;
+                // 源端：种子/底土槽上限 = 苗床并行容量，其余（环境槽）固定 1。
+                if (slot == SLOT_SEED || slot == SLOT_SUB_SOIL) {
+                    return Math.max(1, getSeedBedCapacity());
+                }
+                return 1;
             }
         };
     }
@@ -593,48 +822,133 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     // ==================== 输入模式 ====================
 
     /** 从输入总线吞种子与底土进内部槽。 */
+    /**
+     * 从输入总线吞种子与底土进内部槽。
+     *
+     * <p>源端不是「一次吞一个」：它把种子槽补到苗床容量（并行数），
+     * 底土槽也跟着补到同样的数量；已经有一份种子时只吞同种种子。
+     */
     private void runInputMode() {
-        if (!getSeed().isEmpty()) {
+        int capacity = getSeedBedCapacity();
+        if (capacity <= 0) {
             return;
         }
-        // 找第一个已分析的种子
+        ItemStack existing = getSeed();
+        if (!existing.isEmpty() && existing.getCount() >= capacity) {
+            return;
+        }
+
+        // 找一份可用的种子：槽里已有就找同种，否则找第一份已分析的。
+        int seedSlot = -1;
+        ItemStack candidate = ItemStack.EMPTY;
         for (int slot = 0; slot < importItems.getSlots(); slot++) {
-            ItemStack candidate = importItems.getStackInSlot(slot);
-            if (!isAnalyzedSeed(candidate)) {
+            ItemStack stack = importItems.getStackInSlot(slot);
+            if (!isAnalyzedSeed(stack)) {
                 continue;
             }
-            SubSoilRequirement requirement = getRequiredSubSoil(candidate);
-            ItemStack subSoilFound = ItemStack.EMPTY;
-            if (requirement != null) {
-                subSoilFound = findSubSoil(requirement);
-                if (subSoilFound.isEmpty()) {
-                    // 缺底土：这次先不吞
-                    return;
-                }
+            if (!existing.isEmpty() && !sameSeed(existing, stack)) {
+                continue;
             }
-            importItems.extractItem(slot, 1, false);
-            ItemStack seed = candidate.copy();
-            seed.setCount(1);
-            setSeed(seed);
-            if (!subSoilFound.isEmpty()) {
-                setSubSoil(subSoilFound);
+            CropType crop = CropRegistry.get(ItemCropSeed.getCropId(stack));
+            if (crop == null || crop.getMinSeedBedTier() > upgradeTier) {
+                continue;
             }
+            seedSlot = slot;
+            candidate = stack;
+            break;
+        }
+        if (seedSlot < 0) {
             return;
+        }
+
+        CropType crop = CropRegistry.get(ItemCropSeed.getCropId(candidate));
+        int wanted = capacity - (existing.isEmpty() ? 0 : existing.getCount());
+        int available = 0;
+        for (int slot = 0; slot < importItems.getSlots(); slot++) {
+            if (sameSeed(candidate, importItems.getStackInSlot(slot))) {
+                available += importItems.getStackInSlot(slot).getCount();
+            }
+        }
+        int parallels = Math.min(wanted, available);
+
+        SubSoilRequirement requirement = crop.getSubSoilRequirement();
+        ItemStack existingSubSoil = getSubSoil();
+        ItemStack subSoilTemplate = existingSubSoil;
+        if (requirement != null) {
+            if (!existingSubSoil.isEmpty() && !requirement.matches(blockStateOf(existingSubSoil))) {
+                return;
+            }
+            int subSoilHave = existingSubSoil.isEmpty() ? 0 : existingSubSoil.getCount();
+            parallels = Math.min(parallels, subSoilHave + countSubSoil(requirement));
+            if (subSoilTemplate.isEmpty()) {
+                subSoilTemplate = findSubSoilTemplate(requirement);
+            }
+        }
+        if (parallels <= 0 || (requirement != null && subSoilTemplate.isEmpty())) {
+            return;
+        }
+
+        // 扣种子
+        int remaining = parallels;
+        for (int slot = 0; slot < importItems.getSlots() && remaining > 0; slot++) {
+            if (!sameSeed(candidate, importItems.getStackInSlot(slot))) {
+                continue;
+            }
+            remaining -= importItems.extractItem(slot, remaining, false).getCount();
+        }
+        ItemStack newSeed = (existing.isEmpty() ? candidate : existing).copy();
+        newSeed.setCount((existing.isEmpty() ? 0 : existing.getCount()) + parallels);
+        setSeed(newSeed);
+
+        // 扣底土：和种子并行数一致；已有底土只补差额，超出则保持原数量。
+        if (requirement != null) {
+            int subSoilHave = existingSubSoil.isEmpty() ? 0 : existingSubSoil.getCount();
+            int need = Math.max(0, parallels - subSoilHave);
+            int consumed = 0;
+            for (int slot = 0; slot < importItems.getSlots() && need > 0; slot++) {
+                ItemStack stack = importItems.getStackInSlot(slot);
+                if (stack.isEmpty() || isAnalyzedSeed(stack) || !requirement.matches(blockStateOf(stack))) {
+                    continue;
+                }
+                int taken = importItems.extractItem(slot, need, false).getCount();
+                need -= taken;
+                consumed += taken;
+            }
+            ItemStack newSubSoil = subSoilTemplate.copy();
+            newSubSoil.setCount(subSoilHave + consumed);
+            setSubSoil(newSubSoil);
         }
     }
 
-    /** 在输入总线里找一块满足要求的底土。 */
-    private ItemStack findSubSoil(SubSoilRequirement requirement) {
+    private static boolean sameSeed(ItemStack a, ItemStack b) {
+        return !a.isEmpty() && !b.isEmpty()
+                && ItemStack.areItemsEqual(a, b)
+                && ItemStack.areItemStackTagsEqual(a, b);
+    }
+
+    private int countSubSoil(SubSoilRequirement requirement) {
+        int total = 0;
+        for (int slot = 0; slot < importItems.getSlots(); slot++) {
+            ItemStack stack = importItems.getStackInSlot(slot);
+            if (stack.isEmpty() || isAnalyzedSeed(stack)) {
+                continue;
+            }
+            if (requirement.matches(blockStateOf(stack))) {
+                total += stack.getCount();
+            }
+        }
+        return total;
+    }
+
+    /** 在输入总线里找一块满足要求的底土，只取模板不消耗。 */
+    private ItemStack findSubSoilTemplate(SubSoilRequirement requirement) {
         for (int slot = 0; slot < importItems.getSlots(); slot++) {
             ItemStack candidate = importItems.getStackInSlot(slot);
             if (candidate.isEmpty() || isAnalyzedSeed(candidate)) {
                 continue;
             }
             if (requirement.matches(blockStateOf(candidate))) {
-                ItemStack taken = importItems.extractItem(slot, 1, false);
-                if (!taken.isEmpty()) {
-                    return taken;
-                }
+                return candidate.copy();
             }
         }
         return ItemStack.EMPTY;
@@ -653,27 +967,61 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
 
     // ==================== 输出模式 ====================
 
-    /** 把内部种子与底土退回输出总线。 */
+    /**
+     * 把内部种子与底土退回输出总线。
+     *
+     * <p>源端不是「能塞多少塞多少」：并行数取种子与底土数量的较小值，
+     * 再被输出总线的剩余空间压一次（ejectionHelper 先模拟、塞不下就把并行数往下压），
+     * 一次 5 tick 全部退完。这里用 {@code simulate=true} 先探容量，避免塞一半卡住。
+     */
     private void runOutputMode() {
         ItemStack seed = getSeed();
-        if (!seed.isEmpty()) {
-            ItemStack leftover = GTTransferUtils.insertItem(exportItems, seed.copy(), false);
-            if (leftover.isEmpty()) {
-                setSeed(ItemStack.EMPTY);
-            } else {
-                setSeed(leftover);
-                return;
-            }
-        }
         ItemStack subSoil = getSubSoil();
-        if (!subSoil.isEmpty()) {
-            ItemStack leftover = GTTransferUtils.insertItem(exportItems, subSoil.copy(), false);
-            if (leftover.isEmpty()) {
-                setSubSoil(ItemStack.EMPTY);
-            } else {
-                setSubSoil(leftover);
-            }
+        int parallels = Integer.MAX_VALUE;
+        if (!seed.isEmpty()) {
+            parallels = seed.getCount();
         }
+        if (!subSoil.isEmpty()) {
+            parallels = Math.min(parallels, subSoil.getCount());
+        }
+        if (parallels == Integer.MAX_VALUE || parallels <= 0) {
+            return;
+        }
+
+        int fit = Integer.MAX_VALUE;
+        if (!seed.isEmpty()) {
+            fit = Math.min(fit, countOutputFit(seed, parallels));
+        }
+        if (!subSoil.isEmpty()) {
+            fit = Math.min(fit, countOutputFit(subSoil, parallels));
+        }
+        int moved = Math.min(parallels, fit);
+        if (moved <= 0) {
+            return;
+        }
+
+        if (!seed.isEmpty()) {
+            ItemStack leftover = GTTransferUtils.insertItem(exportItems, GTUtility.copy(moved, seed), false);
+            int inserted = moved - leftover.getCount();
+            ItemStack rest = seed.copy();
+            rest.setCount(seed.getCount() - inserted);
+            setSeed(rest.getCount() <= 0 ? ItemStack.EMPTY : rest);
+        }
+        if (!subSoil.isEmpty()) {
+            ItemStack leftover = GTTransferUtils.insertItem(exportItems, GTUtility.copy(moved, subSoil), false);
+            int inserted = moved - leftover.getCount();
+            ItemStack rest = subSoil.copy();
+            rest.setCount(subSoil.getCount() - inserted);
+            setSubSoil(rest.getCount() <= 0 ? ItemStack.EMPTY : rest);
+        }
+    }
+
+    /** 输出总线在不改动内容的前提下还能装下多少个 {@code template}（上限 {@code amount}）。 */
+    private int countOutputFit(ItemStack template, int amount) {
+        ItemStack probe = template.copy();
+        probe.setCount(amount);
+        ItemStack leftover = GTTransferUtils.insertItem(exportItems, probe, true);
+        return amount - leftover.getCount();
     }
 
     // ==================== 生产模式 ====================
@@ -688,6 +1036,14 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
             return;
         }
         CropStats stats = ItemCropSeed.getCropStats(seed);
+
+        // 源端：种子数量超过苗床容量不能种；作物自身的最低苗床档次也要满足。
+        if (seed.getCount() > getSeedBedCapacity()) {
+            return;
+        }
+        if (crop.getMinSeedBedTier() > upgradeTier) {
+            return;
+        }
 
         // 底土对不上就停摆（种子里带底土要求，但槽里的不是那一块）
         SubSoilRequirement requirement = crop.getSubSoilRequirement();
@@ -714,16 +1070,21 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
         if (progressPerCycle <= 0.0d) {
             return;
         }
-        // 累积掉落
-        double rounds = FarmNutrientModel.getAvgDropRounds(stats.getGain()) * getHarvestRoundMultiplier();
+        // 累积掉落（源端：dropChance * 1.03^gain 轮，每轮按条目 chance 期望展开）。
+        // 并行数 = 种子堆叠数；水肥与电力不随并行放大，只有产出放大。
+        int parallels = seed.getCount();
+        double rounds = FarmNutrientModel.getAvgDropRounds(crop.getDropChance(), stats.getGain())
+                * getHarvestRoundMultiplier();
+        double avgIncrease = (stats.getGain() + 1) / 100.0d;
         for (ItemStack drop : crop.getDrops()) {
-            dropTracker.add(drop, drop.getCount() * rounds * progressPerCycle);
+            dropTracker.add(drop, (drop.getCount() + avgIncrease) * rounds * progressPerCycle * parallels);
         }
         for (CropType.ChanceDrop chanceDrop : crop.getChanceDrops()) {
             dropTracker.add(chanceDrop.item,
-                    chanceDrop.item.getCount() * chanceDrop.chance * rounds * progressPerCycle);
+                    (chanceDrop.item.getCount() + avgIncrease) * chanceDrop.chance * rounds
+                            * progressPerCycle * parallels);
         }
-        accumulateLootRolls(crop, rounds * progressPerCycle);
+        accumulateLootRolls(crop, rounds * progressPerCycle * parallels);
         pushCompletedDrops();
     }
 
@@ -855,11 +1216,12 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
             this.expectedEUt = powerUsage;
             return;
         }
-        // 从「苗床档次定的耗电」往上涨，看能 4 倍几次才撞到「能量仓给的电压」
+        // 从「苗床档次定的耗电」往上涨，看能 4 倍几次才撞到「能量仓给的电压」。
+        // 源端不设次数上限：能超几次完全由「组件档次定的基准耗电」与「仓室电压」的落差决定。
         long ceiling = this.energyContainer.getHighestInputVoltage();
         long eut = powerUsage;
         int overclocks = 0;
-        while (overclocks < MAX_OVERCLOCKS
+        while (eut <= Long.MAX_VALUE / OverclockingLogic.STD_VOLTAGE_FACTOR
                 && eut * (long) OverclockingLogic.STD_VOLTAGE_FACTOR <= ceiling) {
             eut *= (long) OverclockingLogic.STD_VOLTAGE_FACTOR;
             overclocks++;
@@ -915,7 +1277,7 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     }
 
     /** 按 potency 消耗流体；不足时返回 false 且不消耗。 */
-    private boolean consumeFluidPotency(int neededPotency, boolean water) {
+    private boolean consumeFluidPotency(int neededPotency, boolean water, boolean fertilizerUnit) {
         int remaining = neededPotency;
         for (int i = 0; i < importFluids.getTanks(); i++) {
             IFluidTank tank = importFluids.getTankAt(i);
@@ -923,9 +1285,15 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
             if (stored == null || stored.amount <= 0) {
                 continue;
             }
-            int potency = water
-                    ? HydrationRegistry.getWater(stored.getFluid())
-                    : FertilizerRegistry.getFertilizer(stored.getFluid());
+            int potency;
+            if (water) {
+                potency = HydrationRegistry.getWater(stored.getFluid());
+            } else if (fertilizerUnit) {
+                // 源端：装了肥料单元时只收浓缩液肥，且不吃 potency 加成（1 点/mB）。
+                potency = FertilizerRegistry.getFertilizerUnit(stored.getFluid());
+            } else {
+                potency = FertilizerRegistry.getFertilizer(stored.getFluid());
+            }
             if (potency <= 0) {
                 continue;
             }
@@ -940,12 +1308,13 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     }
 
     private boolean consumeWater() {
-        return consumeFluidPotency(getWaterPotencyNeededPerCycle(), true);
+        return consumeFluidPotency(getWaterPotencyNeededPerCycle(), true, false);
     }
 
     private boolean consumeFertilizer() {
         // 装了肥料单元才强制要求供肥；否则"没有肥"只是让营养低一点
-        boolean ok = consumeFluidPotency(getFertilizerPotencyNeededPerCycle(), false);
+        boolean ok = consumeFluidPotency(getFertilizerPotencyNeededPerCycle(), false,
+                getUnitCount(FarmType.FERTILIZER) > 0);
         this.hasFertilizer = ok;
         return getUnitCount(FarmType.FERTILIZER) == 0 || ok;
     }
@@ -1001,7 +1370,9 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
     @Override
     protected @NotNull MultiblockUIFactory createUIFactory() {
         return new MultiblockUIFactory(this)
-                .setSize(176, 166)
+                // 176x166 是原来只放槽位与进度条的高度；下面新增了三行信息，
+                // 面板加高 24px，免得和自动贴在底部的玩家背包撞在一起。
+                .setSize(176, 190)
                 .disableDisplay()
                 .disableButtons()
                 .addScreenChildren((parent, syncManager) -> {
@@ -1047,6 +1418,41 @@ public class MetaTileEntityIndustrialFarm extends MultiblockWithDisplayBase {
                                 return key == null ? "" : net.minecraft.client.resources.I18n.format(key);
                             })
                             .asWidget().pos(86, 30));
+
+                    // 收获倍率 / 生长倍率 / 水肥需求：源端把它们放在 scanner 文本里，
+                    // GTCEu 没有 getInfoData，就摊在 GUI 下方，玩家不用扫描器也能看。
+                    IntSyncValue harvestPctSync = new IntSyncValue(
+                            () -> (int) Math.round(getHarvestRoundMultiplier() * 100.0d));
+                    syncManager.syncValue("cropqt_farm_harvest_pct", harvestPctSync);
+                    IntSyncValue growthPctSync = new IntSyncValue(
+                            () -> (int) Math.round(getGrowthSpeedMultiplier() * 100.0d));
+                    syncManager.syncValue("cropqt_farm_growth_pct", growthPctSync);
+                    IntSyncValue waterSync = new IntSyncValue(this::getWaterPotencyNeededPerCycle);
+                    syncManager.syncValue("cropqt_farm_water_per_cycle", waterSync);
+                    IntSyncValue fertSync = new IntSyncValue(this::getFertilizerPotencyNeededPerCycle);
+                    syncManager.syncValue("cropqt_farm_fert_per_cycle", fertSync);
+                    IntSyncValue nutrientSync = new IntSyncValue(this::getNutrientScoreForDisplay);
+                    syncManager.syncValue("cropqt_farm_nutrient", nutrientSync);
+                    IntSyncValue fertUnitSync = new IntSyncValue(() -> hasFertilizerUnit() ? 1 : 0);
+                    syncManager.syncValue("cropqt_farm_fert_unit", fertUnitSync);
+
+                    parent.child(IKey.dynamic(() -> net.minecraft.client.resources.I18n.format(
+                                    "cropqt.farm.display.modifiers",
+                                    harvestPctSync.getIntValue(), growthPctSync.getIntValue()))
+                            .asWidget().pos(8, 66));
+                    parent.child(IKey.dynamic(() -> net.minecraft.client.resources.I18n.format(
+                                    fertUnitSync.getIntValue() > 0
+                                            ? "cropqt.farm.display.water_fert.enriched"
+                                            : "cropqt.farm.display.water_fert",
+                                    waterSync.getIntValue(), fertSync.getIntValue()))
+                            .asWidget().pos(8, 78));
+                    parent.child(IKey.dynamic(() -> nutrientSync.getIntValue() < 0
+                                    ? ""
+                                    : net.minecraft.client.resources.I18n.format(
+                                            "cropqt.farm.display.nutrient",
+                                            nutrientSync.getIntValue(),
+                                            CropConstants.MAX_NUTRIENT_SCORE))
+                            .asWidget().pos(8, 90));
 
                     // 种子 / 底土 / 环境模块
                     for (int i = 0; i < INVENTORY_SIZE; i++) {

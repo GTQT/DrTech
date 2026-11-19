@@ -5,7 +5,9 @@ import com.drppp.drtech.Tags;
 import com.drppp.drtech.common.blocks.metaBlocks.*;
 import com.drppp.drtech.common.tile.*;
 import com.meowmel.cropQT.block.BlockCropStick;
+import com.meowmel.cropQT.block.BlockFarmUpgrade;
 import com.meowmel.cropQT.block.BlockSeedBed;
+import com.meowmel.cropQT.api.capability.FarmType;
 import com.meowmel.cropQT.tile.TileCropStick;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -30,8 +32,18 @@ public class BlocksInit {
     public static final BlockAdvancedCauldron BLOCK_ADVANCED_CAULDRON = new BlockAdvancedCauldron();
     public static final BlockTimeTable BLOCK_TIME_TABLE = new BlockTimeTable();
 
-    // 工业农场的两个组件方块（作物系统）
+    // 工业农场的组件方块（作物系统）
     public static final BlockSeedBed SEED_BED = new BlockSeedBed();
+    public static final BlockFarmUpgrade ENVIRONMENTAL_ENHANCEMENT =
+            new BlockFarmUpgrade(FarmType.ENVIRONMENTAL_ENHANCEMENT);
+    public static final BlockFarmUpgrade GROWTH_ACCELERATION =
+            new BlockFarmUpgrade(FarmType.GROWTH_ACCELERATION);
+    public static final BlockFarmUpgrade FERTILIZER_UNIT =
+            new BlockFarmUpgrade(FarmType.FERTILIZER);
+    public static final BlockFarmUpgrade ADVANCED_HARVESTING =
+            new BlockFarmUpgrade(FarmType.ADVANCED_HARVESTING);
+    public static final BlockFarmUpgrade OVERCLOCKED_GROWTH_ACCELERATION =
+            new BlockFarmUpgrade(FarmType.OVERCLOCKED_GROWTH_ACCELERATION);
     public static BlockCropStick CROP_STICK = new BlockCropStick();
 
     public static void init(RegistryEvent.Register<Block> event) {
@@ -60,6 +72,11 @@ public class BlocksInit {
         GameRegistry.registerTileEntity(TileEntityTimeTable.class, new ResourceLocation(Tags.MODID, "time_table"));
         event.getRegistry().register(CROP_STICK);
         event.getRegistry().register(SEED_BED);
+        event.getRegistry().register(ENVIRONMENTAL_ENHANCEMENT);
+        event.getRegistry().register(GROWTH_ACCELERATION);
+        event.getRegistry().register(FERTILIZER_UNIT);
+        event.getRegistry().register(ADVANCED_HARVESTING);
+        event.getRegistry().register(OVERCLOCKED_GROWTH_ACCELERATION);
         GameRegistry.registerTileEntity(TileCropStick.class, Tags.MODID + ":crop_stick");
     }
 }

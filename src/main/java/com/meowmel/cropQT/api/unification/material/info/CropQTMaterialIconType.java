@@ -34,6 +34,13 @@ public final class CropQTMaterialIconType {
     public static final MaterialIconType magic = new MaterialIconType("magic");
     public static final MaterialIconType oreberry = new MaterialIconType("oreberry");
     public static final MaterialIconType spore = new MaterialIconType("spore");
+    /**
+     * 巨魔形状。
+     *
+     * <p>源端 {@code SeedShape} 有 9 种，这里补齐最后一种 —— 只有巨魔植物
+     * （{@code trollplant}）用它。贴图是源端的 {@code troll1/troll2}，逐字节照抄。
+     */
+    public static final MaterialIconType troll = new MaterialIconType("troll");
     public static final MaterialIconType vanilla = new MaterialIconType("vanilla");
 
     // ==================== 作物材质（10）====================

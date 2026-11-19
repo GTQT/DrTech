@@ -54,6 +54,9 @@ public class Textures {
     public static OrientedOverlayRenderer GENE_EXTRACTOR_OVERLAY;
     //seed_generator
     public static OrientedOverlayRenderer SEED_GENERATOR_OVERLAY;
+    //crop_manager（源端 MTECropManager 六面机壳图案：四面刀刃、顶底箱子）
+    public static SimpleOverlayRenderer CROP_HARVESTER_CUTTER;
+    public static SimpleOverlayRenderer CROP_HARVESTER_BOXES;
     //工业农场的砖砌农业外壳
     public static SimpleOverlayRenderer BRICKED_AGRICULTURAL_CASING;
 
@@ -61,10 +64,12 @@ public class Textures {
         CENTRIFUGE = new OrientedOverlayRenderer("overlay/centrifuge");
         DISASSEMBLY = new OrientedOverlayRenderer("machines/disassembly");
         INDUSTRIAL_APIARY = new OrientedOverlayRenderer("machines/industrial_apiary");
-        CROP_BREEDER_OVERLAY = new OrientedOverlayRenderer("machines/crop_breeder");
-        CROP_SYNTHESIZER_OVERLAY = new OrientedOverlayRenderer("machines/crop_synthesizer");
-        GENE_EXTRACTOR_OVERLAY = new OrientedOverlayRenderer("machines/gene_extractor");
-        SEED_GENERATOR_OVERLAY = new OrientedOverlayRenderer("machines/seed_generator");
+        CROP_BREEDER_OVERLAY = new OrientedOverlayRenderer("drtech:machines/crop_breeder");
+        CROP_SYNTHESIZER_OVERLAY = new OrientedOverlayRenderer("drtech:machines/crop_synthesizer");
+        GENE_EXTRACTOR_OVERLAY = new OrientedOverlayRenderer("drtech:machines/gene_extractor");
+        SEED_GENERATOR_OVERLAY = new OrientedOverlayRenderer("drtech:machines/seed_generator");
+        CROP_HARVESTER_CUTTER = new SimpleOverlayRenderer("drtech:casings/crop_harvester_cutter");
+        CROP_HARVESTER_BOXES = new SimpleOverlayRenderer("drtech:casings/crop_harvester_boxes");
         BRICKED_AGRICULTURAL_CASING = new SimpleOverlayRenderer("bricked_agricultural_casing");
         ELEMENT_CONSTRAINS_MACHINE_CASING = new SimpleOverlayRenderer("casings/element_constrains_machine_casing");
         INDUSTRIAL_MACHINE = new OrientedOverlayRenderer("multiblock/industrial_machine");
