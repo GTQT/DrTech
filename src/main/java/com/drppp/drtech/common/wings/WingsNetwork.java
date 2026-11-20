@@ -24,6 +24,9 @@ public final class WingsNetwork {
         CHANNEL.registerMessage(ToggleHandler.class, TogglePacket.class, 0, Side.SERVER);
         if (FMLCommonHandler.instance().getSide().isClient()) {
             CHANNEL.registerMessage(SyncHandler.class, SyncPacket.class, 1, Side.CLIENT);
+        } else {
+            // The dedicated sender also needs the discriminator to encode the packet.
+            CHANNEL.registerMessage((message, ctx) -> null, SyncPacket.class, 1, Side.CLIENT);
         }
     }
 
