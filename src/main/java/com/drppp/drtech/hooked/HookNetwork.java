@@ -35,6 +35,9 @@ public final class HookNetwork {
         CHANNEL.registerMessage(UpdateWeightsHandler.class, PacketUpdateWeights.class, 3, Side.SERVER);
         if (FMLCommonHandler.instance().getSide().isClient()) {
             CHANNEL.registerMessage(SyncHooksHandler.class, PacketHookCapSync.class, 4, Side.CLIENT);
+        } else {
+            // The dedicated sender also needs the discriminator to encode the packet.
+            CHANNEL.registerMessage((message, ctx) -> null, PacketHookCapSync.class, 4, Side.CLIENT);
         }
     }
 
